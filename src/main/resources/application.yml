@@ -1,0 +1,50 @@
+micronaut:
+  application:
+    name: mmo_server
+  server:
+    port: 8081
+  security:
+    enabled: true
+    authentication: bearer
+    token:
+      jwt:
+        signatures:
+          secret:
+            generator:
+              secret: pleaseChangeThisSecretForANewOne
+
+jooq:
+  datasources:
+    default:
+      sql-dialect: 'POSTGRES'
+jpa:
+  default:
+    entity-scan:
+      classpath: true
+      packages:
+        - 'com.org.mmo_server.repository.model'
+
+datasources:
+  default:
+    url: jdbc:postgresql://127.0.0.1/mmo_server
+    username: mmo_server
+    password: password123
+    driverClassName: org.postgresql.Driver
+    hikari:
+      pool-name: ca-pool
+      minimum-idle: 2
+      maximum-pool-size: 5
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        useLocalSessionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+      leak-detection-threshold: 60000
+      connection-test-query: "SELECT 1"
+      validation-timeout: 50000

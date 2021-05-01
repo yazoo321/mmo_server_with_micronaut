@@ -1,0 +1,148 @@
+plugins {
+    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("io.micronaut.application") version "1.4.2"
+    id 'nu.studer.jooq' version '5.2'
+    id "org.flywaydb.flyway" version "7.7.2"
+    id 'com.avast.gradle.docker-compose' version '0.12.1'
+}
+
+version = "0.1"
+group = "mmo_server"
+
+def dbDriver = System.getenv('DATABASE_DRIVER') ?: 'org.postgresql.Driver'
+def dbUser = System.getenv('DATABASE_USER') ?: 'mmo_server'
+def dbPassword = System.getenv('DATABASE_PASSWORD') ?: 'password123'
+def dbHost = System.getenv('DATABASE_HOST') ?: '127.0.0.1'
+def dbPort = System.getenv('DATABASE_PORT') ?: 5432
+def dbName = System.getenv('DATABASE_NAME') ?: 'mmo_server'
+def dbUrl = System.getenv('DATABASE_URL') ?: "jdbc:postgresql://$dbHost:$dbPort/$dbName"
+
+jooq {
+    configurations {
+        main {
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+                jdbc {
+                    driver = dbDriver
+                    url = dbUrl
+                    user = dbUser
+                    password = dbPassword
+                    properties {
+                        // SSL disabled at the moment (only running locally)
+                        property {
+                            key = 'ssl'
+                            value = 'false'
+                        }
+                    }
+                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        inputSchema = 'public'
+                        forcedTypes {
+                            forcedType {
+                                name = 'varchar'
+                                includeExpression = '.*'
+                                includeTypes = 'JSONB?'
+                            }
+                            forcedType {
+                                name = 'varchar'
+                                includeExpression = '.*'
+                                includeTypes = 'INET'
+                            }
+                        }
+                    }
+                    generate {
+                        // JPA annotations required for micronaut to annotate the generated classes correctly
+                        fluentSetters = true
+                        validationAnnotations = true
+                        jpaAnnotations = true
+                        pojos = true
+                        daos = true
+                    }
+                    target {
+                        packageName = 'com.org.mmo_server.repository.model'
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
+}
+
+task migratePrimaryDB(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
+    locations = ['filesystem:src/main/resources/db/postgres/']
+    url = dbUrl
+    user = dbUser
+    password = dbPassword
+    baselineOnMigrate = true
+    validateOnMigrate = false
+}
+
+
+// make sure Jooq can only run after we've finished creating db and migrating it
+tasks.generateJooq.mustRunAfter(tasks.migratePrimaryDB)
+tasks.compileJava.dependsOn(tasks.migratePrimaryDB)
+tasks.migratePrimaryDB.dependsOn(tasks.composeUp)
+
+repositories {
+    mavenCentral()
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("mmo_server.*")
+    }
+}
+
+dependencies {
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-runtime")
+    implementation("io.micronaut:micronaut-validation")
+    runtimeOnly("ch.qos.logback:logback-classic")
+    annotationProcessor("io.micronaut.data:micronaut-data-processor:2.3.1")
+
+    // Lombok:
+    compileOnly 'org.projectlombok:lombok:1.18.16'
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+
+    // Micronaut inject
+    annotationProcessor(platform("io.micronaut:micronaut-bom:2.0.2"))
+    annotationProcessor("io.micronaut:micronaut-inject-java")
+    implementation(platform("io.micronaut:micronaut-bom:2.0.2"))
+    implementation("io.micronaut:micronaut-inject")
+
+    // database configs
+    implementation("io.micronaut.flyway:micronaut-flyway")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    implementation("io.micronaut.sql:micronaut-jooq")
+    jooqGenerator 'org.postgresql:postgresql:42.2.14'
+    implementation 'org.postgresql:postgresql:42.2.14'
+
+    // security
+    compileOnly "io.micronaut.security:micronaut-security-annotations"
+    implementation "io.micronaut.security:micronaut-security-jwt"
+
+    // transactional annotation
+    implementation("io.micronaut.spring:micronaut-spring")
+}
+
+application {
+    mainClass.set("mmo_server.Application")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("1.8")
+    targetCompatibility = JavaVersion.toVersion("1.8")
+}
+
+dockerCompose {
+    useComposeFiles = ['./docker-compose.yml']
+    stopContainers = true
+    // do not wait for debug port
+    tcpPortsToIgnoreWhenWaiting = [5005]
+}

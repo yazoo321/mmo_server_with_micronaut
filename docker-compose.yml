@@ -1,0 +1,11 @@
+version: '2'
+services:
+  mmo_server:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_DB=mmo_server
+      - POSTGRES_USER=mmo_server
+      - POSTGRES_PASSWORD=password123
+      - PGDATA=/var/lib/pgsql_docker/data
+    ports:
+      - "5432:5432"
