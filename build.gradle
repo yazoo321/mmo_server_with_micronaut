@@ -9,6 +9,7 @@ plugins {
 version = "0.1"
 group = "mmo_server"
 
+
 def dbDriver = System.getenv('DATABASE_DRIVER') ?: 'org.postgresql.Driver'
 def dbUser = System.getenv('DATABASE_USER') ?: 'mmo_server'
 def dbPassword = System.getenv('DATABASE_PASSWORD') ?: 'password123'
@@ -126,9 +127,19 @@ dependencies {
     // security
     compileOnly "io.micronaut.security:micronaut-security-annotations"
     implementation "io.micronaut.security:micronaut-security-jwt"
+    implementation "org.springframework.security:spring-security-crypto:5.2.1.RELEASE"
 
     // transactional annotation
     implementation("io.micronaut.spring:micronaut-spring")
+
+    // MongoDB
+    implementation("io.micronaut.mongodb:micronaut-mongo-reactive")
+    // Gorm -> configure database name in application.yml: grails.mongodb.databaseName
+//    compile "io.micronaut.configuration:micronaut-mongo-gorm"
+    // if we want blocking implementation:
+    // implementation("io.micronaut.mongodb:micronaut-mongo-sync")
+    // for tests
+    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.1")
 }
 
 application {

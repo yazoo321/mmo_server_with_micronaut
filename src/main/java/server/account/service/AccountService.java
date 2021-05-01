@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import server.account.dto.Account;
 import server.account.dto.RegisterDto;
 import server.account.repository.AccountRepository;
+import server.security.BCryptPasswordEncoderService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -15,6 +16,9 @@ public class AccountService {
 
     @Inject
     AccountRepository accountRepository;
+
+    @Inject
+    BCryptPasswordEncoderService bCryptPasswordEncoderService;
 
     public Account fetchAccount(String username) {
         Users user = accountRepository.fetchByUsername(username);
@@ -28,11 +32,14 @@ public class AccountService {
     @Transactional
     public Account registerUser(RegisterDto registerDto) {
         try {
+            String encodedPassword = bCryptPasswordEncoderService.encode(registerDto.getPassword());
+
             LocalDateTime now = LocalDateTime.now();
             Users user = new Users();
             user.setEmail(registerDto.getEmail());
             user.setUsername(registerDto.getUsername());
-            user.setPassword(registerDto.getPassword());
+            // ensure password is encoded. Can be done on repo level instead.
+            user.setPassword(encodedPassword);
             user.setEnabled(true);
             user.setCreatedAt(now);
             user.setUpdatedAt(now);

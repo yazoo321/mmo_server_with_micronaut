@@ -1,7 +1,30 @@
-## Micronaut + Postgres (on docker) + Jooq + Flyway + Lombok template
+## MMO Server implementation (work in progress) 
+
+Currently working on:
+- User login and registration
+- Configuring MongoDB
+- Creation of characters for account
+
+
+Documentation within blog:
+- Setting up Micronaut, jooq, flyway:
+https://ylazarev.com/2021/04/18/4-java-micronaut-dockered-postgres/
+
+- Setting up JWT Authentication: 
+https://ylazarev.com/2021/04/26/5-java-micronaut-jwt-authentication/
+
+- Setting up registrations:
+
+- Setting up MongoDB
+
+This project branches from the Micronaut template found here:
+https://github.com/yazoo321/micronaut_template
 
 To see where components are configured, see mini tutorial on youtube:
 https://www.youtube.com/watch?v=PF_Bg6CgMts&t=16s
+
+JWT Authentication described here on YouTube tutorial here:
+https://www.youtube.com/watch?v=acAFcDWuxhI&t=8s
 
 ## Micronaut 2.4.1 Documentation
 

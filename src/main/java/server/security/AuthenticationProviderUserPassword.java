@@ -18,12 +18,12 @@ public class AuthenticationProviderUserPassword implements AuthenticationProvide
     AccountRepository accountRepository;
 
     @Override
-    public Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<?> httpRequest, AuthenticationRequest<?, ?> authenticationRequest) {
+    public Publisher<AuthenticationResponse> authenticate(@Nullable HttpRequest<?> httpRequest,
+                                                          AuthenticationRequest<?, ?> authenticationRequest) {
         return Flowable.create(emitter -> {
-
             String username = (String) authenticationRequest.getIdentity();
             String pw = (String) authenticationRequest.getSecret();
-            // consider sanitisation
+
             boolean validCredentials = accountRepository.validCredentials(username, pw);
 
             if (validCredentials) {

@@ -22,6 +22,3 @@ CREATE TABLE IF NOT EXISTS user_roles
     unique(username, role),
     foreign key (username) references users (username)
 );
-
-insert into users(username, email, password, enabled, created_at, updated_at, last_logged_in_at) values ('username', 'email', 'password', true, NOW(), NOW(), NOW());
-insert into user_roles(username, role) values ('username', 'ROLE_USER');

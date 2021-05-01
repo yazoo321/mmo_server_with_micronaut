@@ -48,3 +48,15 @@ datasources:
       leak-detection-threshold: 60000
       connection-test-query: "SELECT 1"
       validation-timeout: 50000
+
+mongodb:
+#  Set username/password as env vars
+  uri: mongodb://mongo_mmo_server:mongo_password@localhost:27017/databaseName
+  options:
+    maxConnectionIdleTime: 10000
+    readConcern: majority
+#  For reactive MongoDB driver:
+  cluster:
+    maxWaitQueueSize: 5
+  connectionPool:
+    maxSize: 20

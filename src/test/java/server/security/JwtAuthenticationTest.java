@@ -34,23 +34,18 @@ public class JwtAuthenticationTest {
     @Inject
     DSLContext dslContext;
 
-    private final static String GET_USER_PATH = "/account/get-user?username=username";
+    @Inject
+    BCryptPasswordEncoderService bCryptPasswordEncoderService;
+
+    private static final String GET_USER_PATH = "/account/get-user?username=username";
     private static final String VALID_USER = "username";
     private static final String VALID_PW = "password";
+    private static final String VALID_EMAIL = "email";
 
     @BeforeAll
     void setupDatabase() {
-        LocalDateTime now = LocalDateTime.now();
-        dslContext.insertInto(USERS)
-                .columns(USERS.USERNAME, USERS.EMAIL, USERS.PASSWORD,
-                        USERS.ENABLED, USERS.CREATED_AT, USERS.UPDATED_AT,
-                        USERS.LAST_LOGGED_IN_AT)
-                .values("username", "email", "password",
-                        true, now, now, now);
-
-        dslContext.insertInto(USER_ROLES)
-                .columns(USER_ROLES.USERNAME, USER_ROLES.ROLE)
-                .values("username", "role");
+        cleanDb();
+        seedDb();
 
         client  = embeddedServer.getApplicationContext()
                 .createBean(RxHttpClient.class, embeddedServer.getURL());
@@ -58,8 +53,30 @@ public class JwtAuthenticationTest {
 
     @AfterAll
     void cleanUp() {
+        cleanDb();
+
         embeddedServer.stop();
         client.stop();
+    }
+
+    private void cleanDb() {
+        dslContext.deleteFrom(USER_ROLES).where(USER_ROLES.USERNAME.equal(VALID_USER)).execute();
+        dslContext.deleteFrom(USERS).where(USERS.USERNAME.equal(VALID_USER)).execute();
+    }
+
+    private void seedDb() {
+        String encryptedPw = bCryptPasswordEncoderService.encode(VALID_PW);
+        LocalDateTime now = LocalDateTime.now();
+        dslContext.insertInto(USERS)
+                .columns(USERS.USERNAME, USERS.EMAIL, USERS.PASSWORD,
+                        USERS.ENABLED, USERS.CREATED_AT, USERS.UPDATED_AT,
+                        USERS.LAST_LOGGED_IN_AT)
+                .values(VALID_USER, VALID_EMAIL, encryptedPw,
+                        true, now, now, now).execute();
+
+        dslContext.insertInto(USER_ROLES)
+                .columns(USER_ROLES.USERNAME, USER_ROLES.ROLE)
+                .values(VALID_USER, "ROLE_USER").execute();
     }
 
     @Test
@@ -80,14 +97,14 @@ public class JwtAuthenticationTest {
                 HttpRequest.GET(GET_USER_PATH).basicAuth(VALID_USER, VALID_PW), Account.class);
 
         // then
-        Assertions.assertEquals("username", response.blockingFirst().getUsername());
-        Assertions.assertEquals("email", response.blockingFirst().getEmail());
+        Assertions.assertEquals(VALID_USER, response.blockingFirst().getUsername());
+        Assertions.assertEquals(VALID_EMAIL, response.blockingFirst().getEmail());
     }
 
     @Test
     void testLoginRequestWorkingAsExpected() throws ParseException {
         // given
-        UsernamePasswordCredentials creds = new UsernamePasswordCredentials("username", "password");
+        UsernamePasswordCredentials creds = new UsernamePasswordCredentials(VALID_USER, VALID_PW);
 
         // when
         HttpRequest request = HttpRequest.POST("/login", creds);
@@ -97,7 +114,7 @@ public class JwtAuthenticationTest {
         // then
         Assertions.assertEquals(HttpStatus.OK, rsp.getStatus());
         BearerAccessRefreshToken bearerAccessRefreshToken = rsp.body();
-        Assertions.assertEquals("username", bearerAccessRefreshToken.getUsername());
+        Assertions.assertEquals(VALID_USER, bearerAccessRefreshToken.getUsername());
         Assertions.assertNotNull(bearerAccessRefreshToken.getAccessToken());
         Assertions.assertTrue(JWTParser.parse(bearerAccessRefreshToken.getAccessToken()) instanceof SignedJWT);
     }
@@ -105,7 +122,7 @@ public class JwtAuthenticationTest {
     @Test
     void testLoginAccessTokenCanBeUsedOnSecuredEndpoint() {
         // given
-        UsernamePasswordCredentials creds = new UsernamePasswordCredentials("username", "password");
+        UsernamePasswordCredentials creds = new UsernamePasswordCredentials(VALID_USER, VALID_PW);
 
         // when
         HttpRequest request = HttpRequest.POST("/login", creds);
@@ -118,8 +135,8 @@ public class JwtAuthenticationTest {
         Flowable<Account> response = client.retrieve(
                 HttpRequest.GET(GET_USER_PATH).bearerAuth(accessToken), Account.class);
 
-        Assertions.assertEquals("username", response.blockingFirst().getUsername());
-        Assertions.assertEquals("email", response.blockingFirst().getEmail());
+        Assertions.assertEquals(VALID_USER, response.blockingFirst().getUsername());
+        Assertions.assertEquals(VALID_EMAIL, response.blockingFirst().getEmail());
     }
 
 }

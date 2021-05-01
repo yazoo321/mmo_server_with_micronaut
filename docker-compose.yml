@@ -1,7 +1,10 @@
 version: '2'
 services:
+#  In future, create a dockerized container for the server, then make the 2 db images as dependencies
   mmo_server:
     image: postgres:9.6
+    depends_on:
+      - "mongo_db"
     environment:
       - POSTGRES_DB=mmo_server
       - POSTGRES_USER=mmo_server
@@ -9,3 +12,17 @@ services:
       - PGDATA=/var/lib/pgsql_docker/data
     ports:
       - "5432:5432"
+
+  mongo_db:
+    image: mongo
+    environment:
+     -  MONGO_INITDB_ROOT_USERNAME=mongo_mmo_server
+     -  MONGO_INITDB_ROOT_PASSWORD=mongo_password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongodata:
