@@ -51,7 +51,7 @@ datasources:
 
 mongodb:
 #  Set username/password as env vars
-  uri: mongodb://mongo_mmo_server:mongo_password@localhost:27017/databaseName
+  uri: mongodb://mongo_mmo_server:mongo_password@localhost:27017/mmo_server?authSource=admin
   options:
     maxConnectionIdleTime: 10000
     readConcern: majority
@@ -60,3 +60,7 @@ mongodb:
     maxWaitQueueSize: 5
   connectionPool:
     maxSize: 20
+
+player-character:
+  databaseName: "mmo-server"
+  collectionName: "characters"

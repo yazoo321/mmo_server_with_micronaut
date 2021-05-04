@@ -11,6 +11,8 @@ import java.util.Map;
 
 @Singleton
 public class PlayerMotionService {
+    // This class was used as a demo / proof of concept
+    // Its pending changes in near future
     Map<String, PlayerMotion> playerMotions = new HashMap<>();
 
     public void updatePlayerState(PlayerMotion request) {

@@ -134,8 +134,6 @@ dependencies {
 
     // MongoDB
     implementation("io.micronaut.mongodb:micronaut-mongo-reactive")
-    // Gorm -> configure database name in application.yml: grails.mongodb.databaseName
-//    compile "io.micronaut.configuration:micronaut-mongo-gorm"
     // if we want blocking implementation:
     // implementation("io.micronaut.mongodb:micronaut-mongo-sync")
     // for tests
@@ -147,8 +145,8 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("1.8")
-    targetCompatibility = JavaVersion.toVersion("1.8")
+    sourceCompatibility = JavaVersion.toVersion("11")
+    targetCompatibility = JavaVersion.toVersion("11")
 }
 
 dockerCompose {
