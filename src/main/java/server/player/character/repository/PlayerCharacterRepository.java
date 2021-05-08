@@ -28,7 +28,6 @@ public class PlayerCharacterRepository {
     public PlayerCharacterRepository(
             PlayerCharacterConfiguration configuration,
             MongoClient mongoClient) {
-        // test inject on configuration
         this.configuration = configuration;
         this.mongoClient = mongoClient;
         this.characters = getCollection();
