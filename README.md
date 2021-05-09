@@ -1,21 +1,18 @@
 ## MMO Server implementation (work in progress) 
 
 Currently working on:
-- User login and registration
-- Configuring MongoDB
-- Creation of characters for account
+- configuring UI to create characters in UE4
 
+#Documentation within blog:
+- Configuring MongoDB & creation of characters for account: https://ylazarev.com/2021/05/08/7-java-micronaut-with-mongodb-character-controller/
 
-Documentation within blog:
 - Setting up Micronaut, jooq, flyway:
 https://ylazarev.com/2021/04/18/4-java-micronaut-dockered-postgres/
 
 - Setting up JWT Authentication: 
 https://ylazarev.com/2021/04/26/5-java-micronaut-jwt-authentication/
 
-- Setting up registrations:
-
-- Setting up MongoDB
+- Encode password for user, integrate with JWT: https://ylazarev.com/2021/05/04/6-java-secure-encode-user-credential/
 
 This project branches from the Micronaut template found here:
 https://github.com/yazoo321/micronaut_template
