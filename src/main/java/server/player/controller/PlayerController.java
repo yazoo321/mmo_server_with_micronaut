@@ -6,6 +6,8 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import server.account.dto.Account;
+import server.player.character.dto.AccountCharactersResponse;
 import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.service.PlayerCharacterService;
@@ -35,7 +37,7 @@ public class PlayerController {
     }
 
     @Get("/account-characters")
-    public List<Character> getAccountCharacters(Principal principal) {
+    public AccountCharactersResponse getAccountCharacters(Principal principal) {
         // This endpoint will be for when user logs in.
         // They will be greeted with a list of characters
         return playerCharacterService.getAccountCharacters(principal.getName());

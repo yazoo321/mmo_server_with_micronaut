@@ -1,5 +1,6 @@
 package server.player.character.service;
 
+import server.player.character.dto.AccountCharactersResponse;
 import server.player.character.dto.Character;
 import server.player.character.repository.PlayerCharacterRepository;
 
@@ -13,8 +14,11 @@ public class PlayerCharacterService {
     @Inject
     PlayerCharacterRepository playerCharacterRepository;
 
-    public List<Character> getAccountCharacters(String username) {
-        return playerCharacterRepository.findByAccount(username).blockingGet();
+    public AccountCharactersResponse getAccountCharacters(String username) {
+        AccountCharactersResponse accountCharactersResponse = new AccountCharactersResponse();
+        accountCharactersResponse.setAccountCharacters(
+                playerCharacterRepository.findByAccount(username).blockingGet());
+        return accountCharactersResponse;
     }
 
     public Character createCharacter(String characterName, String username) {
