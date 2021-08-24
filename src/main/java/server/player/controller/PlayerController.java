@@ -48,6 +48,6 @@ public class PlayerController {
         // Principal is the authenticated user, we should not get it from body but JWT token as that is trusted
         String accountName = principal.getName();
 
-        return playerCharacterService.createCharacter(createCharacterRequest.getName(), accountName);
+        return playerCharacterService.createCharacter(createCharacterRequest, accountName);
     }
 }

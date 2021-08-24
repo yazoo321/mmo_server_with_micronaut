@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @Introspected
@@ -25,10 +24,13 @@ public class Character {
             @JsonProperty("xp")
             @BsonProperty("xp") Integer xp,
             @JsonProperty("accountName")
-            @BsonProperty("accountName") String accountName) {
+            @BsonProperty("accountName") String accountName,
+            @JsonProperty("appearanceInfo")
+            @BsonProperty("appearanceInfo") Map<String, String> appearanceInfo) {
         this.name = name;
         this.xp = xp;
         this.accountName = accountName;
+        this.appearanceInfo = appearanceInfo;
     }
     // This DTO should hold all the data that we need to load a player character
     // Hence, this list is far from finished. It will be incremented as development goes on
@@ -43,4 +45,7 @@ public class Character {
 
     @NotBlank
     String accountName;
+
+    @NotNull
+    Map<String, String> appearanceInfo;
 }
