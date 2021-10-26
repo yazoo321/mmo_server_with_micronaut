@@ -17,6 +17,7 @@ import server.security.BCryptPasswordEncoderService;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +74,9 @@ public class PlayerControllerTest {
         String bearerToken = getBearerTokenForUser();
         CreateCharacterRequest createCharacterRequest = new CreateCharacterRequest();
         createCharacterRequest.setName(TEST_CHARACTER_NAME);
+        Map<String, String> appearanceInfo = Map.of("key", "value");
+        createCharacterRequest.setAppearanceInfo(appearanceInfo);
+
         // make sure character does not exist
         Assertions.assertNull(playerCharacterRepository.findByName(createCharacterRequest.getName())
                 .blockingGet());
@@ -87,23 +91,24 @@ public class PlayerControllerTest {
         Character createdCharacter = rspCreateChar.getBody().get();
         Assertions.assertNotNull(createdCharacter);
         Assertions.assertEquals(createCharacterRequest.getName(), createdCharacter.getName());
-
+        Assertions.assertEquals(createCharacterRequest.getAppearanceInfo(), createdCharacter.getAppearanceInfo());
 
         // when
         HttpRequest requestGetCharacters = HttpRequest.GET(GET_CHARACTERS_PATH).bearerAuth(bearerToken);
-        HttpResponse<List<Map<String, String>>> rspWithChars =
+        var rspWithChars =
                 client.toBlocking().exchange(requestGetCharacters, List.class);
-        // This is actually List<Character> but we serialize to hashmap
-        List<Map<String, String>> characterList = rspWithChars.getBody().get();
+
+        // complicated data structure due to bad deserialization
+        var characterList = (LinkedHashMap) ((List)rspWithChars.getBody().get()).get(0);
 
         // then
         Assertions.assertNotNull(characterList);
-        Assertions.assertEquals(1, characterList.size());
-        Assertions.assertEquals(createCharacterRequest.getName(), characterList.get(0).get("name"));
-        Assertions.assertEquals(VALID_USERNAME, characterList.get(0).get("accountName"));
+        LinkedHashMap character = ((List<LinkedHashMap>) characterList.get("accountCharacters")).get(0);
+
+        Assertions.assertEquals(createCharacterRequest.getName(), character.get("name"));
+        Assertions.assertEquals(createCharacterRequest.getAppearanceInfo(), character.get("appearanceInfo"));
+        Assertions.assertEquals(VALID_USERNAME, character.get("accountName"));
     }
-
-
 
     private String getBearerTokenForUser() {
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials(VALID_USERNAME, VALID_PASSWORD);
@@ -136,5 +141,4 @@ public class PlayerControllerTest {
                 .where(UserRoles.USER_ROLES.USERNAME.equal(VALID_USERNAME)).execute();
         dslContext.deleteFrom(USERS).where(USERS.USERNAME.equal(VALID_USERNAME)).execute();
     }
-
 }

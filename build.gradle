@@ -136,8 +136,15 @@ dependencies {
     implementation("io.micronaut.mongodb:micronaut-mongo-reactive")
     // if we want blocking implementation:
     // implementation("io.micronaut.mongodb:micronaut-mongo-sync")
-    // for tests
-    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.1")
+
+
+
+    // test
+    testImplementation("org.assertj:assertj-core:3.20.2")
+    testImplementation("io.micronaut.test:micronaut-test-junit5")
+    testImplementation("org.mockito:mockito-core:3.11.2")
+//    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.1")
+
 }
 
 application {

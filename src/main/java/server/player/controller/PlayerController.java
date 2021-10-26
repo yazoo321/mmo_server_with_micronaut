@@ -6,19 +6,16 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import server.account.dto.Account;
 import server.player.character.dto.AccountCharactersResponse;
 import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.service.PlayerCharacterService;
 import server.player.motion.dto.PlayerMotion;
-import server.player.motion.dto.PlayerMotionList;
 import server.player.motion.service.PlayerMotionService;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.List;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/player")
@@ -31,7 +28,7 @@ public class PlayerController {
     PlayerCharacterService playerCharacterService;
 
     @Post("/update-motion")
-    public PlayerMotionList updatePlayerLocation(@Body PlayerMotion playerMotionRequest) {
+    public AccountCharactersResponse updatePlayerLocation(@Body PlayerMotion playerMotionRequest) {
         playerMotionService.updatePlayerState(playerMotionRequest);
         return playerMotionService.getPlayersNearMe(playerMotionRequest.getPlayerName());
     }

@@ -10,7 +10,12 @@ import org.junit.jupiter.api.Test;
 import server.player.character.dto.Character;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @MicronautTest
 public class PlayerCharacterRepositoryTest {
@@ -54,7 +59,6 @@ public class PlayerCharacterRepositoryTest {
         Character character2 = createCharacter(CHAR_2, ACC_1);
         Character character3 = createCharacter(CHAR_3, ACC_2);
 
-        // blocking get in order to sync up the saves with the test
         playerCharacterRepository.save(character1).blockingGet();
         playerCharacterRepository.save(character2).blockingGet();
         playerCharacterRepository.save(character3).blockingGet();
@@ -104,7 +108,50 @@ public class PlayerCharacterRepositoryTest {
         Single<Character> characterDup = playerCharacterRepository.createNew(character);
 
         // then
-        Assertions.assertThrows(NullPointerException.class, () -> characterDup.blockingGet());
+        Assertions.assertThrows(NullPointerException.class, characterDup::blockingGet);
+    }
+
+    @Test
+    void testCheckAndUpdateUserOnline() {
+        // given
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+
+        Character character1 = createCharacter(CHAR_1, ACC_1);
+        Character character2 = createCharacter(CHAR_2, ACC_1);
+        Character character3 = createCharacter(CHAR_3, ACC_2);
+
+        character1.setIsOnline(true);
+        character2.setIsOnline(true);
+        character3.setIsOnline(true);
+
+        character1.setUpdatedAt(now);
+        character2.setUpdatedAt(now.minusSeconds(5));
+        character3.setUpdatedAt(now.minusSeconds(15));
+
+        // blocking get in order to sync up the saves with the test
+        playerCharacterRepository.save(character1).blockingGet();
+        playerCharacterRepository.save(character2).blockingGet();
+        playerCharacterRepository.save(character3).blockingGet();
+
+        // when
+        playerCharacterRepository.checkAndUpdateUserOnline();
+
+        // then
+        Character actualCharacter1 = playerCharacterRepository.findByName(character1.getName()).blockingGet();
+        Character actualCharacter2 = playerCharacterRepository.findByName(character1.getName()).blockingGet();
+        Character actualCharacter3 = playerCharacterRepository.findByName(character1.getName()).blockingGet();
+
+        character3.setIsOnline(false);
+
+        assertThat(actualCharacter1).usingRecursiveComparison()
+                .ignoringFields("updatedAt")
+                .isEqualTo(character1);
+        assertThat(actualCharacter2).usingRecursiveComparison()
+                .ignoringFields("updatedAt")
+                .isEqualTo(character1);
+        assertThat(actualCharacter3).usingRecursiveComparison()
+                .ignoringFields("updatedAt")
+                .isEqualTo(character1);
     }
 
     private Character createCharacter(String characterName, String account) {
@@ -112,6 +159,7 @@ public class PlayerCharacterRepositoryTest {
         character.setName(characterName);
         character.setXp(0);
         character.setAccountName(account);
+        character.setAppearanceInfo(Map.of("key", "value"));
         return character;
     }
 }

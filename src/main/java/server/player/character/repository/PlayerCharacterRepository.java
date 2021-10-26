@@ -2,21 +2,27 @@ package server.player.character.repository;
 
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.subscribers.DefaultSubscriber;
+import server.common.dto.Motion;
 import server.configuration.PlayerCharacterConfiguration;
 import server.player.character.dto.Character;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 
 @Singleton
 public class PlayerCharacterRepository {
@@ -66,6 +72,14 @@ public class PlayerCharacterRepository {
                 );
     }
 
+    public Maybe<UpdateResult> updateMotion(Motion motion, String characterName) {
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        return Flowable.fromPublisher(
+                characters.updateOne(eq("name", characterName),
+                        combine(set("motion", motion), set("updatedAt", now), set("isOnline", true)))
+        ).firstElement();
+    }
+
     public Single<Character> createNew(@Valid Character character) {
         // detect if we find character
         boolean exists = findByName(character.getName()).blockingGet() != null;
@@ -99,6 +113,25 @@ public class PlayerCharacterRepository {
         return Single.fromPublisher(
                 characters.deleteOne(eq("name", name))
         );
+    }
+
+    public Single<List<Character>> getPlayersNear(String playerName) {
+        // gets players near <player name>
+        // require to add additional filters such as filter by location/town/etc
+
+        return Flowable.fromPublisher(
+                characters.find(and(ne("name", playerName), eq("isOnline", true)))
+        ).toList();
+    }
+
+    public Maybe<UpdateResult> checkAndUpdateUserOnline() {
+        LocalDateTime logoutTime = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(10);
+
+        // if is online and not updated in the last 10 seconds, set to logged out.
+        return Flowable.fromPublisher(
+                characters.updateMany(combine(eq("isOnline", true), lt("updatedAt", logoutTime)),
+                        set("isOnline", false))
+        ).firstElement();
     }
 
     private MongoCollection<Character> getCollection() {

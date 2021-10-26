@@ -1,42 +1,28 @@
 package server.player.motion.service;
 
+import com.mongodb.client.result.UpdateResult;
+import server.player.character.dto.AccountCharactersResponse;
+import server.player.character.dto.Character;
+import server.player.character.repository.PlayerCharacterRepository;
 import server.player.motion.dto.PlayerMotion;
-import server.player.motion.dto.PlayerMotionList;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class PlayerMotionService {
-    // This class was used as a demo / proof of concept
-    // Its pending changes in near future
-    Map<String, PlayerMotion> playerMotions = new HashMap<>();
 
-    public void updatePlayerState(PlayerMotion request) {
+    @Inject
+    PlayerCharacterRepository playerCharacterRepository;
 
-        String playerName = request.getPlayerName();
-        if (playerMotions.containsKey(playerName)) {
-            playerMotions.get(playerName).setMotion(request.getMotion());
-        } else {
-            playerMotions.put(request.getPlayerName(), request);
-        }
+    public UpdateResult updatePlayerState(PlayerMotion request) {
+        // TODO: make async
+        return playerCharacterRepository.updateMotion(request.getMotion(), request.getPlayerName()).blockingGet();
     }
 
-    public PlayerMotionList getPlayersNearMe(String playerName) {
-        PlayerMotionList playerMotionList = new PlayerMotionList();
-        List<PlayerMotion> playersNearMe = new ArrayList<>();
-        playerMotions.forEach((name, motion) -> {
-            if (!motion.getPlayerName().equals(playerName)) {
-                // add more filters, e.g. by distance
-                // consider caching
-                playersNearMe.add(motion);
-            }
-        });
-
-        playerMotionList.setPlayerMotionList(playersNearMe);
-        return playerMotionList;
+    public AccountCharactersResponse getPlayersNearMe(String playerName) {
+        List<Character> characterList = playerCharacterRepository.getPlayersNear(playerName).blockingGet();
+        return new AccountCharactersResponse(characterList);
     }
 }

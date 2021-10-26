@@ -7,9 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import server.common.dto.Motion;
 
 import javax.validation.constraints.*;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Data
@@ -26,11 +27,21 @@ public class Character {
             @JsonProperty("accountName")
             @BsonProperty("accountName") String accountName,
             @JsonProperty("appearanceInfo")
-            @BsonProperty("appearanceInfo") Map<String, String> appearanceInfo) {
+            @BsonProperty("appearanceInfo") Map<String, String> appearanceInfo,
+            @JsonProperty("motion")
+            @BsonProperty("motion") Motion motion,
+            @JsonProperty("updatedAt")
+            @BsonProperty("updatedAt") LocalDateTime updatedAt,
+            @JsonProperty("isOnline")
+            @BsonProperty("isOnline") Boolean isOnline
+            ) {
         this.name = name;
         this.xp = xp;
         this.accountName = accountName;
         this.appearanceInfo = appearanceInfo;
+        this.motion = motion;
+        this.updatedAt = updatedAt;
+        this.isOnline = isOnline;
     }
     // This DTO should hold all the data that we need to load a player character
     // Hence, this list is far from finished. It will be incremented as development goes on
@@ -48,4 +59,10 @@ public class Character {
 
     @NotNull
     Map<String, String> appearanceInfo;
+
+    Motion motion;
+
+    LocalDateTime updatedAt;
+
+    Boolean isOnline;
 }
