@@ -18,11 +18,11 @@ public class PlayerMotionService {
 
     public UpdateResult updatePlayerState(PlayerMotion request) {
         // TODO: make async
-        return playerCharacterRepository.updateMotion(request.getMotion(), request.getPlayerName()).blockingGet();
+        return playerCharacterRepository.updateMotion(request.getMotion(), request.getPlayerName());
     }
 
     public AccountCharactersResponse getPlayersNearMe(String playerName) {
-        List<Character> characterList = playerCharacterRepository.getPlayersNear(playerName).blockingGet();
+        List<Character> characterList = playerCharacterRepository.getPlayersNear(playerName);
         return new AccountCharactersResponse(characterList);
     }
 }

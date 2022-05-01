@@ -36,7 +36,7 @@ public class PlayerMotionServiceTest {
 
     @BeforeEach
     void cleanDb() {
-        playerCharacterRepository.deleteByCharacterName(TEST_CHARACTER_NAME).blockingGet();
+        playerCharacterRepository.deleteByCharacterName(TEST_CHARACTER_NAME);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class PlayerMotionServiceTest {
 
         // When
         UpdateResult res = playerMotionService.updatePlayerState(playerMotion);
-        Character actualCharacter = playerCharacterRepository.findByName(TEST_CHARACTER_NAME).blockingGet();
+        Character actualCharacter = playerCharacterRepository.findByName(TEST_CHARACTER_NAME);
 
         // Then
         Assertions.assertThat(actualCharacter).usingRecursiveComparison()

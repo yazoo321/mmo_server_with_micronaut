@@ -28,7 +28,7 @@ public class PlayerCharacterServiceTest {
 
     @BeforeEach
     void cleanDb() {
-        playerCharacterRepository.deleteByCharacterName(TEST_CHARACTER_NAME).blockingGet();
+        playerCharacterRepository.deleteByCharacterName(TEST_CHARACTER_NAME);
     }
 
     @Test

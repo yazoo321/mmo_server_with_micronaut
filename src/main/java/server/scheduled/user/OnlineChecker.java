@@ -1,4 +1,4 @@
-package server.scheduled;
+package server.scheduled.user;
 
 import io.micronaut.scheduling.annotation.Scheduled;
 import server.player.character.repository.PlayerCharacterRepository;
@@ -14,6 +14,6 @@ public class OnlineChecker {
 
     @Scheduled(fixedDelay = "10s")
     void executeEveryTen() {
-        playerCharacterRepository.checkAndUpdateUserOnline().blockingGet();
+        playerCharacterRepository.checkAndUpdateUserOnline();
     }
 }

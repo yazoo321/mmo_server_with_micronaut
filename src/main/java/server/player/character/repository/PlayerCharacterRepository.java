@@ -6,7 +6,6 @@ import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.subscribers.DefaultSubscriber;
 import server.common.dto.Motion;
@@ -63,75 +62,81 @@ public class PlayerCharacterRepository {
                 });
     }
 
-    public Single<Character> save(@Valid Character character) {
-        return findByName(character.getName())
-                .switchIfEmpty(
-                        Single.fromPublisher(
-                                characters.insertOne(character))
-                                .map(success -> character)
-                );
+    public Character save(@Valid Character character) {
+        Character ch = findByName(character.getName());
+        if (ch == null) {
+            return Single.fromPublisher(
+                    characters.insertOne(character))
+                    .map(success -> character).blockingGet();
+        } else {
+            // don't currently support update all fields
+            return null;
+        }
     }
 
-    public Maybe<UpdateResult> updateMotion(Motion motion, String characterName) {
+    public UpdateResult updateMotion(Motion motion, String characterName) {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         return Flowable.fromPublisher(
                 characters.updateOne(eq("name", characterName),
                         combine(set("motion", motion), set("updatedAt", now), set("isOnline", true)))
-        ).firstElement();
+        ).firstElement().blockingGet();
     }
 
-    public Single<Character> createNew(@Valid Character character) {
+    public Character createNew(@Valid Character character) {
         // detect if we find character
-        boolean exists = findByName(character.getName()).blockingGet() != null;
+        boolean exists = findByName(character.getName()) != null;
 
         if (exists) {
             // change to another error
             // this way we can keep the interface of .blockingGet and avoid nullptr ex
-            return Single.error(new NullPointerException());
+            throw new NullPointerException();
         }
 
         return save(character);
     }
 
-    public Maybe<Character> findByName(String name) {
+    public Character findByName(String name) {
         // TODO: Ignore case
         return Flowable.fromPublisher(
                 characters
                         .find(eq("name", name))
                         .limit(1)
-        ).firstElement();
+        ).firstElement().blockingGet();
     }
 
-    public Single<List<Character>> findByAccount(String accountName) {
+    public List<Character> findByAccount(String accountName) {
         // TODO: Ignore case
         return Flowable.fromPublisher(
-                characters.find(eq("accountName", accountName))
-        ).toList();
+                characters.find(eq("accountName", accountName)))
+                .toList()
+                .blockingGet();
     }
 
-    public Single<DeleteResult> deleteByCharacterName(String name) {
+    public DeleteResult deleteByCharacterName(String name) {
         return Single.fromPublisher(
-                characters.deleteOne(eq("name", name))
-        );
+                characters.deleteOne(eq("name", name)))
+                .blockingGet();
     }
 
-    public Single<List<Character>> getPlayersNear(String playerName) {
+    public List<Character> getPlayersNear(String playerName) {
         // gets players near <player name>
         // require to add additional filters such as filter by location/town/etc
 
         return Flowable.fromPublisher(
-                characters.find(and(ne("name", playerName), eq("isOnline", true)))
-        ).toList();
+                characters.find(and(ne("name", playerName), eq("isOnline", true))))
+                .toList()
+                .blockingGet();
     }
 
-    public Maybe<UpdateResult> checkAndUpdateUserOnline() {
+    public UpdateResult checkAndUpdateUserOnline() {
         LocalDateTime logoutTime = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(10);
 
         // if is online and not updated in the last 10 seconds, set to logged out.
         return Flowable.fromPublisher(
                 characters.updateMany(combine(eq("isOnline", true), lt("updatedAt", logoutTime)),
-                        set("isOnline", false))
-        ).firstElement();
+                        set("isOnline", false)))
+                .firstElement()
+                .blockingGet();
     }
 
     private MongoCollection<Character> getCollection() {

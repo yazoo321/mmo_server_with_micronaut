@@ -2,8 +2,6 @@ package server.player.character.repository;
 
 import com.mongodb.client.result.DeleteResult;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +32,7 @@ public class PlayerCharacterRepositoryTest {
     void cleanup() {
         List<String> namesToDelete = List.of(CHAR_1, CHAR_2, CHAR_3);
         namesToDelete.forEach(name ->
-                playerCharacterRepository.deleteByCharacterName(name).blockingGet());
+                playerCharacterRepository.deleteByCharacterName(name));
     }
 
     @Test
@@ -43,13 +41,13 @@ public class PlayerCharacterRepositoryTest {
         Character character = createCharacter(CHAR_1, ACC_1);
 
         // when
-        Single<Character> saved = playerCharacterRepository.save(character);
+        Character saved = playerCharacterRepository.save(character);
 
         // then
-        Maybe<Character> found = playerCharacterRepository.findByName(CHAR_1);
+        Character found = playerCharacterRepository.findByName(CHAR_1);
 
-        Assertions.assertEquals(CHAR_1, saved.blockingGet().getName());
-        Assertions.assertEquals(CHAR_1, found.blockingGet().getName());
+        Assertions.assertEquals(CHAR_1, saved.getName());
+        Assertions.assertEquals(CHAR_1, found.getName());
     }
 
     @Test
@@ -59,16 +57,16 @@ public class PlayerCharacterRepositoryTest {
         Character character2 = createCharacter(CHAR_2, ACC_1);
         Character character3 = createCharacter(CHAR_3, ACC_2);
 
-        playerCharacterRepository.save(character1).blockingGet();
-        playerCharacterRepository.save(character2).blockingGet();
-        playerCharacterRepository.save(character3).blockingGet();
+        playerCharacterRepository.save(character1);
+        playerCharacterRepository.save(character2);
+        playerCharacterRepository.save(character3);
 
         // when
         List<Character> foundAccount1 =
-                playerCharacterRepository.findByAccount(ACC_1).blockingGet();
+                playerCharacterRepository.findByAccount(ACC_1);
 
         List<Character> foundAccount2 =
-                playerCharacterRepository.findByAccount(ACC_2).blockingGet();
+                playerCharacterRepository.findByAccount(ACC_2);
 
         // then
         Assertions.assertEquals(2, foundAccount1.size());
@@ -85,30 +83,27 @@ public class PlayerCharacterRepositoryTest {
     void testDeleteCharacter() {
         // given
         Character character1 = createCharacter(CHAR_1, ACC_1);
-        playerCharacterRepository.save(character1).blockingGet();
+        playerCharacterRepository.save(character1);
 
         // ensure there's an entry
         Assertions.assertEquals(CHAR_1,
-                playerCharacterRepository.findByName(CHAR_1).blockingGet().getName());
+                playerCharacterRepository.findByName(CHAR_1).getName());
         // when
-        DeleteResult res = playerCharacterRepository.deleteByCharacterName(CHAR_1).blockingGet();
+        DeleteResult res = playerCharacterRepository.deleteByCharacterName(CHAR_1);
 
         // then
         Assertions.assertEquals(1, res.getDeletedCount());
-        Assertions.assertNull(playerCharacterRepository.findByName(CHAR_1).blockingGet());
+        Assertions.assertNull(playerCharacterRepository.findByName(CHAR_1));
     }
 
     @Test
     void testCreateDoesNotCauseDuplicateRecords() {
         // given
         Character character = createCharacter(CHAR_1, ACC_1);
-        playerCharacterRepository.save(character).blockingGet();
+        playerCharacterRepository.save(character);
 
-        // when
-        Single<Character> characterDup = playerCharacterRepository.createNew(character);
-
-        // then
-        Assertions.assertThrows(NullPointerException.class, characterDup::blockingGet);
+        // when then
+        Assertions.assertThrows(NullPointerException.class, () -> playerCharacterRepository.createNew(character));
     }
 
     @Test
@@ -129,17 +124,17 @@ public class PlayerCharacterRepositoryTest {
         character3.setUpdatedAt(now.minusSeconds(15));
 
         // blocking get in order to sync up the saves with the test
-        playerCharacterRepository.save(character1).blockingGet();
-        playerCharacterRepository.save(character2).blockingGet();
-        playerCharacterRepository.save(character3).blockingGet();
+        playerCharacterRepository.save(character1);
+        playerCharacterRepository.save(character2);
+        playerCharacterRepository.save(character3);
 
         // when
         playerCharacterRepository.checkAndUpdateUserOnline();
 
         // then
-        Character actualCharacter1 = playerCharacterRepository.findByName(character1.getName()).blockingGet();
-        Character actualCharacter2 = playerCharacterRepository.findByName(character1.getName()).blockingGet();
-        Character actualCharacter3 = playerCharacterRepository.findByName(character1.getName()).blockingGet();
+        Character actualCharacter1 = playerCharacterRepository.findByName(character1.getName());
+        Character actualCharacter2 = playerCharacterRepository.findByName(character1.getName());
+        Character actualCharacter3 = playerCharacterRepository.findByName(character1.getName());
 
         character3.setIsOnline(false);
 

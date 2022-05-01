@@ -69,7 +69,7 @@ public class PlayerControllerTest {
         // this is not vanilla test, we will combine them in one, similar to BDD/integration test
         // given
         // make sure character does not already exist
-        playerCharacterRepository.deleteByCharacterName(TEST_CHARACTER_NAME).blockingGet();
+        playerCharacterRepository.deleteByCharacterName(TEST_CHARACTER_NAME);
 
         String bearerToken = getBearerTokenForUser();
         CreateCharacterRequest createCharacterRequest = new CreateCharacterRequest();
@@ -78,8 +78,7 @@ public class PlayerControllerTest {
         createCharacterRequest.setAppearanceInfo(appearanceInfo);
 
         // make sure character does not exist
-        Assertions.assertNull(playerCharacterRepository.findByName(createCharacterRequest.getName())
-                .blockingGet());
+        Assertions.assertNull(playerCharacterRepository.findByName(createCharacterRequest.getName()));
 
         // when
         HttpRequest requestCreateCharacter = HttpRequest.POST(CREATE_CHARACTER_PATH, createCharacterRequest)

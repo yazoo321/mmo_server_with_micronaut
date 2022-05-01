@@ -23,7 +23,7 @@ public class PlayerCharacterService {
     PlayerMotionService playerMotionService;
 
     public AccountCharactersResponse getAccountCharacters(String username) {
-        List<Character> characterList =  playerCharacterRepository.findByAccount(username).blockingGet();
+        List<Character> characterList =  playerCharacterRepository.findByAccount(username);
 
         return new AccountCharactersResponse(characterList);
     }
@@ -41,12 +41,7 @@ public class PlayerCharacterService {
         newCharacter.setIsOnline(false);
 
         // this will throw if there's a duplicate entry
-        newCharacter = playerCharacterRepository.createNew(newCharacter).blockingGet();
-
-//        PlayerMotion defaultMotion = new PlayerMotion();
-//        defaultMotion.setPlayerName(newCharacter.getName());
-//        defaultMotion.setMotion(new Motion(0,0,112,0,0,0,0,0,0, false));
-//        playerMotionService.updatePlayerState(defaultMotion);
+        newCharacter = playerCharacterRepository.createNew(newCharacter);
 
         return newCharacter;
     }
