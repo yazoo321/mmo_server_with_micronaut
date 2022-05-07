@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import server.common.dto.Location;
 import server.items.dto.Item;
 
 import java.time.LocalDateTime;
@@ -19,29 +20,28 @@ public class DroppedItem {
 
     @BsonCreator
     @JsonCreator
-    DroppedItem(
-            @JsonProperty("x")
-            @BsonProperty("x") Integer x,
-            @JsonProperty("y")
-            @BsonProperty("y") Integer y,
-            @JsonProperty("z")
-            @BsonProperty("z") Integer z,
+    public DroppedItem(
+            @JsonProperty("itemId")
+            @BsonProperty("itemId") String itemId,
+            @JsonProperty("location")
+            @BsonProperty("location") Location location,
             @JsonProperty("item")
             @BsonProperty("item") Item item,
             @JsonProperty("updatedAt")
             @BsonProperty("updatedAt") LocalDateTime droppedAt
 ) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        // Item ID is duplicate of item -> itemId.
+        // reason for duplication is because nested properties are slow to search and we can add index here.
+        this.itemId = itemId;
+        this.map = map;
+        this.location = location;
         this.item = item;
         this.droppedAt = droppedAt;
     }
 
-    Integer x;
-    Integer y;
-    Integer z;
-
+    String itemId;
+    String map;
+    Location location;
     Item item;
 
     // This is to have timeout for items that are dropped/spawned

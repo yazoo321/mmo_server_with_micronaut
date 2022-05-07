@@ -17,3 +17,8 @@ which is not relevant to `weapon` etc.
 ###
 This way we can keep generic model for all items keeping db model simpler.
 Furthermore we link the items to users inventory via `item id` and `player name`.
+
+##
+Items should be created via a migration. 
+They can be spawned by a service which can randomly generate the item.
+You can create a loot drop table or similar for mobs, or assign value range to items.

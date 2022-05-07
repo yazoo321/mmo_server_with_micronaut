@@ -7,7 +7,8 @@ import server.items.types.ItemType;
 import java.util.List;
 
 public class Weapon extends Item {
-    public Weapon(String itemId, String itemName, List<Tag> tags) {
-        super(itemId, itemName, ItemType.WEAPON.getType(), tags);
+
+    public Weapon(String itemId, String itemName, List<Tag> tags, Integer value) {
+        super(itemId, itemName, ItemType.WEAPON.getType(), tags, value);
     }
 }

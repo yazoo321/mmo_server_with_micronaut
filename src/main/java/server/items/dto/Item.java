@@ -26,16 +26,20 @@ public class Item {
             @JsonProperty("category")
             @BsonProperty("category") String category,
             @JsonProperty("tags")
-            @BsonProperty("tags") List<Tag> tags) {
+            @BsonProperty("tags") List<Tag> tags,
+            @JsonProperty("value")
+            @BsonProperty("value") Integer value) {
+
         this.itemId = itemId;
         this.itemName = itemName;
         this.category = category;
         this.tags = tags;
+        this.value = value;
     }
 
     String itemId;
     String itemName;
     String category;
     List<Tag> tags;
-
+    Integer value;
 }

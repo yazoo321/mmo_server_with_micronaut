@@ -8,7 +8,8 @@ import java.util.List;
 
 public class Consumable extends Item {
 
-    public Consumable(String itemId, String itemName, List<Tag> tags) {
-        super(itemId, itemName, ItemType.CONSUMABLE.getType(), tags);
+    public Consumable(String itemId, String itemName, List<Tag> tags, Integer value) {
+        super(itemId, itemName, ItemType.CONSUMABLE.getType(), tags, value);
     }
+
 }
