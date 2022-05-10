@@ -2,17 +2,18 @@ package server.items.repository;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Flowable;
 import io.reactivex.Single;
+import server.common.dto.Location;
+import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.PlayerCharacterConfiguration;
 import server.items.dropped.model.DroppedItem;
 import server.items.dto.Item;
 
 import javax.inject.Singleton;
 import java.time.LocalDateTime;
+import java.util.List;
 
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.gt;
+import static com.mongodb.client.model.Filters.*;
 
 @Singleton
 public class ItemRepository {
@@ -32,10 +33,23 @@ public class ItemRepository {
         prepareCollections();
     }
 
+    public List<DroppedItem> getItemsNear(Location location) {
+        // filter by map + location of X, Y, Z co-ordinates
+        return MongoDbQueryHelper.betweenLocation(droppedItemCollection, location, 100);
+    }
+
     public DroppedItem createDroppedItem(DroppedItem droppedItem) {
         return Single.fromPublisher(
                 droppedItemCollection.insertOne(droppedItem))
                 .map(success -> droppedItem).blockingGet();
+    }
+
+    public DroppedItem findDroppedItemById(String droppedItemId) {
+        return Single.fromPublisher(
+                droppedItemCollection.find(
+                        eq("droppedItemId", droppedItemId)
+                )
+        ).blockingGet();
     }
 
     public Item createItem(Item item) {
@@ -45,16 +59,15 @@ public class ItemRepository {
     }
 
     public Item findByItemId(String itemId) {
-        return Flowable.fromPublisher(
+        return Single.fromPublisher(
                 itemCollection
                         .find(eq("itemId", itemId))
-                        .limit(1)
-        ).firstElement().blockingGet();
+        ).blockingGet();
     }
 
-    public void deleteDroppedItem(DroppedItem item) {
+    public void deleteDroppedItem(String droppedItemId) {
         Single.fromPublisher(
-                droppedItemCollection.deleteOne(eq("itemId", item.getItem().getItemId())))
+                droppedItemCollection.deleteOne(eq("droppedItemId", droppedItemId)))
                 .blockingGet();
     }
 
@@ -63,6 +76,17 @@ public class ItemRepository {
         Single.fromPublisher(
                 droppedItemCollection.deleteMany(gt("droppedAt", cutoffTime)))
                 .blockingGet();
+    }
+
+    public void deleteAllItemData() {
+        // this is for test purposes
+        Single.fromPublisher(
+                itemCollection.deleteMany(ne("category", "deleteAll"))
+        ).blockingGet();
+
+        Single.fromPublisher(
+                droppedItemCollection.deleteMany(ne("map", "deleteAll"))
+        ).blockingGet();
     }
 
     private void prepareCollections() {

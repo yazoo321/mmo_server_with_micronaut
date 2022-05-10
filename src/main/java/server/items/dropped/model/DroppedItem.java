@@ -1,6 +1,7 @@
 package server.items.dropped.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Introspected
+@JsonInclude()
 @NoArgsConstructor
 public class DroppedItem {
 
@@ -21,8 +23,10 @@ public class DroppedItem {
     @BsonCreator
     @JsonCreator
     public DroppedItem(
-            @JsonProperty("itemId")
-            @BsonProperty("itemId") String itemId,
+            @JsonProperty("droppedItemId")
+            @BsonProperty("droppedItemId") String droppedItemId,
+            @JsonProperty("map")
+            @BsonProperty("map") String map,
             @JsonProperty("location")
             @BsonProperty("location") Location location,
             @JsonProperty("item")
@@ -30,16 +34,14 @@ public class DroppedItem {
             @JsonProperty("updatedAt")
             @BsonProperty("updatedAt") LocalDateTime droppedAt
 ) {
-        // Item ID is duplicate of item -> itemId.
-        // reason for duplication is because nested properties are slow to search and we can add index here.
-        this.itemId = itemId;
+        this.droppedItemId = droppedItemId;
         this.map = map;
         this.location = location;
         this.item = item;
         this.droppedAt = droppedAt;
     }
 
-    String itemId;
+    String droppedItemId;
     String map;
     Location location;
     Item item;

@@ -8,30 +8,45 @@ import server.items.repository.ItemRepository;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class ItemService {
-
-    // maybe consider adding loot tables etc here?
 
     @Inject
     ItemRepository itemRepository;
 
 
-    public DroppedItem dropItem(Item item, Location location) {
+    public DroppedItem dropItem(String itemId, Location location) {
         LocalDateTime now = LocalDateTime.now();
-        DroppedItem droppedItem = new DroppedItem(item.getItemId(), location, item, now);
+        Item foundItem = itemRepository.findByItemId(itemId);
 
-        droppedItem = itemRepository.createDroppedItem(droppedItem);
+        String uuid = UUID.randomUUID().toString(); // generate unique ID for the dropped item
 
-        return droppedItem;
+        DroppedItem droppedItem = new DroppedItem(uuid, location.getMap(), location, foundItem, now);
+
+        return itemRepository.createDroppedItem(droppedItem);
     }
 
-    public void deleteDroppedItem(DroppedItem item) {
-        itemRepository.deleteDroppedItem(item);
+    public DroppedItem getDroppedItemById(String droppedItemId) {
+        return itemRepository.findDroppedItemById(droppedItemId);
+    }
+
+    public List<DroppedItem> getItemsInMap(Location location) {
+        return itemRepository.getItemsNear(location);
+    }
+
+    public void deleteDroppedItem(String droppedItemId) {
+        itemRepository.deleteDroppedItem(droppedItemId);
     }
 
     public Item createItem(Item item) {
         return itemRepository.createItem(item);
+    }
+
+    public void clearAllItemData() {
+        // this is a function for test purposes
+        itemRepository.deleteAllItemData();
     }
 }
