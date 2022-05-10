@@ -19,22 +19,31 @@ public class InventoryController {
 
     @Post("/pickup")
     public Inventory pickupItem(@Body GenericInventoryData pickupRequest, @Header String characterName) {
-        // TODO: add authentication and verify user
-
-        return inventoryService.pickupItem(characterName, pickupRequest.getDroppedItem());
+        return inventoryService.pickupItem(characterName, pickupRequest.getDroppedItemId());
     }
 
     @Post("/drop")
     public DroppedItem dropItem(@Body GenericInventoryData dropRequest, @Header String characterName) {
-
         return inventoryService.dropItem(characterName,
-                dropRequest.getCharacterItem(), dropRequest.getLocation());
+                dropRequest.getItemInventoryLocation(), dropRequest.getLocation());
     }
 
     @Get
     public Inventory getInventory(@Header String characterName) {
-        // TODO: introduce header as jwt token or similar to get character name
-
         return inventoryService.getInventory(characterName);
+    }
+
+    @Post("/generate-inventory")
+    public Inventory createInventoryForCharacter(@Body GenericInventoryData data) {
+        // This is test endpoint, this will be connected to the character creation process.
+
+        return inventoryService.createInventoryForNewCharacter(data.getCharacterName());
+    }
+
+    @Post("/clear-data")
+    public void clearAllData(@Header String characterName) {
+        // this is a test endpoint
+
+        inventoryService.clearAllDataForCharacter(characterName);
     }
 }

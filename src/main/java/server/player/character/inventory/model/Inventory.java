@@ -2,6 +2,7 @@ package server.player.character.inventory.model;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Data
 @Introspected
+@JsonInclude()
 @NoArgsConstructor
 public class Inventory {
 
