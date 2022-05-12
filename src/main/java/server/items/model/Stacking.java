@@ -1,4 +1,4 @@
-package server.items.dto;
+package server.items.model;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;

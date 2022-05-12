@@ -1,4 +1,4 @@
-package server.items.dto;
+package server.items.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,7 +27,6 @@ import java.util.List;
         @JsonSubTypes.Type(value = Weapon.class, name = "WEAPON"),
         @JsonSubTypes.Type(value = Armour.class, name = "ARMOUR"),
         @JsonSubTypes.Type(value = Consumable.class, name = "CONSUMABLE"),
-
 })
 public abstract class Item {
 

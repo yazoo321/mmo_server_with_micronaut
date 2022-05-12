@@ -5,7 +5,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import server.common.dto.Location;
 import server.items.dropped.model.DroppedItem;
-import server.items.dto.Item;
+import server.items.model.Item;
 import server.items.service.ItemService;
 import server.player.character.inventory.model.GenericInventoryData;
 
@@ -25,9 +25,7 @@ public class ItemController {
         // This is a test endpoint!
         // you should not be creating items live, they should be handled via migration
 
-        Item item = itemService.createItem(data.getItem());
-
-        return item;
+        return itemService.createItem(data.getItem());
     }
 
     @Post("/spawn-item")
@@ -42,9 +40,4 @@ public class ItemController {
         return itemService.getItemsInMap(location);
     }
 
-    @Post("/clear-data")
-    public void clearAll() {
-        // this is a test endpoint for clearing all DB data relating to items
-        itemService.clearAllItemData();
-    }
 }

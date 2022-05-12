@@ -1,13 +1,23 @@
 # Items readme
 
+#
+blogpost covering introduction of this module:
+
+https://ylazarev.com/2022/05/11/creating-mmo-rpg-style-inventory-system-with-java-and-mongodb/
+
+Youtube video containing a summary and live testing:
+https://youtu.be/Udm_cTfi7ms
+
 ###
-The structure of items is as follows:
+The key parts of items is as follows:
 - category
 - tags key value pairs
+
+The category defines what class the items belong to
 ###
 Category is defined by enum `ItemType`
 ###
-For example: Armour has category `Armour`. 
+For example: Armour has category `ARMOUR`. 
 When this is the case, you should use the `Armour.java` class
 which extends your `Items` class.
 The `Armour.java` class should be able to get any armour specific 

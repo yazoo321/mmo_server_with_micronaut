@@ -4,7 +4,7 @@ package server.player.character.inventory.model;
 import lombok.Data;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
-import server.items.dto.Item;
+import server.items.model.Item;
 
 @Data
 public class GenericInventoryData {

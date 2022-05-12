@@ -54,6 +54,19 @@ public class InventoryRepository {
         }
     }
 
+    public void updateInventoryMaxSize(Inventory inventory) {
+        UpdateResult res = Single.fromPublisher(
+                inventoryCollection.updateOne(
+                        eq("characterName", inventory.getCharacterName()),
+                        set("maxSize", inventory.getMaxSize())
+                )
+        ).blockingGet();
+
+        if (res.getModifiedCount() < 1) {
+            throw new InventoryException("Failed up update inventory max size");
+        }
+    }
+
     public Inventory insert(Inventory inventory) {
         InsertOneResult res = Single.fromPublisher(
                 inventoryCollection.insertOne(inventory)

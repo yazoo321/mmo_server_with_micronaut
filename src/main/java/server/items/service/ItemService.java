@@ -2,7 +2,7 @@ package server.items.service;
 
 import server.common.dto.Location;
 import server.items.dropped.model.DroppedItem;
-import server.items.dto.Item;
+import server.items.model.Item;
 import server.items.repository.ItemRepository;
 
 import javax.inject.Inject;
@@ -24,7 +24,7 @@ public class ItemService {
 
         String uuid = UUID.randomUUID().toString(); // generate unique ID for the dropped item
 
-        DroppedItem droppedItem = new DroppedItem(uuid, location.getMap(), location, foundItem, now);
+        DroppedItem droppedItem = new DroppedItem(uuid, location, foundItem, now);
 
         return itemRepository.createDroppedItem(droppedItem);
     }
@@ -45,8 +45,4 @@ public class ItemService {
         return itemRepository.createItem(item);
     }
 
-    public void clearAllItemData() {
-        // this is a function for test purposes
-        itemRepository.deleteAllItemData();
-    }
 }

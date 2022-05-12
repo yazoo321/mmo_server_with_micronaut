@@ -5,8 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import server.common.dto.Tag;
-import server.items.dto.Item;
-import server.items.dto.Stacking;
+import server.items.model.Item;
+import server.items.model.Stacking;
 import server.items.types.ItemType;
 
 import java.util.List;

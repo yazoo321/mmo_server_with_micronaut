@@ -3,18 +3,22 @@ package server.items.repository;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.Single;
+import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.PlayerCharacterConfiguration;
 import server.items.dropped.model.DroppedItem;
-import server.items.dto.Item;
+import server.items.model.Item;
+import server.items.model.exceptions.ItemException;
 
 import javax.inject.Singleton;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.mongodb.client.model.Filters.*;
 
+@Slf4j
 @Singleton
 public class ItemRepository {
 
@@ -45,11 +49,16 @@ public class ItemRepository {
     }
 
     public DroppedItem findDroppedItemById(String droppedItemId) {
-        return Single.fromPublisher(
-                droppedItemCollection.find(
-                        eq("droppedItemId", droppedItemId)
-                )
-        ).blockingGet();
+        try {
+            return Single.fromPublisher(
+                    droppedItemCollection.find(
+                            eq("droppedItemId", droppedItemId)
+                    )
+            ).blockingGet();
+        } catch (NoSuchElementException e) {
+            log.warn("Could not find the dropped item by ID!");
+            throw new ItemException("Could not find the dropped item by ID!");
+        }
     }
 
     public Item createItem(Item item) {
@@ -59,16 +68,28 @@ public class ItemRepository {
     }
 
     public Item findByItemId(String itemId) {
-        return Single.fromPublisher(
-                itemCollection
-                        .find(eq("itemId", itemId))
-        ).blockingGet();
+        try {
+            return Single.fromPublisher(
+                    itemCollection
+                            .find(eq("itemId", itemId))
+            ).blockingGet();
+        } catch (NoSuchElementException e) {
+            log.error("Could not find the item by ID! It no longer exists");
+            throw new ItemException("Could not find the item by ID! It no longer exists");
+        }
+
     }
 
     public void deleteDroppedItem(String droppedItemId) {
-        Single.fromPublisher(
-                droppedItemCollection.deleteOne(eq("droppedItemId", droppedItemId)))
-                .blockingGet();
+        try {
+            Single.fromPublisher(
+                    droppedItemCollection.deleteOne(eq("droppedItemId", droppedItemId)))
+                    .blockingGet();
+        } catch (NoSuchElementException e) {
+            // this could be race condition
+            log.warn("Deleting dropped item failed as item was not found!");
+            throw new ItemException("Deleting dropped item failed as item was not found!");
+        }
     }
 
     public void deleteTimedOutDroppedItems() {
@@ -76,17 +97,6 @@ public class ItemRepository {
         Single.fromPublisher(
                 droppedItemCollection.deleteMany(gt("droppedAt", cutoffTime)))
                 .blockingGet();
-    }
-
-    public void deleteAllItemData() {
-        // this is for test purposes
-        Single.fromPublisher(
-                itemCollection.deleteMany(ne("category", "deleteAll"))
-        ).blockingGet();
-
-        Single.fromPublisher(
-                droppedItemCollection.deleteMany(ne("map", "deleteAll"))
-        ).blockingGet();
     }
 
     private void prepareCollections() {
