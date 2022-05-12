@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.common.dto.Location2D;
-import server.items.dto.Item;
+import server.items.model.Item;
 
 @Data
 @Introspected

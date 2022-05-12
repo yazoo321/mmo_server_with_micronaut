@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.items.dropped.model.DroppedItem;
-import server.items.dto.Item;
+import server.items.model.Item;
 import server.items.service.ItemService;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
@@ -40,6 +40,11 @@ public class InventoryService {
         // check for example if inventory is full
         List<CharacterItem> items = inventory.getCharacterItems();
         Location2D position = getNextAvailableSlot(inventory);
+
+        if (position == null) {
+            // no inventory slots left
+            throw new InventoryException("No available slots in inventory");
+        }
 
         CharacterItem newCharacterItem = new CharacterItem(characterName, item, position);
 
@@ -98,6 +103,9 @@ public class InventoryService {
         return inventoryRepository.insert(inventory);
     }
 
+    public void updateInventoryMaxSize(Inventory inventory) {
+        inventoryRepository.updateInventoryMaxSize(inventory);
+    }
 
     private Location2D getNextAvailableSlot(Inventory inventory) {
         // Implement this as per your requirement, based on position for example.

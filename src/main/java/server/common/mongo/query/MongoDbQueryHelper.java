@@ -13,7 +13,7 @@ import static com.mongodb.client.model.Filters.and;
 public class MongoDbQueryHelper {
 
     public static <T> List<T> betweenLocation(MongoCollection<T> collection, Location location, Integer threshold) {
-        Bson mapEq = Filters.eq("map", location.getMap());
+        Bson mapEq = Filters.eq("location.map", location.getMap());
         Bson xWithinRange = Filters.and(
                 Filters.gt("location.x", (location.getX() - threshold)),
                 Filters.lt("location.x", (location.getX() + threshold))
