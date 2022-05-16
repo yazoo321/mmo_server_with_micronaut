@@ -1,7 +1,7 @@
 ## MMO Server implementation (work in progress) 
 
 Currently working on:
-- configuring UI to create characters in UE4
+- Inventory system
 
 #Documentation within blog:
 - Configuring MongoDB & creation of characters for account: https://ylazarev.com/2021/05/08/7-java-micronaut-with-mongodb-character-controller/
@@ -23,6 +23,10 @@ https://www.youtube.com/watch?v=PF_Bg6CgMts&t=16s
 JWT Authentication described here on YouTube tutorial here:
 https://www.youtube.com/watch?v=acAFcDWuxhI&t=8s
 
+## Dependencies
+In this project we rely on Docker, you can download it here:
+https://docs.docker.com/desktop/windows/install/
+
 ## Micronaut 2.4.1 Documentation
 
 - [User Guide](https://docs.micronaut.io/2.4.1/guide/index.html)
@@ -39,6 +43,8 @@ https://www.youtube.com/watch?v=acAFcDWuxhI&t=8s
 
 In order to build the project run:
 `./gradlew build`
+
+
 
 In order to remove the docker container and its database, run
 `docker rm -f -v <container_name>`
