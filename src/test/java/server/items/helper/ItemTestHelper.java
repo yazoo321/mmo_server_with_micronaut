@@ -9,6 +9,7 @@ import server.common.dto.Tag;
 import server.configuration.PlayerCharacterConfiguration;
 import server.items.dropped.model.DroppedItem;
 import server.items.model.Item;
+import server.items.model.ItemConfig;
 import server.items.model.Stacking;
 import server.items.weapons.Weapon;
 import server.player.character.inventory.model.Inventory;
@@ -57,8 +58,8 @@ public class ItemTestHelper {
                 new Tag("damage", "30")
         );
         Stacking stacOpts = new Stacking(false, 1, 1);
-
-        return new Weapon("123", "weapon name", weaponTags, stacOpts, 1000);
+        ItemConfig itemConfig = new ItemConfig("icon", "mesh");
+        return new Weapon("123", "weapon name", weaponTags, stacOpts, 1000, itemConfig);
     }
 
     public Weapon createAndInsertWeaponItem() {

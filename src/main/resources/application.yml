@@ -4,7 +4,7 @@ micronaut:
   server:
     port: 8081
   security:
-    enabled: true
+    enabled: false
     authentication: bearer
     token:
       jwt:
