@@ -39,7 +39,7 @@ public class ItemRepository {
 
     public List<DroppedItem> getItemsNear(Location location) {
         // filter by map + location of X, Y, Z co-ordinates
-        return MongoDbQueryHelper.betweenLocation(droppedItemCollection, location, 100);
+        return MongoDbQueryHelper.betweenLocation(droppedItemCollection, location, 1000);
     }
 
     public DroppedItem createDroppedItem(DroppedItem droppedItem) {

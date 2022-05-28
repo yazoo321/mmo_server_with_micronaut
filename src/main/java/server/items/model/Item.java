@@ -44,7 +44,9 @@ public abstract class Item {
             @JsonProperty("stacking")
             @BsonProperty("stacking") Stacking stacking,
             @JsonProperty("value")
-            @BsonProperty("value") Integer value) {
+            @BsonProperty("value") Integer value,
+            @JsonProperty("config")
+            @BsonProperty("config") ItemConfig itemConfig) {
 
         this.itemId = itemId;
         this.itemName = itemName;
@@ -52,6 +54,7 @@ public abstract class Item {
         this.tags = tags;
         this.stacking = stacking;
         this.value = value;
+        this.itemConfig = itemConfig;
     }
 
     String itemId;
@@ -60,5 +63,5 @@ public abstract class Item {
     List<Tag> tags;
     Stacking stacking;
     Integer value;
-
+    ItemConfig itemConfig;
 }
