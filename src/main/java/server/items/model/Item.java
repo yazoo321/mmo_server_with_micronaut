@@ -33,8 +33,8 @@ public abstract class Item {
     @BsonCreator
     @JsonCreator
     public Item(
-            @JsonProperty("itemId")
-            @BsonProperty("itemId") String itemId,
+            @JsonProperty("id")
+            @BsonProperty("id") String id,
             @JsonProperty("itemName")
             @BsonProperty("itemName") String itemName,
             @JsonProperty("category")
@@ -48,7 +48,7 @@ public abstract class Item {
             @JsonProperty("config")
             @BsonProperty("config") ItemConfig itemConfig) {
 
-        this.itemId = itemId;
+        this.id = id;
         this.itemName = itemName;
         this.category = category;
         this.tags = tags;
@@ -57,7 +57,7 @@ public abstract class Item {
         this.itemConfig = itemConfig;
     }
 
-    String itemId;
+    String id;
     String itemName;
     String category;
     List<Tag> tags;

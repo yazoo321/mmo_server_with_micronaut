@@ -58,7 +58,7 @@ public class ItemTestHelper {
                 new Tag("damage", "30")
         );
         Stacking stacOpts = new Stacking(false, 1, 1);
-        ItemConfig itemConfig = new ItemConfig("icon", "mesh");
+        ItemConfig itemConfig = new ItemConfig("icon", "mesh", "materialInstance");
         return new Weapon("123", "weapon name", weaponTags, stacOpts, 1000, itemConfig);
     }
 

@@ -1,5 +1,4 @@
-package server.items.model;
-
+package server.player.appearance.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,25 +11,20 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @Data
 @Introspected
 @NoArgsConstructor
-public class ItemConfig {
-
+public class MeshMaterialPair {
     @BsonCreator
     @JsonCreator
-    public ItemConfig(
-            @JsonProperty("icon")
-            @BsonProperty("icon") String icon,
+    public MeshMaterialPair(
             @JsonProperty("mesh")
             @BsonProperty("mesh") String mesh,
-            @JsonProperty("materialInstance")
-            @BsonProperty("materialInstance") String materialInstance
-            ) {
+            @JsonProperty("material")
+            @BsonProperty("material") String material
+    ) {
 
-        this.icon = icon;
         this.mesh = mesh;
-        this.materialInstance = materialInstance;
+        this.material = material;
     }
 
-    String icon;
     String mesh;
-    String materialInstance;
+    String material;
 }
