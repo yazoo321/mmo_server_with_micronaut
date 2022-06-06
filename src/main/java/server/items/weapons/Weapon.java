@@ -18,8 +18,10 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class Weapon extends Item {
 
-    public Weapon(String itemId, String itemName, List<Tag> tags, Stacking stacking, Integer value, ItemConfig config) {
-        super(itemId, itemName, ItemType.WEAPON.getType(), tags, stacking, value, config);
+    public Weapon(String itemId, String itemName,
+                  List<Tag> tags, Stacking stacking, Integer value,
+                  ItemConfig config, String appearanceId) {
+        super(itemId, itemName, ItemType.WEAPON.getType(), tags, stacking, value, config, appearanceId);
     }
 
 }

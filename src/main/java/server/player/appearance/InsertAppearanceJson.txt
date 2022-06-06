@@ -1,0 +1,29 @@
+This file is to keep the JSON for inserting the appearance information.
+Potentially it should be merged with a migration system, such as Mongock but its not supported yet by Micronaut
+
+{
+    "appearancePieceList": [
+        {
+            "part": "HEAD",
+            "mesh": "SK_Hu_M_Hair_01",
+            "material": "MI_Hair_01_Bd",
+            "race": "HUMAN",
+            "isMale": true,
+            "itemGroup": "",
+            "itemID": "",
+            "isBase": true,
+            "isDefault": true,
+        },
+        {
+            "part": "HEAD",
+            "mesh": "SK_Hu_M_Hair_02",
+            "material": "MI_Hair_01_Bd",
+            "race": "HUMAN",
+            "isMale": true,
+            "itemGroup": "",
+            "itemID": "",
+            "isBase": true,
+            "isDefault": true,
+        }
+    ]
+}

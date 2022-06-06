@@ -45,4 +45,8 @@ public class ItemService {
         return itemRepository.createItem(item);
     }
 
+    public Boolean assignAppearanceIdToItem(String itemId, String appearanceId) {
+        return itemRepository.updateAppearanceId(itemId, appearanceId);
+    }
+
 }

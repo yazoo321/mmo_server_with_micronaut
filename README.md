@@ -9,6 +9,8 @@ Currently working on:
 - Setting up Micronaut, jooq, flyway:
 https://ylazarev.com/2021/04/18/4-java-micronaut-dockered-postgres/
 
+- Notes on MongoDB and models used here: https://guides.micronaut.io/latest/micronaut-mongodb-synchronous-gradle-java.html
+
 - Setting up JWT Authentication: 
 https://ylazarev.com/2021/04/26/5-java-micronaut-jwt-authentication/
 
@@ -55,4 +57,3 @@ micronaut + postgres + jooq + flyway + lombok.
 It contains a very simple migration file (`resources/db/postgres/V1__create_user_table.sql`) 
 to create a base users table and 
 an entry with a user. Modify this based on your requirements.
-

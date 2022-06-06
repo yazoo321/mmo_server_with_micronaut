@@ -18,8 +18,10 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class Armour extends Item {
 
-    public Armour(String itemId, String itemName, List<Tag> tags, Stacking stacking, Integer value, ItemConfig config) {
-        super(itemId, itemName, ItemType.ARMOUR.getType(), tags, stacking, value, config);
+    public Armour(String itemId, String itemName,
+                  List<Tag> tags, Stacking stacking, Integer value,
+                  ItemConfig config, String appearanceId) {
+        super(itemId, itemName, ItemType.ARMOUR.getType(), tags, stacking, value, config, appearanceId);
     }
 
     // use tags to get specific dynamic data

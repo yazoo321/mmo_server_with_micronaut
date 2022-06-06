@@ -72,7 +72,7 @@ public class InventoryService {
         inventoryRepository.updateInventoryItems(characterName, itemsList);
 
         // TODO: if dropItem fails, we need to revert the removal of item from inventory.
-        return itemService.dropItem(characterItem.getItem().getItemId(), location);
+        return itemService.dropItem(characterItem.getItem().getId(), location);
     }
 
     public Inventory getInventory(String characterName) {

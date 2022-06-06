@@ -37,7 +37,7 @@ public class ItemServiceTest {
         DroppedItem expectedDroppedItem = ItemTestHelper.createDroppedItem(locationToDrop, weapon);
 
         // When
-        DroppedItem actual = itemService.dropItem(weapon.getItemId(), locationToDrop);
+        DroppedItem actual = itemService.dropItem(weapon.getId(), locationToDrop);
 
         // Then
         Assertions.assertThat(actual).usingRecursiveComparison().ignoringFields("droppedItemId", "droppedAt")

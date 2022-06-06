@@ -18,7 +18,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class Consumable extends Item {
 
-    public Consumable(String itemId, String itemName, List<Tag> tags, Stacking stacking, Integer value, ItemConfig config) {
-        super(itemId, itemName, ItemType.CONSUMABLE.getType(), tags, stacking, value, config);
+    public Consumable(String itemId, String itemName,
+                      List<Tag> tags, Stacking stacking, Integer value,
+                      ItemConfig config, String appearanceId) {
+        super(itemId, itemName, ItemType.CONSUMABLE.getType(), tags, stacking, value, config, appearanceId);
     }
 }

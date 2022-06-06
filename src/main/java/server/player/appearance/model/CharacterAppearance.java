@@ -27,7 +27,7 @@ public class CharacterAppearance {
             @JsonProperty("isMale")
             @BsonProperty("isMale") Boolean isMale,
             @JsonProperty("properties")
-            @BsonProperty("properties") Map<String, MeshMaterialPair> properties
+            @BsonProperty("properties") Map<String, AppearancePiece> properties
     ) {
         this.characterName = characterName;
         this.race = race;
@@ -40,5 +40,5 @@ public class CharacterAppearance {
     String race;
     String skinColor;
     Boolean isMale;
-    Map<String, MeshMaterialPair> properties;
+    Map<String, AppearancePiece> properties;
 }

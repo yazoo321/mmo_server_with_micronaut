@@ -1,13 +1,15 @@
 package server.player.appearance.controller;
 
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import server.player.appearance.model.AppearancePiece;
+import server.player.appearance.model.CharacterAppearance;
+import server.player.appearance.model.CreateCharacterGenericReq;
 import server.player.appearance.service.AppearanceService;
 
 import javax.inject.Inject;
+import java.util.List;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/v1/appearance")
@@ -17,7 +19,12 @@ public class CharacterAppearanceController {
     AppearanceService appearanceService;
 
     @Get("/default")
-    public void getDefaultMale(@QueryValue String race, @QueryValue Boolean isMale, @QueryValue String clothes) {
-        appearanceService.getDefaultAppearance(race, isMale, clothes);
+    public CreateCharacterGenericReq getDefaultOpts(@QueryValue String race, @QueryValue Boolean isMale) {
+        return appearanceService.getDefaultAppearance(race, isMale);
+    }
+
+    @Post("/insert")
+    public List<AppearancePiece> addPiecesToRepo(@Body CreateCharacterGenericReq req)  {
+        return appearanceService.insertAppearancePieces(req.getAppearancePieceList());
     }
 }
