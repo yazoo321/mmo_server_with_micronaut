@@ -16,6 +16,7 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Singleton
@@ -46,7 +47,7 @@ public class InventoryService {
             throw new InventoryException("No available slots in inventory");
         }
 
-        CharacterItem newCharacterItem = new CharacterItem(characterName, item, position);
+        CharacterItem newCharacterItem = new CharacterItem(characterName, item, position, UUID.randomUUID().toString());
 
         items.add(newCharacterItem);
 
@@ -56,6 +57,36 @@ public class InventoryService {
         inventoryRepository.updateInventoryItems(characterName, items);
 
         return inventory;
+    }
+
+    public boolean unequipItem(String characterItemId, String characterName) {
+        // this is basically finding the nearest slot and placing item there
+        Inventory inventory = getInventory(characterName);
+        Location2D loc = getNextAvailableSlot(inventory);
+
+        if (loc == null) {
+            return false;
+        }
+
+        List<CharacterItem> items = inventory.getCharacterItems();
+
+        CharacterItem foundItem = items.stream()
+                .filter(i -> i.getCharacterItemId()
+                .equals(characterItemId))
+                .findFirst()
+                .orElse(null);
+
+        if (foundItem == null) {
+            // this is unexpected, the item should exist in the inventory
+            log.error("Un-equip item unexpectedly failed for character {} and characterItemId {}",
+                    characterName, characterItemId);
+            return false;
+        }
+
+        foundItem.setLocation(loc);
+        inventoryRepository.updateInventoryItems(characterName, items);
+
+        return true;
     }
 
     public DroppedItem dropItem(String characterName, Location2D inventoryLocation, Location location)
@@ -115,7 +146,9 @@ public class InventoryService {
 
         items.forEach(i -> {
             Location2D loc = i.getLocation();
-            invArr[loc.getX()][loc.getY()] = 1;
+            if (loc != null) {
+                invArr[loc.getX()][loc.getY()] = 1;
+            }
         });
 
         for (int x = 0; x < maxSize.getX(); x++) {

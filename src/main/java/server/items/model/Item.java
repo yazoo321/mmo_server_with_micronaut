@@ -11,9 +11,12 @@ import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.common.dto.Tag;
-import server.items.armour.Armour;
+import server.items.armour.Chest;
+import server.items.armour.Helm;
 import server.items.consumable.Consumable;
 import server.items.weapons.Weapon;
+import server.player.character.equippable.SlotType;
+import server.player.character.equippable.model.EquippableSlots;
 
 import java.util.List;
 
@@ -24,8 +27,9 @@ import java.util.List;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property= "category")
 // define all the serializers that Items can be, weapon, armour, consumable etc.
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = Weapon.class, name = "WEAPON"),
-        @JsonSubTypes.Type(value = Armour.class, name = "ARMOUR"),
+        @JsonSubTypes.Type(value = Weapon.class, name = "WEAPON1H"),
+        @JsonSubTypes.Type(value = Chest.class, name = "CHEST"),
+        @JsonSubTypes.Type(value = Helm.class, name = "HELM"),
         @JsonSubTypes.Type(value = Consumable.class, name = "CONSUMABLE"),
 })
 public abstract class Item {
@@ -64,4 +68,8 @@ public abstract class Item {
     Stacking stacking;
     Integer value;
     ItemConfig itemConfig;
+
+    public abstract List<SlotType> getValidSlotTypes();
+
+    public abstract EquippableSlots createEquippableSlot(String characterName);
 }

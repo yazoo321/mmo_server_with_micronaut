@@ -9,12 +9,13 @@ import server.items.model.Item;
 import server.items.model.ItemConfig;
 import server.items.model.Stacking;
 import server.items.types.ItemType;
+import server.player.character.equippable.SlotType;
 
 import java.util.List;
 
 @Data
 @NoArgsConstructor
-@JsonTypeName("weapon")
+@JsonTypeName("WEAPON")
 @EqualsAndHashCode(callSuper=false)
 public class Weapon extends Item {
 
@@ -22,4 +23,7 @@ public class Weapon extends Item {
         super(itemId, itemName, ItemType.WEAPON.getType(), tags, stacking, value, config);
     }
 
+    public List<SlotType> getValidSlotTypes() {
+        return List.of(SlotType.WEAPON1, SlotType.WEAPON2);
+    }
 }

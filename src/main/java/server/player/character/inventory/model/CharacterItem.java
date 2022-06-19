@@ -24,17 +24,23 @@ public class CharacterItem {
             @JsonProperty("item")
             @BsonProperty("item") Item item,
             @JsonProperty("location")
-            @BsonProperty("location") Location2D location) {
+            @BsonProperty("location") Location2D location,
+            @JsonProperty("characterItemId")
+            @BsonProperty("characterItemId") String characterItemId
+            ) {
 
         this.characterName = characterName;
         this.item = item;
         this.location = location;
-
+        this.characterItemId = characterItemId;
     }
     String characterName;
     Item item;
 
     // position can be anything you like, 1d, 2d ints, string..
     Location2D location;
+
+    // for unique identifiers of items
+    String characterItemId;
 
 }

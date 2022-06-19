@@ -4,6 +4,8 @@ import server.common.dto.Motion;
 import server.player.character.dto.AccountCharactersResponse;
 import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
+import server.player.character.equippable.service.EquippableItemService;
+import server.player.character.inventory.service.InventoryService;
 import server.player.character.repository.PlayerCharacterRepository;
 import server.player.motion.service.PlayerMotionService;
 
@@ -18,6 +20,12 @@ public class PlayerCharacterService {
 
     @Inject
     PlayerCharacterRepository playerCharacterRepository;
+
+    @Inject
+    InventoryService inventoryService;
+
+    @Inject
+    EquippableItemService equippableItemService;
 
     @Inject
     PlayerMotionService playerMotionService;
@@ -42,6 +50,9 @@ public class PlayerCharacterService {
 
         // this will throw if there's a duplicate entry
         newCharacter = playerCharacterRepository.createNew(newCharacter);
+
+        inventoryService.createInventoryForNewCharacter(newCharacter.getName());
+        equippableItemService.setupEquippedItemsForNewCharacter(newCharacter.getName());
 
         return newCharacter;
     }
