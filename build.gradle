@@ -161,4 +161,5 @@ dockerCompose {
     stopContainers = true
     // do not wait for debug port
     tcpPortsToIgnoreWhenWaiting = [5005]
+    executable = '/usr/local/bin/docker-compose-v1'
 }

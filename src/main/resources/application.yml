@@ -61,6 +61,12 @@ mongodb:
   connectionPool:
     maxSize: 20
 
-player-character:
-  databaseName: "mmo-server"
-  collectionName: "characters"
+
+# MongoDB collections
+mongo-database:
+  database-name: "mmo-server"
+  player-character-collection: "characters"
+  items-collection: "items"
+  dropped-items-collection: "dropped-items"
+  inventory-collection: "inventory"
+  equip-collection: "equip"

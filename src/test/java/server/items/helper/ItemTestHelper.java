@@ -6,32 +6,46 @@ import io.reactivex.Single;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.common.dto.Tag;
-import server.configuration.PlayerCharacterConfiguration;
+import server.configuration.MongoConfiguration;
 import server.items.dropped.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
 import server.items.model.Stacking;
 import server.items.weapons.Weapon;
+import server.player.character.equippable.model.EquippedItems;
+import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
+import server.player.character.inventory.repository.InventoryRepository;
+import server.player.character.inventory.service.InventoryService;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.ne;
 
 @Singleton
 public class ItemTestHelper {
 
-    PlayerCharacterConfiguration configuration;
+    MongoConfiguration configuration;
     MongoClient mongoClient;
     MongoCollection<Item> itemCollection;
     MongoCollection<DroppedItem> droppedItemCollection;
     MongoCollection<Inventory> inventoryMongoCollection;
+    MongoCollection<EquippedItems> equippedItemsMongoCollection;
+
+    @Inject
+    InventoryService inventoryService;
+
+    @Inject
+    InventoryRepository inventoryRepository;
 
     public ItemTestHelper(
-            PlayerCharacterConfiguration configuration,
+            MongoConfiguration configuration,
             MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
@@ -50,6 +64,10 @@ public class ItemTestHelper {
 
         Single.fromPublisher(
                 inventoryMongoCollection.deleteMany(ne("characterName", "deleteAll"))
+        ).blockingGet();
+
+        Single.fromPublisher(
+                equippedItemsMongoCollection.deleteMany(ne("characterName", "deleteAll"))
         ).blockingGet();
     }
 
@@ -93,23 +111,53 @@ public class ItemTestHelper {
         return insertInventory(inventory);
     }
 
+    public CharacterItem addItemToInventory(Item item, String characterName) {
+        Inventory inventory = getInventory(characterName);
+
+        List<CharacterItem> items = inventory.getCharacterItems();
+
+        CharacterItem characterItem = new CharacterItem();
+        characterItem.setItem(item);
+        characterItem.setCharacterName(characterName);
+        characterItem.setLocation(inventoryService.getNextAvailableSlot(inventory));
+        characterItem.setCharacterItemId(UUID.randomUUID().toString());
+
+        items.add(characterItem);
+
+        inventoryRepository.updateInventoryItems(characterName, items);
+
+        return characterItem;
+    }
+
     public Inventory insertInventory(Inventory inventory) {
         return Single.fromPublisher(
                 inventoryMongoCollection.insertOne(inventory)
         ).map(success -> inventory).blockingGet();
     }
 
+    public Inventory getInventory(String characterName) {
+        return Single.fromPublisher(
+                inventoryMongoCollection.find(
+                        eq("characterName", characterName)
+                )
+        ).blockingGet();
+    }
+
     private void prepareCollections() {
         this.itemCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getCollectionName(), Item.class);
+                .getCollection(configuration.getItemsCollection(), Item.class);
 
         this.droppedItemCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getCollectionName(), DroppedItem.class);
+                .getCollection(configuration.getDroppedItemsCollection(), DroppedItem.class);
 
         this.inventoryMongoCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getCollectionName(), Inventory.class);
+                .getCollection(configuration.getInventoryCollection(), Inventory.class);
+
+        this.equippedItemsMongoCollection = mongoClient
+                .getDatabase(configuration.getDatabaseName())
+                .getCollection(configuration.getEquipCollection(), EquippedItems.class);
     }
 }

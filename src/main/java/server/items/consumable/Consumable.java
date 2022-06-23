@@ -10,6 +10,7 @@ import server.items.model.ItemConfig;
 import server.items.model.Stacking;
 import server.items.types.ItemType;
 import server.player.character.equippable.SlotType;
+import server.player.character.equippable.model.EquippedItems;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,5 +28,10 @@ public class Consumable extends Item {
     @Override
     public List<SlotType> getValidSlotTypes() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
+        return null;
     }
 }

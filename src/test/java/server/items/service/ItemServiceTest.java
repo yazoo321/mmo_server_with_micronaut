@@ -29,6 +29,18 @@ public class ItemServiceTest {
     }
 
     @Test
+    void testGetItemByIdReturnsItemAsExpected() {
+        // Given
+        Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
+
+        // When
+
+
+        // Then
+
+    }
+
+    @Test
     void testDropItemWillWorkAsExpectedWhenItemExists() {
         // Given
         Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
@@ -68,7 +80,7 @@ public class ItemServiceTest {
         Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
         Location firstDroppedLocation = new Location("map", 1, 1, 1);
         Location secondDroppedLocation = new Location("map", 2, 2, 1);
-        Location thirdDroppedLocation = new Location("map", 200, 200, 1);
+        Location thirdDroppedLocation = new Location("map", 1500, 1500, 1); // out of range
 
         DroppedItem firstDrop = itemTestHelper.createAndInsertDroppedItem(firstDroppedLocation, weapon);
         DroppedItem secondDrop = itemTestHelper.createAndInsertDroppedItem(secondDroppedLocation, weapon);

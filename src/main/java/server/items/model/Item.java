@@ -16,7 +16,7 @@ import server.items.armour.Helm;
 import server.items.consumable.Consumable;
 import server.items.weapons.Weapon;
 import server.player.character.equippable.SlotType;
-import server.player.character.equippable.model.EquippableSlots;
+import server.player.character.equippable.model.EquippedItems;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import java.util.List;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property= "category")
 // define all the serializers that Items can be, weapon, armour, consumable etc.
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = Weapon.class, name = "WEAPON1H"),
+        @JsonSubTypes.Type(value = Weapon.class, name = "WEAPON"),
         @JsonSubTypes.Type(value = Chest.class, name = "CHEST"),
         @JsonSubTypes.Type(value = Helm.class, name = "HELM"),
         @JsonSubTypes.Type(value = Consumable.class, name = "CONSUMABLE"),
@@ -71,5 +71,6 @@ public abstract class Item {
 
     public abstract List<SlotType> getValidSlotTypes();
 
-    public abstract EquippableSlots createEquippableSlot(String characterName);
+    public abstract EquippedItems createEquippedItem(String characterName, String characterItemId);
+
 }

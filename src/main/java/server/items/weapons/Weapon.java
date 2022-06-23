@@ -10,6 +10,8 @@ import server.items.model.ItemConfig;
 import server.items.model.Stacking;
 import server.items.types.ItemType;
 import server.player.character.equippable.SlotType;
+import server.player.character.equippable.model.EquippedItems;
+import server.player.character.equippable.model.types.WeaponSlot1;
 
 import java.util.List;
 
@@ -26,4 +28,10 @@ public class Weapon extends Item {
     public List<SlotType> getValidSlotTypes() {
         return List.of(SlotType.WEAPON1, SlotType.WEAPON2);
     }
+
+    @Override
+    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
+        return new WeaponSlot1(characterName, characterItemId);
+    }
+
 }

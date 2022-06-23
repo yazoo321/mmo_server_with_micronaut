@@ -9,7 +9,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.subscribers.DefaultSubscriber;
 import server.common.dto.Motion;
-import server.configuration.PlayerCharacterConfiguration;
+import server.configuration.MongoConfiguration;
 import server.player.character.dto.Character;
 
 import javax.annotation.PostConstruct;
@@ -26,12 +26,12 @@ import static com.mongodb.client.model.Updates.set;
 @Singleton
 public class PlayerCharacterRepository {
     // This repository is connected to MongoDB
-    PlayerCharacterConfiguration configuration;
+    MongoConfiguration configuration;
     MongoClient mongoClient;
     MongoCollection<Character> characters;
 
     public PlayerCharacterRepository(
-            PlayerCharacterConfiguration configuration,
+            MongoConfiguration configuration,
             MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
@@ -142,6 +142,6 @@ public class PlayerCharacterRepository {
     private MongoCollection<Character> getCollection() {
         return mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getCollectionName(), Character.class);
+                .getCollection(configuration.getPlayerCharacterCollection(), Character.class);
     }
 }

@@ -6,7 +6,7 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import server.configuration.PlayerCharacterConfiguration;
+import server.configuration.MongoConfiguration;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.model.exceptions.InventoryException;
@@ -22,12 +22,12 @@ public class InventoryRepository {
 
 
     // This repository is connected to MongoDB
-    PlayerCharacterConfiguration configuration;
+    MongoConfiguration configuration;
     MongoClient mongoClient;
     MongoCollection<Inventory> inventoryCollection;
 
     public InventoryRepository(
-            PlayerCharacterConfiguration configuration,
+            MongoConfiguration configuration,
             MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
@@ -87,6 +87,6 @@ public class InventoryRepository {
     private void prepareCollections() {
         this.inventoryCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getCollectionName(), Inventory.class);
+                .getCollection(configuration.getInventoryCollection(), Inventory.class);
     }
 }

@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum SlotType {
-    WEAPON1("WEAPON1"),
+    WEAPON1("weapon"),
     WEAPON2("WEAPON2"),
     HELM("HELM"),
     CHEST("CHEST"),

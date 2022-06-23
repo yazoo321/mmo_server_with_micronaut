@@ -6,6 +6,7 @@ import server.common.dto.Location2D;
 import server.items.dropped.model.DroppedItem;
 import server.items.model.Item;
 import server.items.service.ItemService;
+import server.player.character.equippable.model.exceptions.EquipException;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.model.exceptions.InventoryException;
@@ -59,13 +60,13 @@ public class InventoryService {
         return inventory;
     }
 
-    public boolean unequipItem(String characterItemId, String characterName) {
+    public void unequipItem(String characterItemId, String characterName) {
         // this is basically finding the nearest slot and placing item there
         Inventory inventory = getInventory(characterName);
         Location2D loc = getNextAvailableSlot(inventory);
 
         if (loc == null) {
-            return false;
+            throw new EquipException("Inventory full to unequip item");
         }
 
         List<CharacterItem> items = inventory.getCharacterItems();
@@ -80,13 +81,11 @@ public class InventoryService {
             // this is unexpected, the item should exist in the inventory
             log.error("Un-equip item unexpectedly failed for character {} and characterItemId {}",
                     characterName, characterItemId);
-            return false;
+            throw new EquipException("Un-equip has un-expectadly failed");
         }
 
         foundItem.setLocation(loc);
         inventoryRepository.updateInventoryItems(characterName, items);
-
-        return true;
     }
 
     public DroppedItem dropItem(String characterName, Location2D inventoryLocation, Location location)
@@ -138,7 +137,7 @@ public class InventoryService {
         inventoryRepository.updateInventoryMaxSize(inventory);
     }
 
-    private Location2D getNextAvailableSlot(Inventory inventory) {
+    public Location2D getNextAvailableSlot(Inventory inventory) {
         // Implement this as per your requirement, based on position for example.
         Location2D maxSize = inventory.getMaxSize();
         List<CharacterItem> items = inventory.getCharacterItems();

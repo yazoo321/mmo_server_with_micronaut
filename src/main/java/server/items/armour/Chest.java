@@ -10,7 +10,7 @@ import server.items.model.ItemConfig;
 import server.items.model.Stacking;
 import server.items.types.ItemType;
 import server.player.character.equippable.SlotType;
-import server.player.character.equippable.model.EquippableSlots;
+import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.types.ChestSlot;
 
 import java.util.List;
@@ -29,8 +29,9 @@ public class Chest extends Item {
         return List.of(SlotType.CHEST);
     }
 
-    public EquippableSlots createEquippableSlot(String characterName) {
-        return new ChestSlot(characterName);
+    @Override
+    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
+        return new ChestSlot(characterName, characterItemId);
     }
 
 }

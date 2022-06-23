@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.security.Principal;
 
-@Secured(SecurityRule.IS_AUTHENTICATED)
+//@Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/player")
 public class PlayerController {
 

@@ -5,16 +5,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import server.player.character.equippable.SlotType;
-import server.player.character.equippable.model.EquippableSlots;
+import server.player.character.equippable.model.EquippedItems;
 
 @Data
 @NoArgsConstructor
 @JsonTypeName("CHEST")
 @EqualsAndHashCode(callSuper=false)
-public class HelmSlot extends EquippableSlots {
+public class HelmSlot extends EquippedItems {
 
-    public HelmSlot(String characterName) {
-        super(characterName, SlotType.HELM.getType());
+    public HelmSlot(String characterName, String characterItemId) {
+        super(characterName, characterItemId, SlotType.HELM.getType());
     }
 
 }
