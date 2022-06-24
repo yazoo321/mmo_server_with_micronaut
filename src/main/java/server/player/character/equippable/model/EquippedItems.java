@@ -10,7 +10,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.player.character.equippable.model.types.ChestSlot;
 import server.player.character.equippable.model.types.HelmSlot;
 import server.player.character.equippable.model.types.WeaponSlot1;
-import server.player.character.equippable.model.types.WeaponSlot2;
+import server.player.character.equippable.model.types.ShieldSlot;
 
 
 @Data
@@ -19,8 +19,8 @@ import server.player.character.equippable.model.types.WeaponSlot2;
 @BsonDiscriminator
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property= "category")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = WeaponSlot1.class, name = "WEAPON1"),
-        @JsonSubTypes.Type(value = WeaponSlot2.class, name = "WEAPON2"),
+        @JsonSubTypes.Type(value = WeaponSlot1.class, name = "WEAPON"),
+        @JsonSubTypes.Type(value = ShieldSlot.class, name = "SHIELD"),
         @JsonSubTypes.Type(value = HelmSlot.class, name = "HELM"),
         @JsonSubTypes.Type(value = ChestSlot.class, name = "CHEST"),
 

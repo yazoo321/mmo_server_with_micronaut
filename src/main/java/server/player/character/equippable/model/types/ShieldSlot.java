@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import server.player.character.equippable.SlotType;
+import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
 
 @Data
 @NoArgsConstructor
-@JsonTypeName("WEAPON2")
+@JsonTypeName("SHIELD")
 @EqualsAndHashCode(callSuper=false)
-public class WeaponSlot2 extends EquippedItems {
+public class ShieldSlot extends EquippedItems {
 
-    public WeaponSlot2(String characterName, String characterItemId) {
-        super(characterName, characterItemId, SlotType.WEAPON2.getType());
+    public ShieldSlot(String characterName, String characterItemId) {
+        super(characterName, characterItemId, ItemType.SHIELD.getType());
     }
 
 }

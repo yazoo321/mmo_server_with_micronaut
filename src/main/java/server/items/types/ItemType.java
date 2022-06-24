@@ -22,7 +22,7 @@ import lombok.Getter;
 public enum ItemType {
     // weapons
     WEAPON("WEAPON"),
-
+    SHIELD("SHIELD"),
 
     // armour
     HELM("HELM"),

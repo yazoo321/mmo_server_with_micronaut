@@ -10,6 +10,7 @@ import server.items.helper.ItemTestHelper;
 import server.items.model.Item;
 import server.items.model.exceptions.ItemException;
 import server.items.service.ItemService;
+import server.items.types.ItemType;
 import server.items.weapons.Weapon;
 
 import javax.inject.Inject;
@@ -33,7 +34,7 @@ public class ItemRepositoryTest {
     @Test
     void testGetItemByIdReturnsItemAsExpected() {
         // Given
-        Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
+        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
 
         // When
         Item found = itemRepository.findByItemId(weapon.getItemId());

@@ -7,10 +7,12 @@ import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.common.dto.Tag;
 import server.configuration.MongoConfiguration;
+import server.items.armour.*;
 import server.items.dropped.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
 import server.items.model.Stacking;
+import server.items.types.ItemType;
 import server.items.weapons.Weapon;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.inventory.model.CharacterItem;
@@ -71,21 +73,16 @@ public class ItemTestHelper {
         ).blockingGet();
     }
 
-    public static Weapon createTestWeaponItem() {
-        List<Tag> weaponTags = List.of(
-                new Tag("damage", "30")
-        );
-        Stacking stacOpts = new Stacking(false, 1, 1);
-        ItemConfig itemConfig = new ItemConfig("icon", "mesh");
-        return new Weapon("123", "weapon name", weaponTags, stacOpts, 1000, itemConfig);
+    public Item createAndInsertItem(String type) {
+        Item item = createTestItemOfType(type);
+
+        return insertItem(item);
     }
 
-    public Weapon createAndInsertWeaponItem() {
-        Weapon weapon = createTestWeaponItem();
-
+    public Item insertItem(Item item) {
         return Single.fromPublisher(
-                itemCollection.insertOne(weapon)
-        ).map(success -> weapon).blockingGet();
+                itemCollection.insertOne(item)
+        ).map(success -> item).blockingGet();
     }
 
     public static DroppedItem createDroppedItem(Location location, Item item) {
@@ -159,5 +156,47 @@ public class ItemTestHelper {
         this.equippedItemsMongoCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
                 .getCollection(configuration.getEquipCollection(), EquippedItems.class);
+    }
+
+    public static Item createTestItemOfType(String type) {
+        Stacking stacOpts = new Stacking(false, 1, 1);
+        List<Tag> tags = new ArrayList<>();
+        ItemConfig itemConfig = new ItemConfig("icon", "mesh");
+
+        switch (type) {
+            case "WEAPON":
+                tags.add(new Tag("damage", "30"));
+                return new Weapon(UUID.randomUUID().toString(), "sharp sword", tags, stacOpts, 1000, itemConfig);
+            case "HELM":
+                tags.add(new Tag("armor", "10"));
+                return new Helm(UUID.randomUUID().toString(), "leather helm", tags, stacOpts, 1000, itemConfig);
+            case "CHEST":
+                tags.add(new Tag("armour", "10"));
+                return new Chest(UUID.randomUUID().toString(), "leather armour", tags, stacOpts, 1000, itemConfig);
+            case "BELT":
+                tags.add(new Tag("armor", "10"));
+                return new Belt(UUID.randomUUID().toString(), "leather belt", tags, stacOpts, 1000, itemConfig);
+            case "BRACERS":
+                tags.add(new Tag("armor", "10"));
+                return new Bracers(UUID.randomUUID().toString(), "iron bracers", tags, stacOpts, 1000, itemConfig);
+            case "CAPE":
+                tags.add(new Tag("armor", "10"));
+                return new Cape(UUID.randomUUID().toString(), "green cape", tags, stacOpts, 1000, itemConfig);
+            case "GLOVES":
+                tags.add(new Tag("armor", "10"));
+                return new Gloves(UUID.randomUUID().toString(), "leather gloves", tags, stacOpts, 1000, itemConfig);
+            case "LEGS":
+                tags.add(new Tag("armor", "10"));
+                return new Legs(UUID.randomUUID().toString(), "leather pants", tags, stacOpts, 1000, itemConfig);
+            case "SHOULDER":
+                tags.add(new Tag("armor", "10"));
+                return new Shoulder(UUID.randomUUID().toString(), "leather shoulder pads", tags, stacOpts, 1000, itemConfig);
+            case "NECK":
+                tags.add(new Tag("armor", "10"));
+                return new Neck(UUID.randomUUID().toString(), "leather shoulder pads", tags, stacOpts, 1000, itemConfig);
+            default:
+                return null;
+        }
+
     }
 }

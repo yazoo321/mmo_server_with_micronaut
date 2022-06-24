@@ -15,7 +15,6 @@ import server.items.armour.Chest;
 import server.items.armour.Helm;
 import server.items.consumable.Consumable;
 import server.items.weapons.Weapon;
-import server.player.character.equippable.SlotType;
 import server.player.character.equippable.model.EquippedItems;
 
 import java.util.List;
@@ -68,8 +67,6 @@ public abstract class Item {
     Stacking stacking;
     Integer value;
     ItemConfig itemConfig;
-
-    public abstract List<SlotType> getValidSlotTypes();
 
     public abstract EquippedItems createEquippedItem(String characterName, String characterItemId);
 
