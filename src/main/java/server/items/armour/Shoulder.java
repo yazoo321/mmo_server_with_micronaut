@@ -11,6 +11,7 @@ import server.items.model.Stacking;
 import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.types.BeltSlot;
+import server.player.character.equippable.model.types.ShoulderSlot;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class Shoulder extends Item {
 
     @Override
     public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new BeltSlot(characterName, characterItemId);
+        return new ShoulderSlot(characterName, characterItemId);
     }
 
 }

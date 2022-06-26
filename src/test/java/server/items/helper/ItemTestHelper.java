@@ -7,12 +7,16 @@ import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.common.dto.Tag;
 import server.configuration.MongoConfiguration;
+import server.items.accessories.Belt;
+import server.items.accessories.Cape;
+import server.items.accessories.Neck;
+import server.items.accessories.Ring;
 import server.items.armour.*;
 import server.items.dropped.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
 import server.items.model.Stacking;
-import server.items.types.ItemType;
+import server.items.weapons.Shield;
 import server.items.weapons.Weapon;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.inventory.model.CharacterItem;
@@ -194,6 +198,15 @@ public class ItemTestHelper {
             case "NECK":
                 tags.add(new Tag("armor", "10"));
                 return new Neck(UUID.randomUUID().toString(), "leather shoulder pads", tags, stacOpts, 1000, itemConfig);
+            case "BOOTS":
+                tags.add(new Tag("armor", "10"));
+                return new Boots(UUID.randomUUID().toString(), "leather boots", tags, stacOpts, 1000, itemConfig);
+            case "RING":
+                tags.add(new Tag("armour", "10"));
+                return new Ring(UUID.randomUUID().toString(), "gold ring", tags, stacOpts, 1000, itemConfig);
+            case "SHIELD":
+                tags.add(new Tag("armor", "10"));
+                return new Shield(UUID.randomUUID().toString(), "bronze shield", tags, stacOpts, 1000, itemConfig);
             default:
                 return null;
         }

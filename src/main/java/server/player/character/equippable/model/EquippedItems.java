@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import server.player.character.equippable.model.types.ChestSlot;
-import server.player.character.equippable.model.types.HelmSlot;
-import server.player.character.equippable.model.types.WeaponSlot1;
-import server.player.character.equippable.model.types.ShieldSlot;
+import server.items.armour.Boots;
+import server.items.armour.Gloves;
+import server.player.character.equippable.model.types.*;
 
 
 @Data
@@ -19,12 +18,22 @@ import server.player.character.equippable.model.types.ShieldSlot;
 @BsonDiscriminator
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property= "category")
 @JsonSubTypes({
+        // Weapons
         @JsonSubTypes.Type(value = WeaponSlot1.class, name = "WEAPON"),
         @JsonSubTypes.Type(value = ShieldSlot.class, name = "SHIELD"),
-        @JsonSubTypes.Type(value = HelmSlot.class, name = "HELM"),
+        // Accessories
+        @JsonSubTypes.Type(value = BeltSlot.class, name = "BELT"),
+        @JsonSubTypes.Type(value = CapeSlot.class, name = "CAPE"),
+        @JsonSubTypes.Type(value = NeckSlot.class, name = "NECK"),
+        @JsonSubTypes.Type(value = RingSlot1.class, name = "RING"),
+        // Armour
+        @JsonSubTypes.Type(value = BootsSlot.class, name = "BOOTS"),
+        @JsonSubTypes.Type(value = BracersSlot.class, name = "BRACERS"),
         @JsonSubTypes.Type(value = ChestSlot.class, name = "CHEST"),
-
-
+        @JsonSubTypes.Type(value = GlovesSlot.class, name = "GLOVES"),
+        @JsonSubTypes.Type(value = HelmSlot.class, name = "HELM"),
+        @JsonSubTypes.Type(value = LegsSlot.class, name = "LEGS"),
+        @JsonSubTypes.Type(value = ShoulderSlot.class, name = "SHOULDER"),
 })
 public abstract class EquippedItems {
 

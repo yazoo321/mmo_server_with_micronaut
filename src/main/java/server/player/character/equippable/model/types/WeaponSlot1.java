@@ -7,13 +7,6 @@ import lombok.NoArgsConstructor;
 import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
 
-
-
-//
-//    public Weapon(String itemId, String itemName, List<Tag> tags, Stacking stacking, Integer value, ItemConfig config) {
-//        super(itemId, itemName, ItemType.WEAPON.getType(), tags, stacking, value, config);
-//    }
-
 @Data
 @NoArgsConstructor
 @JsonTypeName("WEAPON")

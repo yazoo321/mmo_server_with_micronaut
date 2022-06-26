@@ -2,21 +2,23 @@ package server.player.character.equippable.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import server.items.helper.ItemTestHelper;
 import server.items.model.Item;
 import server.items.types.ItemType;
-import server.items.weapons.Weapon;
 import server.player.character.equippable.model.EquippedItems;
-import server.player.character.equippable.model.types.WeaponSlot1;
+import server.player.character.equippable.model.types.*;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.service.InventoryService;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -39,33 +41,60 @@ public class EquipItemServiceTest {
         itemTestHelper.prepareInventory(CHARACTER_NAME);
     }
 
-    @Test
-    void equipWeaponItemWhenNothingAlreadyEquippedWillWorkAsExpected() {
+    private static Stream<Arguments> itemTypesAndSlots() {
+        // TODO: Support Ring slot 2, Weapon 2h, dual wield weapon
+        return Stream.of(
+                // Weapons
+                Arguments.of(ItemType.WEAPON.getType(), new WeaponSlot1(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.SHIELD.getType(), new ShieldSlot(CHARACTER_NAME, "override")),
+
+                // Accessories
+                Arguments.of(ItemType.BELT.getType(), new BeltSlot(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.CAPE.getType(), new CapeSlot(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.NECK.getType(), new NeckSlot(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.RING.getType(), new RingSlot1(CHARACTER_NAME, "override")),
+
+                // Armour
+                Arguments.of(ItemType.BOOTS.getType(), new BootsSlot(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.BRACERS.getType(), new BracersSlot(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.CHEST.getType(), new ChestSlot(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.GLOVES.getType(), new GlovesSlot(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.HELM.getType(), new HelmSlot(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.LEGS.getType(), new LegsSlot(CHARACTER_NAME, "override")),
+                Arguments.of(ItemType.SHOULDER.getType(), new ShoulderSlot(CHARACTER_NAME, "override"))
+            );
+    }
+
+    @ParameterizedTest
+    @MethodSource("itemTypesAndSlots")
+    void equipWeaponItemWhenNothingAlreadyEquippedWillWorkAsExpected(String itemType, EquippedItems expectedEquipped) {
         // Given
-        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
-        CharacterItem item  = itemTestHelper.addItemToInventory(weapon, CHARACTER_NAME);
+        Item item = itemTestHelper.createAndInsertItem(itemType);
+        CharacterItem characterItem = itemTestHelper.addItemToInventory(item, CHARACTER_NAME);
+        characterItem.setCharacterItemId("override");
 
         // When
-        equipItemService.equipItem(item, CHARACTER_NAME);
+        equipItemService.equipItem(characterItem, CHARACTER_NAME);
 
         // Then
         List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
-        WeaponSlot1 expectedWeapon = new WeaponSlot1(CHARACTER_NAME, item.getCharacterItemId());
-        Assertions.assertThat(equipped).usingRecursiveComparison().isEqualTo(List.of(expectedWeapon));
+        Assertions.assertThat(equipped).usingRecursiveComparison().isEqualTo(List.of(expectedEquipped));
     }
 
-    @Test
-    void equipWeaponItemWhenOneIsAlreadyEquippedWillWorkAsExpected() {
+    @ParameterizedTest
+    @MethodSource("itemTypesAndSlots")
+    void equipWeaponItemWhenOneIsAlreadyEquippedWillWorkAsExpected(String itemType, EquippedItems expectedEquipped) {
         // Given
-        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
+        Item item = itemTestHelper.createAndInsertItem(itemType);
 
-        Weapon weapon2 = (Weapon) ItemTestHelper.createTestItemOfType(ItemType.WEAPON.getType());
-        weapon2.setItemId("111");
-        weapon2.setItemName("hammer");
-        weapon2 = (Weapon) itemTestHelper.insertItem(weapon2);
+        Item item2 = ItemTestHelper.createTestItemOfType(itemType);
+        item2.setItemId(UUID.randomUUID().toString());
+        item2.setItemName("some name");
+        item2 = itemTestHelper.insertItem(item2);
 
-        CharacterItem i1  = itemTestHelper.addItemToInventory(weapon, CHARACTER_NAME);
-        CharacterItem i2  = itemTestHelper.addItemToInventory(weapon2, CHARACTER_NAME);
+        CharacterItem i1  = itemTestHelper.addItemToInventory(item, CHARACTER_NAME);
+        CharacterItem i2  = itemTestHelper.addItemToInventory(item2, CHARACTER_NAME);
+        i2.setCharacterItemId("override");
 
         equipItemService.equipItem(i1, CHARACTER_NAME);
 
@@ -76,48 +105,7 @@ public class EquipItemServiceTest {
         List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
         Assertions.assertThat(equipped.size()).isEqualTo(1);
 
-        WeaponSlot1 expectedWeapon = new WeaponSlot1(CHARACTER_NAME, i2.getCharacterItemId());
-        Assertions.assertThat(equipped).usingRecursiveComparison().isEqualTo(List.of(expectedWeapon));
+        Assertions.assertThat(equipped).usingRecursiveComparison().isEqualTo(List.of(expectedEquipped));
     }
 
-    @Test
-    void equipHelmItemWhenNothingAlreadyEquippedWillWorkAsExpected() {
-        // Given
-        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
-        CharacterItem item  = itemTestHelper.addItemToInventory(weapon, CHARACTER_NAME);
-
-        // When
-        equipItemService.equipItem(item, CHARACTER_NAME);
-
-        // Then
-        List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
-        WeaponSlot1 expectedWeapon = new WeaponSlot1(CHARACTER_NAME, item.getCharacterItemId());
-        Assertions.assertThat(equipped).usingRecursiveComparison().isEqualTo(List.of(expectedWeapon));
-    }
-
-    @Test
-    void equipHelmItemWhenOneIsAlreadyEquippedWillWorkAsExpected() {
-        // Given
-        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
-
-        Weapon weapon2 = (Weapon) ItemTestHelper.createTestItemOfType(ItemType.WEAPON.getType());
-        weapon2.setItemId("111");
-        weapon2.setItemName("hammer");
-        weapon2 = (Weapon) itemTestHelper.insertItem(weapon2);
-
-        CharacterItem i1  = itemTestHelper.addItemToInventory(weapon, CHARACTER_NAME);
-        CharacterItem i2  = itemTestHelper.addItemToInventory(weapon2, CHARACTER_NAME);
-
-        equipItemService.equipItem(i1, CHARACTER_NAME);
-
-        // When
-        equipItemService.equipItem(i2, CHARACTER_NAME);
-
-        // Then
-        List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
-        Assertions.assertThat(equipped.size()).isEqualTo(1);
-
-        WeaponSlot1 expectedWeapon = new WeaponSlot1(CHARACTER_NAME, i2.getCharacterItemId());
-        Assertions.assertThat(equipped).usingRecursiveComparison().isEqualTo(List.of(expectedWeapon));
-    }
 }

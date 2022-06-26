@@ -1,4 +1,4 @@
-package server.items.armour;
+package server.items.accessories;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
@@ -22,7 +22,7 @@ import java.util.List;
 public class Belt extends Item {
 
     public Belt(String itemId, String itemName, List<Tag> tags, Stacking stacking, Integer value, ItemConfig config) {
-        super(itemId, itemName, ItemType.CHEST.getType(), tags, stacking, value, config);
+        super(itemId, itemName, ItemType.BELT.getType(), tags, stacking, value, config);
     }
 
     @Override

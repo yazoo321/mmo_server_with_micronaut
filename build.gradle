@@ -140,6 +140,10 @@ dependencies {
 
 
     // test
+    testCompile("org.junit.jupiter:junit-jupiter-params:5.8.1")
+//    testCompile("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+//    testCompile("org.junit.jupiter:junit-jupiter-api:5.8.1")
+
     testImplementation("org.assertj:assertj-core:3.20.2")
     testImplementation("io.micronaut.test:micronaut-test-junit5")
     testImplementation("org.mockito:mockito-core:3.11.2")
@@ -161,5 +165,6 @@ dockerCompose {
     stopContainers = true
     // do not wait for debug port
     tcpPortsToIgnoreWhenWaiting = [5005]
-    executable = '/usr/local/bin/docker-compose-v1'
+    // Mac M1 fix:
+//    executable = '/usr/local/bin/docker-compose-v1'
 }

@@ -9,11 +9,11 @@ import server.player.character.equippable.model.EquippedItems;
 
 @Data
 @NoArgsConstructor
-@JsonTypeName("CHEST")
+@JsonTypeName("BOOTS")
 @EqualsAndHashCode(callSuper=false)
-public class ChestSlot extends EquippedItems {
+public class BootsSlot extends EquippedItems {
 
-    public ChestSlot(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.CHEST.getType());
+    public BootsSlot(String characterName, String characterItemId) {
+        super(characterName, characterItemId, ItemType.BOOTS.getType());
     }
 }

@@ -1,4 +1,4 @@
-package server.items.armour;
+package server.items.accessories;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
@@ -10,24 +10,24 @@ import server.items.model.ItemConfig;
 import server.items.model.Stacking;
 import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
-import server.player.character.equippable.model.types.BeltSlot;
-import server.player.character.equippable.model.types.LegsSlot;
+import server.player.character.equippable.model.types.RingSlot1;
+import server.player.character.equippable.model.types.ShoulderSlot;
 
 import java.util.List;
 
 @Data
 @NoArgsConstructor
-@JsonTypeName("LEGS")
+@JsonTypeName("RING")
 @EqualsAndHashCode(callSuper=false)
-public class Legs extends Item {
+public class Ring extends Item {
 
-    public Legs(String itemId, String itemName, List<Tag> tags, Stacking stacking, Integer value, ItemConfig config) {
-        super(itemId, itemName, ItemType.LEGS.getType(), tags, stacking, value, config);
+    public Ring(String itemId, String itemName, List<Tag> tags, Stacking stacking, Integer value, ItemConfig config) {
+        super(itemId, itemName, ItemType.RING.getType(), tags, stacking, value, config);
     }
 
     @Override
     public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new LegsSlot(characterName, characterItemId);
+        return new RingSlot1(characterName, characterItemId);
     }
 
 }

@@ -35,8 +35,7 @@ public enum ItemType {
     BRACERS("BRACERS"),
     GLOVES("GLOVES"),
     SHIRT("SHIRT"),
-    RING1("RING1"),
-    RING2("RING2"),
+    RING("RING"),
     NECK("NECK"),
 
     // consumables

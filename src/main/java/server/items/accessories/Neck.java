@@ -1,4 +1,4 @@
-package server.items.armour;
+package server.items.accessories;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
@@ -11,6 +11,7 @@ import server.items.model.Stacking;
 import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.types.BeltSlot;
+import server.player.character.equippable.model.types.NeckSlot;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class Neck extends Item {
 
     @Override
     public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new BeltSlot(characterName, characterItemId);
+        return new NeckSlot(characterName, characterItemId);
     }
 
 }
