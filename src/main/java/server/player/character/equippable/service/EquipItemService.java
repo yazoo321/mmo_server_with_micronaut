@@ -4,9 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import server.items.model.Item;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.exceptions.EquipException;
-import server.player.character.equippable.model.types.WeaponSlot1;
 import server.player.character.equippable.repository.EquipRepository;
 import server.player.character.inventory.model.CharacterItem;
+import server.player.character.inventory.model.Inventory;
+import server.player.character.inventory.model.exceptions.InventoryException;
 import server.player.character.inventory.service.InventoryService;
 
 import javax.inject.Inject;
@@ -23,36 +24,41 @@ public class EquipItemService {
     @Inject
     InventoryService inventoryService;
 
-    public EquippedItems equipItem(CharacterItem itemToEquip, String characterName) {
-        if (!characterName.equalsIgnoreCase(itemToEquip.getCharacterName())) {
-            log.error("equipItem: Request came from unexpected character, potential hacking in progress");
-            return null;
-        }
-
+    public EquippedItems equipItem(String characterItemId, String characterName) {
         // in order to equip item, first un-equip item from slot if one exists
-        Item item = itemToEquip.getItem();
+
+        Inventory inventory = inventoryService.getInventory(characterName);
+        List<CharacterItem> items = inventory.getCharacterItems();
+        CharacterItem characterItem = items
+                .stream()
+                .filter(iterator->iterator.getCharacterItemId().equals(characterItemId))
+                .findFirst().orElseThrow(() ->
+                        new InventoryException("The item trying to equip does not exist"));
+
+        Item item = characterItem.getItem();
         String slotType = item.getCategory();
 
         EquippedItems equippedItem = equipRepository.getCharacterItemSlot(characterName, slotType);
 
         if (equippedItem != null) {
-            unequipItem(equippedItem, characterName);
+            unequipItem(equippedItem.getCharacterItemId(), characterName);
         }
 
-        equippedItem = item.createEquippedItem(characterName, itemToEquip.getCharacterItemId());
+        equippedItem = item.createEquippedItem(characterName, characterItemId);
+        // setting location to null effectively moves it away from inventory space
+        characterItem.setLocation(null);
+        inventoryService.updateInventoryItems(characterName, items);
+
         return equipRepository.insert(equippedItem);
     }
 
-    public void unequipItem(EquippedItems item, String characterName) {
-        if (!item.getCharacterName().equalsIgnoreCase(characterName)) {
-            log.error("unequipItem: Request came from unexpected character, potential hacking in progress");
-        }
-        inventoryService.unequipItem(item.getCharacterItemId(), item.getCharacterName());
-        boolean success = equipRepository.deleteEquippedItem(item.getCharacterItemId());
+    public void unequipItem(String characterItemId, String characterName) {
+        inventoryService.unequipItem(characterItemId, characterName);
+        boolean success = equipRepository.deleteEquippedItem(characterItemId);
 
         if (!success) {
             log.error("error with unequip item, potential duplicate record created, characterItemId: {}",
-                    item.getCharacterItemId());
+                    characterItemId);
             throw new EquipException("Did not delete equipped item successfully");
         }
     }

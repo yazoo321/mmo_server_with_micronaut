@@ -18,6 +18,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.combine;
@@ -97,11 +98,14 @@ public class PlayerCharacterRepository {
 
     public Character findByName(String name) {
         // TODO: Ignore case
-        return Flowable.fromPublisher(
-                characters
-                        .find(eq("name", name))
-                        .limit(1)
-        ).firstElement().blockingGet();
+        try {
+            return Single.fromPublisher(
+                    characters
+                            .find(eq("name", name))
+            ).blockingGet();
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 
     public List<Character> findByAccount(String accountName) {

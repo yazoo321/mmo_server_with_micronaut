@@ -112,7 +112,7 @@ public class ItemTestHelper {
         return insertInventory(inventory);
     }
 
-    public CharacterItem addItemToInventory(Item item, String characterName) {
+    public CharacterItem addItemToInventoryWithOverrideId(Item item, String characterName, String characterItemId) {
         Inventory inventory = getInventory(characterName);
 
         List<CharacterItem> items = inventory.getCharacterItems();
@@ -121,13 +121,19 @@ public class ItemTestHelper {
         characterItem.setItem(item);
         characterItem.setCharacterName(characterName);
         characterItem.setLocation(inventoryService.getNextAvailableSlot(inventory));
-        characterItem.setCharacterItemId(UUID.randomUUID().toString());
+        String id = characterItemId == null ? UUID.randomUUID().toString() : characterItemId;
+        characterItem.setCharacterItemId(id);
 
         items.add(characterItem);
 
         inventoryRepository.updateInventoryItems(characterName, items);
 
         return characterItem;
+    }
+
+    public CharacterItem addItemToInventory(Item item, String characterName) {
+
+        return addItemToInventoryWithOverrideId(item, characterName, null);
     }
 
     public Inventory insertInventory(Inventory inventory) {

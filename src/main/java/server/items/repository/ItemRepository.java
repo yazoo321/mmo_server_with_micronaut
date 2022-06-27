@@ -62,9 +62,14 @@ public class ItemRepository {
     }
 
     public Item createItem(Item item) {
-        return Single.fromPublisher(
-                itemCollection.insertOne(item))
-                .map(success -> item).blockingGet();
+        try {
+            return findByItemId(item.getItemId());
+            // if item is found, we want to ignore creating this item and just return the found item.
+        } catch (ItemException e) {
+            return Single.fromPublisher(
+                    itemCollection.insertOne(item))
+                    .map(success -> item).blockingGet();
+        }
     }
 
     public Item findByItemId(String itemId) {

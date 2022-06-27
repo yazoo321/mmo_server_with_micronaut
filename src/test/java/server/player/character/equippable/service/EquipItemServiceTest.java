@@ -70,11 +70,10 @@ public class EquipItemServiceTest {
     void equipWeaponItemWhenNothingAlreadyEquippedWillWorkAsExpected(String itemType, EquippedItems expectedEquipped) {
         // Given
         Item item = itemTestHelper.createAndInsertItem(itemType);
-        CharacterItem characterItem = itemTestHelper.addItemToInventory(item, CHARACTER_NAME);
-        characterItem.setCharacterItemId("override");
+        CharacterItem characterItem = itemTestHelper.addItemToInventoryWithOverrideId(item, CHARACTER_NAME, "override");
 
         // When
-        equipItemService.equipItem(characterItem, CHARACTER_NAME);
+        equipItemService.equipItem(characterItem.getCharacterItemId(), CHARACTER_NAME);
 
         // Then
         List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
@@ -93,13 +92,12 @@ public class EquipItemServiceTest {
         item2 = itemTestHelper.insertItem(item2);
 
         CharacterItem i1  = itemTestHelper.addItemToInventory(item, CHARACTER_NAME);
-        CharacterItem i2  = itemTestHelper.addItemToInventory(item2, CHARACTER_NAME);
-        i2.setCharacterItemId("override");
+        CharacterItem i2  = itemTestHelper.addItemToInventoryWithOverrideId(item2, CHARACTER_NAME, "override");
 
-        equipItemService.equipItem(i1, CHARACTER_NAME);
+        equipItemService.equipItem(i1.getCharacterItemId(), CHARACTER_NAME);
 
         // When
-        equipItemService.equipItem(i2, CHARACTER_NAME);
+        equipItemService.equipItem(i2.getCharacterItemId(), CHARACTER_NAME);
 
         // Then
         List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);

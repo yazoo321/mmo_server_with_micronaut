@@ -1,0 +1,289 @@
+Here's a body with sample item creation body for `/v1/items/create-items`
+
+```
+{
+
+    "items": [
+        {
+            "itemId": "500",
+            "itemName": "small axe",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "15"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "600",
+            "itemName": "wooden buckler",
+            "category": "SHIELD",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "10"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "700",
+            "itemName": "leather belt",
+            "category": "BELT",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "3"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "800",
+            "itemName": "Green cape",
+            "category": "CAPE",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "3"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "900",
+            "itemName": "Gold necklace",
+            "category": "NECK",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "2"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "1000",
+            "itemName": "Gold ring",
+            "category": "RING",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "1"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "1100",
+            "itemName": "Leather boots",
+            "category": "BOOTS",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "2"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "1200",
+            "itemName": "Leather bracers",
+            "category": "BOOTS",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "2"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "1300",
+            "itemName": "Leather armour",
+            "category": "CHEST",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "20"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "1400",
+            "itemName": "Leather gloves",
+            "category": "GLOVES",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "5"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "1500",
+            "itemName": "Leather helm",
+            "category": "HELM",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "10"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "1600",
+            "itemName": "Leather pants",
+            "category": "LEGS",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "7"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "1700",
+            "itemName": "Leather shoulder pads",
+            "category": "SHOULDER",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "6"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "1800",
+            "itemName": "Leather shoulder pads",
+            "category": "SHOULDER",
+            "tags": [
+                {
+                    "name": "armour",
+                    "value": "6"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        }
+    ]
+}
+```

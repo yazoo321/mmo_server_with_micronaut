@@ -109,6 +109,10 @@ public class InventoryService {
         return inventoryRepository.getCharacterInventory(characterName);
     }
 
+    public void updateInventoryItems(String characterName, List<CharacterItem> characterItems) {
+        inventoryRepository.updateInventoryItems(characterName, characterItems);
+    }
+
     public void sellItem() {
         // TODO: later
     }
@@ -162,6 +166,7 @@ public class InventoryService {
     }
 
     public void clearAllDataForCharacter(String characterName) {
+        // This is for test purposes!
         inventoryRepository.deleteAllInventoryDataForCharacter(characterName);
     }
 
