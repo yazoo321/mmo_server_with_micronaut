@@ -2,6 +2,7 @@ package server.player.character.inventory.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
@@ -10,6 +11,7 @@ import server.items.dropped.model.DroppedItem;
 import server.items.helper.ItemTestHelper;
 import server.items.model.Item;
 import server.items.service.ItemService;
+import server.items.types.ItemType;
 import server.items.weapons.Weapon;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
@@ -42,7 +44,7 @@ public class InventoryServiceTest {
     void testPickupItemWillPickUpItemAndSetToInventory() {
         // Given
         Location location = new Location("map", 1, 1, 1);
-        Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
+        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
 
         // When
@@ -61,7 +63,7 @@ public class InventoryServiceTest {
     @Test
     void dropItemWillRemoveItFromInventoryAndAddDroppedItemObject() {
         // Given
-        Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
+        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location location = new Location("map", 1, 1, 1);
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
         // TODO: make test not rely on service call
@@ -85,7 +87,7 @@ public class InventoryServiceTest {
         inventory.setMaxSize(new Location2D(2, 2));
         inventoryService.updateInventoryMaxSize(inventory);
 
-        Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
+        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
 
         // When
         for (int i=0; i<4; i++) {

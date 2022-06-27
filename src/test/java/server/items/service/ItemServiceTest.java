@@ -8,6 +8,7 @@ import server.common.dto.Location;
 import server.items.dropped.model.DroppedItem;
 import server.items.helper.ItemTestHelper;
 import server.items.model.exceptions.ItemException;
+import server.items.types.ItemType;
 import server.items.weapons.Weapon;
 
 import javax.inject.Inject;
@@ -29,9 +30,21 @@ public class ItemServiceTest {
     }
 
     @Test
+    void testGetItemByIdReturnsItemAsExpected() {
+        // Given
+        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
+
+        // When
+
+
+        // Then
+
+    }
+
+    @Test
     void testDropItemWillWorkAsExpectedWhenItemExists() {
         // Given
-        Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
+        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
 
         DroppedItem expectedDroppedItem = ItemTestHelper.createDroppedItem(locationToDrop, weapon);
@@ -47,7 +60,7 @@ public class ItemServiceTest {
     @Test
     void getDroppedItemByIdFindsTheItemAndReturnsIt() {
         // Given
-        Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
+        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
         DroppedItem expectedDroppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
@@ -65,10 +78,10 @@ public class ItemServiceTest {
     @Test
     void getItemsInMapWillReturnResultsWhenInRange() {
         // Given
-        Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
+        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location firstDroppedLocation = new Location("map", 1, 1, 1);
         Location secondDroppedLocation = new Location("map", 2, 2, 1);
-        Location thirdDroppedLocation = new Location("map", 200, 200, 1);
+        Location thirdDroppedLocation = new Location("map", 1500, 1500, 1); // out of range
 
         DroppedItem firstDrop = itemTestHelper.createAndInsertDroppedItem(firstDroppedLocation, weapon);
         DroppedItem secondDrop = itemTestHelper.createAndInsertDroppedItem(secondDroppedLocation, weapon);
@@ -89,7 +102,7 @@ public class ItemServiceTest {
     @Test
     void deleteDroppedItemWillRemoveIt() {
         // Given
-        Weapon weapon = itemTestHelper.createAndInsertWeaponItem();
+        Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 

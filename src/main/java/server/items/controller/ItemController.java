@@ -11,6 +11,7 @@ import server.items.service.ItemService;
 import server.player.character.inventory.model.GenericInventoryData;
 
 import javax.inject.Inject;
+import java.util.List;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/v1/items")
@@ -19,12 +20,12 @@ public class ItemController {
     @Inject
     ItemService itemService;
 
-    @Post("/create-item")
-    public Item updatePlayerLocation(@Body GenericInventoryData data) {
+    @Post("/create-items")
+    public List<Item> createItems(@Body GenericInventoryData data) {
         // This is a test endpoint!
         // you should not be creating items live, they should be handled via migration
 
-        return itemService.createItem(data.getItem());
+        return itemService.createItems(data.getItems());
     }
 
     @Post("/spawn-item")

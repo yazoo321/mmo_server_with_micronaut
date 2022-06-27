@@ -9,7 +9,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.subscribers.DefaultSubscriber;
 import server.common.dto.Motion;
-import server.configuration.PlayerCharacterConfiguration;
+import server.configuration.MongoConfiguration;
 import server.player.character.dto.Character;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +18,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.combine;
@@ -26,12 +27,12 @@ import static com.mongodb.client.model.Updates.set;
 @Singleton
 public class PlayerCharacterRepository {
     // This repository is connected to MongoDB
-    PlayerCharacterConfiguration configuration;
+    MongoConfiguration configuration;
     MongoClient mongoClient;
     MongoCollection<Character> characters;
 
     public PlayerCharacterRepository(
-            PlayerCharacterConfiguration configuration,
+            MongoConfiguration configuration,
             MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
@@ -97,11 +98,14 @@ public class PlayerCharacterRepository {
 
     public Character findByName(String name) {
         // TODO: Ignore case
-        return Flowable.fromPublisher(
-                characters
-                        .find(eq("name", name))
-                        .limit(1)
-        ).firstElement().blockingGet();
+        try {
+            return Single.fromPublisher(
+                    characters
+                            .find(eq("name", name))
+            ).blockingGet();
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 
     public List<Character> findByAccount(String accountName) {
@@ -142,6 +146,6 @@ public class PlayerCharacterRepository {
     private MongoCollection<Character> getCollection() {
         return mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getCollectionName(), Character.class);
+                .getCollection(configuration.getPlayerCharacterCollection(), Character.class);
     }
 }

@@ -32,3 +32,6 @@ Furthermore we link the items to users inventory via `item id` and `player name`
 Items should be created via a migration. 
 They can be spawned by a service which can randomly generate the item.
 You can create a loot drop table or similar for mobs, or assign value range to items.
+
+## 
+To create some items easily via API, some post data is available in `src/main/resources/items/create-items.txt`

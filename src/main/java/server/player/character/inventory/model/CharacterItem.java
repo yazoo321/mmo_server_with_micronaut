@@ -2,6 +2,7 @@ package server.player.character.inventory.model;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Data;
@@ -13,6 +14,7 @@ import server.items.model.Item;
 
 @Data
 @Introspected
+@JsonInclude()
 @NoArgsConstructor
 public class CharacterItem {
 
@@ -24,17 +26,22 @@ public class CharacterItem {
             @JsonProperty("item")
             @BsonProperty("item") Item item,
             @JsonProperty("location")
-            @BsonProperty("location") Location2D location) {
+            @BsonProperty("location") Location2D location,
+            @JsonProperty("characterItemId")
+            @BsonProperty("characterItemId") String characterItemId) {
 
         this.characterName = characterName;
         this.item = item;
         this.location = location;
-
+        this.characterItemId = characterItemId;
     }
     String characterName;
     Item item;
 
     // position can be anything you like, 1d, 2d ints, string..
     Location2D location;
+
+    // for unique identifiers of items
+    String characterItemId;
 
 }

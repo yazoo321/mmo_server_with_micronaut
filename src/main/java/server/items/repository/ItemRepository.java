@@ -6,7 +6,7 @@ import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.mongo.query.MongoDbQueryHelper;
-import server.configuration.PlayerCharacterConfiguration;
+import server.configuration.MongoConfiguration;
 import server.items.dropped.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.exceptions.ItemException;
@@ -24,13 +24,13 @@ public class ItemRepository {
 
     private final static Integer DROPPED_ITEM_TIMEOUT_SECONDS = 60;
 
-    PlayerCharacterConfiguration configuration;
+    MongoConfiguration configuration;
     MongoClient mongoClient;
     MongoCollection<Item> itemCollection;
     MongoCollection<DroppedItem> droppedItemCollection;
 
     public ItemRepository(
-            PlayerCharacterConfiguration configuration,
+            MongoConfiguration configuration,
             MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
@@ -62,9 +62,14 @@ public class ItemRepository {
     }
 
     public Item createItem(Item item) {
-        return Single.fromPublisher(
-                itemCollection.insertOne(item))
-                .map(success -> item).blockingGet();
+        try {
+            return findByItemId(item.getItemId());
+            // if item is found, we want to ignore creating this item and just return the found item.
+        } catch (ItemException e) {
+            return Single.fromPublisher(
+                    itemCollection.insertOne(item))
+                    .map(success -> item).blockingGet();
+        }
     }
 
     public Item findByItemId(String itemId) {
@@ -102,10 +107,10 @@ public class ItemRepository {
     private void prepareCollections() {
         this.itemCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getCollectionName(), Item.class);
+                .getCollection(configuration.getItemsCollection(), Item.class);
 
         this.droppedItemCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getCollectionName(), DroppedItem.class);
+                .getCollection(configuration.getDroppedItemsCollection(), DroppedItem.class);
     }
 }

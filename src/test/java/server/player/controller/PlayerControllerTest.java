@@ -24,6 +24,8 @@ import java.util.Map;
 import static com.org.mmo_server.repository.model.tables.UserRoles.USER_ROLES;
 import static com.org.mmo_server.repository.model.tables.Users.USERS;
 
+// This test is disabled because authentication is disabled
+@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @MicronautTest
 public class PlayerControllerTest {

@@ -8,6 +8,7 @@ import server.items.repository.ItemRepository;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,8 +42,13 @@ public class ItemService {
         itemRepository.deleteDroppedItem(droppedItemId);
     }
 
-    public Item createItem(Item item) {
-        return itemRepository.createItem(item);
+    public List<Item> createItems(List<Item> items) {
+        List<Item> created = new ArrayList<>();
+        for (Item i : items) {
+            created.add(itemRepository.createItem(i));
+        }
+
+        return created;
     }
 
 }

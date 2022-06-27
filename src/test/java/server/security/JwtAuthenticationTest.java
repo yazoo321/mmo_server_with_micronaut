@@ -25,6 +25,8 @@ import static com.org.mmo_server.repository.model.tables.Users.USERS;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @MicronautTest
+// Disabled auth in application.yml, therefore disable tests
+@Disabled
 public class JwtAuthenticationTest {
 
     @Inject

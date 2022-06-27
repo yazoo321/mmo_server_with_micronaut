@@ -6,6 +6,7 @@ import server.common.dto.Location2D;
 import server.items.dropped.model.DroppedItem;
 import server.items.model.Item;
 import server.items.service.ItemService;
+import server.player.character.equippable.model.exceptions.EquipException;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.model.exceptions.InventoryException;
@@ -16,6 +17,7 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Singleton
@@ -46,7 +48,7 @@ public class InventoryService {
             throw new InventoryException("No available slots in inventory");
         }
 
-        CharacterItem newCharacterItem = new CharacterItem(characterName, item, position);
+        CharacterItem newCharacterItem = new CharacterItem(characterName, item, position, UUID.randomUUID().toString());
 
         items.add(newCharacterItem);
 
@@ -56,6 +58,34 @@ public class InventoryService {
         inventoryRepository.updateInventoryItems(characterName, items);
 
         return inventory;
+    }
+
+    public void unequipItem(String characterItemId, String characterName) {
+        // this is basically finding the nearest slot and placing item there
+        Inventory inventory = getInventory(characterName);
+        Location2D loc = getNextAvailableSlot(inventory);
+
+        if (loc == null) {
+            throw new EquipException("Inventory full to unequip item");
+        }
+
+        List<CharacterItem> items = inventory.getCharacterItems();
+
+        CharacterItem foundItem = items.stream()
+                .filter(i -> i.getCharacterItemId()
+                .equals(characterItemId))
+                .findFirst()
+                .orElse(null);
+
+        if (foundItem == null) {
+            // this is unexpected, the item should exist in the inventory
+            log.error("Un-equip item unexpectedly failed for character {} and characterItemId {}",
+                    characterName, characterItemId);
+            throw new EquipException("Un-equip has un-expectadly failed");
+        }
+
+        foundItem.setLocation(loc);
+        inventoryRepository.updateInventoryItems(characterName, items);
     }
 
     public DroppedItem dropItem(String characterName, Location2D inventoryLocation, Location location)
@@ -77,6 +107,10 @@ public class InventoryService {
 
     public Inventory getInventory(String characterName) {
         return inventoryRepository.getCharacterInventory(characterName);
+    }
+
+    public void updateInventoryItems(String characterName, List<CharacterItem> characterItems) {
+        inventoryRepository.updateInventoryItems(characterName, characterItems);
     }
 
     public void sellItem() {
@@ -107,7 +141,7 @@ public class InventoryService {
         inventoryRepository.updateInventoryMaxSize(inventory);
     }
 
-    private Location2D getNextAvailableSlot(Inventory inventory) {
+    public Location2D getNextAvailableSlot(Inventory inventory) {
         // Implement this as per your requirement, based on position for example.
         Location2D maxSize = inventory.getMaxSize();
         List<CharacterItem> items = inventory.getCharacterItems();
@@ -115,7 +149,9 @@ public class InventoryService {
 
         items.forEach(i -> {
             Location2D loc = i.getLocation();
-            invArr[loc.getX()][loc.getY()] = 1;
+            if (loc != null) {
+                invArr[loc.getX()][loc.getY()] = 1;
+            }
         });
 
         for (int x = 0; x < maxSize.getX(); x++) {
@@ -130,6 +166,7 @@ public class InventoryService {
     }
 
     public void clearAllDataForCharacter(String characterName) {
+        // This is for test purposes!
         inventoryRepository.deleteAllInventoryDataForCharacter(characterName);
     }
 
