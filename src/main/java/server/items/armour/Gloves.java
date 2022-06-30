@@ -26,8 +26,8 @@ public class Gloves extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new GlovesSlot(characterName, characterItemId);
+    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
+        return new GlovesSlot(characterName, itemInstanceId);
     }
 
 }

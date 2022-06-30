@@ -13,7 +13,7 @@ import server.player.character.equippable.model.EquippedItems;
 @EqualsAndHashCode(callSuper=false)
 public class RingSlot1 extends EquippedItems {
 
-    public RingSlot1(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.RING.getType());
+    public RingSlot1(String characterName, String itemInstanceId) {
+        super(characterName, itemInstanceId, ItemType.RING.getType());
     }
 }

@@ -6,13 +6,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.items.dropped.model.DroppedItem;
+import server.items.dropped.model.DroppedItemDto;
 import server.items.helper.ItemTestHelper;
+import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
 import server.items.types.ItemType;
 import server.items.weapons.Weapon;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @MicronautTest
@@ -47,14 +51,18 @@ public class ItemServiceTest {
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
 
-        DroppedItem expectedDroppedItem = ItemTestHelper.createDroppedItem(locationToDrop, weapon);
+        DroppedItem expectedDroppedItem = new DroppedItem(
+                "droppedItemId", locationToDrop, "itemInstanceId", LocalDateTime.now());
+
+        DroppedItemDto expectedDroppedItemDto = new DroppedItemDto(expectedDroppedItem, weapon,
+                new ItemInstance(weapon.getItemId(), "not matched", new ArrayList<>()));
 
         // When
-        DroppedItem actual = itemService.dropItem(weapon.getItemId(), locationToDrop);
+        DroppedItemDto actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop);
 
         // Then
-        Assertions.assertThat(actual).usingRecursiveComparison().ignoringFields("droppedItemId", "droppedAt")
-                .isEqualTo(expectedDroppedItem);
+        Assertions.assertThat(actual).usingRecursiveComparison().ignoringFields("droppedItemId", "droppedAt", "itemInstanceId")
+                .isEqualTo(expectedDroppedItemDto);
     }
 
     @Test
@@ -62,7 +70,7 @@ public class ItemServiceTest {
         // Given
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
-        DroppedItem expectedDroppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
+        DroppedItemDto expectedDroppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
         DroppedItem actual = itemService.getDroppedItemById(expectedDroppedItem.getDroppedItemId());
@@ -83,12 +91,12 @@ public class ItemServiceTest {
         Location secondDroppedLocation = new Location("map", 2, 2, 1);
         Location thirdDroppedLocation = new Location("map", 1500, 1500, 1); // out of range
 
-        DroppedItem firstDrop = itemTestHelper.createAndInsertDroppedItem(firstDroppedLocation, weapon);
-        DroppedItem secondDrop = itemTestHelper.createAndInsertDroppedItem(secondDroppedLocation, weapon);
-        DroppedItem thirdDrop = itemTestHelper.createAndInsertDroppedItem(thirdDroppedLocation, weapon);
+        DroppedItemDto firstDrop = itemTestHelper.createAndInsertDroppedItem(firstDroppedLocation, weapon);
+        DroppedItemDto secondDrop = itemTestHelper.createAndInsertDroppedItem(secondDroppedLocation, weapon);
+        DroppedItemDto thirdDrop = itemTestHelper.createAndInsertDroppedItem(thirdDroppedLocation, weapon);
 
         Location searchRadius = new Location("map", 50, 50, 50);
-        List<DroppedItem> expectedList = List.of(firstDrop, secondDrop);
+        List<DroppedItemDto> expectedList = List.of(firstDrop, secondDrop);
         // don't expect third item to appear as its out of range
 
         // When
@@ -104,7 +112,7 @@ public class ItemServiceTest {
         // Given
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
-        DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
+        DroppedItemDto droppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
         itemService.deleteDroppedItem(droppedItem.getDroppedItemId());

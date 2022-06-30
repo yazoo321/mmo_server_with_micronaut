@@ -13,8 +13,8 @@ import server.player.character.equippable.model.EquippedItems;
 @EqualsAndHashCode(callSuper=false)
 public class HelmSlot extends EquippedItems {
 
-    public HelmSlot(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.HELM.getType());
+    public HelmSlot(String characterName, String itemInstanceId) {
+        super(characterName, itemInstanceId, ItemType.HELM.getType());
     }
 
 }

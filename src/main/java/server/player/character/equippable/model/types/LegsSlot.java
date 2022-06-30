@@ -13,7 +13,7 @@ import server.player.character.equippable.model.EquippedItems;
 @EqualsAndHashCode(callSuper=false)
 public class LegsSlot extends EquippedItems {
 
-    public LegsSlot(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.LEGS.getType());
+    public LegsSlot(String characterName, String itemInstanceId) {
+        super(characterName, itemInstanceId, ItemType.LEGS.getType());
     }
 }

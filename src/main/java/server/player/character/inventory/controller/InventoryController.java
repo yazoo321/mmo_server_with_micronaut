@@ -4,6 +4,7 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import server.items.dropped.model.DroppedItem;
+import server.items.dropped.model.DroppedItemDto;
 import server.player.character.inventory.model.GenericInventoryData;
 import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.service.InventoryService;
@@ -23,7 +24,7 @@ public class InventoryController {
     }
 
     @Post("/drop")
-    public DroppedItem dropItem(@Body GenericInventoryData dropRequest, @Header String characterName) {
+    public DroppedItemDto dropItem(@Body GenericInventoryData dropRequest, @Header String characterName) {
         return inventoryService.dropItem(characterName,
                 dropRequest.getItemInventoryLocation(), dropRequest.getLocation());
     }

@@ -83,10 +83,10 @@ public class EquipRepository {
         }
     }
 
-    public boolean deleteEquippedItem(String characterItemId) {
+    public boolean deleteEquippedItem(String itemInstanceId) {
         DeleteResult res = Single.fromPublisher(
                 equippedItemsCollection.deleteOne(
-                        eq("characterItemId", characterItemId)
+                        eq("itemInstanceId", itemInstanceId)
                 )
         ).blockingGet();
 

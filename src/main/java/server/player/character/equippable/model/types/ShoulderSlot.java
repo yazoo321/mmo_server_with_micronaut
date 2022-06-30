@@ -13,7 +13,7 @@ import server.player.character.equippable.model.EquippedItems;
 @EqualsAndHashCode(callSuper=false)
 public class ShoulderSlot extends EquippedItems {
 
-    public ShoulderSlot(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.SHOULDER.getType());
+    public ShoulderSlot(String characterName, String itemInstanceId) {
+        super(characterName, itemInstanceId, ItemType.SHOULDER.getType());
     }
 }

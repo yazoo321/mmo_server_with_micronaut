@@ -26,8 +26,8 @@ public class Ring extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new RingSlot1(characterName, characterItemId);
+    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
+        return new RingSlot1(characterName, itemInstanceId);
     }
 
 }

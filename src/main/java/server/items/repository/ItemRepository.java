@@ -9,6 +9,7 @@ import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
 import server.items.dropped.model.DroppedItem;
 import server.items.model.Item;
+import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
 
 import javax.inject.Singleton;
@@ -28,6 +29,7 @@ public class ItemRepository {
     MongoClient mongoClient;
     MongoCollection<Item> itemCollection;
     MongoCollection<DroppedItem> droppedItemCollection;
+    MongoCollection<ItemInstance> itemInstanceCollection;
 
     public ItemRepository(
             MongoConfiguration configuration,
@@ -82,7 +84,31 @@ public class ItemRepository {
             log.error("Could not find the item by ID! It no longer exists");
             throw new ItemException("Could not find the item by ID! It no longer exists");
         }
+    }
 
+
+    public ItemInstance createItemInstance(ItemInstance itemInstance) {
+        try {
+            return Single.fromPublisher(
+                    itemInstanceCollection.insertOne(itemInstance))
+                    .map(success -> itemInstance).blockingGet();
+        } catch (Exception e) {
+            log.error("Failed to create item instance, {}", e.getMessage());
+
+            throw new ItemException("Failed to create item instance");
+        }
+    }
+
+    public ItemInstance findItemInstanceById(String instanceId) {
+        try {
+            return Single.fromPublisher(
+                    itemInstanceCollection
+                            .find(eq("itemInstanceId", instanceId))
+            ).blockingGet();
+        } catch (NoSuchElementException e) {
+            log.error("Could not find the item instance by ID! It no longer exists");
+            throw new ItemException("Could not find the item instance by ID! It no longer exists");
+        }
     }
 
     public void deleteDroppedItem(String droppedItemId) {
@@ -112,5 +138,9 @@ public class ItemRepository {
         this.droppedItemCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
                 .getCollection(configuration.getDroppedItemsCollection(), DroppedItem.class);
+
+        this.itemInstanceCollection = mongoClient
+                .getDatabase(configuration.getDatabaseName())
+                .getCollection(configuration.getItemInstancesCollection(), ItemInstance.class);
     }
 }

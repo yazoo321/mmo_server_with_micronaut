@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.items.dropped.model.DroppedItem;
-import server.items.model.Item;
+import server.items.dropped.model.DroppedItemDto;
 import server.items.service.ItemService;
 import server.player.character.equippable.model.exceptions.EquipException;
 import server.player.character.inventory.model.CharacterItem;
@@ -17,7 +17,6 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Singleton
@@ -36,7 +35,8 @@ public class InventoryService {
         // you could add item more than once / to multiple users
 
         DroppedItem droppedItem = itemService.getDroppedItemById(droppedItemId);
-        Item item = droppedItem.getItem();
+        String itemInstanceId = droppedItem.getItemInstanceId();
+
         Inventory inventory = inventoryRepository.getCharacterInventory(characterName);
 
         // check for example if inventory is full
@@ -48,7 +48,7 @@ public class InventoryService {
             throw new InventoryException("No available slots in inventory");
         }
 
-        CharacterItem newCharacterItem = new CharacterItem(characterName, item, position, UUID.randomUUID().toString());
+        CharacterItem newCharacterItem = new CharacterItem(characterName, position, itemInstanceId);
 
         items.add(newCharacterItem);
 
@@ -60,7 +60,7 @@ public class InventoryService {
         return inventory;
     }
 
-    public void unequipItem(String characterItemId, String characterName) {
+    public void unequipItem(String itemInstanceId, String characterName) {
         // this is basically finding the nearest slot and placing item there
         Inventory inventory = getInventory(characterName);
         Location2D loc = getNextAvailableSlot(inventory);
@@ -72,15 +72,15 @@ public class InventoryService {
         List<CharacterItem> items = inventory.getCharacterItems();
 
         CharacterItem foundItem = items.stream()
-                .filter(i -> i.getCharacterItemId()
-                .equals(characterItemId))
+                .filter(i -> i.getItemInstanceId()
+                .equals(itemInstanceId))
                 .findFirst()
                 .orElse(null);
 
         if (foundItem == null) {
             // this is unexpected, the item should exist in the inventory
-            log.error("Un-equip item unexpectedly failed for character {} and characterItemId {}",
-                    characterName, characterItemId);
+            log.error("Un-equip item unexpectedly failed for character {} and itemInstanceId {}",
+                    characterName, itemInstanceId);
             throw new EquipException("Un-equip has un-expectadly failed");
         }
 
@@ -88,7 +88,7 @@ public class InventoryService {
         inventoryRepository.updateInventoryItems(characterName, items);
     }
 
-    public DroppedItem dropItem(String characterName, Location2D inventoryLocation, Location location)
+    public DroppedItemDto dropItem(String characterName, Location2D inventoryLocation, Location location)
             throws InventoryException {
         Inventory inventory = inventoryRepository.getCharacterInventory(characterName);
         CharacterItem characterItem = getItemAtLocation(inventoryLocation, inventory);
@@ -102,7 +102,7 @@ public class InventoryService {
         inventoryRepository.updateInventoryItems(characterName, itemsList);
 
         // TODO: if dropItem fails, we need to revert the removal of item from inventory.
-        return itemService.dropItem(characterItem.getItem().getItemId(), location);
+        return itemService.dropExistingItem(characterItem.getItemInstanceId(), location);
     }
 
     public Inventory getInventory(String characterName) {
@@ -111,19 +111,6 @@ public class InventoryService {
 
     public void updateInventoryItems(String characterName, List<CharacterItem> characterItems) {
         inventoryRepository.updateInventoryItems(characterName, characterItems);
-    }
-
-    public void sellItem() {
-        // TODO: later
-    }
-
-    public void equipItem() {
-        // validate item and target
-        // TODO: later
-    }
-
-    public void pickupGold() {
-        // TODO: later
     }
 
     public Inventory createInventoryForNewCharacter(String characterName) {

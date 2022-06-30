@@ -13,7 +13,7 @@ import server.player.character.equippable.model.EquippedItems;
 @EqualsAndHashCode(callSuper=false)
 public class NeckSlot extends EquippedItems {
 
-    public NeckSlot(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.NECK.getType());
+    public NeckSlot(String characterName, String itemInstanceId) {
+        super(characterName, itemInstanceId, ItemType.NECK.getType());
     }
 }

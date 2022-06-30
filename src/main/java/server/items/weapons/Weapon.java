@@ -25,8 +25,8 @@ public class Weapon extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new WeaponSlot1(characterName, characterItemId);
+    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
+        return new WeaponSlot1(characterName, itemInstanceId);
     }
 
 }

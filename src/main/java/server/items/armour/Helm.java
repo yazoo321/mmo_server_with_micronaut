@@ -25,8 +25,8 @@ public class Helm extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new HelmSlot(characterName, characterItemId);
+    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
+        return new HelmSlot(characterName, itemInstanceId);
     }
 
 }

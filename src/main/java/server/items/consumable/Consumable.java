@@ -24,7 +24,7 @@ public class Consumable extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
+    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
         return null;
     }
 }

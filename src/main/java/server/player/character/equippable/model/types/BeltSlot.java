@@ -13,7 +13,7 @@ import server.player.character.equippable.model.EquippedItems;
 @EqualsAndHashCode(callSuper=false)
 public class BeltSlot extends EquippedItems {
 
-    public BeltSlot(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.BELT.getType());
+    public BeltSlot(String characterName, String itemInstanceId) {
+        super(characterName, itemInstanceId, ItemType.BELT.getType());
     }
 }

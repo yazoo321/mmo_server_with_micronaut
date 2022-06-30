@@ -26,8 +26,8 @@ public class Boots extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new BootsSlot(characterName, characterItemId);
+    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
+        return new BootsSlot(characterName, itemInstanceId);
     }
 
 }

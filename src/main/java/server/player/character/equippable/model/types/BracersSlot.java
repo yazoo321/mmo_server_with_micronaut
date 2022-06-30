@@ -13,7 +13,7 @@ import server.player.character.equippable.model.EquippedItems;
 @EqualsAndHashCode(callSuper=false)
 public class BracersSlot extends EquippedItems {
 
-    public BracersSlot(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.BRACERS.getType());
+    public BracersSlot(String characterName, String itemInstanceId) {
+        super(characterName, itemInstanceId, ItemType.BRACERS.getType());
     }
 }

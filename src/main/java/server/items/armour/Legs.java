@@ -26,8 +26,8 @@ public class Legs extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new LegsSlot(characterName, characterItemId);
+    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
+        return new LegsSlot(characterName, itemInstanceId);
     }
 
 }

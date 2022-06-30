@@ -26,8 +26,8 @@ public class Shield extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new ShieldSlot(characterName, characterItemId);
+    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
+        return new ShieldSlot(characterName, itemInstanceId);
     }
 
 }

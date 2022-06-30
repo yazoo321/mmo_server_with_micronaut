@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import server.items.helper.ItemTestHelper;
 import server.items.model.Item;
+import server.items.model.ItemInstance;
 import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.types.*;
@@ -16,6 +17,7 @@ import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.service.InventoryService;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -70,10 +72,12 @@ public class EquipItemServiceTest {
     void equipWeaponItemWhenNothingAlreadyEquippedWillWorkAsExpected(String itemType, EquippedItems expectedEquipped) {
         // Given
         Item item = itemTestHelper.createAndInsertItem(itemType);
-        CharacterItem characterItem = itemTestHelper.addItemToInventoryWithOverrideId(item, CHARACTER_NAME, "override");
+        String itemInstanceId = "override";
+        ItemInstance instance = itemTestHelper.createItemInstanceFor(item.getItemId(), itemInstanceId, new ArrayList<>());
+        CharacterItem characterItem = itemTestHelper.addItemToInventory(CHARACTER_NAME, itemInstanceId);
 
         // When
-        equipItemService.equipItem(characterItem.getCharacterItemId(), CHARACTER_NAME);
+        equipItemService.equipItem(characterItem.getItemInstanceId(), CHARACTER_NAME);
 
         // Then
         List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
@@ -91,13 +95,16 @@ public class EquipItemServiceTest {
         item2.setItemName("some name");
         item2 = itemTestHelper.insertItem(item2);
 
-        CharacterItem i1  = itemTestHelper.addItemToInventory(item, CHARACTER_NAME);
-        CharacterItem i2  = itemTestHelper.addItemToInventoryWithOverrideId(item2, CHARACTER_NAME, "override");
+        ItemInstance instance1 = itemTestHelper.createItemInstanceFor(item.getItemId(), "override2", new ArrayList<>());
+        ItemInstance instance2 = itemTestHelper.createItemInstanceFor(item.getItemId(), "override", new ArrayList<>());
 
-        equipItemService.equipItem(i1.getCharacterItemId(), CHARACTER_NAME);
+        CharacterItem i1  = itemTestHelper.addItemToInventory(CHARACTER_NAME, "override2");
+        CharacterItem i2  = itemTestHelper.addItemToInventory(CHARACTER_NAME, "override");
+
+        equipItemService.equipItem(i1.getItemInstanceId(), CHARACTER_NAME);
 
         // When
-        equipItemService.equipItem(i2.getCharacterItemId(), CHARACTER_NAME);
+        equipItemService.equipItem(i2.getItemInstanceId(), CHARACTER_NAME);
 
         // Then
         List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);

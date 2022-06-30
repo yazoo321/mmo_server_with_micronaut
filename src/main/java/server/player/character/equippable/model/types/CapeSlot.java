@@ -13,7 +13,7 @@ import server.player.character.equippable.model.EquippedItems;
 @EqualsAndHashCode(callSuper=false)
 public class CapeSlot extends EquippedItems {
 
-    public CapeSlot(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.CAPE.getType());
+    public CapeSlot(String characterName, String itemInstanceId) {
+        super(characterName, itemInstanceId, ItemType.CAPE.getType());
     }
 }

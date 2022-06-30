@@ -26,8 +26,8 @@ public class Belt extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new BeltSlot(characterName, characterItemId);
+    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
+        return new BeltSlot(characterName, itemInstanceId);
     }
 
 }

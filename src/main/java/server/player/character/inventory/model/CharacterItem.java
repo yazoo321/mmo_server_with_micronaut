@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.common.dto.Location2D;
-import server.items.model.Item;
 
 @Data
 @Introspected
@@ -23,25 +22,21 @@ public class CharacterItem {
     public CharacterItem(
             @JsonProperty("characterName")
             @BsonProperty("characterName") String characterName,
-            @JsonProperty("item")
-            @BsonProperty("item") Item item,
             @JsonProperty("location")
             @BsonProperty("location") Location2D location,
-            @JsonProperty("characterItemId")
-            @BsonProperty("characterItemId") String characterItemId) {
+            @JsonProperty("itemInstanceId")
+            @BsonProperty("itemInstanceId") String itemInstanceId) {
 
         this.characterName = characterName;
-        this.item = item;
         this.location = location;
-        this.characterItemId = characterItemId;
+        this.itemInstanceId = itemInstanceId;
     }
     String characterName;
-    Item item;
 
     // position can be anything you like, 1d, 2d ints, string..
     Location2D location;
 
     // for unique identifiers of items
-    String characterItemId;
+    String itemInstanceId;
 
 }

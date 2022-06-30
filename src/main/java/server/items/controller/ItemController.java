@@ -5,6 +5,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import server.common.dto.Location;
 import server.items.dropped.model.DroppedItem;
+import server.items.dropped.model.DroppedItemDto;
 import server.items.dropped.model.DroppedItemResponse;
 import server.items.model.Item;
 import server.items.service.ItemService;
@@ -29,9 +30,9 @@ public class ItemController {
     }
 
     @Post("/spawn-item")
-    public DroppedItem spawnItem(@Body GenericInventoryData inventoryData) {
+    public DroppedItemDto spawnItem(@Body GenericInventoryData inventoryData) {
         // TODO: this will be changed to a loot service. e.g. when mob is killed, spawn random items
-        return itemService.dropItem(inventoryData.getItemId(), inventoryData.getLocation());
+        return itemService.createNewDroppedItem(inventoryData.getItemId(), inventoryData.getLocation());
     }
 
     @Get("/dropped")

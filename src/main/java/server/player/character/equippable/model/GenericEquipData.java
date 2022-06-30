@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GenericEquipData {
 
-    String characterItemId;
+    String itemInstanceId;
     EquippedItems equippedItems;
     List<EquippedItems> equippedItemsList;
 
