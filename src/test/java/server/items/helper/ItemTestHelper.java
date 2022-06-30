@@ -162,7 +162,7 @@ public class ItemTestHelper {
 
         this.itemInstanceCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getEquipCollection(), ItemInstance.class);
+                .getCollection(configuration.getItemInstancesCollection(), ItemInstance.class);
 
         this.droppedItemCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
