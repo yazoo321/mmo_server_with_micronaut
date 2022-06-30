@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
-import server.items.dropped.model.DroppedItem;
 import server.items.dropped.model.DroppedItemDto;
 import server.items.helper.ItemTestHelper;
 import server.items.service.ItemService;
@@ -73,7 +72,7 @@ public class InventoryServiceTest {
         inventoryService.dropItem(CHARACTER_NAME, new Location2D(0, 0), location);
 
         // Then
-        List<DroppedItem> itemList = itemService.getItemsInMap(location);
+        List<DroppedItemDto> itemList = itemService.getItemsInMap(location);
 
         Assertions.assertThat(itemList.size()).isEqualTo(1);
         Assertions.assertThat(itemList.get(0).getItemInstanceId()).isEqualTo(droppedItem.getItemInstanceId());

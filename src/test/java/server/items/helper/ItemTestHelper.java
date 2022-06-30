@@ -130,7 +130,7 @@ public class ItemTestHelper {
         CharacterItem characterItem = new CharacterItem();
         characterItem.setItemInstanceId(itemInstanceId);
         characterItem.setCharacterName(characterName);
-        characterItem.setLocation(inventoryService.getNextAvailableSlot(inventory));
+        characterItem.setLocation(inventoryService.getNextAvailableSlot(inventory.getMaxSize(), inventory.getCharacterItems()));
         String id = itemInstanceId == null ? UUID.randomUUID().toString() : itemInstanceId;
         characterItem.setItemInstanceId(id);
 

@@ -100,7 +100,7 @@ public class ItemServiceTest {
         // don't expect third item to appear as its out of range
 
         // When
-        List<DroppedItem> actual = itemService.getItemsInMap(searchRadius);
+        List<DroppedItemDto> actual = itemService.getItemsInMap(searchRadius);
 
         Assertions.assertThat(actual).usingRecursiveComparison()
                 .ignoringFields("droppedAt")

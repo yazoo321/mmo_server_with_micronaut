@@ -4,12 +4,11 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import server.common.dto.Location;
-import server.items.dropped.model.DroppedItem;
 import server.items.dropped.model.DroppedItemDto;
 import server.items.dropped.model.DroppedItemResponse;
 import server.items.model.Item;
 import server.items.service.ItemService;
-import server.player.character.inventory.model.GenericInventoryData;
+import server.player.character.inventory.model.response.GenericInventoryData;
 
 import javax.inject.Inject;
 import java.util.List;

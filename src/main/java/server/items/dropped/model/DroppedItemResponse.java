@@ -9,5 +9,5 @@ import java.util.List;
 @AllArgsConstructor
 public class DroppedItemResponse {
 
-    List<DroppedItem> droppedItemList;
+    List<DroppedItemDto> droppedItemList;
 }

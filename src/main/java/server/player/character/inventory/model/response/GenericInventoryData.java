@@ -1,4 +1,4 @@
-package server.player.character.inventory.model;
+package server.player.character.inventory.model.response;
 
 
 import lombok.Data;

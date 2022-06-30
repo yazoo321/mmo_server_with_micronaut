@@ -58,8 +58,20 @@ public class ItemService {
         return itemRepository.findDroppedItemById(droppedItemId);
     }
 
-    public List<DroppedItem> getItemsInMap(Location location) {
-        return itemRepository.getItemsNear(location);
+    public List<DroppedItemDto> getItemsInMap(Location location) {
+        List<DroppedItem> droppedItems = itemRepository.getItemsNear(location);
+        List<DroppedItemDto> droppedItemDtos = new ArrayList<>();
+
+        // TODO: performance improvement here, pre-load the data
+        droppedItems.forEach(i -> {
+            ItemInstance instance = itemRepository.findItemInstanceById(i.getItemInstanceId());
+            Item item = itemRepository.findByItemId(instance.getItemId());
+            droppedItemDtos.add(
+                    new DroppedItemDto(i, item, instance)
+            );
+        });
+
+        return droppedItemDtos;
     }
 
     public void deleteDroppedItem(String droppedItemId) {
