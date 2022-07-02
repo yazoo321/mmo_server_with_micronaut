@@ -6,6 +6,7 @@ import io.micronaut.security.rules.SecurityRule;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.GenericEquipData;
 import server.player.character.equippable.service.EquipItemService;
+import server.player.character.inventory.model.Inventory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -26,8 +27,13 @@ public class EquipItemsController {
     }
 
     @Post("/unequip")
-    public void unequip(@Body GenericEquipData equipData, @Header String characterName) {
-        equipItemService.unequipItem(equipData.getItemInstanceId(), characterName);
+    public GenericEquipData unequip(@Body GenericEquipData equipData, @Header String characterName) {
+        Inventory i = equipItemService.unequipItem(equipData.getItemInstanceId(), characterName);
+
+        GenericEquipData genericEquipData = new GenericEquipData();
+        genericEquipData.setInventory(i);
+
+        return genericEquipData;
     }
 
     @Get()

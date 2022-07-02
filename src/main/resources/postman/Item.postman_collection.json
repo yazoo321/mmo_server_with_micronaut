@@ -1,0 +1,258 @@
+{
+	"info": {
+		"_postman_id": "7495c8fd-8bbc-4553-93c4-991b49f773f7",
+		"name": "Item",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create items",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\r\n    \"items\": [\r\n        {\r\n            \"itemId\": \"500\",\r\n            \"itemName\": \"small axe\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"15\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"600\",\r\n            \"itemName\": \"wooden buckler\",\r\n            \"category\": \"SHIELD\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"10\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"700\",\r\n            \"itemName\": \"leather belt\",\r\n            \"category\": \"BELT\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"3\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"800\",\r\n            \"itemName\": \"Green cape\",\r\n            \"category\": \"CAPE\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"3\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"900\",\r\n            \"itemName\": \"Gold necklace\",\r\n            \"category\": \"NECK\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"2\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1000\",\r\n            \"itemName\": \"Gold ring\",\r\n            \"category\": \"RING\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"1\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1100\",\r\n            \"itemName\": \"Leather boots\",\r\n            \"category\": \"BOOTS\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"2\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1200\",\r\n            \"itemName\": \"Leather bracers\",\r\n            \"category\": \"BOOTS\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"2\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1300\",\r\n            \"itemName\": \"Leather armour\",\r\n            \"category\": \"CHEST\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"20\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1400\",\r\n            \"itemName\": \"Leather gloves\",\r\n            \"category\": \"GLOVES\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"5\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1500\",\r\n            \"itemName\": \"Leather helm\",\r\n            \"category\": \"HELM\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"10\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1600\",\r\n            \"itemName\": \"Leather pants\",\r\n            \"category\": \"LEGS\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"7\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1700\",\r\n            \"itemName\": \"Leather shoulder pads\",\r\n            \"category\": \"SHOULDER\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"6\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1800\",\r\n            \"itemName\": \"Leather shoulder pads\",\r\n            \"category\": \"SHOULDER\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"6\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/v1/items/create-items",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"items",
+						"create-items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Spawn Item",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"itemId\": \"700\",\r\n    \"location\": {\r\n        \"map\": \"map1\",\r\n        \"x\": 2000,\r\n        \"y\": 2000,\r\n        \"z\": 100\r\n    }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/v1/items/spawn-item",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"items",
+						"spawn-item"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get nearby items",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjY4OTc1NSwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTI2OTMzNTUsImlhdCI6MTY1MjY4OTc1NX0.wqJClW7nZwZlsKAiWzieivOSh0wMO0nY51dgZXw-BTg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/v1/items/dropped?map=map1&x=2000&y=2000&z=265",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"items",
+						"dropped"
+					],
+					"query": [
+						{
+							"key": "map",
+							"value": "map1"
+						},
+						{
+							"key": "x",
+							"value": "2000"
+						},
+						{
+							"key": "y",
+							"value": "2000"
+						},
+						{
+							"key": "z",
+							"value": "265"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clear data",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/v1/items/clear-data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"items",
+						"clear-data"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

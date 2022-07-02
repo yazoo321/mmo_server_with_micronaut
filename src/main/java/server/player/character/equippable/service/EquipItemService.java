@@ -59,7 +59,7 @@ public class EquipItemService {
         return equipRepository.insert(equippedItem);
     }
 
-    public void unequipItem(String itemInstanceId, String characterName) {
+    public Inventory unequipItem(String itemInstanceId, String characterName) {
         inventoryService.unequipItem(itemInstanceId, characterName);
         boolean success = equipRepository.deleteEquippedItem(itemInstanceId);
 
@@ -68,6 +68,8 @@ public class EquipItemService {
                     itemInstanceId);
             throw new EquipException("Did not delete equipped item successfully");
         }
+
+        return inventoryService.getInventory(characterName);
     }
 
     public List<EquippedItems> getEquippedItems(String characterName) {

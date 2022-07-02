@@ -1,0 +1,463 @@
+{
+	"info": {
+		"_postman_id": "e98ec88e-0621-4ac3-b3e0-e25ee96a0aee",
+		"name": "Inventory",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Equips",
+			"item": [
+				{
+					"name": "Get Equipped Items",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "characterName",
+								"value": "character1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/v1/equipped",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"equipped"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Equip item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "characterName",
+								"value": "character1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"itemInstanceId\": \"0d605a98-ef78-4a12-ab56-11b77bcd6870\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/v1/equipped/equip",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"equipped",
+								"equip"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unequip item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "characterName",
+								"value": "character1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"itemInstanceId\": \"2193b0e0-acdc-499b-936a-f7f4bb61fbfd\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/v1/equipped/unequip",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"equipped",
+								"unequip"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Generate inventory",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "characterName",
+						"value": "character1",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"characterName\": \"character1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/v1/inventory/generate-inventory",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"inventory",
+						"generate-inventory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Inventory",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjY4OTc1NSwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTI2OTMzNTUsImlhdCI6MTY1MjY4OTc1NX0.wqJClW7nZwZlsKAiWzieivOSh0wMO0nY51dgZXw-BTg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "characterName",
+						"value": "character1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/v1/inventory/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"inventory",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pickup item",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "characterName",
+						"value": "character1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"droppedItemId\": \"a541a5b0-b421-480e-ad04-e87a908b92c0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/v1/inventory/pickup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"inventory",
+						"pickup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Drop item",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "characterName",
+						"value": "character1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"characterName\": \"character1\",\r\n    \"itemInventoryLocation\": {\r\n        \"x\": 0,\r\n        \"y\": 0\r\n    },\r\n    \"location\": {\r\n        \"map\": \"map1\",\r\n        \"x\": -240,\r\n        \"y\": -220,\r\n        \"z\": 123\r\n    } \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/v1/inventory/drop",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"inventory",
+						"drop"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clear user inventory data",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "characterName",
+						"value": "character1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/v1/inventory/clear-data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"v1",
+						"inventory",
+						"clear-data"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
