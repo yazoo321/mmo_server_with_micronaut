@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import server.items.model.ItemInstance;
 import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
 
@@ -13,7 +14,7 @@ import server.player.character.equippable.model.EquippedItems;
 @EqualsAndHashCode(callSuper=false)
 public class BootsSlot extends EquippedItems {
 
-    public BootsSlot(String characterName, String characterItemId) {
-        super(characterName, characterItemId, ItemType.BOOTS.getType());
+    public BootsSlot(String characterName, ItemInstance itemInstance) {
+        super(characterName, itemInstance, ItemType.BOOTS.getType());
     }
 }

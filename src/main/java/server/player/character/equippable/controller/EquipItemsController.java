@@ -20,14 +20,14 @@ public class EquipItemsController {
 
     @Post("/equip")
     public GenericEquipData equip(@Body GenericEquipData equipData, @Header String characterName) {
-        EquippedItems equippedItems = equipItemService.equipItem(equipData.getCharacterItemId(), characterName);
+        EquippedItems equippedItems = equipItemService.equipItem(equipData.getItemInstanceId(), characterName);
 
         return GenericEquipData.builder().equippedItems(equippedItems).build();
     }
 
     @Post("/unequip")
     public void unequip(@Body GenericEquipData equipData, @Header String characterName) {
-        equipItemService.unequipItem(equipData.getCharacterItemId(), characterName);
+        equipItemService.unequipItem(equipData.getItemInstanceId(), characterName);
     }
 
     @Get()

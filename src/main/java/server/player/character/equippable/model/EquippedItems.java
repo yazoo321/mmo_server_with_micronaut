@@ -1,14 +1,16 @@
 package server.player.character.equippable.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import server.items.armour.Boots;
-import server.items.armour.Gloves;
+import server.items.model.ItemInstance;
 import server.player.character.equippable.model.types.*;
 
 
@@ -43,17 +45,18 @@ public abstract class EquippedItems {
     public EquippedItems(
             @JsonProperty("characterName")
             @BsonProperty("characterName") String characterName,
-            @JsonProperty("characterItemId")
-            @BsonProperty("characterItemId") String characterItemId,
+            @JsonProperty("itemInstance")
+            @BsonProperty("itemInstance") ItemInstance itemInstance,
             @JsonProperty("category")
             @BsonProperty("category") String category
     ) {
         this.characterName = characterName;
-        this.characterItemId = characterItemId;
+        this.itemInstance = itemInstance;
         this.category = category;
     }
 
     String characterName;
-    String characterItemId;
+    ItemInstance itemInstance;
     String category;
+
 }

@@ -7,11 +7,13 @@ import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.items.dropped.model.DroppedItem;
 import server.items.helper.ItemTestHelper;
+import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
 import server.items.types.ItemType;
 import server.items.weapons.Weapon;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -47,13 +49,18 @@ public class ItemServiceTest {
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
 
-        DroppedItem expectedDroppedItem = ItemTestHelper.createDroppedItem(locationToDrop, weapon);
+        DroppedItem expectedDroppedItem = new DroppedItem(
+                "droppedItemId", locationToDrop,
+                new ItemInstance(weapon.getItemId(), "itemInstanceId", weapon),
+                LocalDateTime.now());
 
         // When
-        DroppedItem actual = itemService.dropItem(weapon.getItemId(), locationToDrop);
+        DroppedItem actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop);
 
         // Then
-        Assertions.assertThat(actual).usingRecursiveComparison().ignoringFields("droppedItemId", "droppedAt")
+        Assertions.assertThat(actual)
+                .usingRecursiveComparison()
+                .ignoringFields("droppedItemId", "droppedAt", "itemInstance.itemInstanceId")
                 .isEqualTo(expectedDroppedItem);
     }
 

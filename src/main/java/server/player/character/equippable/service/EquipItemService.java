@@ -2,6 +2,8 @@ package server.player.character.equippable.service;
 
 import lombok.extern.slf4j.Slf4j;
 import server.items.model.Item;
+import server.items.model.ItemInstance;
+import server.items.repository.ItemRepository;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.exceptions.EquipException;
 import server.player.character.equippable.repository.EquipRepository;
@@ -24,27 +26,32 @@ public class EquipItemService {
     @Inject
     InventoryService inventoryService;
 
-    public EquippedItems equipItem(String characterItemId, String characterName) {
+    @Inject
+    ItemRepository itemRepository;
+
+    public EquippedItems equipItem(String itemInstanceId, String characterName) {
         // in order to equip item, first un-equip item from slot if one exists
 
         Inventory inventory = inventoryService.getInventory(characterName);
         List<CharacterItem> items = inventory.getCharacterItems();
         CharacterItem characterItem = items
                 .stream()
-                .filter(iterator->iterator.getCharacterItemId().equals(characterItemId))
+                .filter(iterator->iterator.getItemInstance().getItemInstanceId().equals(itemInstanceId))
                 .findFirst().orElseThrow(() ->
                         new InventoryException("The item trying to equip does not exist"));
 
-        Item item = characterItem.getItem();
+        ItemInstance instance = characterItem.getItemInstance();
+        Item item = instance.getItem();
+
         String slotType = item.getCategory();
 
         EquippedItems equippedItem = equipRepository.getCharacterItemSlot(characterName, slotType);
 
         if (equippedItem != null) {
-            unequipItem(equippedItem.getCharacterItemId(), characterName);
+            unequipItem(equippedItem.getItemInstance().getItemInstanceId(), characterName);
         }
 
-        equippedItem = item.createEquippedItem(characterName, characterItemId);
+        equippedItem = item.createEquippedItem(characterName, instance);
         // setting location to null effectively moves it away from inventory space
         characterItem.setLocation(null);
         inventoryService.updateInventoryItems(characterName, items);
@@ -52,13 +59,13 @@ public class EquipItemService {
         return equipRepository.insert(equippedItem);
     }
 
-    public void unequipItem(String characterItemId, String characterName) {
-        inventoryService.unequipItem(characterItemId, characterName);
-        boolean success = equipRepository.deleteEquippedItem(characterItemId);
+    public void unequipItem(String itemInstanceId, String characterName) {
+        inventoryService.unequipItem(itemInstanceId, characterName);
+        boolean success = equipRepository.deleteEquippedItem(itemInstanceId);
 
         if (!success) {
-            log.error("error with unequip item, potential duplicate record created, characterItemId: {}",
-                    characterItemId);
+            log.error("error with unequip item, potential duplicate record created, itemInstanceId: {}",
+                    itemInstanceId);
             throw new EquipException("Did not delete equipped item successfully");
         }
     }

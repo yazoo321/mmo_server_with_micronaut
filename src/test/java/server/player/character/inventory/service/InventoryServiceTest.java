@@ -2,14 +2,12 @@ package server.player.character.inventory.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.items.dropped.model.DroppedItem;
 import server.items.helper.ItemTestHelper;
-import server.items.model.Item;
 import server.items.service.ItemService;
 import server.items.types.ItemType;
 import server.items.weapons.Weapon;
@@ -55,9 +53,10 @@ public class InventoryServiceTest {
         Inventory inventory = inventoryService.getInventory(CHARACTER_NAME);
         List<CharacterItem> items = inventory.getCharacterItems();
         Assertions.assertThat(items.size()).isEqualTo(1);
-        Item actual = items.get(0).getItem();
 
-        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(weapon);
+        String actualInstanceId = items.get(0).getItemInstance().getItemInstanceId();
+
+        Assertions.assertThat(actualInstanceId).isEqualTo(droppedItem.getItemInstance().getItemInstanceId());
     }
 
     @Test
@@ -76,7 +75,7 @@ public class InventoryServiceTest {
         List<DroppedItem> itemList = itemService.getItemsInMap(location);
 
         Assertions.assertThat(itemList.size()).isEqualTo(1);
-        Assertions.assertThat(itemList.get(0).getItem()).usingRecursiveComparison().isEqualTo(weapon);
+        Assertions.assertThat(itemList.get(0).getItemInstance()).isEqualTo(droppedItem.getItemInstance());
     }
 
     @Test

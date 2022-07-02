@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import server.common.dto.Tag;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
+import server.items.model.ItemInstance;
 import server.items.model.Stacking;
 import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
-import server.player.character.equippable.model.types.BeltSlot;
 import server.player.character.equippable.model.types.NeckSlot;
 
 import java.util.List;
@@ -26,8 +26,7 @@ public class Neck extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String characterItemId) {
-        return new NeckSlot(characterName, characterItemId);
+    public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
+        return new NeckSlot(characterName, itemInstance);
     }
-
 }

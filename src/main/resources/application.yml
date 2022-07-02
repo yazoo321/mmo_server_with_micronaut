@@ -67,6 +67,7 @@ mongo-database:
   database-name: "mmo-server"
   player-character-collection: "characters"
   items-collection: "items"
+  item-instances-collection: "item-instances"
   dropped-items-collection: "dropped-items"
   inventory-collection: "inventory"
   equip-collection: "equip"

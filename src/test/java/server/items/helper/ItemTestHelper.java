@@ -15,7 +15,9 @@ import server.items.armour.*;
 import server.items.dropped.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
+import server.items.model.ItemInstance;
 import server.items.model.Stacking;
+import server.items.service.ItemService;
 import server.items.weapons.Shield;
 import server.items.weapons.Weapon;
 import server.player.character.equippable.model.EquippedItems;
@@ -26,7 +28,6 @@ import server.player.character.inventory.service.InventoryService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,9 +41,13 @@ public class ItemTestHelper {
     MongoConfiguration configuration;
     MongoClient mongoClient;
     MongoCollection<Item> itemCollection;
+    MongoCollection<ItemInstance> itemInstanceCollection;
     MongoCollection<DroppedItem> droppedItemCollection;
     MongoCollection<Inventory> inventoryMongoCollection;
     MongoCollection<EquippedItems> equippedItemsMongoCollection;
+
+    @Inject
+    ItemService itemService;
 
     @Inject
     InventoryService inventoryService;
@@ -75,6 +80,10 @@ public class ItemTestHelper {
         Single.fromPublisher(
                 equippedItemsMongoCollection.deleteMany(ne("characterName", "deleteAll"))
         ).blockingGet();
+
+        Single.fromPublisher(
+                itemInstanceCollection.deleteMany(ne("itemInstanceId", "deleteAll"))
+        ).blockingGet();
     }
 
     public Item createAndInsertItem(String type) {
@@ -89,16 +98,16 @@ public class ItemTestHelper {
         ).map(success -> item).blockingGet();
     }
 
-    public static DroppedItem createDroppedItem(Location location, Item item) {
-        return new DroppedItem("random-uuid", location, item, LocalDateTime.now());
+    public ItemInstance createItemInstanceFor(Item item, String itemInstanceId) {
+        ItemInstance itemInstance = new ItemInstance(item.getItemId(), itemInstanceId, item);
+
+        return Single.fromPublisher(
+                itemInstanceCollection.insertOne(itemInstance)
+        ).map(success -> itemInstance).blockingGet();
     }
 
     public DroppedItem createAndInsertDroppedItem(Location location, Item item) {
-        DroppedItem droppedItem = createDroppedItem(location, item);
-
-        return Single.fromPublisher(
-                droppedItemCollection.insertOne(droppedItem)
-        ).map(success -> droppedItem).blockingGet();
+        return itemService.createNewDroppedItem(item.getItemId(), location);
     }
 
     public Inventory prepareInventory(String characterName) {
@@ -112,28 +121,20 @@ public class ItemTestHelper {
         return insertInventory(inventory);
     }
 
-    public CharacterItem addItemToInventoryWithOverrideId(Item item, String characterName, String characterItemId) {
+    public CharacterItem addItemToInventory(String characterName, ItemInstance itemInstance) {
         Inventory inventory = getInventory(characterName);
 
         List<CharacterItem> items = inventory.getCharacterItems();
 
         CharacterItem characterItem = new CharacterItem();
-        characterItem.setItem(item);
+        characterItem.setItemInstance(itemInstance);
         characterItem.setCharacterName(characterName);
-        characterItem.setLocation(inventoryService.getNextAvailableSlot(inventory));
-        String id = characterItemId == null ? UUID.randomUUID().toString() : characterItemId;
-        characterItem.setCharacterItemId(id);
-
+        characterItem.setLocation(inventoryService.getNextAvailableSlot(inventory.getMaxSize(), inventory.getCharacterItems()));
         items.add(characterItem);
 
         inventoryRepository.updateInventoryItems(characterName, items);
 
         return characterItem;
-    }
-
-    public CharacterItem addItemToInventory(Item item, String characterName) {
-
-        return addItemToInventoryWithOverrideId(item, characterName, null);
     }
 
     public Inventory insertInventory(Inventory inventory) {
@@ -154,6 +155,10 @@ public class ItemTestHelper {
         this.itemCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
                 .getCollection(configuration.getItemsCollection(), Item.class);
+
+        this.itemInstanceCollection = mongoClient
+                .getDatabase(configuration.getDatabaseName())
+                .getCollection(configuration.getItemInstancesCollection(), ItemInstance.class);
 
         this.droppedItemCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())

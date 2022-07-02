@@ -8,7 +8,7 @@ import server.items.dropped.model.DroppedItem;
 import server.items.dropped.model.DroppedItemResponse;
 import server.items.model.Item;
 import server.items.service.ItemService;
-import server.player.character.inventory.model.GenericInventoryData;
+import server.player.character.inventory.model.response.GenericInventoryData;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -31,7 +31,7 @@ public class ItemController {
     @Post("/spawn-item")
     public DroppedItem spawnItem(@Body GenericInventoryData inventoryData) {
         // TODO: this will be changed to a loot service. e.g. when mob is killed, spawn random items
-        return itemService.dropItem(inventoryData.getItemId(), inventoryData.getLocation());
+        return itemService.createNewDroppedItem(inventoryData.getItemId(), inventoryData.getLocation());
     }
 
     @Get("/dropped")
