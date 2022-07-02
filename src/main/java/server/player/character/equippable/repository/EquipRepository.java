@@ -84,9 +84,10 @@ public class EquipRepository {
     }
 
     public boolean deleteEquippedItem(String itemInstanceId) {
+        // TODO: Consider duplicating item instance ID as nested query is slower
         DeleteResult res = Single.fromPublisher(
                 equippedItemsCollection.deleteOne(
-                        eq("itemInstanceId", itemInstanceId)
+                        eq("itemInstance.itemInstanceId", itemInstanceId)
                 )
         ).blockingGet();
 

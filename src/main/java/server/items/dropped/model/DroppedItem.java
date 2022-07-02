@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.common.dto.Location;
+import server.items.model.ItemInstance;
 
 import java.time.LocalDateTime;
 
@@ -26,20 +27,20 @@ public class DroppedItem {
             @BsonProperty("droppedItemId") String droppedItemId,
             @JsonProperty("location")
             @BsonProperty("location") Location location,
-            @JsonProperty("itemInstanceId")
-            @BsonProperty("itemInstanceId") String itemInstanceId,
+            @JsonProperty("itemInstance")
+            @BsonProperty("itemInstance") ItemInstance itemInstance,
             @JsonProperty("updatedAt")
             @BsonProperty("updatedAt") LocalDateTime droppedAt
 ) {
         this.droppedItemId = droppedItemId;
         this.location = location;
-        this.itemInstanceId = itemInstanceId;
+        this.itemInstance = itemInstance;
         this.droppedAt = droppedAt;
     }
 
     String droppedItemId;
     Location location;
-    String itemInstanceId;
+    ItemInstance itemInstance;
 
     // This is to have timeout for items that are dropped/spawned
     LocalDateTime droppedAt;

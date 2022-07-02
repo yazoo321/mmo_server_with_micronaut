@@ -13,7 +13,6 @@ import server.items.accessories.Neck;
 import server.items.accessories.Ring;
 import server.items.armour.*;
 import server.items.dropped.model.DroppedItem;
-import server.items.dropped.model.DroppedItemDto;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
 import server.items.model.ItemInstance;
@@ -99,7 +98,7 @@ public class ItemTestHelper {
         ).map(success -> item).blockingGet();
     }
 
-    public ItemInstance createItemInstanceFor(Item item, String itemInstanceId, List<Tag> tags) {
+    public ItemInstance createItemInstanceFor(Item item, String itemInstanceId) {
         ItemInstance itemInstance = new ItemInstance(item.getItemId(), itemInstanceId, item);
 
         return Single.fromPublisher(
@@ -107,7 +106,7 @@ public class ItemTestHelper {
         ).map(success -> itemInstance).blockingGet();
     }
 
-    public DroppedItemDto createAndInsertDroppedItem(Location location, Item item) {
+    public DroppedItem createAndInsertDroppedItem(Location location, Item item) {
         return itemService.createNewDroppedItem(item.getItemId(), location);
     }
 
@@ -122,18 +121,15 @@ public class ItemTestHelper {
         return insertInventory(inventory);
     }
 
-    public CharacterItem addItemToInventory(String characterName, String itemInstanceId) {
+    public CharacterItem addItemToInventory(String characterName, ItemInstance itemInstance) {
         Inventory inventory = getInventory(characterName);
 
         List<CharacterItem> items = inventory.getCharacterItems();
 
         CharacterItem characterItem = new CharacterItem();
-        characterItem.setItemInstanceId(itemInstanceId);
+        characterItem.setItemInstance(itemInstance);
         characterItem.setCharacterName(characterName);
         characterItem.setLocation(inventoryService.getNextAvailableSlot(inventory.getMaxSize(), inventory.getCharacterItems()));
-        String id = itemInstanceId == null ? UUID.randomUUID().toString() : itemInstanceId;
-        characterItem.setItemInstanceId(id);
-
         items.add(characterItem);
 
         inventoryRepository.updateInventoryItems(characterName, items);

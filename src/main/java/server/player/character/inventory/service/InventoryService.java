@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.items.dropped.model.DroppedItem;
-import server.items.dropped.model.DroppedItemDto;
 import server.items.model.ItemInstance;
 import server.items.repository.ItemRepository;
 import server.items.service.ItemService;
@@ -40,8 +39,7 @@ public class InventoryService {
         // you could add item more than once / to multiple users
 
         DroppedItem droppedItem = itemService.getDroppedItemById(droppedItemId);
-        String itemInstanceId = droppedItem.getItemInstanceId();
-        ItemInstance instance = itemRepository.findItemInstanceById(itemInstanceId);
+        ItemInstance instance = droppedItem.getItemInstance();
 
         Inventory inventory = inventoryRepository.getCharacterInventory(characterName);
 
@@ -54,7 +52,7 @@ public class InventoryService {
             throw new InventoryException("No available slots in inventory");
         }
 
-        CharacterItem newCharacterItem = new CharacterItem(characterName, position, instance.getItem(), itemInstanceId);
+        CharacterItem newCharacterItem = new CharacterItem(characterName, position, instance);
 
         items.add(newCharacterItem);
 
@@ -78,7 +76,7 @@ public class InventoryService {
         List<CharacterItem> items = inventory.getCharacterItems();
 
         CharacterItem foundItem = items.stream()
-                .filter(i -> i.getItemInstanceId()
+                .filter(i -> i.getItemInstance().getItemInstanceId()
                 .equals(itemInstanceId))
                 .findFirst()
                 .orElse(null);
@@ -94,7 +92,7 @@ public class InventoryService {
         inventoryRepository.updateInventoryItems(characterName, items);
     }
 
-    public DroppedItemDto dropItem(String characterName, Location2D inventoryLocation, Location location)
+    public DroppedItem dropItem(String characterName, Location2D inventoryLocation, Location location)
             throws InventoryException {
         Inventory inventory = inventoryRepository.getCharacterInventory(characterName);
         CharacterItem characterItem = getItemAtLocation(inventoryLocation, inventory);
@@ -108,7 +106,7 @@ public class InventoryService {
         inventoryRepository.updateInventoryItems(characterName, itemsList);
 
         // TODO: if dropItem fails, we need to revert the removal of item from inventory.
-        return itemService.dropExistingItem(characterItem.getItemInstanceId(), location);
+        return itemService.dropExistingItem(characterItem.getItemInstance().getItemInstanceId(), location);
     }
 
     public Inventory getInventory(String characterName) {

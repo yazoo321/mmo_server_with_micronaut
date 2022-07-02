@@ -14,10 +14,8 @@ import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.types.*;
 import server.player.character.inventory.model.CharacterItem;
-import server.player.character.inventory.service.InventoryService;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -28,9 +26,6 @@ public class EquipItemServiceTest {
 
     @Inject
     EquipItemService equipItemService;
-
-    @Inject
-    InventoryService inventoryService;
 
     @Inject
     ItemTestHelper itemTestHelper;
@@ -99,18 +94,17 @@ public class EquipItemServiceTest {
     void equipWeaponItemWhenNothingAlreadyEquippedWillWorkAsExpected(String itemType, EquippedItems expectedEquipped) {
         // Given
         Item item = itemTestHelper.createAndInsertItem(itemType);
-        String itemInstanceId = "override";
-        ItemInstance instance = itemTestHelper.createItemInstanceFor(item, itemInstanceId, new ArrayList<>());
-        CharacterItem characterItem = itemTestHelper.addItemToInventory(CHARACTER_NAME, itemInstanceId);
+        ItemInstance instance = itemTestHelper.createItemInstanceFor(item, "override");
+        CharacterItem characterItem = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance);
 
         // When
-        equipItemService.equipItem(characterItem.getItemInstanceId(), CHARACTER_NAME);
+        equipItemService.equipItem("override", CHARACTER_NAME);
 
         // Then
         List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
         Assertions.assertThat(equipped)
                 .usingRecursiveComparison()
-                .ignoringFields("item.itemId")   // Because in the args list we pre-create item for expected result
+                .ignoringFields("item.itemId", "itemInstance.itemId", "itemInstance.item.itemId")   // Because in the args list we pre-create item for expected result
                 .isEqualTo(List.of(expectedEquipped));
     }
 
@@ -125,16 +119,16 @@ public class EquipItemServiceTest {
         item2.setItemName("some name");
         item2 = itemTestHelper.insertItem(item2);
 
-        ItemInstance instance1 = itemTestHelper.createItemInstanceFor(item, "override2", new ArrayList<>());
-        ItemInstance instance2 = itemTestHelper.createItemInstanceFor(item, "override", new ArrayList<>());
+        ItemInstance instance1 = itemTestHelper.createItemInstanceFor(item, "override2");
+        ItemInstance instance2 = itemTestHelper.createItemInstanceFor(item, "override");
 
-        CharacterItem i1  = itemTestHelper.addItemToInventory(CHARACTER_NAME, "override2");
-        CharacterItem i2  = itemTestHelper.addItemToInventory(CHARACTER_NAME, "override");
+        CharacterItem i1  = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance1);
+        CharacterItem i2  = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance2);
 
-        equipItemService.equipItem(i1.getItemInstanceId(), CHARACTER_NAME);
+        equipItemService.equipItem(instance1.getItemInstanceId(), CHARACTER_NAME);
 
         // When
-        equipItemService.equipItem(i2.getItemInstanceId(), CHARACTER_NAME);
+        equipItemService.equipItem(instance2.getItemInstanceId(), CHARACTER_NAME);
 
         // Then
         List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
@@ -142,7 +136,7 @@ public class EquipItemServiceTest {
 
         Assertions.assertThat(equipped)
                 .usingRecursiveComparison()
-                .ignoringFields("item.itemId")   // Because in the args list we pre-create item for expected result
+                .ignoringFields("item.itemId", "itemInstance.itemId", "itemInstance.item.itemId") // The item was created twice in test
                 .isEqualTo(List.of(expectedEquipped));
     }
 

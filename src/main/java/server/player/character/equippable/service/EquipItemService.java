@@ -36,19 +36,19 @@ public class EquipItemService {
         List<CharacterItem> items = inventory.getCharacterItems();
         CharacterItem characterItem = items
                 .stream()
-                .filter(iterator->iterator.getItemInstanceId().equals(itemInstanceId))
+                .filter(iterator->iterator.getItemInstance().getItemInstanceId().equals(itemInstanceId))
                 .findFirst().orElseThrow(() ->
                         new InventoryException("The item trying to equip does not exist"));
 
-        ItemInstance instance = itemRepository.findItemInstanceById(characterItem.getItemInstanceId());
-        Item item = itemRepository.findByItemId(instance.getItemId());
+        ItemInstance instance = characterItem.getItemInstance();
+        Item item = instance.getItem();
 
         String slotType = item.getCategory();
 
         EquippedItems equippedItem = equipRepository.getCharacterItemSlot(characterName, slotType);
 
         if (equippedItem != null) {
-            unequipItem(equippedItem.getItemInstanceId(), characterName);
+            unequipItem(equippedItem.getItemInstance().getItemInstanceId(), characterName);
         }
 
         equippedItem = item.createEquippedItem(characterName, instance);

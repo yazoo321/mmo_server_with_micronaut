@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.items.dropped.model.DroppedItem;
-import server.items.dropped.model.DroppedItemDto;
 import server.items.helper.ItemTestHelper;
 import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
@@ -51,17 +50,18 @@ public class ItemServiceTest {
         Location locationToDrop = new Location("map", 1, 1, 1);
 
         DroppedItem expectedDroppedItem = new DroppedItem(
-                "droppedItemId", locationToDrop, "itemInstanceId", LocalDateTime.now());
-
-        DroppedItemDto expectedDroppedItemDto = new DroppedItemDto(expectedDroppedItem,
-                new ItemInstance(weapon.getItemId(), "not matched", weapon));
+                "droppedItemId", locationToDrop,
+                new ItemInstance(weapon.getItemId(), "itemInstanceId", weapon),
+                LocalDateTime.now());
 
         // When
-        DroppedItemDto actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop);
+        DroppedItem actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop);
 
         // Then
-        Assertions.assertThat(actual).usingRecursiveComparison().ignoringFields("droppedItemId", "droppedAt", "itemInstanceId")
-                .isEqualTo(expectedDroppedItemDto);
+        Assertions.assertThat(actual)
+                .usingRecursiveComparison()
+                .ignoringFields("droppedItemId", "droppedAt", "itemInstance.itemInstanceId")
+                .isEqualTo(expectedDroppedItem);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class ItemServiceTest {
         // Given
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
-        DroppedItemDto expectedDroppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
+        DroppedItem expectedDroppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
         DroppedItem actual = itemService.getDroppedItemById(expectedDroppedItem.getDroppedItemId());
@@ -90,16 +90,16 @@ public class ItemServiceTest {
         Location secondDroppedLocation = new Location("map", 2, 2, 1);
         Location thirdDroppedLocation = new Location("map", 1500, 1500, 1); // out of range
 
-        DroppedItemDto firstDrop = itemTestHelper.createAndInsertDroppedItem(firstDroppedLocation, weapon);
-        DroppedItemDto secondDrop = itemTestHelper.createAndInsertDroppedItem(secondDroppedLocation, weapon);
-        DroppedItemDto thirdDrop = itemTestHelper.createAndInsertDroppedItem(thirdDroppedLocation, weapon);
+        DroppedItem firstDrop = itemTestHelper.createAndInsertDroppedItem(firstDroppedLocation, weapon);
+        DroppedItem secondDrop = itemTestHelper.createAndInsertDroppedItem(secondDroppedLocation, weapon);
+        DroppedItem thirdDrop = itemTestHelper.createAndInsertDroppedItem(thirdDroppedLocation, weapon);
 
         Location searchRadius = new Location("map", 50, 50, 50);
-        List<DroppedItemDto> expectedList = List.of(firstDrop, secondDrop);
+        List<DroppedItem> expectedList = List.of(firstDrop, secondDrop);
         // don't expect third item to appear as its out of range
 
         // When
-        List<DroppedItemDto> actual = itemService.getItemsInMap(searchRadius);
+        List<DroppedItem> actual = itemService.getItemsInMap(searchRadius);
 
         Assertions.assertThat(actual).usingRecursiveComparison()
                 .ignoringFields("droppedAt")
@@ -111,7 +111,7 @@ public class ItemServiceTest {
         // Given
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
-        DroppedItemDto droppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
+        DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
         itemService.deleteDroppedItem(droppedItem.getDroppedItemId());

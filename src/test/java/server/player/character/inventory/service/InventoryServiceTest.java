@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
-import server.items.dropped.model.DroppedItemDto;
+import server.items.dropped.model.DroppedItem;
 import server.items.helper.ItemTestHelper;
 import server.items.service.ItemService;
 import server.items.types.ItemType;
@@ -43,10 +43,10 @@ public class InventoryServiceTest {
         // Given
         Location location = new Location("map", 1, 1, 1);
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
-        DroppedItemDto droppedItemDto = itemTestHelper.createAndInsertDroppedItem(location, weapon);
+        DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
 
         // When
-        inventoryService.pickupItem(CHARACTER_NAME, droppedItemDto.getDroppedItemId());
+        inventoryService.pickupItem(CHARACTER_NAME, droppedItem.getDroppedItemId());
 
         // Then
         // TODO: Make test not rely on service call
@@ -54,9 +54,9 @@ public class InventoryServiceTest {
         List<CharacterItem> items = inventory.getCharacterItems();
         Assertions.assertThat(items.size()).isEqualTo(1);
 
-        String actualInstanceId = items.get(0).getItemInstanceId();
+        String actualInstanceId = items.get(0).getItemInstance().getItemInstanceId();
 
-        Assertions.assertThat(actualInstanceId).isEqualTo(droppedItemDto.getItemInstanceId());
+        Assertions.assertThat(actualInstanceId).isEqualTo(droppedItem.getItemInstance().getItemInstanceId());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class InventoryServiceTest {
         // Given
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location location = new Location("map", 1, 1, 1);
-        DroppedItemDto droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
+        DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
         // TODO: make test not rely on service call
         inventoryService.pickupItem(CHARACTER_NAME, droppedItem.getDroppedItemId());
 
@@ -72,10 +72,10 @@ public class InventoryServiceTest {
         inventoryService.dropItem(CHARACTER_NAME, new Location2D(0, 0), location);
 
         // Then
-        List<DroppedItemDto> itemList = itemService.getItemsInMap(location);
+        List<DroppedItem> itemList = itemService.getItemsInMap(location);
 
         Assertions.assertThat(itemList.size()).isEqualTo(1);
-        Assertions.assertThat(itemList.get(0).getItemInstanceId()).isEqualTo(droppedItem.getItemInstanceId());
+        Assertions.assertThat(itemList.get(0).getItemInstance()).isEqualTo(droppedItem.getItemInstance());
     }
 
     @Test
@@ -91,13 +91,13 @@ public class InventoryServiceTest {
         // When
         for (int i=0; i<4; i++) {
             Location location = new Location("map", 1, 1, 1);
-            DroppedItemDto droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
+            DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
             inventoryService.pickupItem(CHARACTER_NAME, droppedItem.getDroppedItemId());
         }
 
         // Then
         Location location = new Location("map", 1, 1, 1);
-        DroppedItemDto droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
+        DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
         // next `pickup` will error out
         org.junit.jupiter.api.Assertions.assertThrows(InventoryException.class,
                 () -> inventoryService.pickupItem(CHARACTER_NAME, droppedItem.getDroppedItemId()));
