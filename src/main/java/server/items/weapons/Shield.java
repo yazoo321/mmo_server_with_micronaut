@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 import server.common.dto.Tag;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
+import server.items.model.ItemInstance;
 import server.items.model.Stacking;
 import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.types.ShieldSlot;
-import server.player.character.equippable.model.types.WeaponSlot1;
 
 import java.util.List;
 
@@ -26,8 +26,8 @@ public class Shield extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, String itemInstanceId) {
-        return new ShieldSlot(characterName, itemInstanceId);
+    public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
+        return new ShieldSlot(characterName, itemInstance);
     }
 
 }

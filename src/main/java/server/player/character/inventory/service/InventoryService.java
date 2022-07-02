@@ -5,13 +5,13 @@ import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.items.dropped.model.DroppedItem;
 import server.items.dropped.model.DroppedItemDto;
+import server.items.model.ItemInstance;
+import server.items.repository.ItemRepository;
 import server.items.service.ItemService;
 import server.player.character.equippable.model.exceptions.EquipException;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.model.exceptions.InventoryException;
-import server.player.character.inventory.model.response.CharacterItemDto;
-import server.player.character.inventory.model.response.InventoryDto;
 import server.player.character.inventory.repository.InventoryRepository;
 
 import javax.inject.Inject;
@@ -30,7 +30,10 @@ public class InventoryService {
     @Inject
     ItemService itemService;
 
-    public InventoryDto pickupItem(String characterName, String droppedItemId) throws InventoryException {
+    @Inject
+    ItemRepository itemRepository;
+
+    public Inventory pickupItem(String characterName, String droppedItemId) throws InventoryException {
         // Could add additional validations.
         // For example add unique ID to player items and match it with dropped ID
         // There can be occasions where when laggy
@@ -38,19 +41,20 @@ public class InventoryService {
 
         DroppedItem droppedItem = itemService.getDroppedItemById(droppedItemId);
         String itemInstanceId = droppedItem.getItemInstanceId();
+        ItemInstance instance = itemRepository.findItemInstanceById(itemInstanceId);
 
         Inventory inventory = inventoryRepository.getCharacterInventory(characterName);
 
         // check for example if inventory is full
         List<CharacterItem> items = inventory.getCharacterItems();
-        Location2D position = getNextAvailableSlot(inventory);
+        Location2D position = getNextAvailableSlot(inventory.getMaxSize(), inventory.getCharacterItems());
 
         if (position == null) {
             // no inventory slots left
             throw new InventoryException("No available slots in inventory");
         }
 
-        CharacterItem newCharacterItem = new CharacterItem(characterName, position, itemInstanceId);
+        CharacterItem newCharacterItem = new CharacterItem(characterName, position, instance.getItem(), itemInstanceId);
 
         items.add(newCharacterItem);
 
@@ -64,7 +68,7 @@ public class InventoryService {
 
     public void unequipItem(String itemInstanceId, String characterName) {
         // this is basically finding the nearest slot and placing item there
-        InventoryDto inventory = getInventory(characterName);
+        Inventory inventory = getInventory(characterName);
         Location2D loc = getNextAvailableSlot(inventory.getMaxSize(), inventory.getCharacterItems());
 
         if (loc == null) {
@@ -83,7 +87,7 @@ public class InventoryService {
             // this is unexpected, the item should exist in the inventory
             log.error("Un-equip item unexpectedly failed for character {} and itemInstanceId {}",
                     characterName, itemInstanceId);
-            throw new EquipException("Un-equip has un-expectadly failed");
+            throw new EquipException("Un-equip has unexpectedly failed");
         }
 
         foundItem.setLocation(loc);
@@ -107,7 +111,7 @@ public class InventoryService {
         return itemService.dropExistingItem(characterItem.getItemInstanceId(), location);
     }
 
-    public InventoryDto getInventory(String characterName) {
+    public Inventory getInventory(String characterName) {
         return inventoryRepository.getCharacterInventory(characterName);
     }
 

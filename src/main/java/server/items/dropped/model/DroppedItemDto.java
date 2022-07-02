@@ -23,15 +23,14 @@ public class DroppedItemDto {
     LocalDateTime droppedAt;
 
 
-    public DroppedItemDto(DroppedItem droppedItem, Item item, ItemInstance instance) {
+    public DroppedItemDto(DroppedItem droppedItem, ItemInstance instance) {
         this.droppedItemId = droppedItem.getDroppedItemId();
         this.location = droppedItem.getLocation();
         this.itemInstanceId = droppedItem.getItemInstanceId();
 
         // merge item instance content with item content
-        item.getTags().addAll(instance.getTags());
 
-        this.item = item;
+        this.item = instance.getItem();
         this.droppedAt = droppedItem.getDroppedAt();
     }
 }

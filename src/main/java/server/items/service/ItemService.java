@@ -34,12 +34,12 @@ public class ItemService {
         String itemInstanceId = UUID.randomUUID().toString();
         String droppedItemId = UUID.randomUUID().toString(); // generate unique ID for the dropped item
 
-        ItemInstance instance = new ItemInstance(itemId, itemInstanceId, new ArrayList<>());
+        ItemInstance instance = new ItemInstance(itemId, itemInstanceId, foundItem);
         instance = itemRepository.createItemInstance(instance);
         DroppedItem droppedItem = new DroppedItem(droppedItemId, location, instance.getItemInstanceId(), now);
         droppedItem = itemRepository.createDroppedItem(droppedItem);
 
-        return new DroppedItemDto(droppedItem, foundItem, instance);
+        return new DroppedItemDto(droppedItem, instance);
     }
 
     public DroppedItemDto dropExistingItem(String itemInstanceId, Location location) {
@@ -51,7 +51,7 @@ public class ItemService {
         Item item = itemRepository.findByItemId(instance.getItemId());
         droppedItem = itemRepository.createDroppedItem(droppedItem);
 
-        return new DroppedItemDto(droppedItem, item, instance) ;
+        return new DroppedItemDto(droppedItem, instance) ;
     }
 
     public DroppedItem getDroppedItemById(String droppedItemId) {
@@ -67,7 +67,7 @@ public class ItemService {
             ItemInstance instance = itemRepository.findItemInstanceById(i.getItemInstanceId());
             Item item = itemRepository.findByItemId(instance.getItemId());
             droppedItemDtos.add(
-                    new DroppedItemDto(i, item, instance)
+                    new DroppedItemDto(i, instance)
             );
         });
 

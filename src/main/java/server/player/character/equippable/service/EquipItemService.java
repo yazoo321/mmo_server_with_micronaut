@@ -51,7 +51,7 @@ public class EquipItemService {
             unequipItem(equippedItem.getItemInstanceId(), characterName);
         }
 
-        equippedItem = item.createEquippedItem(characterName, itemInstanceId);
+        equippedItem = item.createEquippedItem(characterName, instance);
         // setting location to null effectively moves it away from inventory space
         characterItem.setLocation(null);
         inventoryService.updateInventoryItems(characterName, items);

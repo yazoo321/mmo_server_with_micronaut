@@ -86,6 +86,6 @@ public abstract class Item {
     Integer value;
     ItemConfig itemConfig;
 
-    public abstract EquippedItems createEquippedItem(String characterName, String itemInstanceId);
+    public abstract EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance);
 
 }

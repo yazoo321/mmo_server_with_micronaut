@@ -16,7 +16,6 @@ import server.items.weapons.Weapon;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
 @MicronautTest
@@ -54,8 +53,8 @@ public class ItemServiceTest {
         DroppedItem expectedDroppedItem = new DroppedItem(
                 "droppedItemId", locationToDrop, "itemInstanceId", LocalDateTime.now());
 
-        DroppedItemDto expectedDroppedItemDto = new DroppedItemDto(expectedDroppedItem, weapon,
-                new ItemInstance(weapon.getItemId(), "not matched", new ArrayList<>()));
+        DroppedItemDto expectedDroppedItemDto = new DroppedItemDto(expectedDroppedItem,
+                new ItemInstance(weapon.getItemId(), "not matched", weapon));
 
         // When
         DroppedItemDto actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop);

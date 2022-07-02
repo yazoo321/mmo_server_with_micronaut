@@ -8,9 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import server.common.dto.Tag;
-
-import java.util.List;
 
 @Data
 @Introspected
@@ -26,15 +23,15 @@ public class ItemInstance {
             @BsonProperty("itemId") String itemId,
             @JsonProperty("itemInstanceId")
             @BsonProperty("itemInstanceId") String itemInstanceId,
-            @JsonProperty("tags")
-            @BsonProperty("tags") List<Tag> tags) {
+            @JsonProperty("item")
+            @BsonProperty("item") Item item) {
 
         this.itemId = itemId;
         this.itemInstanceId = itemInstanceId;
-        this.tags = tags;
+        this.item = item;
     }
 
     String itemId;
     String itemInstanceId;
-    List<Tag> tags;
+    Item item;
 }

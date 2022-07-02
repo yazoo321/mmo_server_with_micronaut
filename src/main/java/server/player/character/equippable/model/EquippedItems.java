@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import server.items.model.Item;
+import server.items.model.ItemInstance;
 import server.player.character.equippable.model.types.*;
 
 
@@ -46,15 +48,26 @@ public abstract class EquippedItems {
             @BsonProperty("characterName") String characterName,
             @JsonProperty("itemInstanceId")
             @BsonProperty("itemInstanceId") String itemInstanceId,
+            @JsonProperty("item")
+            @BsonProperty("item") Item item,
             @JsonProperty("category")
             @BsonProperty("category") String category
     ) {
         this.characterName = characterName;
         this.itemInstanceId = itemInstanceId;
+        this.item = item;
         this.category = category;
     }
 
     String characterName;
     String itemInstanceId;
+    Item item;
     String category;
+
+    public EquippedItems(String characterName, ItemInstance itemInstance, String category) {
+        this.characterName = characterName;
+        this.itemInstanceId = itemInstance.getItemInstanceId();
+        this.item = itemInstance.getItem();
+        this.category = category;
+    }
 }

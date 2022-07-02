@@ -99,8 +99,8 @@ public class ItemTestHelper {
         ).map(success -> item).blockingGet();
     }
 
-    public ItemInstance createItemInstanceFor(String itemId, String itemInstanceId, List<Tag> tags) {
-        ItemInstance itemInstance = new ItemInstance(itemId, itemInstanceId, tags);
+    public ItemInstance createItemInstanceFor(Item item, String itemInstanceId, List<Tag> tags) {
+        ItemInstance itemInstance = new ItemInstance(item.getItemId(), itemInstanceId, item);
 
         return Single.fromPublisher(
                 itemInstanceCollection.insertOne(itemInstance)
