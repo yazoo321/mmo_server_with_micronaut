@@ -1,6 +1,8 @@
 package server.player.character.service;
 
 import server.common.dto.Motion;
+import server.player.attributes.levels.service.PlayerLevelAttributeService;
+import server.player.attributes.service.PlayerAttributeService;
 import server.player.character.dto.AccountCharactersResponse;
 import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
@@ -11,6 +13,7 @@ import server.player.motion.service.PlayerMotionService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.xml.bind.annotation.XmlInlineBinaryData;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -25,7 +28,10 @@ public class PlayerCharacterService {
     InventoryService inventoryService;
 
     @Inject
-    EquipItemService equipItemService;
+    PlayerAttributeService attributeService;
+
+    @Inject
+    PlayerLevelAttributeService levelAttributeService;
 
     @Inject
     PlayerMotionService playerMotionService;
@@ -50,7 +56,13 @@ public class PlayerCharacterService {
 
         // this will throw if there's a duplicate entry
         newCharacter = playerCharacterRepository.createNew(newCharacter);
+
+        // call relevant services to initialise data
         inventoryService.createInventoryForNewCharacter(newCharacter.getName());
+
+        attributeService.createBaseAttributes(newCharacter.getName());
+
+        levelAttributeService.initializeCharacterClass(newCharacter.getName(), createCharacterRequest.getClassName());
 
         return newCharacter;
     }

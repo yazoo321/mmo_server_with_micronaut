@@ -71,3 +71,4 @@ mongo-database:
   dropped-items-collection: "dropped-items"
   inventory-collection: "inventory"
   equip-collection: "equip"
+  player-attributes: "playerAttributes"

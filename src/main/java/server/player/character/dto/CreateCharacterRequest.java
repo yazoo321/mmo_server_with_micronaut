@@ -20,4 +20,7 @@ public class CreateCharacterRequest {
 
     @NotNull
     Map<String, String> appearanceInfo;
+
+    @NotNull
+    String className;
 }
