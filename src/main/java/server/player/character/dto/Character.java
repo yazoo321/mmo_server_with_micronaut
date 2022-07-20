@@ -17,6 +17,8 @@ import java.util.Map;
 @Introspected
 @NoArgsConstructor
 public class Character {
+    // TODO: Break this DTO into multiple classes
+
     @BsonCreator
     @JsonCreator
     public Character(
@@ -43,8 +45,6 @@ public class Character {
         this.updatedAt = updatedAt;
         this.isOnline = isOnline;
     }
-    // This DTO should hold all the data that we need to load a player character
-    // Hence, this list is far from finished. It will be incremented as development goes on
 
     // Make sure name only contains letters, allow upper
     @Pattern(message="Name can only contain letters and number", regexp = "^[a-zA-Z0-9]*$")

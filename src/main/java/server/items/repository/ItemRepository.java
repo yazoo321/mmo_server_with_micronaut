@@ -2,6 +2,7 @@ package server.items.repository;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
@@ -14,6 +15,7 @@ import server.items.model.exceptions.ItemException;
 
 import javax.inject.Singleton;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -108,6 +110,23 @@ public class ItemRepository {
         } catch (NoSuchElementException e) {
             log.error("Could not find the item instance by ID! It no longer exists");
             throw new ItemException("Could not find the item instance by ID! It no longer exists");
+        }
+    }
+
+    public List<ItemInstance> findItemByItemInstanceIds(List<String> itemInstanceIds) {
+        if (null == itemInstanceIds || itemInstanceIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        try {
+            return Flowable.fromPublisher(
+                    itemInstanceCollection.find(
+                            in("itemInstanceId", itemInstanceIds)
+                    )
+            ).toList().blockingGet();
+        } catch (NoSuchElementException e) {
+            log.error("Could not find the instances for given instance IDs, {}", itemInstanceIds);
+            throw new ItemException("Could not find the instances for given instance IDs");
         }
     }
 

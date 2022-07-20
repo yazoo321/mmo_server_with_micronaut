@@ -6,11 +6,13 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Motion;
+import server.player.attributes.levels.types.ClassesAttributeTypes;
 import server.player.character.dto.AccountCharactersResponse;
 import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.repository.PlayerCharacterRepository;
 import server.player.character.service.PlayerCharacterService;
+import server.player.character.service.PlayerCharacterServiceTest;
 import server.player.motion.dto.PlayerMotion;
 import server.player.motion.service.PlayerMotionService;
 
@@ -42,10 +44,7 @@ public class PlayerMotionServiceTest {
     @Test
     void testWhenCharacterIsCreatedTheMotionCanBeUpdatedAsExpected() {
         // Given
-        CreateCharacterRequest createCharacterRequest = new CreateCharacterRequest();
-        createCharacterRequest.setName(TEST_CHARACTER_NAME);
-        Map<String, String> appearanceInfo = Map.of("key", "value");
-        createCharacterRequest.setAppearanceInfo(appearanceInfo);
+        CreateCharacterRequest createCharacterRequest = PlayerCharacterServiceTest.createBasicCharacterRequest();
 
         Character testCharacter = playerCharacterService.createCharacter(createCharacterRequest, TEST_USERNAME);
 
@@ -74,10 +73,7 @@ public class PlayerMotionServiceTest {
     @Test
     void testWhenCharacterIsNearbyIsReturnedAsExpected() {
         // Given
-        CreateCharacterRequest createCharacterRequest = new CreateCharacterRequest();
-        createCharacterRequest.setName(TEST_CHARACTER_NAME);
-        Map<String, String> appearanceInfo = Map.of("key", "value");
-        createCharacterRequest.setAppearanceInfo(appearanceInfo);
+        CreateCharacterRequest createCharacterRequest = PlayerCharacterServiceTest.createBasicCharacterRequest();
 
         Character testCharacter = playerCharacterService.createCharacter(createCharacterRequest, TEST_USERNAME);
 

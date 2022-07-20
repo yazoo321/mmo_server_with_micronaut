@@ -4,12 +4,14 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.player.attributes.levels.types.ClassesAttributeTypes;
 import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.repository.PlayerCharacterRepository;
 import server.util.TestCharacterUtil;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.Map;
 
 @MicronautTest
@@ -34,13 +36,10 @@ public class PlayerCharacterServiceTest {
     @Test
     void testSaveCharacterAndGetCharacterForUser() {
         // Given
-        CreateCharacterRequest createCharacterRequest = new CreateCharacterRequest();
-        createCharacterRequest.setName(TEST_CHARACTER_NAME);
-        Map<String, String> appearanceInfo = Map.of("key", "value");
-        createCharacterRequest.setAppearanceInfo(appearanceInfo);
+        CreateCharacterRequest createCharacterRequest = createBasicCharacterRequest();
 
         Character testCharacter = TestCharacterUtil.getBasicTestCharacter(
-                TEST_USERNAME, TEST_CHARACTER_NAME, appearanceInfo);
+                TEST_USERNAME, TEST_CHARACTER_NAME, Map.of("key", "value"));
 
         // When
         Character character = playerCharacterService.createCharacter(createCharacterRequest, TEST_USERNAME);
@@ -51,6 +50,16 @@ public class PlayerCharacterServiceTest {
                 .isEqualTo(testCharacter);
 
         Assertions.assertThat(character.getUpdatedAt()).isNotNull();
+    }
+
+    public static CreateCharacterRequest createBasicCharacterRequest() {
+        CreateCharacterRequest createCharacterRequest = new CreateCharacterRequest();
+        createCharacterRequest.setName(TEST_CHARACTER_NAME);
+        Map<String, String> appearanceInfo = Map.of("key", "value");
+        createCharacterRequest.setAppearanceInfo(appearanceInfo);
+        createCharacterRequest.setClassName(ClassesAttributeTypes.FIGHTER.getType());
+
+        return createCharacterRequest;
     }
 
 }

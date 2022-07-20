@@ -1,6 +1,7 @@
 package server.player.character.equippable.service;
 
 import lombok.extern.slf4j.Slf4j;
+import server.common.dto.Tag;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.repository.ItemRepository;
@@ -15,6 +16,7 @@ import server.player.character.inventory.service.InventoryService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -74,6 +76,15 @@ public class EquipItemService {
 
     public List<EquippedItems> getEquippedItems(String characterName) {
         return equipRepository.getEquippedItemsForCharacter(characterName);
+    }
+
+    public void getModifiersOfEquippedItems(String characterName) {
+        List<EquippedItems> equippedItems = equipRepository.getEquippedItemsForCharacter(characterName);
+
+        List<ItemInstance> itemInstances = equippedItems.stream().map(EquippedItems::getItemInstance)
+                .collect(Collectors.toList());
+
+        // TBD
     }
 
 
