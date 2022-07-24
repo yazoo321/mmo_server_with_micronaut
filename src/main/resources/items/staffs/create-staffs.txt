@@ -1,0 +1,145 @@
+{
+
+    "items": [
+        {
+            "itemId": "17000",
+            "itemName": "Staff of divinity",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "35"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "17001",
+            "itemName": "Staff of divinity",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "300"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "17002",
+            "itemName": "Lifestealer staff",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "250"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "17003",
+            "itemName": "Wooden stick",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "3"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "17004",
+            "itemName": "Apprentice's staff",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "35"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "17005",
+            "itemName": "Chipped arnana stick",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "50"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "17006",
+            "itemName": "Empowered stick",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "60"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        }
+    ]
+}

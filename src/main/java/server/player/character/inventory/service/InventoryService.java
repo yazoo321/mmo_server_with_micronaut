@@ -64,7 +64,7 @@ public class InventoryService {
         return getInventory(characterName);
     }
 
-    public void unequipItem(String itemInstanceId, String characterName) {
+    public List<CharacterItem> unequipItem(String itemInstanceId, String characterName) {
         // this is basically finding the nearest slot and placing item there
         Inventory inventory = getInventory(characterName);
         Location2D loc = getNextAvailableSlot(inventory.getMaxSize(), inventory.getCharacterItems());
@@ -90,6 +90,8 @@ public class InventoryService {
 
         foundItem.setLocation(loc);
         inventoryRepository.updateInventoryItems(characterName, items);
+
+        return items;
     }
 
     public DroppedItem dropItem(String characterName, Location2D inventoryLocation, Location location)
@@ -123,7 +125,7 @@ public class InventoryService {
         inventory.setCharacterName(characterName);
         inventory.setCharacterItems(new ArrayList<>());
         inventory.setGold(0);
-        inventory.setMaxSize(new Location2D(10, 10));
+        inventory.setMaxSize(new Location2D(4, 10));
 
         return inventoryRepository.insert(inventory);
     }
@@ -140,13 +142,14 @@ public class InventoryService {
 
         items.forEach(i -> {
             Location2D loc = i.getLocation();
-            if (loc != null) {
+            // process only valid locations, ignore 'equipped' items
+            if (loc != null && loc.getX() > -1) {
                 invArr[loc.getX()][loc.getY()] = 1;
             }
         });
 
-        for (int x = 0; x < maxSize.getX(); x++) {
-            for (int y = 0; y < maxSize.getY(); y++) {
+        for (int x = 0; x < maxSize.getY(); x++) {
+            for (int y = 0; y < maxSize.getX(); y++) {
                 if (invArr[x][y] != 1) {
                     return new Location2D(x,y);
                 }
