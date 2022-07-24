@@ -1,0 +1,105 @@
+{
+
+    "items": [
+        {
+            "itemId": "15000",
+            "itemName": "Sunsword of Vallen",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "300"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "15001",
+            "itemName": "Iron butcher sword",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "35"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "15002",
+            "itemName": "Guards cleaver",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "125"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "15003",
+            "itemName": "Fallen champions sword",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "200"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "15004",
+            "itemName": "Giants cleaver",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "250"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        }
+    ]
+}

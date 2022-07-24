@@ -116,7 +116,7 @@ public class ItemTestHelper {
         inventory.setCharacterName(characterName);
         inventory.setCharacterItems(new ArrayList<>());
         inventory.setGold(0);
-        inventory.setMaxSize(new Location2D(10, 10));
+        inventory.setMaxSize(new Location2D(3, 20));
 
         return insertInventory(inventory);
     }

@@ -1,0 +1,105 @@
+{
+
+    "items": [
+        {
+            "itemId": "16000",
+            "itemName": "Iron pickaxe",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "5"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "16001",
+            "itemName": "Iron double axe",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "35"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "16002",
+            "itemName": "Wood chopper",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "40"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "16003",
+            "itemName": "Axe with a thousand souls",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "200"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "16004",
+            "itemName": "Generals axe",
+            "category": "WEAPON",
+            "tags": [
+                {
+                    "name": "damage",
+                    "value": "200"
+                }
+            ],
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        }
+    ]
+}

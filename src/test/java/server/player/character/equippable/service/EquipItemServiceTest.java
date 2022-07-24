@@ -7,6 +7,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import server.common.dto.Location2D;
 import server.items.helper.ItemTestHelper;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
@@ -14,6 +15,7 @@ import server.items.types.ItemType;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.types.*;
 import server.player.character.inventory.model.CharacterItem;
+import server.player.character.inventory.model.Inventory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -106,6 +108,18 @@ public class EquipItemServiceTest {
                 .usingRecursiveComparison()
                 .ignoringFields("item.itemId", "itemInstance.itemId", "itemInstance.item.itemId")   // Because in the args list we pre-create item for expected result
                 .isEqualTo(List.of(expectedEquipped));
+
+        // Then
+        // Check that the inventory item has no location set
+
+        Inventory inventory = itemTestHelper.getInventory(CHARACTER_NAME);
+        List<CharacterItem> inventoryItems = inventory.getCharacterItems();
+
+        CharacterItem ci1 = inventoryItems.stream().filter(ii ->
+                ii.getItemInstance().getItemInstanceId().equals(characterItem.getItemInstance().getItemInstanceId())
+        ).findFirst().get();
+
+        Assertions.assertThat(ci1.getLocation()).usingRecursiveComparison().isEqualTo(new Location2D(-1, -1));
     }
 
     @ParameterizedTest
@@ -138,6 +152,24 @@ public class EquipItemServiceTest {
                 .usingRecursiveComparison()
                 .ignoringFields("item.itemId", "itemInstance.itemId", "itemInstance.item.itemId") // The item was created twice in test
                 .isEqualTo(List.of(expectedEquipped));
+
+        // Then
+        // also check the inventory is set as expected
+        Inventory inventory = itemTestHelper.getInventory(CHARACTER_NAME);
+        List<CharacterItem> inventoryItems = inventory.getCharacterItems();
+
+        CharacterItem ci1 = inventoryItems.stream().filter(ii ->
+                ii.getItemInstance().getItemInstanceId().equals(i1.getItemInstance().getItemInstanceId())
+        ).findFirst().get();
+
+        CharacterItem ci2 = inventoryItems.stream().filter(ii ->
+                ii.getItemInstance().getItemInstanceId().equals(i2.getItemInstance().getItemInstanceId())
+        ).findFirst().get();
+
+        Assertions.assertThat(ci1.getLocation()).usingRecursiveComparison()
+                .isEqualTo(new Location2D(0,0));
+
+        Assertions.assertThat(ci2.getLocation()).usingRecursiveComparison().isEqualTo(new Location2D(-1, -1));
     }
 
 }

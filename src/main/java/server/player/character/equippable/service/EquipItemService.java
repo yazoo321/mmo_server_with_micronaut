@@ -1,8 +1,7 @@
 package server.player.character.equippable.service;
 
 import lombok.extern.slf4j.Slf4j;
-import server.common.dto.Tag;
-import server.items.model.Item;
+import server.common.dto.Location2D;
 import server.items.model.ItemInstance;
 import server.items.repository.ItemRepository;
 import server.player.character.equippable.model.EquippedItems;
@@ -36,26 +35,24 @@ public class EquipItemService {
 
         Inventory inventory = inventoryService.getInventory(characterName);
         List<CharacterItem> items = inventory.getCharacterItems();
-        CharacterItem characterItem = items
-                .stream()
-                .filter(iterator->iterator.getItemInstance().getItemInstanceId().equals(itemInstanceId))
-                .findFirst().orElseThrow(() ->
-                        new InventoryException("The item trying to equip does not exist"));
 
-        ItemInstance instance = characterItem.getItemInstance();
-        Item item = instance.getItem();
+        ItemInstance instance = getCharacterItemByInstance(items, itemInstanceId).getItemInstance();
 
-        String slotType = item.getCategory();
+        String slotType = instance.getItem().getCategory();
 
         EquippedItems equippedItem = equipRepository.getCharacterItemSlot(characterName, slotType);
 
         if (equippedItem != null) {
-            unequipItem(equippedItem.getItemInstance().getItemInstanceId(), characterName);
+           items = unequipItem(equippedItem.getItemInstance().getItemInstanceId(), characterName).getCharacterItems();
         }
 
-        equippedItem = item.createEquippedItem(characterName, instance);
-        // setting location to null effectively moves it away from inventory space
-        characterItem.setLocation(null);
+        // the items object has been refreshed, need to re-sync object
+        CharacterItem characterItem = getCharacterItemByInstance(items, itemInstanceId);
+
+        equippedItem = characterItem.getItemInstance().getItem().createEquippedItem(characterName, instance);
+
+        // setting location to 'invalid' value, to not show it in inventory
+        characterItem.setLocation(new Location2D(-1, -1));
         inventoryService.updateInventoryItems(characterName, items);
 
         return equipRepository.insert(equippedItem);
@@ -76,6 +73,14 @@ public class EquipItemService {
 
     public List<EquippedItems> getEquippedItems(String characterName) {
         return equipRepository.getEquippedItemsForCharacter(characterName);
+    }
+
+    private CharacterItem getCharacterItemByInstance(List<CharacterItem> items, String itemInstanceId) {
+        return items
+                .stream()
+                .filter(iterator->iterator.getItemInstance().getItemInstanceId().equals(itemInstanceId))
+                .findFirst().orElseThrow(() ->
+                new InventoryException("The item trying to equip does not exist"));
     }
 
     public void getModifiersOfEquippedItems(String characterName) {

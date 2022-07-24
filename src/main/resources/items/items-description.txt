@@ -1,0 +1,8 @@
+The aim here is to organise the items creation and allocation.
+For example, let's reserve certain item categories to certain IDs.
+E.g. Each weapon type should have 1000 IDs reserved for them.
+
+E.g.:
+Swords      15000 -> 16000
+Axes        16000 -> 17000
+Staffs      17000 -> 18000
