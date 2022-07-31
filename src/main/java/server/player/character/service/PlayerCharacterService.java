@@ -9,7 +9,7 @@ import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.equippable.service.EquipItemService;
 import server.player.character.inventory.service.InventoryService;
 import server.player.character.repository.PlayerCharacterRepository;
-import server.player.motion.service.PlayerMotionService;
+import server.player.motion.socket.v1.service.PlayerMotionService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -59,10 +59,9 @@ public class PlayerCharacterService {
 
         // call relevant services to initialise data
         inventoryService.createInventoryForNewCharacter(newCharacter.getName());
-
         attributeService.createBaseAttributes(newCharacter.getName());
-
         levelAttributeService.initializeCharacterClass(newCharacter.getName(), createCharacterRequest.getClassName());
+        playerMotionService.initializePlayerMotion(newCharacter.getName());
 
         return newCharacter;
     }

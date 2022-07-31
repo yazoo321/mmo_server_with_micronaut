@@ -15,5 +15,6 @@ public class MongoConfiguration {
     private String inventoryCollection;
     private String equipCollection;
     private String playerAttributes;
+    private String playerMotion;
 
 }

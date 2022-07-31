@@ -12,7 +12,12 @@ micronaut:
           secret:
             generator:
               secret: pleaseChangeThisSecretForANewOne
-
+  router:
+    static-resources:
+      default:
+        enabled: true
+        mapping: /**
+        paths: classpath:public
 jooq:
   datasources:
     default:
@@ -72,3 +77,4 @@ mongo-database:
   inventory-collection: "inventory"
   equip-collection: "equip"
   player-attributes: "playerAttributes"
+  player-motion: "playerMotion"

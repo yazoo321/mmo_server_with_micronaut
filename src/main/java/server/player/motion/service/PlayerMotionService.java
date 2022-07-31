@@ -12,6 +12,7 @@ import java.util.List;
 
 @Singleton
 public class PlayerMotionService {
+    // Deprecated by server.player.motion.socket.v1.service.PlayerMotionService
 
     @Inject
     PlayerCharacterRepository playerCharacterRepository;
