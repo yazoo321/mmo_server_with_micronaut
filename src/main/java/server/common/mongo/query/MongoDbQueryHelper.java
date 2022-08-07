@@ -5,6 +5,8 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.Flowable;
 import org.bson.conversions.Bson;
 import server.common.dto.Location;
+import server.common.dto.Motion;
+import server.player.motion.dto.PlayerMotion;
 
 import java.util.List;
 
@@ -30,6 +32,34 @@ public class MongoDbQueryHelper {
                                 and(xWithinRange, yWithinRange)
                         )
                 )).toList()
+                .blockingGet();
+    }
+
+    public static <T> List<T> nearbyMotionFinder(MongoCollection<T> collection, PlayerMotion playerMotion, Integer threshold) {
+        Motion motion = playerMotion.getMotion();
+
+        Bson excludingThisCharacter = Filters.ne("playerName", playerMotion.getPlayerName());
+        Bson isOnline = Filters.eq("isOnline", true);
+        Bson mapEq = Filters.eq("motion.map", motion.getMap());
+        Bson xWithinRange = Filters.and(
+                Filters.gt("motion.x", (motion.getX() - threshold)),
+                Filters.lt("motion.x", (motion.getX() + threshold))
+        );
+        Bson yWithinRange = Filters.and(
+                Filters.gt("motion.y", (motion.getY() - threshold)),
+                Filters.lt("motion.y", (motion.getY() + threshold))
+        );
+
+        return Flowable.fromPublisher(
+                        collection.find(
+                                and(
+                                        excludingThisCharacter,
+                                        isOnline,
+                                        mapEq,
+                                        xWithinRange,
+                                        yWithinRange
+                                )
+                        )).toList()
                 .blockingGet();
     }
 }

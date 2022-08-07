@@ -1,11 +1,6 @@
 package server.player.controller;
 
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.http.annotation.*;
 import server.player.character.dto.AccountCharactersResponse;
 import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
@@ -29,21 +24,21 @@ public class PlayerController {
 
     @Post("/update-motion")
     public AccountCharactersResponse updatePlayerLocation(@Body PlayerMotion playerMotionRequest) {
+        // TODO: Remove this, its deprecated
         playerMotionService.updatePlayerState(playerMotionRequest);
         return playerMotionService.getPlayersNearMe(playerMotionRequest.getPlayerName());
     }
 
     @Get("/account-characters")
-    public AccountCharactersResponse getAccountCharacters(Principal principal) {
+    public AccountCharactersResponse getAccountCharacters(@Header String accountName) {
         // This endpoint will be for when user logs in.
         // They will be greeted with a list of characters
-        return playerCharacterService.getAccountCharacters(principal.getName());
+        return playerCharacterService.getAccountCharacters(accountName);
     }
 
     @Post("/create-character")
-    public Character createCharacter(@Body @Valid CreateCharacterRequest createCharacterRequest, Principal principal) {
-        // Principal is the authenticated user, we should not get it from body but JWT token as that is trusted
-        String accountName = principal.getName();
+    public Character createCharacter(@Body @Valid CreateCharacterRequest createCharacterRequest,
+                                     @Header String accountName) {
 
         return playerCharacterService.createCharacter(createCharacterRequest, accountName);
     }

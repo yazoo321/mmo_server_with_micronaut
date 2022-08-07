@@ -18,7 +18,7 @@ public class TestCharacterUtil {
         character.setIsOnline(false);
 
         // default motion
-        character.setMotion(new Motion(0,0,112,0,0,0,0,0,0, false));
+        character.setMotion(new Motion("map1", 0,0,112,0,0,0,0,0,0, false));
 
         return character;
     }

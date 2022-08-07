@@ -8,9 +8,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ClassesAttributeTypes {
 
-    MAGE("MAGE"),
-    FIGHTER("FIGHTER"),
-    CLERIC("CLERIC");
+    MAGE("mage"),
+    FIGHTER("fighter"),
+    CLERIC("cleric");
 
 
     public final String type;

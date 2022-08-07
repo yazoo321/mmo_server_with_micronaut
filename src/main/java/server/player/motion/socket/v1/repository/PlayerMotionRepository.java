@@ -6,6 +6,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
+import server.common.dto.Motion;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
 import server.items.dropped.model.DroppedItem;
@@ -26,8 +27,6 @@ import static com.mongodb.client.model.Filters.*;
 @Slf4j
 @Singleton
 public class PlayerMotionRepository {
-
-    private final static Integer DROPPED_ITEM_TIMEOUT_SECONDS = 60;
 
     MongoConfiguration configuration;
     MongoClient mongoClient;
@@ -74,17 +73,19 @@ public class PlayerMotionRepository {
                         eq("playerName", playerMotion.getPlayerName()),
                         playerMotion
                 )
-        ).subscribe();
+        ).blockingGet();
 
         return playerMotion;
     }
 
-
+    public List<PlayerMotion> getPlayersNearby(PlayerMotion playerMotion) {
+        return MongoDbQueryHelper.nearbyMotionFinder(playerMotionMongoCollection, playerMotion, 1000);
+    }
 
 
     private void prepareCollections() {
         this.playerMotionMongoCollection = mongoClient
                 .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getItemInstancesCollection(), PlayerMotion.class);
+                .getCollection(configuration.getPlayerMotion(), PlayerMotion.class);
     }
 }

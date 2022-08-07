@@ -48,7 +48,7 @@ public class PlayerMotionServiceTest {
 
         Character testCharacter = playerCharacterService.createCharacter(createCharacterRequest, TEST_USERNAME);
 
-        Motion motion = new Motion(1,2,3,4,5,6,7,8,9, true);
+        Motion motion = new Motion("map1", 1,2,3,4,5,6,7,8,9, true);
         PlayerMotion playerMotion = new PlayerMotion();
         playerMotion.setPlayerName(TEST_CHARACTER_NAME);
         playerMotion.setMotion(motion);
@@ -77,7 +77,7 @@ public class PlayerMotionServiceTest {
 
         Character testCharacter = playerCharacterService.createCharacter(createCharacterRequest, TEST_USERNAME);
 
-        Motion motion = new Motion(1,2,3,4,5,6,7,8,9, true);
+        Motion motion = new Motion("map1", 1,2,3,4,5,6,7,8,9, true);
         PlayerMotion playerMotion = new PlayerMotion();
         playerMotion.setPlayerName(TEST_CHARACTER_NAME);
         playerMotion.setMotion(motion);

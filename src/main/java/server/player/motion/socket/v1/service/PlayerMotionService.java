@@ -1,19 +1,17 @@
 package server.player.motion.socket.v1.service;
 
 import io.micronaut.websocket.WebSocketBroadcaster;
-import io.micronaut.websocket.WebSocketSession;
 import lombok.extern.slf4j.Slf4j;
-import org.reactivestreams.Publisher;
 import server.common.dto.Motion;
 import server.player.motion.dto.PlayerMotion;
-import server.player.motion.dto.exceptions.PlayerMotionException;
+import server.player.motion.socket.v1.model.PlayerMotionList;
 import server.player.motion.socket.v1.repository.PlayerMotionRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.List;
 
 @Slf4j
 @Singleton
@@ -48,34 +46,29 @@ public class PlayerMotionService {
         return playerMotion;
     }
 
-    public Publisher<PlayerMotion> updatePlayerMotion(String playerName, PlayerMotion motion, WebSocketBroadcaster broadcaster) {
-        if (!Objects.equals(playerName, motion.getPlayerName())) {
-            log.error("Logged in player {} tried to update motion for player {}", playerName, motion.getPlayerName());
-            throw new PlayerMotionException("Tried to update motion for incorrect player name");
-        }
+    public void updatePlayerMotion(String playerName, Motion motion) {
+//        if (!Objects.equals(playerName, motion.getPlayerName())) {
+//            log.error("Logged in player {} tried to update motion for player {}", playerName, motion.getPlayerName());
+//            throw new PlayerMotionException("Tried to update motion for incorrect player name");
+//        }
 
-        motion.setUpdatedAt(ZonedDateTime.now());
-        motion.setIsOnline(true);
-        playerMotionRepository.updatePlayerMotion(motion);
-
-        return broadcaster.broadcast(motion, sendToNearbyListenersFilter(motion));
+        PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
+        playerMotionRepository.updatePlayerMotion(playerMotion);
     }
 
-    public Publisher<PlayerMotion> disconnectPlayer(String playerName, WebSocketBroadcaster broadcaster) {
+    public void disconnectPlayer(String playerName) {
         PlayerMotion motion = playerMotionRepository.findPlayerMotion(playerName);
 
         motion.setIsOnline(false);
 
         playerMotionRepository.updatePlayerMotion(motion);
-
-        return broadcaster.broadcast(motion, sendToNearbyListenersFilter(motion));
     }
 
-    private Predicate<WebSocketSession> sendToNearbyListenersFilter(PlayerMotion playerMotion) {
-        return s -> {
-            // TODO: Add filters to track only nearby motion
-            return true;
-        };
+    public PlayerMotionList getPlayersNearMe(Motion motion, String playerName) {
+        PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
+        List<PlayerMotion> playerMotions = playerMotionRepository.getPlayersNearby(playerMotion);
+
+        return new PlayerMotionList(playerMotions);
     }
 
 }
