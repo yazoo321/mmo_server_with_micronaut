@@ -10,6 +10,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.common.dto.Motion;
 
 import javax.validation.constraints.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -24,24 +25,18 @@ public class Character {
     public Character(
             @JsonProperty("name")
             @BsonProperty("name") String name,
-            @JsonProperty("xp")
-            @BsonProperty("xp") Integer xp,
             @JsonProperty("accountName")
             @BsonProperty("accountName") String accountName,
             @JsonProperty("appearanceInfo")
             @BsonProperty("appearanceInfo") Map<String, String> appearanceInfo,
-            @JsonProperty("motion")
-            @BsonProperty("motion") Motion motion,
             @JsonProperty("updatedAt")
-            @BsonProperty("updatedAt") LocalDateTime updatedAt,
+            @BsonProperty("updatedAt") Instant updatedAt,
             @JsonProperty("isOnline")
             @BsonProperty("isOnline") Boolean isOnline
             ) {
         this.name = name;
-        this.xp = xp;
         this.accountName = accountName;
         this.appearanceInfo = appearanceInfo;
-        this.motion = motion;
         this.updatedAt = updatedAt;
         this.isOnline = isOnline;
     }
@@ -51,18 +46,13 @@ public class Character {
     @Size(min=3, max=25)
     String name;
 
-    @Min(0)
-    Integer xp;
-
     @NotBlank
     String accountName;
 
     @NotNull
     Map<String, String> appearanceInfo;
 
-    Motion motion;
-
-    LocalDateTime updatedAt;
+    Instant updatedAt;
 
     Boolean isOnline;
 }

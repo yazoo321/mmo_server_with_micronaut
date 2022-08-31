@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import server.player.character.dto.Character;
 
 import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -109,7 +108,7 @@ public class PlayerCharacterRepositoryTest {
     @Test
     void testCheckAndUpdateUserOnline() {
         // given
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        Instant now = Instant.now();
 
         Character character1 = createCharacter(CHAR_1, ACC_1);
         Character character2 = createCharacter(CHAR_2, ACC_1);
@@ -152,7 +151,6 @@ public class PlayerCharacterRepositoryTest {
     private Character createCharacter(String characterName, String account) {
         Character character = new Character();
         character.setName(characterName);
-        character.setXp(0);
         character.setAccountName(account);
         character.setAppearanceInfo(Map.of("key", "value"));
         return character;

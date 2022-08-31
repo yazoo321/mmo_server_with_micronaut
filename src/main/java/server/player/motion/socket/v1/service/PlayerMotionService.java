@@ -1,6 +1,5 @@
 package server.player.motion.socket.v1.service;
 
-import io.micronaut.websocket.WebSocketBroadcaster;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.player.motion.dto.PlayerMotion;
@@ -10,7 +9,6 @@ import server.player.motion.socket.v1.repository.PlayerMotionRepository;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @Slf4j
@@ -20,26 +18,27 @@ public class PlayerMotionService {
     @Inject
     PlayerMotionRepository playerMotionRepository;
 
+    public static final Motion STARTING_MOTION = Motion.builder()
+            .map("MAP1")
+            .vx(0)
+            .vy(0)
+            .vz(0)
+            .x(0)
+            .y(0)
+            .z(0)
+            .isFalling(false)
+            .pitch(0)
+            .roll(0)
+            .yaw(0)
+            .build();
+
     public PlayerMotion initializePlayerMotion(String playerName) {
         // can create custom start points for different classes/maps etc
         PlayerMotion playerMotion = new PlayerMotion();
-        Motion startMotion = new Motion();
-        startMotion.setX(0);
-        startMotion.setY(0);
-        startMotion.setZ(0);
-
-        startMotion.setVx(0);
-        startMotion.setVy(0);
-        startMotion.setVz(0);
-
-        startMotion.setPitch(0);
-        startMotion.setRoll(0);
-        startMotion.setYaw(0);
-
-        startMotion.setIsFalling(false);
-
-        playerMotion.setMotion(startMotion);
+        playerMotion.setMotion(STARTING_MOTION);
         playerMotion.setPlayerName(playerName);
+        playerMotion.setIsOnline(false);
+        playerMotion.setUpdatedAt(Instant.now());
 
         playerMotionRepository.insertPlayerMotion(playerMotion);
 

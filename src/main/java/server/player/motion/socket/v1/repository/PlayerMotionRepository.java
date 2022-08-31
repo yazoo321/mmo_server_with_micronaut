@@ -2,23 +2,14 @@ package server.player.motion.socket.v1.repository;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Flowable;
 import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;
-import server.common.dto.Location;
-import server.common.dto.Motion;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
-import server.items.dropped.model.DroppedItem;
-import server.items.model.Item;
-import server.items.model.ItemInstance;
-import server.items.model.exceptions.ItemException;
 import server.player.motion.dto.PlayerMotion;
 import server.player.motion.dto.exceptions.PlayerMotionException;
 
 import javax.inject.Singleton;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 

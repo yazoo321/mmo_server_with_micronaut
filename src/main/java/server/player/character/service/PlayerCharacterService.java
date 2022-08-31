@@ -1,6 +1,5 @@
 package server.player.character.service;
 
-import server.common.dto.Motion;
 import server.player.attributes.levels.service.PlayerLevelAttributeService;
 import server.player.attributes.service.PlayerAttributeService;
 import server.player.character.dto.AccountCharactersResponse;
@@ -12,8 +11,7 @@ import server.player.motion.socket.v1.service.PlayerMotionService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.List;
 
 @Singleton
@@ -41,16 +39,11 @@ public class PlayerCharacterService {
     }
 
     public Character createCharacter(CreateCharacterRequest createCharacterRequest, String username) {
-
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-
         Character newCharacter = new Character();
-        newCharacter.setXp(0);
         newCharacter.setName(createCharacterRequest.getName());
         newCharacter.setAccountName(username);
         newCharacter.setAppearanceInfo(createCharacterRequest.getAppearanceInfo());
-        newCharacter.setMotion(new Motion("map1", 0,0,112,0,0,0,0,0,0, false));
-        newCharacter.setUpdatedAt(now);
+        newCharacter.setUpdatedAt(Instant.now());
         newCharacter.setIsOnline(false);
 
         // this will throw if there's a duplicate entry
