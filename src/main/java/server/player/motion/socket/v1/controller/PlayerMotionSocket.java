@@ -39,21 +39,6 @@ public class PlayerMotionSocket {
     }
 
     @OnMessage
-    public Publisher<String> onMessage(
-            String playerName,
-            String map,
-            String message,
-            WebSocketSession session) {
-
-        log("onMessage", session, playerName, map);
-
-//        playerMotionService.updatePlayerMotion(playerName, message);
-//        PlayerMotionList res = playerMotionService.getPlayersNearMe(message, playerName);
-
-        return broadcaster.broadcast(message);
-    }
-
-    @OnMessage
     public Publisher<PlayerMotion> onMessage(
             String playerName,
             String map,
