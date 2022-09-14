@@ -137,18 +137,16 @@ dependencies {
     // if we want blocking implementation:
     // implementation("io.micronaut.mongodb:micronaut-mongo-sync")
 
-
+    // Serializer
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // test
     testCompile("org.junit.jupiter:junit-jupiter-params:5.8.1")
-//    testCompile("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-//    testCompile("org.junit.jupiter:junit-jupiter-api:5.8.1")
-
     testImplementation("org.assertj:assertj-core:3.20.2")
     testImplementation("io.micronaut.test:micronaut-test-junit5")
     testImplementation("org.mockito:mockito-core:3.11.2")
-//    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.1")
-
+    compile 'io.projectreactor:reactor-core'
+    testImplementation 'org.awaitility:awaitility:4.2.0'
 }
 
 application {

@@ -45,14 +45,11 @@ public class PlayerMotionService {
         return playerMotion;
     }
 
-    public void updatePlayerMotion(String playerName, Motion motion) {
-//        if (!Objects.equals(playerName, motion.getPlayerName())) {
-//            log.error("Logged in player {} tried to update motion for player {}", playerName, motion.getPlayerName());
-//            throw new PlayerMotionException("Tried to update motion for incorrect player name");
-//        }
-
+    public PlayerMotion updatePlayerMotion(String playerName, Motion motion) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
         playerMotionRepository.updatePlayerMotion(playerMotion);
+
+        return playerMotion;
     }
 
     public void disconnectPlayer(String playerName) {

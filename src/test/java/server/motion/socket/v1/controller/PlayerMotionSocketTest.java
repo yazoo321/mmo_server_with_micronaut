@@ -1,0 +1,191 @@
+package server.motion.socket.v1.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.micronaut.context.BeanContext;
+import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.http.uri.UriBuilder;
+import io.micronaut.runtime.server.EmbeddedServer;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.websocket.WebSocketClient;
+import io.micronaut.websocket.annotation.ClientWebSocket;
+import io.micronaut.websocket.annotation.OnMessage;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import server.common.dto.Motion;
+import server.player.motion.dto.PlayerMotion;
+import server.player.motion.socket.v1.model.PlayerMotionList;
+import server.player.motion.socket.v1.service.PlayerMotionService;
+import server.util.PlayerMotionUtil;
+
+import javax.inject.Inject;
+import java.net.URI;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
+
+
+@Property(name = "spec.name", value = "PlayerMotionSocketTest")
+@MicronautTest
+public class PlayerMotionSocketTest {
+
+    @Inject
+    BeanContext beanContext;
+
+    @Inject
+    EmbeddedServer embeddedServer;
+
+    @Inject
+    PlayerMotionService playerMotionService;
+
+    @Inject
+    PlayerMotionUtil playerMotionUtil;
+
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectReader objectReader = objectMapper.reader();
+
+    private static final String MAP_1 = "map1";
+
+    private final String CHARACTER_1 = "character1";
+    private final String CHARACTER_2 = "character2";
+
+    @BeforeEach
+    void setup() {
+        playerMotionUtil.deleteAllPlayerMotionData();
+    }
+
+    @Requires(property = "spec.name", value = "PlayerMotionSocketTest")
+    @ClientWebSocket
+    static abstract class TestWebSocketClient implements AutoCloseable {
+
+        private final Deque<String> messageHistory = new ConcurrentLinkedDeque<>();
+
+        public String getLatestMessage() {
+            return messageHistory.peekLast();
+        }
+
+        public List<String> getMessagesChronologically() {
+            return new ArrayList<>(messageHistory);
+        }
+
+        @OnMessage
+        void onMessage(String message) {
+            messageHistory.add(message);
+        }
+
+        abstract void send(Motion message);
+    }
+
+    private TestWebSocketClient createWebSocketClient(int port, String map, String playerName) {
+        WebSocketClient webSocketClient = beanContext.getBean(WebSocketClient.class);
+        URI uri = UriBuilder.of("ws://localhost")
+                .port(port)
+                .path("v1")
+                .path("player-motion")
+                .path("{map}")
+                .path("{playerName}")
+                .expand(CollectionUtils.mapOf("map", map, "playerName", playerName));
+        Publisher<TestWebSocketClient> client = webSocketClient.connect(TestWebSocketClient.class,  uri);
+        // requires to install reactor
+        return Flux.from(client).blockFirst();
+    }
+
+    private Motion createBaseMotion() {
+        return Motion.builder()
+                .x(100)
+                .y(110)
+                .z(120)
+                .vx(200)
+                .vy(210)
+                .vz(220)
+                .pitch(300)
+                .roll(310)
+                .yaw(320)
+                .map(MAP_1)
+                .build();
+    }
+
+    @Test
+    void testSomeStuff() throws Exception {
+        playerMotionService.initializePlayerMotion(CHARACTER_1);
+        playerMotionService.initializePlayerMotion(CHARACTER_2);
+
+        TestWebSocketClient client1 = createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_1);
+
+        String expectedMsgCharacter1 = "[character1] Joined map1!";
+        String expectedMsgCharacter2 = "[character2] Joined map1!";
+
+        await()
+                .pollDelay(100, TimeUnit.MILLISECONDS)
+                .timeout(Duration.of(1, ChronoUnit.SECONDS))
+                .until(() ->
+                    Collections.singletonList(expectedMsgCharacter1)
+                        .equals(client1.getMessagesChronologically())
+                );
+
+        TestWebSocketClient client2 = createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_2);
+
+        await()
+                .pollDelay(100, TimeUnit.MILLISECONDS)
+                .timeout(Duration.of(1, ChronoUnit.SECONDS))
+                .until(() ->
+                        Collections.singletonList(expectedMsgCharacter2)
+                                .equals(client2.getMessagesChronologically())
+                );
+
+        // Update motion on player 1
+        Motion motion = createBaseMotion();
+
+        // prepare client 1 to send motion data
+        client1.send(motion);
+
+        // expected response in client 2 (client1 motion)
+        PlayerMotion expectedPlayerMotion = new PlayerMotion();
+        expectedPlayerMotion.setPlayerName(CHARACTER_1);
+        expectedPlayerMotion.setIsOnline(true);
+        expectedPlayerMotion.setMotion(motion);
+
+        // expect client 2 to receive the update of the first client
+        await()
+                .pollDelay(300, TimeUnit.MILLISECONDS)
+                .timeout(Duration.of(3, ChronoUnit.SECONDS))
+                .until(() -> PlayerMotionUtil.playerMotionEquals(
+                        objectReader.readValue(client2.getLatestMessage(), PlayerMotion.class),
+                        expectedPlayerMotion));
+
+        // client 2 will now make some motion in same ma
+        client2.send(motion);
+
+        // client 1 should receive update from client 2
+        PlayerMotion expectedPlayerMotion2 = new PlayerMotion();
+        expectedPlayerMotion2.setPlayerName(CHARACTER_2);
+        expectedPlayerMotion2.setIsOnline(true);
+        expectedPlayerMotion2.setMotion(motion);
+
+        // expect client 1 to receive the update of the first client
+        await()
+                .pollDelay(300, TimeUnit.MILLISECONDS)
+                .timeout(Duration.of(3, ChronoUnit.SECONDS))
+                .until(() -> PlayerMotionUtil.playerMotionEquals(
+                        objectReader.readValue(client1.getLatestMessage(), PlayerMotion.class),
+                        expectedPlayerMotion2));
+
+        client1.close();
+        client2.close();
+    }
+
+}

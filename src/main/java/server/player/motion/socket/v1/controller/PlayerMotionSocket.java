@@ -10,10 +10,12 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.common.dto.Motion;
+import server.player.motion.dto.PlayerMotion;
 import server.player.motion.socket.v1.model.PlayerMotionList;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 
 import javax.inject.Inject;
+import java.util.function.Predicate;
 
 @ServerWebSocket("/v1/player-motion/{map}/{playerName}")
 public class PlayerMotionSocket {
@@ -37,7 +39,22 @@ public class PlayerMotionSocket {
     }
 
     @OnMessage
-    public Publisher<PlayerMotionList> onMessage(
+    public Publisher<String> onMessage(
+            String playerName,
+            String map,
+            String message,
+            WebSocketSession session) {
+
+        log("onMessage", session, playerName, map);
+
+//        playerMotionService.updatePlayerMotion(playerName, message);
+//        PlayerMotionList res = playerMotionService.getPlayersNearMe(message, playerName);
+
+        return broadcaster.broadcast(message);
+    }
+
+    @OnMessage
+    public Publisher<PlayerMotion> onMessage(
             String playerName,
             String map,
             Motion message,
@@ -45,10 +62,12 @@ public class PlayerMotionSocket {
 
         log("onMessage", session, playerName, map);
 
-        playerMotionService.updatePlayerMotion(playerName, message);
-        PlayerMotionList res = playerMotionService.getPlayersNearMe(message, playerName);
+        PlayerMotion playerMotion = playerMotionService.updatePlayerMotion(playerName, message);
 
-        return broadcaster.broadcast(res);
+        // Another option is to send specific details to user and filter by player name
+        // PlayerMotionList res = playerMotionService.getPlayersNearMe(message, playerName);
+
+        return broadcaster.broadcast(playerMotion, isValid(map));
     }
 
     @OnClose
@@ -67,9 +86,11 @@ public class PlayerMotionSocket {
                 event, session.getId(), username, topic);
     }
 
-//    private Predicate<WebSocketSession> isValid(String map) {
-//        return s -> map.equals("all") //broadcast to all users
-//                || "all".equals(s.getUriVariables().get("map", String.class, null)) //"all" subscribes to every topic
-//                || map.equalsIgnoreCase(s.getUriVariables().get("map", String.class, null)); //intra-topic chat
-//    }
+    private Predicate<WebSocketSession> isValid(String map) {
+        // TODO: improve filter
+        // Currently users will 'hear' all updates from the map, we need to reduce this to an area around.
+        return s ->
+                map.equalsIgnoreCase(s.getUriVariables().get("map", String.class, null));
+    }
+
 }
