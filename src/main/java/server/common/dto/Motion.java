@@ -3,6 +3,7 @@ package server.common.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
@@ -11,11 +12,15 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @Data
 @Introspected
 @NoArgsConstructor
+@Builder
 public class Motion {
 
     @BsonCreator
     @JsonCreator
     public Motion(
+            @JsonProperty("map")
+            @BsonProperty("map") String map,
+
             @JsonProperty("x")
             @BsonProperty("x") Integer x,
             @JsonProperty("y")
@@ -39,6 +44,8 @@ public class Motion {
 
             @JsonProperty("isFalling")
             @BsonProperty("isFalling") Boolean isFalling) {
+        this.map = map;
+
         this.x = x;
         this.y = y;
         this.z = z;
@@ -53,6 +60,8 @@ public class Motion {
 
         this.isFalling = isFalling;
     }
+
+    String map;
 
     // Position
     Integer x;
