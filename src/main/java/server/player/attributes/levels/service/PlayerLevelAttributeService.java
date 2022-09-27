@@ -6,6 +6,7 @@ import server.player.attributes.levels.types.LevelAttributeTypes;
 import server.player.attributes.model.PlayerAttributes;
 import server.player.attributes.repository.PlayerAttributesRepository;
 import server.player.attributes.service.PlayerAttributeService;
+import server.player.exceptions.CharacterException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class PlayerLevelAttributeService {
 
     public PlayerAttributes initializeCharacterClass(String playerName, String playerClass) {
         if (!isClassValid(playerClass)) {
-            throw new RuntimeException("Invalid class selected");
+            throw new CharacterException("Invalid class selected");
         }
 
         PlayerAttributes attributes = playerAttributeService.getPlayerAttributes(playerName);

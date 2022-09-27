@@ -11,6 +11,7 @@ import io.reactivex.subscribers.DefaultSubscriber;
 import server.common.dto.Motion;
 import server.configuration.MongoConfiguration;
 import server.player.character.dto.Character;
+import server.player.exceptions.CharacterException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
@@ -90,7 +91,7 @@ public class PlayerCharacterRepository {
         if (exists) {
             // change to another error
             // this way we can keep the interface of .blockingGet and avoid nullptr ex
-            throw new NullPointerException();
+            throw new CharacterException("Character name already exists");
         }
 
         return save(character);

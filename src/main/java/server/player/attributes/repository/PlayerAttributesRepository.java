@@ -58,6 +58,17 @@ public class PlayerAttributesRepository {
         ).blockingGet();
     }
 
+    public void deletePlayerAttributes(String playerName) {
+        // This should be used cautiously, e.g. when rolling back changes
+
+        Single.fromPublisher(
+                playerAttributesCollection
+                        .deleteOne(
+                                eq("playerName", playerName)
+                        )
+        ).blockingGet();
+    }
+
     private MongoCollection<PlayerAttributes> getCollection() {
         return mongoClient
                 .getDatabase(configuration.getDatabaseName())

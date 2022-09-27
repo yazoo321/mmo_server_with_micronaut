@@ -126,4 +126,8 @@ public class PlayerAttributeService {
                 .findFirst()
                 .orElseThrow();
     }
+
+    public void removePlayerAttributes(String playerName) {
+        attributesRepository.deletePlayerAttributes(playerName);
+    }
 }
