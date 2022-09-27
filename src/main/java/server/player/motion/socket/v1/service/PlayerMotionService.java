@@ -45,6 +45,10 @@ public class PlayerMotionService {
         return playerMotion;
     }
 
+    public void deletePlayerMotion(String playerName) {
+
+    }
+
     public PlayerMotion updatePlayerMotion(String playerName, Motion motion) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
         playerMotionRepository.updatePlayerMotion(playerMotion);

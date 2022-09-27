@@ -69,6 +69,14 @@ public class PlayerMotionRepository {
         return playerMotion;
     }
 
+    public void deletePlayerMotion(String playerName) {
+        Single.fromPublisher(
+                playerMotionMongoCollection.deleteOne(
+                        eq("playerName", playerName)
+                )
+        ).blockingGet();
+    }
+
     public List<PlayerMotion> getPlayersNearby(PlayerMotion playerMotion) {
         return MongoDbQueryHelper.nearbyMotionFinder(playerMotionMongoCollection, playerMotion, 1000);
     }

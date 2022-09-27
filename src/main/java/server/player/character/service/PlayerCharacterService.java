@@ -39,6 +39,8 @@ public class PlayerCharacterService {
     }
 
     public Character createCharacter(CreateCharacterRequest createCharacterRequest, String username) {
+        createCharacterRequest.setClassName(createCharacterRequest.getClassName().toLowerCase());
+
         Character newCharacter = new Character();
         newCharacter.setName(createCharacterRequest.getName());
         newCharacter.setAccountName(username);
@@ -50,7 +52,6 @@ public class PlayerCharacterService {
         newCharacter = playerCharacterRepository.createNew(newCharacter);
 
         try {
-
             // call relevant services to initialise data
             inventoryService.createInventoryForNewCharacter(newCharacter.getName());
             attributeService.createBaseAttributes(newCharacter.getName());
@@ -58,10 +59,20 @@ public class PlayerCharacterService {
             playerMotionService.initializePlayerMotion(newCharacter.getName());
         } catch (Exception e) {
             // we need to rollback the changes
-            playerCharacterRepository.deleteByCharacterName(newCharacter.getName());
+            rollbackChanges(newCharacter.getName());
+
+            // give the 'useful' message back
+            throw e;
         }
 
         return newCharacter;
+    }
+
+    private void rollbackChanges(String playerName) {
+        attributeService.removePlayerAttributes(playerName);
+        inventoryService.clearAllDataForCharacter(playerName);
+        playerMotionService.deletePlayerMotion(playerName);
+        playerCharacterRepository.deleteByCharacterName(playerName);
     }
 
     // TODO: Support deletes

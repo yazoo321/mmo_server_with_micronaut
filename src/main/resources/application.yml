@@ -18,6 +18,9 @@ micronaut:
         enabled: true
         mapping: /**
         paths: classpath:public
+jackson:
+  serialization:
+    writeDatesAsTimestamps: false
 jooq:
   datasources:
     default:
