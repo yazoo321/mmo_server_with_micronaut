@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.player.character.dto.Character;
+import server.player.exceptions.CharacterException;
 
 import javax.inject.Inject;
 import java.time.Instant;
@@ -102,7 +103,7 @@ public class PlayerCharacterRepositoryTest {
         playerCharacterRepository.save(character);
 
         // when then
-        Assertions.assertThrows(NullPointerException.class, () -> playerCharacterRepository.createNew(character));
+        Assertions.assertThrows(CharacterException.class, () -> playerCharacterRepository.createNew(character));
     }
 
     @Test
