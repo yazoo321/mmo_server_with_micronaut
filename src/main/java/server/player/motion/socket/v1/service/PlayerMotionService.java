@@ -19,13 +19,13 @@ public class PlayerMotionService {
     PlayerMotionRepository playerMotionRepository;
 
     public static final Motion STARTING_MOTION = Motion.builder()
-            .map("MAP1")
+            .map("dreamscape")  // Set up default starting location to match your map
+            .x(34723)
+            .y(-69026)
+            .z(-20121)
             .vx(0)
             .vy(0)
             .vz(0)
-            .x(0)
-            .y(0)
-            .z(0)
             .isFalling(false)
             .pitch(0)
             .roll(0)
@@ -46,7 +46,7 @@ public class PlayerMotionService {
     }
 
     public void deletePlayerMotion(String playerName) {
-
+        playerMotionRepository.deletePlayerMotion(playerName);
     }
 
     public PlayerMotion updatePlayerMotion(String playerName, Motion motion) {
@@ -69,6 +69,10 @@ public class PlayerMotionService {
         List<PlayerMotion> playerMotions = playerMotionRepository.getPlayersNearby(playerMotion);
 
         return new PlayerMotionList(playerMotions);
+    }
+
+    public PlayerMotion getPlayerMotion(String playerName) {
+        return playerMotionRepository.findPlayerMotion(playerName);
     }
 
 }
