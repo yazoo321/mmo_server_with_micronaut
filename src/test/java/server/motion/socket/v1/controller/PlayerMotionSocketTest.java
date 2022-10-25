@@ -125,6 +125,7 @@ public class PlayerMotionSocketTest {
         playerMotionService.initializePlayerMotion(CHARACTER_2);
 
         TestWebSocketClient client1 = createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_1);
+        TestWebSocketClient client2 = createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_2);
 
         String expectedMsgCharacter1 = "[character1] Joined map1!";
         String expectedMsgCharacter2 = "[character2] Joined map1!";
@@ -137,7 +138,6 @@ public class PlayerMotionSocketTest {
                         .equals(client1.getMessagesChronologically())
                 );
 
-        TestWebSocketClient client2 = createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_2);
 
         await()
                 .pollDelay(100, TimeUnit.MILLISECONDS)
@@ -159,33 +159,53 @@ public class PlayerMotionSocketTest {
         expectedPlayerMotion.setIsOnline(true);
         expectedPlayerMotion.setMotion(motion);
 
-        // expect client 2 to receive the update of the first client
+        PlayerMotionList expectedPlayerMotionList = new PlayerMotionList(List.of(expectedPlayerMotion));
+
+
+        // client 1 will send motion and there's nothing around, so empty result returned
         await()
                 .pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(3, ChronoUnit.SECONDS))
-                .until(() -> PlayerMotionUtil.playerMotionEquals(
-                        objectReader.readValue(client2.getLatestMessage(), PlayerMotion.class),
-                        expectedPlayerMotion));
+                .until(() ->
+                        getPlayerMotionList(client1).getPlayerMotionList() == null
+                );
 
-        // client 2 will now make some motion in same ma
+        // client 2 will now make some motion
         client2.send(motion);
+
+        // client 2 will have motion of client 1 as its nearby
+        await()
+                .pollDelay(300, TimeUnit.MILLISECONDS)
+                .timeout(Duration.of(3, ChronoUnit.SECONDS))
+                .until(() -> PlayerMotionUtil.playerMotionListEquals(
+                        getPlayerMotionList(client2), expectedPlayerMotionList));
+
+        // if client 1 updates motion again, it will receive new updates from client 2
+        client1.send(motion);
 
         // client 1 should receive update from client 2
         PlayerMotion expectedPlayerMotion2 = new PlayerMotion();
         expectedPlayerMotion2.setPlayerName(CHARACTER_2);
         expectedPlayerMotion2.setIsOnline(true);
         expectedPlayerMotion2.setMotion(motion);
+        PlayerMotionList expectedPlayerMotionList2 = new PlayerMotionList(List.of(expectedPlayerMotion2));
 
-        // expect client 1 to receive the update of the first client
+        // expect client 1 to receive the update from client 2
         await()
                 .pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(3, ChronoUnit.SECONDS))
-                .until(() -> PlayerMotionUtil.playerMotionEquals(
-                        objectReader.readValue(client1.getLatestMessage(), PlayerMotion.class),
-                        expectedPlayerMotion2));
+                .until(() -> PlayerMotionUtil.playerMotionListEquals(
+                        getPlayerMotionList(client1), expectedPlayerMotionList2));
 
         client1.close();
         client2.close();
     }
 
+    private PlayerMotionList getPlayerMotionList(TestWebSocketClient client) {
+        try {
+            return objectReader.readValue(client.getLatestMessage(), PlayerMotionList.class);
+        } catch (Exception e) {
+            return new PlayerMotionList();
+        }
+    }
 }
