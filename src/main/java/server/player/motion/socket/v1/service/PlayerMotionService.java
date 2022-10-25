@@ -49,11 +49,11 @@ public class PlayerMotionService {
         playerMotionRepository.deletePlayerMotion(playerName);
     }
 
-    public PlayerMotion updatePlayerMotion(String playerName, Motion motion) {
+    public PlayerMotionList updatePlayerMotion(String playerName, Motion motion) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
         playerMotionRepository.updatePlayerMotion(playerMotion);
 
-        return playerMotion;
+        return getPlayersNearMe(motion, playerName);
     }
 
     public void disconnectPlayer(String playerName) {
