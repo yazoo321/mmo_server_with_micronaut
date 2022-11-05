@@ -22,6 +22,7 @@ import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
 import server.player.motion.dto.PlayerMotion;
 import server.player.motion.socket.v1.model.PlayerMotionList;
+import server.player.motion.socket.v1.model.PlayerMotionMessage;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
@@ -87,7 +88,7 @@ public class PlayerMotionSocketTest {
             messageHistory.add(message);
         }
 
-        abstract void send(Motion message);
+        abstract void send(PlayerMotionMessage message);
     }
 
     private TestWebSocketClient createWebSocketClient(int port, String map, String playerName) {
@@ -149,9 +150,10 @@ public class PlayerMotionSocketTest {
 
         // Update motion on player 1
         Motion motion = createBaseMotion();
+        PlayerMotionMessage playerMotionMessage = new PlayerMotionMessage(motion, true);
 
         // prepare client 1 to send motion data
-        client1.send(motion);
+        client1.send(playerMotionMessage);
 
         // expected response in client 2 (client1 motion)
         PlayerMotion expectedPlayerMotion = new PlayerMotion();
@@ -171,7 +173,7 @@ public class PlayerMotionSocketTest {
                 );
 
         // client 2 will now make some motion
-        client2.send(motion);
+        client2.send(playerMotionMessage);
 
         // client 2 will have motion of client 1 as its nearby
         await()
@@ -181,7 +183,7 @@ public class PlayerMotionSocketTest {
                         getPlayerMotionList(client2), expectedPlayerMotionList));
 
         // if client 1 updates motion again, it will receive new updates from client 2
-        client1.send(motion);
+        client1.send(playerMotionMessage);
 
         // client 1 should receive update from client 2
         PlayerMotion expectedPlayerMotion2 = new PlayerMotion();

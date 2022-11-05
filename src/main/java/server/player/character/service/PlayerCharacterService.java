@@ -38,6 +38,12 @@ public class PlayerCharacterService {
         return new AccountCharactersResponse(characterList);
     }
 
+    public AccountCharactersResponse getCharacters(List<String> names) {
+        List<Character> characterList =  playerCharacterRepository.findByName(names);
+
+        return new AccountCharactersResponse(characterList);
+    }
+
     public Character createCharacter(CreateCharacterRequest createCharacterRequest, String username) {
         createCharacterRequest.setClassName(createCharacterRequest.getClassName().toLowerCase());
 

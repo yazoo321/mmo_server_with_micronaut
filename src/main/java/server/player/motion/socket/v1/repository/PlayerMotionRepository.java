@@ -1,7 +1,9 @@
 package server.player.motion.socket.v1.repository;
 
+import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;
 import server.common.mongo.query.MongoDbQueryHelper;
@@ -10,10 +12,14 @@ import server.player.motion.dto.PlayerMotion;
 import server.player.motion.dto.exceptions.PlayerMotionException;
 
 import javax.inject.Singleton;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 
 @Slf4j
 @Singleton
@@ -81,6 +87,17 @@ public class PlayerMotionRepository {
         return MongoDbQueryHelper.nearbyMotionFinder(playerMotionMongoCollection, playerMotion, 1000);
     }
 
+    public UpdateResult checkAndUpdateUserOnline() {
+        // Duplicate functionality of Character service
+        LocalDateTime logoutTime = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(10);
+
+        // if is online and not updated in the last 20 seconds, set to logged out.
+        return Flowable.fromPublisher(
+                        playerMotionMongoCollection.updateMany(combine(eq("isOnline", true), lt("updatedAt", logoutTime)),
+                                set("isOnline", false)))
+                .firstElement()
+                .blockingGet();
+    }
 
     private void prepareCollections() {
         this.playerMotionMongoCollection = mongoClient

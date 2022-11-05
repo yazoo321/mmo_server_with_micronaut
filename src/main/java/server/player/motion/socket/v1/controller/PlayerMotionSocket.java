@@ -13,6 +13,7 @@ import server.common.dto.Location2D;
 import server.common.dto.Motion;
 import server.player.motion.dto.PlayerMotion;
 import server.player.motion.socket.v1.model.PlayerMotionList;
+import server.player.motion.socket.v1.model.PlayerMotionMessage;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 
 import javax.inject.Inject;
@@ -45,13 +46,16 @@ public class PlayerMotionSocket {
     public Publisher<PlayerMotionList> onMessage(
             String playerName,
             String map,
-            Motion message,
+            PlayerMotionMessage message,
             WebSocketSession session) {
 
         log("onMessage", session, playerName, map);
 
-        PlayerMotionList playerMotionList = playerMotionService.updatePlayerMotion(playerName, message);
+        if (message.getUpdate()) {
+            playerMotionService.updatePlayerMotion(playerName, message.getMotion());
+        }
 
+        PlayerMotionList playerMotionList = playerMotionService.getPlayersNearMe(message.getMotion(), playerName);
         // Another option is to send specific details to user and filter by player name
         // PlayerMotionList res = playerMotionService.getPlayersNearMe(message, playerName);
 

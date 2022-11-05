@@ -49,11 +49,9 @@ public class PlayerMotionService {
         playerMotionRepository.deletePlayerMotion(playerName);
     }
 
-    public PlayerMotionList updatePlayerMotion(String playerName, Motion motion) {
+    public void updatePlayerMotion(String playerName, Motion motion) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
         playerMotionRepository.updatePlayerMotion(playerMotion);
-
-        return getPlayersNearMe(motion, playerName);
     }
 
     public void disconnectPlayer(String playerName) {
