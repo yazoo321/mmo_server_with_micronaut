@@ -109,6 +109,12 @@ public class PlayerCharacterRepository {
         }
     }
 
+    public List<Character> findByName(List<String> names) {
+        return Flowable.fromPublisher(
+                characters.find(in("name", names))
+        ).toList().blockingGet();
+    }
+
     public List<Character> findByAccount(String accountName) {
         // TODO: Ignore case
         return Flowable.fromPublisher(

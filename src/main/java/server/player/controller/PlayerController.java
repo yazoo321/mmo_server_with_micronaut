@@ -9,6 +9,7 @@ import server.player.motion.dto.PlayerMotion;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.util.List;
 
 //@Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/player")
@@ -29,5 +30,11 @@ public class PlayerController {
                                      @Header String accountName) {
 
         return playerCharacterService.createCharacter(createCharacterRequest, accountName);
+    }
+
+    @Get("/characters")
+    public AccountCharactersResponse getCharacters(@QueryValue List<String> names) {
+
+        return playerCharacterService.getCharacters(names);
     }
 }
