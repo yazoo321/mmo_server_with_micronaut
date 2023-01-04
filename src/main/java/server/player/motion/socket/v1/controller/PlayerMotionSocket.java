@@ -6,19 +6,15 @@ import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
+import jakarta.inject.Inject;
+import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.common.dto.Location2D;
-import server.common.dto.Motion;
-import server.player.motion.dto.PlayerMotion;
 import server.player.motion.socket.v1.model.PlayerMotionList;
 import server.player.motion.socket.v1.model.PlayerMotionMessage;
 import server.player.motion.socket.v1.service.PlayerMotionService;
-
-import jakarta.inject.Inject;
-import java.util.List;
-import java.util.function.Predicate;
 
 @ServerWebSocket("/v1/player-motion/{map}/{playerName}/")
 public class PlayerMotionSocket {
@@ -28,8 +24,7 @@ public class PlayerMotionSocket {
 
     private static final Location2D distanceThreshold = new Location2D(30, 30);
 
-    @Inject
-    PlayerMotionService playerMotionService;
+    @Inject PlayerMotionService playerMotionService;
 
     public PlayerMotionSocket(WebSocketBroadcaster broadcaster) {
         this.broadcaster = broadcaster;
@@ -39,15 +34,13 @@ public class PlayerMotionSocket {
     public Publisher<String> onOpen(String map, String playerName, WebSocketSession session) {
         log("onOpen", session, playerName, map);
 
-        return broadcaster.broadcast(String.format("[%s] Joined %s!", playerName, map), isValid(playerName));
+        return broadcaster.broadcast(
+                String.format("[%s] Joined %s!", playerName, map), isValid(playerName));
     }
 
     @OnMessage
     public Publisher<PlayerMotionList> onMessage(
-            String playerName,
-            String map,
-            PlayerMotionMessage message,
-            WebSocketSession session) {
+            String playerName, String map, PlayerMotionMessage message, WebSocketSession session) {
 
         log("onMessage", session, playerName, map);
 
@@ -55,7 +48,8 @@ public class PlayerMotionSocket {
             playerMotionService.updatePlayerMotion(playerName, message.getMotion());
         }
 
-        PlayerMotionList playerMotionList = playerMotionService.getPlayersNearMe(message.getMotion(), playerName);
+        PlayerMotionList playerMotionList =
+                playerMotionService.getPlayersNearMe(message.getMotion(), playerName);
         // Another option is to send specific details to user and filter by player name
         // PlayerMotionList res = playerMotionService.getPlayersNearMe(message, playerName);
 
@@ -63,10 +57,7 @@ public class PlayerMotionSocket {
     }
 
     @OnClose
-    public Publisher<String> onClose(
-            String playerName,
-            String map,
-            WebSocketSession session) {
+    public Publisher<String> onClose(String playerName, String map, WebSocketSession session) {
 
         log("onClose", session, playerName, map);
         playerMotionService.disconnectPlayer(playerName);
@@ -74,14 +65,18 @@ public class PlayerMotionSocket {
     }
 
     private void log(String event, WebSocketSession session, String username, String topic) {
-        LOG.info("* WebSocket: {} received for session {} from '{}' regarding '{}'",
-                event, session.getId(), username, topic);
+        LOG.info(
+                "* WebSocket: {} received for session {} from '{}' regarding '{}'",
+                event,
+                session.getId(),
+                username,
+                topic);
     }
 
     private Predicate<WebSocketSession> isValid(String playerName) {
         // we will report to player every time they call update about other players nearby
         return s ->
-                playerName.equalsIgnoreCase(s.getUriVariables().get("playerName", String.class, null));
+                playerName.equalsIgnoreCase(
+                        s.getUriVariables().get("playerName", String.class, null));
     }
-
 }

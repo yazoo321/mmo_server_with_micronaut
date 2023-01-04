@@ -1,36 +1,35 @@
 package server.player.motion.socket.v1.service;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.player.motion.dto.PlayerMotion;
 import server.player.motion.socket.v1.model.PlayerMotionList;
 import server.player.motion.socket.v1.repository.PlayerMotionRepository;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-import java.time.Instant;
-import java.util.List;
-
 @Slf4j
 @Singleton
 public class PlayerMotionService {
 
-    @Inject
-    PlayerMotionRepository playerMotionRepository;
+    @Inject PlayerMotionRepository playerMotionRepository;
 
-    public static final Motion STARTING_MOTION = Motion.builder()
-            .map("dreamscape")  // Set up default starting location to match your map
-            .x(34723)
-            .y(-69026)
-            .z(-20121)
-            .vx(0)
-            .vy(0)
-            .vz(0)
-            .isFalling(false)
-            .pitch(0)
-            .roll(0)
-            .yaw(0)
-            .build();
+    public static final Motion STARTING_MOTION =
+            Motion.builder()
+                    .map("dreamscape") // Set up default starting location to match your map
+                    .x(34723)
+                    .y(-69026)
+                    .z(-20121)
+                    .vx(0)
+                    .vy(0)
+                    .vz(0)
+                    .isFalling(false)
+                    .pitch(0)
+                    .roll(0)
+                    .yaw(0)
+                    .build();
 
     public PlayerMotion initializePlayerMotion(String playerName) {
         // can create custom start points for different classes/maps etc
@@ -72,5 +71,4 @@ public class PlayerMotionService {
     public PlayerMotion getPlayerMotion(String playerName) {
         return playerMotionRepository.findPlayerMotion(playerName);
     }
-
 }

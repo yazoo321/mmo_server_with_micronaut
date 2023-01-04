@@ -1,22 +1,19 @@
 package server.player.controller;
 
 import io.micronaut.http.annotation.*;
+import jakarta.inject.Inject;
+import java.util.List;
+import javax.validation.Valid;
 import server.player.character.dto.AccountCharactersResponse;
 import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.service.PlayerCharacterService;
-import server.player.motion.dto.PlayerMotion;
 
-import jakarta.inject.Inject;
-import javax.validation.Valid;
-import java.util.List;
-
-//@Secured(SecurityRule.IS_AUTHENTICATED)
+// @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/player")
 public class PlayerController {
 
-    @Inject
-    PlayerCharacterService playerCharacterService;
+    @Inject PlayerCharacterService playerCharacterService;
 
     @Get("/account-characters")
     public AccountCharactersResponse getAccountCharacters(@Header String accountName) {
@@ -26,8 +23,9 @@ public class PlayerController {
     }
 
     @Post("/create-character")
-    public Character createCharacter(@Body @Valid CreateCharacterRequest createCharacterRequest,
-                                     @Header String accountName) {
+    public Character createCharacter(
+            @Body @Valid CreateCharacterRequest createCharacterRequest,
+            @Header String accountName) {
 
         return playerCharacterService.createCharacter(createCharacterRequest, accountName);
     }

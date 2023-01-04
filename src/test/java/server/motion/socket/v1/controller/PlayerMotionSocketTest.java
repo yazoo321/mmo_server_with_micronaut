@@ -1,8 +1,9 @@
 package server.motion.socket.v1.controller;
 
+import static org.awaitility.Awaitility.await;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.Property;
@@ -14,7 +15,16 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.websocket.WebSocketClient;
 import io.micronaut.websocket.annotation.ClientWebSocket;
 import io.micronaut.websocket.annotation.OnMessage;
-import org.assertj.core.api.Assertions;
+import jakarta.inject.Inject;
+import java.net.URI;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
@@ -26,37 +36,20 @@ import server.player.motion.socket.v1.model.PlayerMotionMessage;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
-import jakarta.inject.Inject;
-import java.net.URI;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
-
-
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
 @MicronautTest
 public class PlayerMotionSocketTest {
 
-    @Inject
-    BeanContext beanContext;
+    @Inject BeanContext beanContext;
 
-    @Inject
-    EmbeddedServer embeddedServer;
+    @Inject EmbeddedServer embeddedServer;
 
-    @Inject
-    PlayerMotionService playerMotionService;
+    @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    PlayerMotionUtil playerMotionUtil;
+    @Inject PlayerMotionUtil playerMotionUtil;
 
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectMapper objectMapper =
+            new ObjectMapper().registerModule(new JavaTimeModule());
     private final ObjectReader objectReader = objectMapper.reader();
 
     private static final String MAP_1 = "map1";
@@ -71,7 +64,7 @@ public class PlayerMotionSocketTest {
 
     @Requires(property = "spec.name", value = "PlayerMotionSocketTest")
     @ClientWebSocket
-    static abstract class TestWebSocketClient implements AutoCloseable {
+    abstract static class TestWebSocketClient implements AutoCloseable {
 
         private final Deque<String> messageHistory = new ConcurrentLinkedDeque<>();
 
@@ -93,14 +86,16 @@ public class PlayerMotionSocketTest {
 
     private TestWebSocketClient createWebSocketClient(int port, String map, String playerName) {
         WebSocketClient webSocketClient = beanContext.getBean(WebSocketClient.class);
-        URI uri = UriBuilder.of("ws://localhost")
-                .port(port)
-                .path("v1")
-                .path("player-motion")
-                .path("{map}")
-                .path("{playerName}")
-                .expand(CollectionUtils.mapOf("map", map, "playerName", playerName));
-        Publisher<TestWebSocketClient> client = webSocketClient.connect(TestWebSocketClient.class,  uri);
+        URI uri =
+                UriBuilder.of("ws://localhost")
+                        .port(port)
+                        .path("v1")
+                        .path("player-motion")
+                        .path("{map}")
+                        .path("{playerName}")
+                        .expand(CollectionUtils.mapOf("map", map, "playerName", playerName));
+        Publisher<TestWebSocketClient> client =
+                webSocketClient.connect(TestWebSocketClient.class, uri);
         // requires to install reactor
         return Flux.from(client).blockFirst();
     }
@@ -125,28 +120,27 @@ public class PlayerMotionSocketTest {
         playerMotionService.initializePlayerMotion(CHARACTER_1);
         playerMotionService.initializePlayerMotion(CHARACTER_2);
 
-        TestWebSocketClient client1 = createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_1);
-        TestWebSocketClient client2 = createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_2);
+        TestWebSocketClient client1 =
+                createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_1);
+        TestWebSocketClient client2 =
+                createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_2);
 
         String expectedMsgCharacter1 = "[character1] Joined map1!";
         String expectedMsgCharacter2 = "[character2] Joined map1!";
 
-        await()
-                .pollDelay(100, TimeUnit.MILLISECONDS)
+        await().pollDelay(100, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(1, ChronoUnit.SECONDS))
-                .until(() ->
-                    Collections.singletonList(expectedMsgCharacter1)
-                        .equals(client1.getMessagesChronologically())
-                );
+                .until(
+                        () ->
+                                Collections.singletonList(expectedMsgCharacter1)
+                                        .equals(client1.getMessagesChronologically()));
 
-
-        await()
-                .pollDelay(100, TimeUnit.MILLISECONDS)
+        await().pollDelay(100, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(1, ChronoUnit.SECONDS))
-                .until(() ->
-                        Collections.singletonList(expectedMsgCharacter2)
-                                .equals(client2.getMessagesChronologically())
-                );
+                .until(
+                        () ->
+                                Collections.singletonList(expectedMsgCharacter2)
+                                        .equals(client2.getMessagesChronologically()));
 
         // Update motion on player 1
         Motion motion = createBaseMotion();
@@ -161,26 +155,24 @@ public class PlayerMotionSocketTest {
         expectedPlayerMotion.setIsOnline(true);
         expectedPlayerMotion.setMotion(motion);
 
-        PlayerMotionList expectedPlayerMotionList = new PlayerMotionList(List.of(expectedPlayerMotion));
-
+        PlayerMotionList expectedPlayerMotionList =
+                new PlayerMotionList(List.of(expectedPlayerMotion));
 
         // client 1 will send motion and there's nothing around, so empty result returned
-        await()
-                .pollDelay(300, TimeUnit.MILLISECONDS)
+        await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(3, ChronoUnit.SECONDS))
-                .until(() ->
-                        getPlayerMotionList(client1).getPlayerMotionList() == null
-                );
+                .until(() -> getPlayerMotionList(client1).getPlayerMotionList() == null);
 
         // client 2 will now make some motion
         client2.send(playerMotionMessage);
 
         // client 2 will have motion of client 1 as its nearby
-        await()
-                .pollDelay(300, TimeUnit.MILLISECONDS)
+        await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(3, ChronoUnit.SECONDS))
-                .until(() -> PlayerMotionUtil.playerMotionListEquals(
-                        getPlayerMotionList(client2), expectedPlayerMotionList));
+                .until(
+                        () ->
+                                PlayerMotionUtil.playerMotionListEquals(
+                                        getPlayerMotionList(client2), expectedPlayerMotionList));
 
         // if client 1 updates motion again, it will receive new updates from client 2
         client1.send(playerMotionMessage);
@@ -190,14 +182,16 @@ public class PlayerMotionSocketTest {
         expectedPlayerMotion2.setPlayerName(CHARACTER_2);
         expectedPlayerMotion2.setIsOnline(true);
         expectedPlayerMotion2.setMotion(motion);
-        PlayerMotionList expectedPlayerMotionList2 = new PlayerMotionList(List.of(expectedPlayerMotion2));
+        PlayerMotionList expectedPlayerMotionList2 =
+                new PlayerMotionList(List.of(expectedPlayerMotion2));
 
         // expect client 1 to receive the update from client 2
-        await()
-                .pollDelay(300, TimeUnit.MILLISECONDS)
+        await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(3, ChronoUnit.SECONDS))
-                .until(() -> PlayerMotionUtil.playerMotionListEquals(
-                        getPlayerMotionList(client1), expectedPlayerMotionList2));
+                .until(
+                        () ->
+                                PlayerMotionUtil.playerMotionListEquals(
+                                        getPlayerMotionList(client1), expectedPlayerMotionList2));
 
         client1.close();
         client2.close();

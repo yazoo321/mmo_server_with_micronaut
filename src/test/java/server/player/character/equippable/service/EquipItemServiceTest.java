@@ -1,6 +1,10 @@
 package server.player.character.equippable.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -17,20 +21,13 @@ import server.player.character.equippable.model.types.*;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
 
-import jakarta.inject.Inject;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
-
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EquipItemServiceTest {
 
-    @Inject
-    EquipItemService equipItemService;
+    @Inject EquipItemService equipItemService;
 
-    @Inject
-    ItemTestHelper itemTestHelper;
+    @Inject ItemTestHelper itemTestHelper;
 
     private static final String CHARACTER_NAME = "test_character";
 
@@ -44,56 +41,120 @@ public class EquipItemServiceTest {
         // TODO: Support Ring slot 2, Weapon 2h, dual wield weapon
         return Stream.of(
                 // Weapons
-                Arguments.of(ItemType.WEAPON.getType(), new WeaponSlot1(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("WEAPON")))),
-                Arguments.of(ItemType.SHIELD.getType(), new ShieldSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("SHIELD")))),
-//
-//                // Accessories
-                Arguments.of(ItemType.BELT.getType(), new BeltSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("BELT")))),
-                Arguments.of(ItemType.CAPE.getType(), new CapeSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("CAPE")))),
                 Arguments.of(
-                        ItemType.NECK.getType(), new NeckSlot(CHARACTER_NAME,
-                                new ItemInstance("not-matched", "override",
+                        ItemType.WEAPON.getType(),
+                        new WeaponSlot1(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("WEAPON")))),
+                Arguments.of(
+                        ItemType.SHIELD.getType(),
+                        new ShieldSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("SHIELD")))),
+                //
+                //                // Accessories
+                Arguments.of(
+                        ItemType.BELT.getType(),
+                        new BeltSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("BELT")))),
+                Arguments.of(
+                        ItemType.CAPE.getType(),
+                        new CapeSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("CAPE")))),
+                Arguments.of(
+                        ItemType.NECK.getType(),
+                        new NeckSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
                                         ItemTestHelper.createTestItemOfType("NECK")))),
-                Arguments.of(ItemType.RING.getType(), new RingSlot1(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("RING")))),
-//
-//                // Armour
-                Arguments.of(ItemType.BOOTS.getType(), new BootsSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("BOOTS")))),
-                Arguments.of(ItemType.BRACERS.getType(), new BracersSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("BRACERS")))),
-                Arguments.of(ItemType.CHEST.getType(), new ChestSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("CHEST")))),
-                Arguments.of(ItemType.GLOVES.getType(), new GlovesSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("GLOVES")))),
-                Arguments.of(ItemType.HELM.getType(), new HelmSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("HELM")))),
-                Arguments.of(ItemType.LEGS.getType(), new LegsSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("LEGS")))),
-                Arguments.of(ItemType.SHOULDER.getType(), new ShoulderSlot(CHARACTER_NAME,
-                        new ItemInstance("not-matched", "override",
-                                ItemTestHelper.createTestItemOfType("SHOULDER"))))
-            );
+                Arguments.of(
+                        ItemType.RING.getType(),
+                        new RingSlot1(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("RING")))),
+                //
+                //                // Armour
+                Arguments.of(
+                        ItemType.BOOTS.getType(),
+                        new BootsSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("BOOTS")))),
+                Arguments.of(
+                        ItemType.BRACERS.getType(),
+                        new BracersSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("BRACERS")))),
+                Arguments.of(
+                        ItemType.CHEST.getType(),
+                        new ChestSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("CHEST")))),
+                Arguments.of(
+                        ItemType.GLOVES.getType(),
+                        new GlovesSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("GLOVES")))),
+                Arguments.of(
+                        ItemType.HELM.getType(),
+                        new HelmSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("HELM")))),
+                Arguments.of(
+                        ItemType.LEGS.getType(),
+                        new LegsSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("LEGS")))),
+                Arguments.of(
+                        ItemType.SHOULDER.getType(),
+                        new ShoulderSlot(
+                                CHARACTER_NAME,
+                                new ItemInstance(
+                                        "not-matched",
+                                        "override",
+                                        ItemTestHelper.createTestItemOfType("SHOULDER")))));
     }
 
     @ParameterizedTest
     @MethodSource("itemTypesAndSlots")
-    void equipWeaponItemWhenNothingAlreadyEquippedWillWorkAsExpected(String itemType, EquippedItems expectedEquipped) {
+    void equipWeaponItemWhenNothingAlreadyEquippedWillWorkAsExpected(
+            String itemType, EquippedItems expectedEquipped) {
         // Given
         Item item = itemTestHelper.createAndInsertItem(itemType);
         ItemInstance instance = itemTestHelper.createItemInstanceFor(item, "override");
@@ -106,7 +167,11 @@ public class EquipItemServiceTest {
         List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
         Assertions.assertThat(equipped)
                 .usingRecursiveComparison()
-                .ignoringFields("item.itemId", "itemInstance.itemId", "itemInstance.item.itemId")   // Because in the args list we pre-create item for expected result
+                .ignoringFields(
+                        "item.itemId",
+                        "itemInstance.itemId",
+                        "itemInstance.item.itemId") // Because in the args list we pre-create item
+                // for expected result
                 .isEqualTo(List.of(expectedEquipped));
 
         // Then
@@ -115,16 +180,28 @@ public class EquipItemServiceTest {
         Inventory inventory = itemTestHelper.getInventory(CHARACTER_NAME);
         List<CharacterItem> inventoryItems = inventory.getCharacterItems();
 
-        CharacterItem ci1 = inventoryItems.stream().filter(ii ->
-                ii.getItemInstance().getItemInstanceId().equals(characterItem.getItemInstance().getItemInstanceId())
-        ).findFirst().get();
+        CharacterItem ci1 =
+                inventoryItems.stream()
+                        .filter(
+                                ii ->
+                                        ii.getItemInstance()
+                                                .getItemInstanceId()
+                                                .equals(
+                                                        characterItem
+                                                                .getItemInstance()
+                                                                .getItemInstanceId()))
+                        .findFirst()
+                        .get();
 
-        Assertions.assertThat(ci1.getLocation()).usingRecursiveComparison().isEqualTo(new Location2D(-1, -1));
+        Assertions.assertThat(ci1.getLocation())
+                .usingRecursiveComparison()
+                .isEqualTo(new Location2D(-1, -1));
     }
 
     @ParameterizedTest
     @MethodSource("itemTypesAndSlots")
-    void equipWeaponItemWhenOneIsAlreadyEquippedWillWorkAsExpected(String itemType, EquippedItems expectedEquipped) {
+    void equipWeaponItemWhenOneIsAlreadyEquippedWillWorkAsExpected(
+            String itemType, EquippedItems expectedEquipped) {
         // Given
         Item item = itemTestHelper.createAndInsertItem(itemType);
 
@@ -136,8 +213,8 @@ public class EquipItemServiceTest {
         ItemInstance instance1 = itemTestHelper.createItemInstanceFor(item, "override2");
         ItemInstance instance2 = itemTestHelper.createItemInstanceFor(item, "override");
 
-        CharacterItem i1  = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance1);
-        CharacterItem i2  = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance2);
+        CharacterItem i1 = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance1);
+        CharacterItem i2 = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance2);
 
         equipItemService.equipItem(instance1.getItemInstanceId(), CHARACTER_NAME);
 
@@ -150,7 +227,10 @@ public class EquipItemServiceTest {
 
         Assertions.assertThat(equipped)
                 .usingRecursiveComparison()
-                .ignoringFields("item.itemId", "itemInstance.itemId", "itemInstance.item.itemId") // The item was created twice in test
+                .ignoringFields(
+                        "item.itemId",
+                        "itemInstance.itemId",
+                        "itemInstance.item.itemId") // The item was created twice in test
                 .isEqualTo(List.of(expectedEquipped));
 
         // Then
@@ -158,18 +238,32 @@ public class EquipItemServiceTest {
         Inventory inventory = itemTestHelper.getInventory(CHARACTER_NAME);
         List<CharacterItem> inventoryItems = inventory.getCharacterItems();
 
-        CharacterItem ci1 = inventoryItems.stream().filter(ii ->
-                ii.getItemInstance().getItemInstanceId().equals(i1.getItemInstance().getItemInstanceId())
-        ).findFirst().get();
+        CharacterItem ci1 =
+                inventoryItems.stream()
+                        .filter(
+                                ii ->
+                                        ii.getItemInstance()
+                                                .getItemInstanceId()
+                                                .equals(i1.getItemInstance().getItemInstanceId()))
+                        .findFirst()
+                        .get();
 
-        CharacterItem ci2 = inventoryItems.stream().filter(ii ->
-                ii.getItemInstance().getItemInstanceId().equals(i2.getItemInstance().getItemInstanceId())
-        ).findFirst().get();
+        CharacterItem ci2 =
+                inventoryItems.stream()
+                        .filter(
+                                ii ->
+                                        ii.getItemInstance()
+                                                .getItemInstanceId()
+                                                .equals(i2.getItemInstance().getItemInstanceId()))
+                        .findFirst()
+                        .get();
 
-        Assertions.assertThat(ci1.getLocation()).usingRecursiveComparison()
-                .isEqualTo(new Location2D(0,0));
+        Assertions.assertThat(ci1.getLocation())
+                .usingRecursiveComparison()
+                .isEqualTo(new Location2D(0, 0));
 
-        Assertions.assertThat(ci2.getLocation()).usingRecursiveComparison().isEqualTo(new Location2D(-1, -1));
+        Assertions.assertThat(ci2.getLocation())
+                .usingRecursiveComparison()
+                .isEqualTo(new Location2D(-1, -1));
     }
-
 }

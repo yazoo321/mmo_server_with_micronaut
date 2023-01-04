@@ -1,28 +1,28 @@
 package server.player.character.inventory.controller;
 
 import io.micronaut.http.annotation.*;
+import jakarta.inject.Inject;
 import server.items.dropped.model.DroppedItem;
 import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.model.response.GenericInventoryData;
 import server.player.character.inventory.service.InventoryService;
 
-import jakarta.inject.Inject;
-
 @Controller("/v1/inventory")
 public class InventoryController {
 
-    @Inject
-    InventoryService inventoryService;
+    @Inject InventoryService inventoryService;
 
     @Post("/pickup")
-    public Inventory pickupItem(@Body GenericInventoryData pickupRequest, @Header String characterName) {
+    public Inventory pickupItem(
+            @Body GenericInventoryData pickupRequest, @Header String characterName) {
         return inventoryService.pickupItem(characterName, pickupRequest.getDroppedItemId());
     }
 
     @Post("/drop")
-    public DroppedItem dropItem(@Body GenericInventoryData dropRequest, @Header String characterName) {
-        return inventoryService.dropItem(characterName,
-                dropRequest.getItemInventoryLocation(), dropRequest.getLocation());
+    public DroppedItem dropItem(
+            @Body GenericInventoryData dropRequest, @Header String characterName) {
+        return inventoryService.dropItem(
+                characterName, dropRequest.getItemInventoryLocation(), dropRequest.getLocation());
     }
 
     @Get

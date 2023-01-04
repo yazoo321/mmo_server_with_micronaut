@@ -1,6 +1,10 @@
 package server.items.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,19 +16,12 @@ import server.items.model.exceptions.ItemException;
 import server.items.types.ItemType;
 import server.items.weapons.Weapon;
 
-import jakarta.inject.Inject;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-
 @MicronautTest
 public class ItemServiceTest {
 
-    @Inject
-    ItemService itemService;
+    @Inject ItemService itemService;
 
-    @Inject
-    ItemTestHelper itemTestHelper;
+    @Inject ItemTestHelper itemTestHelper;
 
     @BeforeEach
     void cleanDb() {
@@ -38,7 +35,6 @@ public class ItemServiceTest {
 
         // When
 
-
         // Then
 
     }
@@ -49,10 +45,12 @@ public class ItemServiceTest {
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
 
-        DroppedItem expectedDroppedItem = new DroppedItem(
-                "droppedItemId", locationToDrop,
-                new ItemInstance(weapon.getItemId(), "itemInstanceId", weapon),
-                LocalDateTime.now());
+        DroppedItem expectedDroppedItem =
+                new DroppedItem(
+                        "droppedItemId",
+                        locationToDrop,
+                        new ItemInstance(weapon.getItemId(), "itemInstanceId", weapon),
+                        LocalDateTime.now());
 
         // When
         DroppedItem actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop);
@@ -69,17 +67,22 @@ public class ItemServiceTest {
         // Given
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         Location locationToDrop = new Location("map", 1, 1, 1);
-        DroppedItem expectedDroppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
+        DroppedItem expectedDroppedItem =
+                itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
         DroppedItem actual = itemService.getDroppedItemById(expectedDroppedItem.getDroppedItemId());
 
         // Then
-        Assertions.assertThat(actual).usingRecursiveComparison().ignoringFields("droppedAt")
+        Assertions.assertThat(actual)
+                .usingRecursiveComparison()
+                .ignoringFields("droppedAt")
                 .isEqualTo(expectedDroppedItem);
         // check droppedAt separately as we drop microseconds.
-        Assertions.assertThat(actual.getDroppedAt()).isCloseTo(expectedDroppedItem.getDroppedAt(),
-                Assertions.within(1, ChronoUnit.MILLIS));
+        Assertions.assertThat(actual.getDroppedAt())
+                .isCloseTo(
+                        expectedDroppedItem.getDroppedAt(),
+                        Assertions.within(1, ChronoUnit.MILLIS));
     }
 
     @Test
@@ -90,9 +93,12 @@ public class ItemServiceTest {
         Location secondDroppedLocation = new Location("map", 2, 2, 1);
         Location thirdDroppedLocation = new Location("map", 1500, 1500, 1); // out of range
 
-        DroppedItem firstDrop = itemTestHelper.createAndInsertDroppedItem(firstDroppedLocation, weapon);
-        DroppedItem secondDrop = itemTestHelper.createAndInsertDroppedItem(secondDroppedLocation, weapon);
-        DroppedItem thirdDrop = itemTestHelper.createAndInsertDroppedItem(thirdDroppedLocation, weapon);
+        DroppedItem firstDrop =
+                itemTestHelper.createAndInsertDroppedItem(firstDroppedLocation, weapon);
+        DroppedItem secondDrop =
+                itemTestHelper.createAndInsertDroppedItem(secondDroppedLocation, weapon);
+        DroppedItem thirdDrop =
+                itemTestHelper.createAndInsertDroppedItem(thirdDroppedLocation, weapon);
 
         Location searchRadius = new Location("map", 50, 50, 50);
         List<DroppedItem> expectedList = List.of(firstDrop, secondDrop);
@@ -101,7 +107,8 @@ public class ItemServiceTest {
         // When
         List<DroppedItem> actual = itemService.getItemsInMap(searchRadius);
 
-        Assertions.assertThat(actual).usingRecursiveComparison()
+        Assertions.assertThat(actual)
+                .usingRecursiveComparison()
                 .ignoringFields("droppedAt")
                 .isEqualTo(expectedList);
     }
@@ -118,7 +125,7 @@ public class ItemServiceTest {
 
         // Then
         org.junit.jupiter.api.Assertions.assertThrows(
-                ItemException.class, () -> itemService.getDroppedItemById(droppedItem.getDroppedItemId()));
+                ItemException.class,
+                () -> itemService.getDroppedItemById(droppedItem.getDroppedItemId()));
     }
-
 }

@@ -1,23 +1,24 @@
 import org.flywaydb.gradle.task.FlywayMigrateTask
 
 buildscript {
-    ext {
-        FLWAY_VERSION = "9.8.1"
-        JOOQ_VERSION = "8.1"
-    }
-    configurations['classpath'].resolutionStrategy.eachDependency {
-        if (requested.group == 'org.jooq') {
-            useVersion '3.17.3'
-        }
-    }
+	ext {
+		FLWAY_VERSION = "9.8.1"
+		JOOQ_VERSION = "8.1"
+	}
+	configurations['classpath'].resolutionStrategy.eachDependency {
+		if (requested.group == 'org.jooq') {
+			useVersion '3.17.3'
+		}
+	}
 }
 
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
-    id "io.micronaut.application" version "3.6.7"
-    id 'nu.studer.jooq' version "$JOOQ_VERSION"
-    id "org.flywaydb.flyway" version "$FLWAY_VERSION"
-    id 'com.avast.gradle.docker-compose' version '0.16.11'
+	id "com.github.johnrengelman.shadow" version "7.1.2"
+	id "io.micronaut.application" version "3.6.7"
+	id 'nu.studer.jooq' version "$JOOQ_VERSION"
+	id "org.flywaydb.flyway" version "$FLWAY_VERSION"
+	id 'com.avast.gradle.docker-compose' version '0.16.11'
+	id "com.diffplug.spotless" version "6.12.1"
 }
 
 version = "0.1"
@@ -33,65 +34,92 @@ def dbName = System.getenv('DATABASE_NAME') ?: 'mmo_server'
 def dbUrl = System.getenv('DATABASE_URL') ?: "jdbc:postgresql://$dbHost:$dbPort/$dbName"
 
 jooq {
-    version = '3.17.6'
-    configurations {
-        main {
-            generationTool {
-                logging = org.jooq.meta.jaxb.Logging.WARN
-                jdbc {
-                    driver = dbDriver
-                    url = dbUrl
-                    user = dbUser
-                    password = dbPassword
-                    properties {
-                        // SSL disabled at the moment (only running locally)
-                        property {
-                            key = 'ssl'
-                            value = 'false'
-                        }
-                    }
-                }
-                generator {
-                    name = 'org.jooq.codegen.DefaultGenerator'
-                    database {
-                        name = 'org.jooq.meta.postgres.PostgresDatabase'
-                        inputSchema = 'public'
-                        forcedTypes {
-                            forcedType {
-                                name = 'varchar'
-                                includeExpression = '.*'
-                                includeTypes = 'JSONB?'
-                            }
-                            forcedType {
-                                name = 'varchar'
-                                includeExpression = '.*'
-                                includeTypes = 'INET'
-                            }
-                        }
-                    }
-                    generate {
-                        deprecated = false
-                        records = true
-                        immutablePojos = true
-                        fluentSetters = true
-                    }
-                    target {
-                        packageName = 'com.org.mmo_server.repository.model'
-                    }
-                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
-                }
-            }
-        }
-    }
+	version = '3.17.6'
+	configurations {
+		main {
+			generationTool {
+				logging = org.jooq.meta.jaxb.Logging.WARN
+				jdbc {
+					driver = dbDriver
+					url = dbUrl
+					user = dbUser
+					password = dbPassword
+					properties {
+						// SSL disabled at the moment (only running locally)
+						property {
+							key = 'ssl'
+							value = 'false'
+						}
+					}
+				}
+				generator {
+					name = 'org.jooq.codegen.DefaultGenerator'
+					database {
+						name = 'org.jooq.meta.postgres.PostgresDatabase'
+						inputSchema = 'public'
+						forcedTypes {
+							forcedType {
+								name = 'varchar'
+								includeExpression = '.*'
+								includeTypes = 'JSONB?'
+							}
+							forcedType {
+								name = 'varchar'
+								includeExpression = '.*'
+								includeTypes = 'INET'
+							}
+						}
+					}
+					generate {
+						deprecated = false
+						records = true
+						immutablePojos = true
+						fluentSetters = true
+					}
+					target {
+						packageName = 'com.org.mmo_server.repository.model'
+					}
+					strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+				}
+			}
+		}
+	}
+}
+
+spotless {
+	// optional: limit format enforcement to just the files changed by this feature branch
+	ratchetFrom 'origin/master'
+
+	format 'misc', {
+		// define the files to apply `misc` to
+		target '*.gradle', '*.md', '.gitignore'
+
+		// define the steps to apply to those files
+		trimTrailingWhitespace()
+		indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
+		endWithNewline()
+	}
+	java {
+		// don't need to set target, it is inferred from java
+
+		// apply a specific flavor of google-java-format
+		googleJavaFormat('1.15.0').aosp().reflowLongStrings()
+		// fix formatting of type annotations
+		formatAnnotations()
+		// make sure every file has the following copyright header.
+		// optionally, Spotless can set copyright years by digging
+		// through git history (see "license" section below)
+		// licenseHeader '/* (C)$YEAR */'
+	}
 }
 
 task migratePrimaryDB(type: FlywayMigrateTask) {
-    locations = ['filesystem:src/main/resources/db/postgres/']
-    url = dbUrl
-    user = dbUser
-    password = dbPassword
-    baselineOnMigrate = true
-    validateOnMigrate = false
+	locations = ['filesystem:src/main/resources/db/postgres/']
+	url = dbUrl
+	user = dbUser
+	password = dbPassword
+	baselineOnMigrate = true
+	validateOnMigrate = false
 }
 
 
@@ -99,77 +127,78 @@ task migratePrimaryDB(type: FlywayMigrateTask) {
 tasks.generateJooq.mustRunAfter(tasks.migratePrimaryDB)
 tasks.compileJava.dependsOn(tasks.migratePrimaryDB)
 tasks.migratePrimaryDB.dependsOn(tasks.composeUp)
+tasks.compileJava.mustRunAfter(spotlessCheck)
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 micronaut {
-    runtime("netty")
-    testRuntime("junit5")
-    processing {
-        incremental(true)
-        annotations("mmo_server.*")
-    }
+	runtime("netty")
+	testRuntime("junit5")
+	processing {
+		incremental(true)
+		annotations("mmo_server.*")
+	}
 }
 
 dependencies {
-    implementation("io.micronaut:micronaut-http-client")
-    implementation("io.micronaut:micronaut-runtime")
-    implementation("io.micronaut:micronaut-validation")
-    runtimeOnly("ch.qos.logback:logback-classic")
-    annotationProcessor('io.micronaut.data:micronaut-data-processor:3.8.1')
+	implementation("io.micronaut:micronaut-http-client")
+	implementation("io.micronaut:micronaut-runtime")
+	implementation("io.micronaut:micronaut-validation")
+	runtimeOnly("ch.qos.logback:logback-classic")
+	annotationProcessor('io.micronaut.data:micronaut-data-processor:3.8.1')
 
-    // Flowable
-    implementation "io.reactivex.rxjava3:rxjava:3.1.5"
+	// Flowable
+	implementation "io.reactivex.rxjava3:rxjava:3.1.5"
 
-    // Lombok:
-    compileOnly 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+	// Lombok:
+	compileOnly 'org.projectlombok:lombok:1.18.24'
+	annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    // Micronaut inject
-    annotationProcessor(platform('io.micronaut:micronaut-bom:3.7.4'))
-    annotationProcessor("io.micronaut:micronaut-inject-java")
-    implementation(platform('io.micronaut:micronaut-bom:3.7.4'))
-    implementation("io.micronaut:micronaut-inject")
+	// Micronaut inject
+	annotationProcessor(platform('io.micronaut:micronaut-bom:3.7.4'))
+	annotationProcessor("io.micronaut:micronaut-inject-java")
+	implementation(platform('io.micronaut:micronaut-bom:3.7.4'))
+	implementation("io.micronaut:micronaut-inject")
 
-    // database configs
-    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    jooqGenerator 'org.postgresql:postgresql:42.5.1'
-    implementation 'org.postgresql:postgresql:42.5.1'
+	// database configs
+	implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+	jooqGenerator 'org.postgresql:postgresql:42.5.1'
+	implementation 'org.postgresql:postgresql:42.5.1'
 
-    // transactional annotation
-    implementation("io.micronaut.spring:micronaut-spring:4.4.0")
+	// transactional annotation
+	implementation("io.micronaut.spring:micronaut-spring:4.4.0")
 
-    // MongoDB
-    implementation "io.micronaut.mongodb:micronaut-mongo-reactive:4.6.0"
+	// MongoDB
+	implementation "io.micronaut.mongodb:micronaut-mongo-reactive:4.6.0"
 
-    // Serializer
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
+	// Serializer
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
 
-    // test
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.1'
-    testImplementation 'org.assertj:assertj-core:3.23.1'
-    testImplementation "io.micronaut.test:micronaut-test-junit5"
-    testImplementation 'org.mockito:mockito-core:4.10.0'
-    testImplementation 'io.projectreactor:reactor-core:3.5.1'
-    testImplementation 'org.awaitility:awaitility:4.2.0'
+	// test
+	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.1'
+	testImplementation 'org.assertj:assertj-core:3.23.1'
+	testImplementation "io.micronaut.test:micronaut-test-junit5"
+	testImplementation 'org.mockito:mockito-core:4.10.0'
+	testImplementation 'io.projectreactor:reactor-core:3.5.1'
+	testImplementation 'org.awaitility:awaitility:4.2.0'
 }
 
 application {
-    mainClass.set("mmo_server.Application")
+	mainClass.set("mmo_server.Application")
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
-    targetCompatibility = JavaVersion.toVersion("17")
+	sourceCompatibility = JavaVersion.toVersion("17")
+	targetCompatibility = JavaVersion.toVersion("17")
 }
 
 dockerCompose {
-    useComposeFiles = ['./docker-compose.yml']
-    stopContainers = true
-    // do not wait for debug port
-    tcpPortsToIgnoreWhenWaiting = [5005]
-    // Mac M1 fix:
+	useComposeFiles = ['./docker-compose.yml']
+	stopContainers = true
+	// do not wait for debug port
+	tcpPortsToIgnoreWhenWaiting = [5005]
+	// Mac M1 fix:
 //    executable = '/usr/local/bin/docker-compose-v1'
 }
