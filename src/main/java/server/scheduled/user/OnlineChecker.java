@@ -1,11 +1,10 @@
 package server.scheduled.user;
 
 import io.micronaut.scheduling.annotation.Scheduled;
+import jakarta.inject.Singleton;
 import server.player.character.repository.PlayerCharacterRepository;
 import server.player.motion.socket.v1.repository.PlayerMotionRepository;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
 
 @Singleton
 public class OnlineChecker {

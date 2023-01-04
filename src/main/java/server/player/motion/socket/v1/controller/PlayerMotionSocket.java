@@ -16,7 +16,7 @@ import server.player.motion.socket.v1.model.PlayerMotionList;
 import server.player.motion.socket.v1.model.PlayerMotionMessage;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.function.Predicate;
 

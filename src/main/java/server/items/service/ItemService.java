@@ -8,8 +8,8 @@ import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
 import server.items.repository.ItemRepository;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

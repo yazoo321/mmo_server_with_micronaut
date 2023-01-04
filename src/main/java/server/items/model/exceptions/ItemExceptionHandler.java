@@ -8,7 +8,7 @@ import io.micronaut.http.server.exceptions.ExceptionHandler;
 import server.common.dto.ErrorResponseDto;
 import server.player.character.inventory.model.exceptions.InventoryException;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Produces
 @Singleton

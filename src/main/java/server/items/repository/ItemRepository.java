@@ -2,8 +2,8 @@ package server.items.repository;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.mongo.query.MongoDbQueryHelper;
@@ -13,7 +13,7 @@ import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

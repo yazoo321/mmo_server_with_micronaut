@@ -17,7 +17,7 @@ import server.player.attributes.model.PlayerAttributes;
 import server.player.attributes.repository.PlayerAttributesRepository;
 import server.player.attributes.service.PlayerAttributeService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;

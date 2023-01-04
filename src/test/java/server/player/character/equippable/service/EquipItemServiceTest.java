@@ -17,7 +17,7 @@ import server.player.character.equippable.model.types.*;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;

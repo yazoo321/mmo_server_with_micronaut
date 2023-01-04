@@ -13,7 +13,7 @@ import server.items.service.ItemService;
 import server.items.types.ItemType;
 import server.items.weapons.Weapon;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 

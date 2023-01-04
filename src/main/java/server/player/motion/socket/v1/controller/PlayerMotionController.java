@@ -5,7 +5,7 @@ import io.micronaut.http.annotation.Get;
 import server.player.motion.dto.PlayerMotion;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Controller("/player-motion")
 public class PlayerMotionController {

@@ -2,7 +2,7 @@ package server.items.helper;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.common.dto.Tag;
@@ -26,8 +26,8 @@ import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.repository.InventoryRepository;
 import server.player.character.inventory.service.InventoryService;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

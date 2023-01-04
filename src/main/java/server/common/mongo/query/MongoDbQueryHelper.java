@@ -2,7 +2,7 @@ package server.common.mongo.query;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Flowable;
+import io.reactivex.rxjava3.core.Flowable;
 import org.bson.conversions.Bson;
 import server.common.dto.Location;
 import server.common.dto.Motion;

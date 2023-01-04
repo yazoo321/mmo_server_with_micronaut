@@ -1,17 +1,14 @@
 package server.player.character.equippable.controller;
 
 import io.micronaut.http.annotation.*;
-import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import server.player.character.equippable.model.EquippedItems;
 import server.player.character.equippable.model.GenericEquipData;
 import server.player.character.equippable.service.EquipItemService;
 import server.player.character.inventory.model.Inventory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
-@Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/v1/equipped")
 public class EquipItemsController {
 

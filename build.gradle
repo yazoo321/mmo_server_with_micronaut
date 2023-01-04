@@ -1,9 +1,23 @@
+import org.flywaydb.gradle.task.FlywayMigrateTask
+
+buildscript {
+    ext {
+        FLWAY_VERSION = "9.8.1"
+        JOOQ_VERSION = "8.1"
+    }
+    configurations['classpath'].resolutionStrategy.eachDependency {
+        if (requested.group == 'org.jooq') {
+            useVersion '3.17.3'
+        }
+    }
+}
+
 plugins {
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("io.micronaut.application") version "1.4.2"
-    id 'nu.studer.jooq' version '5.2'
-    id "org.flywaydb.flyway" version "7.7.2"
-    id 'com.avast.gradle.docker-compose' version '0.12.1'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "io.micronaut.application" version "3.6.7"
+    id 'nu.studer.jooq' version "$JOOQ_VERSION"
+    id "org.flywaydb.flyway" version "$FLWAY_VERSION"
+    id 'com.avast.gradle.docker-compose' version '0.16.11'
 }
 
 version = "0.1"
@@ -19,6 +33,7 @@ def dbName = System.getenv('DATABASE_NAME') ?: 'mmo_server'
 def dbUrl = System.getenv('DATABASE_URL') ?: "jdbc:postgresql://$dbHost:$dbPort/$dbName"
 
 jooq {
+    version = '3.17.6'
     configurations {
         main {
             generationTool {
@@ -55,12 +70,10 @@ jooq {
                         }
                     }
                     generate {
-                        // JPA annotations required for micronaut to annotate the generated classes correctly
+                        deprecated = false
+                        records = true
+                        immutablePojos = true
                         fluentSetters = true
-                        validationAnnotations = true
-                        jpaAnnotations = true
-                        pojos = true
-                        daos = true
                     }
                     target {
                         packageName = 'com.org.mmo_server.repository.model'
@@ -72,7 +85,7 @@ jooq {
     }
 }
 
-task migratePrimaryDB(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
+task migratePrimaryDB(type: FlywayMigrateTask) {
     locations = ['filesystem:src/main/resources/db/postgres/']
     url = dbUrl
     user = dbUser
@@ -105,47 +118,43 @@ dependencies {
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut:micronaut-validation")
     runtimeOnly("ch.qos.logback:logback-classic")
-    annotationProcessor("io.micronaut.data:micronaut-data-processor:2.3.1")
+    annotationProcessor('io.micronaut.data:micronaut-data-processor:3.8.1')
+
+    // Flowable
+    implementation "io.reactivex.rxjava3:rxjava:3.1.5"
 
     // Lombok:
-    compileOnly 'org.projectlombok:lombok:1.18.16'
-    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     // Micronaut inject
-    annotationProcessor(platform("io.micronaut:micronaut-bom:2.0.2"))
+    annotationProcessor(platform('io.micronaut:micronaut-bom:3.7.4'))
     annotationProcessor("io.micronaut:micronaut-inject-java")
-    implementation(platform("io.micronaut:micronaut-bom:2.0.2"))
+    implementation(platform('io.micronaut:micronaut-bom:3.7.4'))
     implementation("io.micronaut:micronaut-inject")
 
     // database configs
-    implementation("io.micronaut.flyway:micronaut-flyway")
+//    implementation("io.micronaut.flyway:micronaut-flyway:$FLWAY_VERSION")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    implementation("io.micronaut.sql:micronaut-jooq")
-    jooqGenerator 'org.postgresql:postgresql:42.2.14'
-    implementation 'org.postgresql:postgresql:42.2.14'
-
-    // security
-    compileOnly "io.micronaut.security:micronaut-security-annotations"
-    implementation "io.micronaut.security:micronaut-security-jwt"
-    implementation "org.springframework.security:spring-security-crypto:5.2.1.RELEASE"
+//    implementation("io.micronaut.sql:micronaut-jooq:$JOOQ_VERSION")
+    jooqGenerator 'org.postgresql:postgresql:42.5.1'
+    implementation 'org.postgresql:postgresql:42.5.1'
 
     // transactional annotation
-    implementation("io.micronaut.spring:micronaut-spring")
+    implementation("io.micronaut.spring:micronaut-spring:4.4.0")
 
     // MongoDB
-    implementation("io.micronaut.mongodb:micronaut-mongo-reactive")
-    // if we want blocking implementation:
-    // implementation("io.micronaut.mongodb:micronaut-mongo-sync")
+    implementation "io.micronaut.mongodb:micronaut-mongo-reactive:4.6.0"
 
     // Serializer
-    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
 
     // test
-    testCompile("org.junit.jupiter:junit-jupiter-params:5.8.1")
-    testImplementation("org.assertj:assertj-core:3.20.2")
-    testImplementation("io.micronaut.test:micronaut-test-junit5")
-    testImplementation("org.mockito:mockito-core:3.11.2")
-    compile 'io.projectreactor:reactor-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.1'
+    testImplementation 'org.assertj:assertj-core:3.23.1'
+    testImplementation "io.micronaut.test:micronaut-test-junit5"
+    testImplementation 'org.mockito:mockito-core:4.10.0'
+    testImplementation 'io.projectreactor:reactor-core:3.5.1'
     testImplementation 'org.awaitility:awaitility:4.2.0'
 }
 
@@ -154,8 +163,8 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("11")
-    targetCompatibility = JavaVersion.toVersion("11")
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
 }
 
 dockerCompose {

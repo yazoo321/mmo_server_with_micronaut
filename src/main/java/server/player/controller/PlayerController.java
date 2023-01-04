@@ -7,7 +7,7 @@ import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.service.PlayerCharacterService;
 import server.player.motion.dto.PlayerMotion;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
 

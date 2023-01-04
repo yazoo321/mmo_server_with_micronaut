@@ -11,7 +11,7 @@ import server.player.motion.socket.v1.repository.PlayerMotionRepository;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 @MicronautTest

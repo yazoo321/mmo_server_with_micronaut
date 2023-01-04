@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import server.player.character.dto.Character;
 import server.player.exceptions.CharacterException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;

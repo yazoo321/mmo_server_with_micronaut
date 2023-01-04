@@ -2,7 +2,7 @@ version: '2'
 services:
 #  In future, create a dockerized container for the server, then make the 2 db images as dependencies
   mmo_server:
-    image: postgres:9.6
+    image: postgres:15.1
     depends_on:
       - "mongo_db"
     environment:

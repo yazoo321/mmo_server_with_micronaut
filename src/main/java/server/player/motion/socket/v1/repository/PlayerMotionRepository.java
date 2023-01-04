@@ -3,15 +3,15 @@ package server.player.motion.socket.v1.repository;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 import lombok.extern.slf4j.Slf4j;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
 import server.player.motion.dto.PlayerMotion;
 import server.player.motion.dto.exceptions.PlayerMotionException;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;

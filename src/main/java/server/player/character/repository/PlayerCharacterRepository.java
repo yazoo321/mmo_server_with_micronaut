@@ -5,16 +5,16 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
-import io.reactivex.subscribers.DefaultSubscriber;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.subscribers.DefaultSubscriber;
 import server.common.dto.Motion;
 import server.configuration.MongoConfiguration;
 import server.player.character.dto.Character;
 import server.player.exceptions.CharacterException;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -46,7 +46,7 @@ public class PlayerCharacterRepository {
         // https://www.javaer101.com/en/article/20717814.html
 
         characters.createIndex(Indexes.text("name"))
-                .subscribe(new DefaultSubscriber<>() {
+                .subscribe(new DefaultSubscriber<String>() {
                     @Override
                     public void onNext(String s) {
                         System.out.format("Index %s was created.%n", s);

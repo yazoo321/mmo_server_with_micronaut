@@ -15,7 +15,7 @@ import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.model.exceptions.InventoryException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 
 @MicronautTest

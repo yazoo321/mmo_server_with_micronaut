@@ -9,8 +9,8 @@ import server.player.character.inventory.service.InventoryService;
 import server.player.character.repository.PlayerCharacterRepository;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.List;
 

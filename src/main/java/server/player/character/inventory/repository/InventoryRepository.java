@@ -4,14 +4,14 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 import server.configuration.MongoConfiguration;
 import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.model.exceptions.InventoryException;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;

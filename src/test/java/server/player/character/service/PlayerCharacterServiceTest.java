@@ -10,7 +10,7 @@ import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.repository.PlayerCharacterRepository;
 import server.util.TestCharacterUtil;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 

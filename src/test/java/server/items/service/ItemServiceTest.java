@@ -12,7 +12,7 @@ import server.items.model.exceptions.ItemException;
 import server.items.types.ItemType;
 import server.items.weapons.Weapon;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;

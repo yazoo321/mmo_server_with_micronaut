@@ -5,8 +5,8 @@ import server.common.dto.NumTag;
 import server.player.attributes.model.PlayerAttributes;
 import server.player.attributes.repository.PlayerAttributesRepository;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 

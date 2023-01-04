@@ -3,7 +3,7 @@ package server.scheduled.items;
 import io.micronaut.scheduling.annotation.Scheduled;
 import server.items.repository.ItemRepository;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class DroppedItemCleaner {
 

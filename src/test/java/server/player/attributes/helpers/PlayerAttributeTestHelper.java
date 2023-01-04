@@ -2,11 +2,11 @@ package server.player.attributes.helpers;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
 import server.configuration.MongoConfiguration;
 import server.player.attributes.model.PlayerAttributes;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import static com.mongodb.client.model.Filters.ne;
 

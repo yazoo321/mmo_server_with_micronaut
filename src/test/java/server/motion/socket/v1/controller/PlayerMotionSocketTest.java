@@ -26,7 +26,7 @@ import server.player.motion.socket.v1.model.PlayerMotionMessage;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.net.URI;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
