@@ -1,10 +1,11 @@
-## MMO Server implementation (work in progress) 
+## MMO Server implementation (work in progress)
 
 Currently working on:
 - Synchronising motion of character in-game.
 
 # Documentation within blog:
 Each of the posts contains a video overview.
+
 ## Character creation examples:
 - Part 1: overview using N-Hance Assets: https://ylazarev.com/2022/08/10/20-unreal-engine-mmo-style-character-creation-with-n-hance-assets/
 - Part 2: Complex nested options: https://ylazarev.com/2022/08/17/21-unreal-engine-character-creation-part-2-complex-nested-options/
@@ -14,7 +15,9 @@ Each of the posts contains a video overview.
 
 ## Logging into the game:
 - Part 1: https://ylazarev.com/2022/10/19/24-unreal-engine-logging-into-a-custom-server/
-- Part 2: TBD (In progress)
+- Part 2: https://ylazarev.com/2022/10/26/26-unreal-engine-synchronize-motion-with-a-custom-server/
+- part 3: https://ylazarev.com/2022/11/14/27-unreal-engine-display-nearby-players-with-custom-server/
+- part 4: https://ylazarev.com/2022/11/24/28-unreal-engine-synchronize-nearby-player-appearance/
 
 ## Inventory Implementation
 - Base implementation: https://ylazarev.com/2022/05/11/creating-mmo-rpg-style-inventory-system-with-java-and-mongodb/
@@ -29,7 +32,7 @@ Each of the posts contains a video overview.
 - Setting up Micronaut, jooq, flyway:
 https://ylazarev.com/2021/04/18/4-java-micronaut-dockered-postgres/
 
-- Setting up JWT Authentication: 
+- Setting up JWT Authentication:
 https://ylazarev.com/2021/04/26/5-java-micronaut-jwt-authentication/
 
 - Encode password for user, integrate with JWT: https://ylazarev.com/2021/05/04/6-java-secure-encode-user-credential/
@@ -69,10 +72,9 @@ In order to build the project run:
 In order to remove the docker container and its database, run
 `docker rm -f -v <container_name>`
 
-This project is a base template for getting started with 
+This project is a base template for getting started with
 micronaut + postgres + jooq + flyway + lombok.
 
-It contains a very simple migration file (`resources/db/postgres/V1__create_user_table.sql`) 
-to create a base users table and 
+It contains a very simple migration file (`resources/db/postgres/V1__create_user_table.sql`)
+to create a base users table and
 an entry with a user. Modify this based on your requirements.
-
