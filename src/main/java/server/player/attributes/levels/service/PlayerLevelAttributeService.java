@@ -1,5 +1,8 @@
 package server.player.attributes.levels.service;
 
+import jakarta.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 import server.common.dto.NumTag;
 import server.player.attributes.levels.types.ClassesAttributeTypes;
 import server.player.attributes.levels.types.LevelAttributeTypes;
@@ -8,24 +11,17 @@ import server.player.attributes.repository.PlayerAttributesRepository;
 import server.player.attributes.service.PlayerAttributeService;
 import server.player.exceptions.CharacterException;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-
 public class PlayerLevelAttributeService {
 
-    @Inject
-    PlayerAttributeService playerAttributeService;
-    
-    @Inject
-    PlayerAttributesRepository attributesRepository;
+    @Inject PlayerAttributeService playerAttributeService;
 
+    @Inject PlayerAttributesRepository attributesRepository;
 
-    public static final List<String> AVAILABLE_CLASSES = List.of(
-            ClassesAttributeTypes.MAGE.getType(),
-            ClassesAttributeTypes.FIGHTER.getType(),
-            ClassesAttributeTypes.CLERIC.getType()
-    );
+    public static final List<String> AVAILABLE_CLASSES =
+            List.of(
+                    ClassesAttributeTypes.MAGE.getType(),
+                    ClassesAttributeTypes.FIGHTER.getType(),
+                    ClassesAttributeTypes.CLERIC.getType());
 
     public PlayerAttributes initializeCharacterClass(String playerName, String playerClass) {
         if (!isClassValid(playerClass)) {
@@ -36,19 +32,23 @@ public class PlayerLevelAttributeService {
         List<NumTag> baseAttr = attributes.getBaseAttributes();
         List<NumTag> currentAttr = attributes.getCurrentAttributes();
 
-        List<NumTag> toAdd = new ArrayList<>(List.of(
-                // base level attr
-                new NumTag(LevelAttributeTypes.LEVEL.type, 1),
-                new NumTag(LevelAttributeTypes.XP.type, 0)
-        ));
+        List<NumTag> toAdd =
+                new ArrayList<>(
+                        List.of(
+                                // base level attr
+                                new NumTag(LevelAttributeTypes.LEVEL.type, 1),
+                                new NumTag(LevelAttributeTypes.XP.type, 0)));
 
         // next add the levels for other classes
-        // This will set each class level to 0, except for the class the user chose at character selection.
-        // This in theory allows us to multi-class, by keeping track of individual levels in attributes.
-        AVAILABLE_CLASSES.forEach(c-> {
-            Integer level = c.equalsIgnoreCase(playerClass) ? 1 : 0;
-            toAdd.add(new NumTag(c, level));
-        });
+        // This will set each class level to 0, except for the class the user chose at character
+        // selection.
+        // This in theory allows us to multi-class, by keeping track of individual levels in
+        // attributes.
+        AVAILABLE_CLASSES.forEach(
+                c -> {
+                    Integer level = c.equalsIgnoreCase(playerClass) ? 1 : 0;
+                    toAdd.add(new NumTag(c, level));
+                });
 
         // store to base and current
         baseAttr.addAll(toAdd);
@@ -63,13 +63,15 @@ public class PlayerLevelAttributeService {
     }
 
     public void handleLevelUp(String playerName, String classToLevel) {
-        // TODO: Handle validation, does user have enough xp for level up? Are they able to level in this class?
+        // TODO: Handle validation, does user have enough xp for level up? Are they able to level in
+        // this class?
         PlayerAttributes attributes = playerAttributeService.getPlayerAttributes(playerName);
         List<NumTag> baseAttr = attributes.getBaseAttributes();
         List<NumTag> currentAttr = attributes.getCurrentAttributes();
 
         NumTag classLevelBase = PlayerAttributeService.findTag(baseAttr, classToLevel);
-        // TODO: This can be evaluated using a hook, which calls to evaluate all 'current' attributes.
+        // TODO: This can be evaluated using a hook, which calls to evaluate all 'current'
+        // attributes.
         NumTag classLevelCurrent = PlayerAttributeService.findTag(currentAttr, classToLevel);
 
         classLevelBase.setValue(classLevelBase.getValue() + 1);

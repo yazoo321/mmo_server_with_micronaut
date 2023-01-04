@@ -1,5 +1,11 @@
 package server.items.service;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.items.dropped.model.DroppedItem;
@@ -8,19 +14,11 @@ import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
 import server.items.repository.ItemRepository;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 @Slf4j
 @Singleton
 public class ItemService {
 
-    @Inject
-    ItemRepository itemRepository;
+    @Inject ItemRepository itemRepository;
 
     public DroppedItem createNewDroppedItem(String itemId, Location location) {
         LocalDateTime now = LocalDateTime.now();
@@ -31,7 +29,8 @@ public class ItemService {
             throw new ItemException("Failed to create new dropped item - check Item ID");
         }
         String itemInstanceId = UUID.randomUUID().toString();
-        String droppedItemId = UUID.randomUUID().toString(); // generate unique ID for the dropped item
+        String droppedItemId =
+                UUID.randomUUID().toString(); // generate unique ID for the dropped item
 
         ItemInstance instance = new ItemInstance(itemId, itemInstanceId, foundItem);
         instance = itemRepository.createItemInstance(instance);
@@ -70,5 +69,4 @@ public class ItemService {
 
         return created;
     }
-
 }

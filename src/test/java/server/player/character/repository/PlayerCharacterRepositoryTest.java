@@ -1,25 +1,23 @@
 package server.player.character.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.mongodb.client.result.DeleteResult;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.player.character.dto.Character;
 import server.player.exceptions.CharacterException;
 
-import javax.inject.Inject;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @MicronautTest
 public class PlayerCharacterRepositoryTest {
 
-    @Inject
-    PlayerCharacterRepository playerCharacterRepository;
+    @Inject PlayerCharacterRepository playerCharacterRepository;
 
     private static final String CHAR_1 = "char1";
     private static final String CHAR_2 = "char2";
@@ -31,8 +29,7 @@ public class PlayerCharacterRepositoryTest {
     @BeforeEach
     void cleanup() {
         List<String> namesToDelete = List.of(CHAR_1, CHAR_2, CHAR_3);
-        namesToDelete.forEach(name ->
-                playerCharacterRepository.deleteByCharacterName(name));
+        namesToDelete.forEach(name -> playerCharacterRepository.deleteByCharacterName(name));
     }
 
     @Test
@@ -62,19 +59,16 @@ public class PlayerCharacterRepositoryTest {
         playerCharacterRepository.save(character3);
 
         // when
-        List<Character> foundAccount1 =
-                playerCharacterRepository.findByAccount(ACC_1);
+        List<Character> foundAccount1 = playerCharacterRepository.findByAccount(ACC_1);
 
-        List<Character> foundAccount2 =
-                playerCharacterRepository.findByAccount(ACC_2);
+        List<Character> foundAccount2 = playerCharacterRepository.findByAccount(ACC_2);
 
         // then
         Assertions.assertEquals(2, foundAccount1.size());
         Assertions.assertEquals(1, foundAccount2.size());
 
         List<String> expectedNames1 = List.of(CHAR_1, CHAR_2);
-        foundAccount1.forEach(acc ->
-                Assertions.assertTrue(expectedNames1.contains(acc.getName())));
+        foundAccount1.forEach(acc -> Assertions.assertTrue(expectedNames1.contains(acc.getName())));
 
         Assertions.assertEquals(CHAR_3, foundAccount2.get(0).getName());
     }
@@ -86,8 +80,7 @@ public class PlayerCharacterRepositoryTest {
         playerCharacterRepository.save(character1);
 
         // ensure there's an entry
-        Assertions.assertEquals(CHAR_1,
-                playerCharacterRepository.findByName(CHAR_1).getName());
+        Assertions.assertEquals(CHAR_1, playerCharacterRepository.findByName(CHAR_1).getName());
         // when
         DeleteResult res = playerCharacterRepository.deleteByCharacterName(CHAR_1);
 
@@ -103,7 +96,8 @@ public class PlayerCharacterRepositoryTest {
         playerCharacterRepository.save(character);
 
         // when then
-        Assertions.assertThrows(CharacterException.class, () -> playerCharacterRepository.createNew(character));
+        Assertions.assertThrows(
+                CharacterException.class, () -> playerCharacterRepository.createNew(character));
     }
 
     @Test
@@ -138,13 +132,16 @@ public class PlayerCharacterRepositoryTest {
 
         character3.setIsOnline(false);
 
-        assertThat(actualCharacter1).usingRecursiveComparison()
+        assertThat(actualCharacter1)
+                .usingRecursiveComparison()
                 .ignoringFields("updatedAt")
                 .isEqualTo(character1);
-        assertThat(actualCharacter2).usingRecursiveComparison()
+        assertThat(actualCharacter2)
+                .usingRecursiveComparison()
                 .ignoringFields("updatedAt")
                 .isEqualTo(character1);
-        assertThat(actualCharacter3).usingRecursiveComparison()
+        assertThat(actualCharacter3)
+                .usingRecursiveComparison()
                 .ignoringFields("updatedAt")
                 .isEqualTo(character1);
     }

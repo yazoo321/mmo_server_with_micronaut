@@ -1,3 +1,6 @@
+-- This is now deprecated and not in use, but if you want to, this is how user table can be created
+-- Jooq is also configured to be integrated easily
+
 CREATE TABLE IF NOT EXISTS users
 (
     username                  varchar(50)   not null,

@@ -1,14 +1,12 @@
 package server.scheduled.items;
 
 import io.micronaut.scheduling.annotation.Scheduled;
+import jakarta.inject.Inject;
 import server.items.repository.ItemRepository;
-
-import javax.inject.Inject;
 
 public class DroppedItemCleaner {
 
-    @Inject
-    ItemRepository itemRepository;
+    @Inject ItemRepository itemRepository;
 
     @Scheduled(fixedDelay = "10s")
     void cleanItemsOnSchedule() {

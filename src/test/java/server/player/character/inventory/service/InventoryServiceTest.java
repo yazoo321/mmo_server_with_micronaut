@@ -1,6 +1,8 @@
 package server.player.character.inventory.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,20 +17,14 @@ import server.player.character.inventory.model.CharacterItem;
 import server.player.character.inventory.model.Inventory;
 import server.player.character.inventory.model.exceptions.InventoryException;
 
-import javax.inject.Inject;
-import java.util.List;
-
 @MicronautTest
 public class InventoryServiceTest {
 
-    @Inject
-    InventoryService inventoryService;
+    @Inject InventoryService inventoryService;
 
-    @Inject
-    ItemService itemService;
+    @Inject ItemService itemService;
 
-    @Inject
-    ItemTestHelper itemTestHelper;
+    @Inject ItemTestHelper itemTestHelper;
 
     private static final String CHARACTER_NAME = "test_character";
 
@@ -56,7 +52,8 @@ public class InventoryServiceTest {
 
         String actualInstanceId = items.get(0).getItemInstance().getItemInstanceId();
 
-        Assertions.assertThat(actualInstanceId).isEqualTo(droppedItem.getItemInstance().getItemInstanceId());
+        Assertions.assertThat(actualInstanceId)
+                .isEqualTo(droppedItem.getItemInstance().getItemInstanceId());
     }
 
     @Test
@@ -75,21 +72,23 @@ public class InventoryServiceTest {
         List<DroppedItem> itemList = itemService.getItemsInMap(location);
 
         Assertions.assertThat(itemList.size()).isEqualTo(1);
-        Assertions.assertThat(itemList.get(0).getItemInstance()).isEqualTo(droppedItem.getItemInstance());
+        Assertions.assertThat(itemList.get(0).getItemInstance())
+                .isEqualTo(droppedItem.getItemInstance());
     }
 
     @Test
     void getAvailableSlotWillReturnCorrectValuesForInventorySize() {
         // Given
         Inventory inventory = inventoryService.getInventory(CHARACTER_NAME);
-        // max size of 2x2 would allow 4 slots. ensure we can add 4 items and anything else will throw.
+        // max size of 2x2 would allow 4 slots. ensure we can add 4 items and anything else will
+        // throw.
         inventory.setMaxSize(new Location2D(2, 2));
         inventoryService.updateInventoryMaxSize(inventory);
 
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
 
         // When
-        for (int i=0; i<4; i++) {
+        for (int i = 0; i < 4; i++) {
             Location location = new Location("map", 1, 1, 1);
             DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
             inventoryService.pickupItem(CHARACTER_NAME, droppedItem.getDroppedItemId());
@@ -99,7 +98,8 @@ public class InventoryServiceTest {
         Location location = new Location("map", 1, 1, 1);
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
         // next `pickup` will error out
-        org.junit.jupiter.api.Assertions.assertThrows(InventoryException.class,
+        org.junit.jupiter.api.Assertions.assertThrows(
+                InventoryException.class,
                 () -> inventoryService.pickupItem(CHARACTER_NAME, droppedItem.getDroppedItemId()));
     }
 }

@@ -1,6 +1,12 @@
 package server.player.attributes.levels.service;
 
+import static server.player.attributes.types.AttributeTypes.*;
+
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,39 +23,25 @@ import server.player.attributes.model.PlayerAttributes;
 import server.player.attributes.repository.PlayerAttributesRepository;
 import server.player.attributes.service.PlayerAttributeService;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static server.player.attributes.types.AttributeTypes.*;
-import static server.player.attributes.types.AttributeTypes.INT;
-
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PlayerLevelAttributeServiceTest {
 
-    @Inject
-    PlayerLevelAttributeService playerLevelAttributeService;
+    @Inject PlayerLevelAttributeService playerLevelAttributeService;
 
-    @Inject
-    PlayerAttributeService attributeService;
+    @Inject PlayerAttributeService attributeService;
 
-    @Inject
-    PlayerAttributeTestHelper playerAttributeTestHelper;
+    @Inject PlayerAttributeTestHelper playerAttributeTestHelper;
 
-    @Inject
-    PlayerAttributesRepository attributesRepository;
+    @Inject PlayerAttributesRepository attributesRepository;
 
     private static final String CHARACTER_NAME = "TEST_PLAYER";
-
 
     private static Stream<Arguments> availableClasses() {
         return Stream.of(
                 Arguments.of(ClassesAttributeTypes.CLERIC.getType()),
                 Arguments.of(ClassesAttributeTypes.FIGHTER.getType()),
-                Arguments.of(ClassesAttributeTypes.MAGE.getType())
-        );
+                Arguments.of(ClassesAttributeTypes.MAGE.getType()));
     }
 
     @BeforeEach
@@ -61,7 +53,6 @@ public class PlayerLevelAttributeServiceTest {
     void clean() {
         playerAttributeTestHelper.deleteAllAttributeData();
     }
-
 
     @ParameterizedTest
     @MethodSource("availableClasses")
@@ -103,7 +94,8 @@ public class PlayerLevelAttributeServiceTest {
     void addXpToCharacter() {
         // given
         attributeService.createBaseAttributes(CHARACTER_NAME);
-        playerLevelAttributeService.initializeCharacterClass(CHARACTER_NAME, ClassesAttributeTypes.FIGHTER.getType());
+        playerLevelAttributeService.initializeCharacterClass(
+                CHARACTER_NAME, ClassesAttributeTypes.FIGHTER.getType());
 
         NumTag expectedTag = new NumTag(LevelAttributeTypes.XP.getType(), 700);
 
@@ -114,22 +106,18 @@ public class PlayerLevelAttributeServiceTest {
         // then
         PlayerAttributes attributes = attributeService.getPlayerAttributes(CHARACTER_NAME);
         List<NumTag> actualBaseAttr = attributes.getBaseAttributes();
-        NumTag xpTag = PlayerAttributeService.findTag(actualBaseAttr, LevelAttributeTypes.XP.getType());
+        NumTag xpTag =
+                PlayerAttributeService.findTag(actualBaseAttr, LevelAttributeTypes.XP.getType());
 
         Assertions.assertThat(xpTag).usingRecursiveComparison().isEqualTo(expectedTag);
     }
 
-    private List<NumTag> buildBaseExpectedNumTagsForCharacterClass(String characterClass, Integer expectedLevel) {
+    private List<NumTag> buildBaseExpectedNumTagsForCharacterClass(
+            String characterClass, Integer expectedLevel) {
         List<String> classesAvailable = PlayerLevelAttributeService.AVAILABLE_CLASSES;
         List<NumTag> expectedTags = new ArrayList<>();
-        classesAvailable.forEach(c ->
-            expectedTags.add(
-                    new NumTag(
-                            c,
-                            c.equals(characterClass) ? expectedLevel : 0
-                    )
-            )
-        );
+        classesAvailable.forEach(
+                c -> expectedTags.add(new NumTag(c, c.equals(characterClass) ? expectedLevel : 0)));
 
         return expectedTags;
     }

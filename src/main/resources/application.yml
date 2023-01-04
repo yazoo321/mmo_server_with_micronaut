@@ -3,15 +3,6 @@ micronaut:
     name: mmo_server
   server:
     port: 8081
-  security:
-    enabled: false
-    authentication: bearer
-    token:
-      jwt:
-        signatures:
-          secret:
-            generator:
-              secret: pleaseChangeThisSecretForANewOne
   router:
     static-resources:
       default:

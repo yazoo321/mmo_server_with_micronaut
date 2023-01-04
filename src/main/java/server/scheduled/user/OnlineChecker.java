@@ -1,20 +1,17 @@
 package server.scheduled.user;
 
 import io.micronaut.scheduling.annotation.Scheduled;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import server.player.character.repository.PlayerCharacterRepository;
 import server.player.motion.socket.v1.repository.PlayerMotionRepository;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class OnlineChecker {
 
-    @Inject
-    PlayerCharacterRepository playerCharacterRepository;
+    @Inject PlayerCharacterRepository playerCharacterRepository;
 
-    @Inject
-    PlayerMotionRepository playerMotionRepository;
+    @Inject PlayerMotionRepository playerMotionRepository;
 
     @Scheduled(fixedDelay = "10s")
     void executeEveryTen() {

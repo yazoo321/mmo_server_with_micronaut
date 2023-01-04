@@ -1,5 +1,9 @@
 package server.player.character.service;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.List;
 import server.player.attributes.levels.service.PlayerLevelAttributeService;
 import server.player.attributes.service.PlayerAttributeService;
 import server.player.character.dto.AccountCharactersResponse;
@@ -9,42 +13,33 @@ import server.player.character.inventory.service.InventoryService;
 import server.player.character.repository.PlayerCharacterRepository;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.time.Instant;
-import java.util.List;
-
 @Singleton
 public class PlayerCharacterService {
 
-    @Inject
-    PlayerCharacterRepository playerCharacterRepository;
+    @Inject PlayerCharacterRepository playerCharacterRepository;
 
-    @Inject
-    InventoryService inventoryService;
+    @Inject InventoryService inventoryService;
 
-    @Inject
-    PlayerAttributeService attributeService;
+    @Inject PlayerAttributeService attributeService;
 
-    @Inject
-    PlayerLevelAttributeService levelAttributeService;
+    @Inject PlayerLevelAttributeService levelAttributeService;
 
-    @Inject
-    PlayerMotionService playerMotionService;
+    @Inject PlayerMotionService playerMotionService;
 
     public AccountCharactersResponse getAccountCharacters(String username) {
-        List<Character> characterList =  playerCharacterRepository.findByAccount(username);
+        List<Character> characterList = playerCharacterRepository.findByAccount(username);
 
         return new AccountCharactersResponse(characterList);
     }
 
     public AccountCharactersResponse getCharacters(List<String> names) {
-        List<Character> characterList =  playerCharacterRepository.findByName(names);
+        List<Character> characterList = playerCharacterRepository.findByName(names);
 
         return new AccountCharactersResponse(characterList);
     }
 
-    public Character createCharacter(CreateCharacterRequest createCharacterRequest, String username) {
+    public Character createCharacter(
+            CreateCharacterRequest createCharacterRequest, String username) {
         createCharacterRequest.setClassName(createCharacterRequest.getClassName().toLowerCase());
 
         Character newCharacter = new Character();
@@ -61,7 +56,8 @@ public class PlayerCharacterService {
             // call relevant services to initialise data
             inventoryService.createInventoryForNewCharacter(newCharacter.getName());
             attributeService.createBaseAttributes(newCharacter.getName());
-            levelAttributeService.initializeCharacterClass(newCharacter.getName(), createCharacterRequest.getClassName());
+            levelAttributeService.initializeCharacterClass(
+                    newCharacter.getName(), createCharacterRequest.getClassName());
             playerMotionService.initializePlayerMotion(newCharacter.getName());
         } catch (Exception e) {
             // we need to rollback the changes

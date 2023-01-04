@@ -1,9 +1,16 @@
 package server.items.repository;
 
+import static com.mongodb.client.model.Filters.*;
+
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
+import jakarta.inject.Singleton;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.mongo.query.MongoDbQueryHelper;
@@ -13,19 +20,11 @@ import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
 
-import javax.inject.Singleton;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static com.mongodb.client.model.Filters.*;
-
 @Slf4j
 @Singleton
 public class ItemRepository {
 
-    private final static Integer DROPPED_ITEM_TIMEOUT_SECONDS = 60;
+    private static final Integer DROPPED_ITEM_TIMEOUT_SECONDS = 60;
 
     MongoConfiguration configuration;
     MongoClient mongoClient;
@@ -33,9 +32,7 @@ public class ItemRepository {
     MongoCollection<DroppedItem> droppedItemCollection;
     MongoCollection<ItemInstance> itemInstanceCollection;
 
-    public ItemRepository(
-            MongoConfiguration configuration,
-            MongoClient mongoClient) {
+    public ItemRepository(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
         prepareCollections();
@@ -47,18 +44,16 @@ public class ItemRepository {
     }
 
     public DroppedItem createDroppedItem(DroppedItem droppedItem) {
-        return Single.fromPublisher(
-                droppedItemCollection.insertOne(droppedItem))
-                .map(success -> droppedItem).blockingGet();
+        return Single.fromPublisher(droppedItemCollection.insertOne(droppedItem))
+                .map(success -> droppedItem)
+                .blockingGet();
     }
 
     public DroppedItem findDroppedItemById(String droppedItemId) {
         try {
             return Single.fromPublisher(
-                    droppedItemCollection.find(
-                            eq("droppedItemId", droppedItemId)
-                    )
-            ).blockingGet();
+                            droppedItemCollection.find(eq("droppedItemId", droppedItemId)))
+                    .blockingGet();
         } catch (NoSuchElementException e) {
             log.warn("Could not find the dropped item by ID!");
             throw new ItemException("Could not find the dropped item by ID!");
@@ -68,32 +63,29 @@ public class ItemRepository {
     public Item createItem(Item item) {
         try {
             return findByItemId(item.getItemId());
-            // if item is found, we want to ignore creating this item and just return the found item.
+            // if item is found, we want to ignore creating this item and just return the found
+            // item.
         } catch (ItemException e) {
-            return Single.fromPublisher(
-                    itemCollection.insertOne(item))
-                    .map(success -> item).blockingGet();
+            return Single.fromPublisher(itemCollection.insertOne(item))
+                    .map(success -> item)
+                    .blockingGet();
         }
     }
 
     public Item findByItemId(String itemId) {
         try {
-            return Single.fromPublisher(
-                    itemCollection
-                            .find(eq("itemId", itemId))
-            ).blockingGet();
+            return Single.fromPublisher(itemCollection.find(eq("itemId", itemId))).blockingGet();
         } catch (NoSuchElementException e) {
             log.error("Could not find the item by ID! It no longer exists");
             throw new ItemException("Could not find the item by ID! It no longer exists");
         }
     }
 
-
     public ItemInstance createItemInstance(ItemInstance itemInstance) {
         try {
-            return Single.fromPublisher(
-                    itemInstanceCollection.insertOne(itemInstance))
-                    .map(success -> itemInstance).blockingGet();
+            return Single.fromPublisher(itemInstanceCollection.insertOne(itemInstance))
+                    .map(success -> itemInstance)
+                    .blockingGet();
         } catch (Exception e) {
             log.error("Failed to create item instance, {}", e.getMessage());
 
@@ -104,9 +96,8 @@ public class ItemRepository {
     public ItemInstance findItemInstanceById(String instanceId) {
         try {
             return Single.fromPublisher(
-                    itemInstanceCollection
-                            .find(eq("itemInstanceId", instanceId))
-            ).blockingGet();
+                            itemInstanceCollection.find(eq("itemInstanceId", instanceId)))
+                    .blockingGet();
         } catch (NoSuchElementException e) {
             log.error("Could not find the item instance by ID! It no longer exists");
             throw new ItemException("Could not find the item instance by ID! It no longer exists");
@@ -120,10 +111,9 @@ public class ItemRepository {
 
         try {
             return Flowable.fromPublisher(
-                    itemInstanceCollection.find(
-                            in("itemInstanceId", itemInstanceIds)
-                    )
-            ).toList().blockingGet();
+                            itemInstanceCollection.find(in("itemInstanceId", itemInstanceIds)))
+                    .toList()
+                    .blockingGet();
         } catch (NoSuchElementException e) {
             log.error("Could not find the instances for given instance IDs, {}", itemInstanceIds);
             throw new ItemException("Could not find the instances for given instance IDs");
@@ -133,7 +123,7 @@ public class ItemRepository {
     public void deleteDroppedItem(String droppedItemId) {
         try {
             Single.fromPublisher(
-                    droppedItemCollection.deleteOne(eq("droppedItemId", droppedItemId)))
+                            droppedItemCollection.deleteOne(eq("droppedItemId", droppedItemId)))
                     .blockingGet();
         } catch (NoSuchElementException e) {
             // this could be race condition
@@ -144,22 +134,26 @@ public class ItemRepository {
 
     public void deleteTimedOutDroppedItems() {
         LocalDateTime cutoffTime = LocalDateTime.now().minusSeconds(DROPPED_ITEM_TIMEOUT_SECONDS);
-        Single.fromPublisher(
-                droppedItemCollection.deleteMany(gt("droppedAt", cutoffTime)))
+        Single.fromPublisher(droppedItemCollection.deleteMany(gt("droppedAt", cutoffTime)))
                 .blockingGet();
     }
 
     private void prepareCollections() {
-        this.itemCollection = mongoClient
-                .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getItemsCollection(), Item.class);
+        this.itemCollection =
+                mongoClient
+                        .getDatabase(configuration.getDatabaseName())
+                        .getCollection(configuration.getItemsCollection(), Item.class);
 
-        this.droppedItemCollection = mongoClient
-                .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getDroppedItemsCollection(), DroppedItem.class);
+        this.droppedItemCollection =
+                mongoClient
+                        .getDatabase(configuration.getDatabaseName())
+                        .getCollection(
+                                configuration.getDroppedItemsCollection(), DroppedItem.class);
 
-        this.itemInstanceCollection = mongoClient
-                .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getItemInstancesCollection(), ItemInstance.class);
+        this.itemInstanceCollection =
+                mongoClient
+                        .getDatabase(configuration.getDatabaseName())
+                        .getCollection(
+                                configuration.getItemInstancesCollection(), ItemInstance.class);
     }
 }

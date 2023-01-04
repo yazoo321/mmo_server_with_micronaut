@@ -1,6 +1,8 @@
 package server.motion.socket.v1.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,21 +13,14 @@ import server.player.motion.socket.v1.repository.PlayerMotionRepository;
 import server.player.motion.socket.v1.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
-import javax.inject.Inject;
-import java.util.List;
-
 @MicronautTest
 public class PlayerMotionServiceTest {
 
-    @Inject
-    PlayerMotionService playerMotionService;
+    @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    PlayerMotionRepository playerMotionRepository;
+    @Inject PlayerMotionRepository playerMotionRepository;
 
-    @Inject
-    PlayerMotionUtil playerMotionUtil;
-
+    @Inject PlayerMotionUtil playerMotionUtil;
 
     private static final String TEST_USERNAME = "USER";
     private static final String TEST_CHARACTER_NAME = "CHARACTER";
@@ -49,7 +44,8 @@ public class PlayerMotionServiceTest {
         PlayerMotion actual = playerMotionRepository.findPlayerMotion(TEST_CHARACTER_NAME);
 
         // Then
-        Assertions.assertThat(actual).usingRecursiveComparison()
+        Assertions.assertThat(actual)
+                .usingRecursiveComparison()
                 .ignoringFields("updatedAt")
                 .isEqualTo(playerMotion);
     }
@@ -77,7 +73,8 @@ public class PlayerMotionServiceTest {
         PlayerMotion actual = playerMotionRepository.findPlayerMotion(TEST_CHARACTER_NAME);
 
         // Then
-        Assertions.assertThat(actual).usingRecursiveComparison()
+        Assertions.assertThat(actual)
+                .usingRecursiveComparison()
                 .ignoringFields("updatedAt")
                 .isEqualTo(playerMotion);
         Assertions.assertThat(actual.getUpdatedAt()).isAfter(playerMotion.getUpdatedAt());

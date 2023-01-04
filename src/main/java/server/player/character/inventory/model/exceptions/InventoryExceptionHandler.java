@@ -5,14 +5,14 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.server.exceptions.ExceptionHandler;
+import jakarta.inject.Singleton;
 import server.common.dto.ErrorResponseDto;
-
-import javax.inject.Singleton;
 
 @Produces
 @Singleton
 @Requires(classes = {InventoryException.class, ExceptionHandler.class})
-public class InventoryExceptionHandler implements ExceptionHandler<InventoryException, HttpResponse<?>> {
+public class InventoryExceptionHandler
+        implements ExceptionHandler<InventoryException, HttpResponse<?>> {
 
     @Override
     public HttpResponse<?> handle(HttpRequest request, InventoryException exception) {

@@ -1,17 +1,15 @@
 package server.util;
 
+import static com.mongodb.client.model.Filters.ne;
+
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.Single;
+import io.reactivex.rxjava3.core.Single;
+import jakarta.inject.Singleton;
+import java.util.List;
 import server.configuration.MongoConfiguration;
 import server.player.motion.dto.PlayerMotion;
 import server.player.motion.socket.v1.model.PlayerMotionList;
-
-import javax.inject.Singleton;
-
-import java.util.List;
-
-import static com.mongodb.client.model.Filters.ne;
 
 @Singleton
 public class PlayerMotionUtil {
@@ -20,20 +18,16 @@ public class PlayerMotionUtil {
     MongoClient mongoClient;
     MongoCollection<PlayerMotion> motionCollection;
 
-    public PlayerMotionUtil(
-            MongoConfiguration configuration,
-            MongoClient mongoClient) {
+    public PlayerMotionUtil(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
         prepareCollections();
     }
 
     public void deleteAllPlayerMotionData() {
-        Single.fromPublisher(motionCollection.deleteMany(
-                ne("playerName", "deleteAll")
-        )).blockingGet();
+        Single.fromPublisher(motionCollection.deleteMany(ne("playerName", "deleteAll")))
+                .blockingGet();
     }
-
 
     public static boolean playerMotionListEquals(PlayerMotionList pml1, PlayerMotionList pml2) {
         if (pml1.getPlayerMotionList().size() != pml2.getPlayerMotionList().size()) {
@@ -42,7 +36,7 @@ public class PlayerMotionUtil {
         List<PlayerMotion> list1 = pml1.getPlayerMotionList();
         List<PlayerMotion> list2 = pml2.getPlayerMotionList();
 
-        for(int i = 0; i < list1.size(); i++) {
+        for (int i = 0; i < list1.size(); i++) {
             if (!playerMotionEquals(list1.get(i), list2.get(i))) {
                 return false;
             }
@@ -59,10 +53,9 @@ public class PlayerMotionUtil {
     }
 
     private void prepareCollections() {
-        this.motionCollection = mongoClient
-                .getDatabase(configuration.getDatabaseName())
-                .getCollection(configuration.getPlayerMotion(), PlayerMotion.class);
-
+        this.motionCollection =
+                mongoClient
+                        .getDatabase(configuration.getDatabaseName())
+                        .getCollection(configuration.getPlayerMotion(), PlayerMotion.class);
     }
-
 }
