@@ -173,6 +173,9 @@ dependencies {
 	// MongoDB
 	implementation "io.micronaut.mongodb:micronaut-mongo-reactive:4.6.0"
 
+	// Kafka
+	implementation("io.micronaut.kafka:micronaut-kafka")
+
 	// Serializer
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
 
@@ -196,7 +199,7 @@ java {
 
 dockerCompose {
 	useComposeFiles = ['./docker-compose.yml']
-	stopContainers = true
+	stopContainers = false
 	// do not wait for debug port
 	tcpPortsToIgnoreWhenWaiting = [5005]
 	// Mac M1 fix:
