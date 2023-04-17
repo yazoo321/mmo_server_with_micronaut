@@ -8,7 +8,13 @@ public class MonsterServerListener {
 
     @Topic("mob-updates")
     public void receive(@Kaf MobUpdate mobUpdate) {
-        System.out.printf("Got a mob update, mob id: %s, mob instance id: %s, mote: %s, state: %s, target: %s%n",
-                mobUpdate.getMobId(), mobUpdate.getMobInstanceId(), mobUpdate.getMotion(), mobUpdate.getState(), mobUpdate.getTarget());
+        System.out.printf(
+                "Got a mob update, mob id: %s, mob instance id: %s, mote: %s, state: %s, target:"
+                        + " %s%n",
+                mobUpdate.getMobId(),
+                mobUpdate.getMobInstanceId(),
+                mobUpdate.getMotion(),
+                mobUpdate.getState(),
+                mobUpdate.getTarget());
     }
 }

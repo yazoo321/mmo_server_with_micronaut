@@ -53,6 +53,9 @@ Docker will be used to spin up the dependencies, including any DBs (postgres, mo
 now Kafka + Zookeeper.
 
 ## Kafka
+More in-depth Kafka instructions here: 
+https://unreal-mmo-dev.com/2023/04/17/37-how-to-connect-your-java-micronaut-springboot-with-kafka-sasl/
+
 There was a very useful video covering some details that can be found here:
 https://www.youtube.com/watch?v=bj5SKXanaAI
 

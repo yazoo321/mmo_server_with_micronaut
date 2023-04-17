@@ -9,7 +9,6 @@ public interface TestProducer {
 
     @Topic("mob-updates")
     void sendFakeUpdate(MobUpdate mobUpdate);
-
 }
 
 

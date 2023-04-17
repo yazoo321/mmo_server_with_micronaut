@@ -3,10 +3,9 @@ package server.scheduled.kafka;
 import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Singleton;
+import java.util.UUID;
 import server.monster.server_integration.model.MobUpdate;
 import server.monster.server_integration.producer.TestProducer;
-
-import java.util.UUID;
 
 @Singleton
 public class TestKafkaService {
@@ -20,7 +19,13 @@ public class TestKafkaService {
 
     @Scheduled(fixedDelay = "10s")
     void executeEveryTen() {
-        MobUpdate mobUpdate = new MobUpdate(UUID.randomUUID().toString(), UUID.randomUUID().toString(), null, "ATTACKING", "player1");
+        MobUpdate mobUpdate =
+                new MobUpdate(
+                        UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(),
+                        null,
+                        "ATTACKING",
+                        "player1");
         testProducer.sendFakeUpdate(mobUpdate);
     }
 }
