@@ -7,7 +7,7 @@ import server.monster.server_integration.model.MobUpdate;
 public class MonsterServerListener {
 
     @Topic("mob-updates")
-    public void receive(@Kaf MobUpdate mobUpdate) {
+    public void receive(MobUpdate mobUpdate) {
         System.out.printf(
                 "Got a mob update, mob id: %s, mob instance id: %s, mote: %s, state: %s, target:"
                         + " %s%n",
