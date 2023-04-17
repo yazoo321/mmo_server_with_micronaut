@@ -1,7 +1,7 @@
 ## MMO Server implementation (work in progress)
 
 Currently working on:
-- Synchronising motion of character in-game.
+- Receiving info from UE server about mobs to process and pass to player clients
 
 # Documentation within blog:
 Each of the posts contains a video overview.
@@ -49,6 +49,19 @@ https://www.youtube.com/watch?v=acAFcDWuxhI&t=8s
 ## Dependencies
 In this project we rely on Docker, you can download it here:
 https://docs.docker.com/desktop/windows/install/
+Docker will be used to spin up the dependencies, including any DBs (postgres, mongodb) and
+now Kafka + Zookeeper.
+
+## Kafka
+There was a very useful video covering some details that can be found here:
+https://www.youtube.com/watch?v=bj5SKXanaAI
+
+Kafka is spun up using 'docker-compose' so check the relevant entries there.
+the './configs' directory contains the necessary configs for SASL enabled Kafka
+Do note that you will need to change these for production use.
+
+Micronaut also offers some useful documentation: https://guides.micronaut.io/latest/micronaut-kafka-maven-java.html
+
 
 ## Micronaut 2.4.1 Documentation
 
