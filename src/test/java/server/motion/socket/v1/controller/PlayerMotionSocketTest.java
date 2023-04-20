@@ -116,7 +116,7 @@ public class PlayerMotionSocketTest {
     }
 
     @Test
-    void testSomeStuff() throws Exception {
+    void testBasicMotionUpdateBetween2Players() throws Exception {
         playerMotionService.initializePlayerMotion(CHARACTER_1);
         playerMotionService.initializePlayerMotion(CHARACTER_2);
 
@@ -161,7 +161,7 @@ public class PlayerMotionSocketTest {
         // client 1 will send motion and there's nothing around, so empty result returned
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(3, ChronoUnit.SECONDS))
-                .until(() -> getPlayerMotionList(client1).getPlayerMotionList() == null);
+                .until(() -> getPlayerMotionList(client1).getPlayerMotionList().isEmpty());
 
         // client 2 will now make some motion
         client2.send(playerMotionMessage);

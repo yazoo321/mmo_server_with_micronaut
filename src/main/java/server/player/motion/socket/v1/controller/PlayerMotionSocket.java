@@ -32,7 +32,7 @@ public class PlayerMotionSocket {
 
     @OnOpen
     public Publisher<String> onOpen(String map, String playerName, WebSocketSession session) {
-        log("onOpen", session, playerName, map);
+        //        log("onOpen", session, playerName, map);
 
         return broadcaster.broadcast(
                 String.format("[%s] Joined %s!", playerName, map), isValid(playerName));
@@ -42,7 +42,7 @@ public class PlayerMotionSocket {
     public Publisher<PlayerMotionList> onMessage(
             String playerName, String map, PlayerMotionMessage message, WebSocketSession session) {
 
-        log("onMessage", session, playerName, map);
+        //        log("onMessage", session, playerName, map);
 
         if (message.getUpdate()) {
             playerMotionService.updatePlayerMotion(playerName, message.getMotion());
@@ -59,7 +59,7 @@ public class PlayerMotionSocket {
     @OnClose
     public Publisher<String> onClose(String playerName, String map, WebSocketSession session) {
 
-        log("onClose", session, playerName, map);
+        //        log("onClose", session, playerName, map);
         playerMotionService.disconnectPlayer(playerName);
         return broadcaster.broadcast(String.format("[%s] Leaving %s!", playerName, map));
     }
