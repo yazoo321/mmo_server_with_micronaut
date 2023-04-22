@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import server.common.mongo.query.MongoDbQueryHelper;
@@ -21,7 +23,7 @@ import server.player.motion.dto.PlayerMotion;
 import server.player.motion.dto.exceptions.PlayerMotionException;
 
 @Slf4j
-@Repository
+@Singleton
 public class PlayerMotionRepository {
 
     MongoConfiguration configuration;

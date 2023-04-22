@@ -3,6 +3,8 @@ package server.player.motion.socket.v1.service;
 import jakarta.inject.Inject;
 import java.time.Instant;
 import java.util.List;
+
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.common.dto.Motion;
@@ -11,7 +13,7 @@ import server.player.motion.socket.v1.model.PlayerMotionList;
 import server.player.motion.socket.v1.repository.PlayerMotionRepository;
 
 @Slf4j
-@Service
+@Singleton
 public class PlayerMotionService {
 
     @Inject PlayerMotionRepository playerMotionRepository;
