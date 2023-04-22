@@ -5,6 +5,7 @@ import static com.mongodb.client.model.Filters.and;
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 import java.util.List;
 import org.bson.conversions.Bson;
 import server.common.dto.Location;
@@ -56,5 +57,22 @@ public class MongoDbQueryHelper {
                                         yWithinRange)))
                 .toList()
                 .blockingGet();
+    }
+
+    public static <T> Single<List<T>> nearbyMobMotionFinder(
+            MongoCollection<T> collection, Location location, Integer threshold) {
+
+        Bson mapEq = Filters.eq("motion.map", location.getMap());
+        Bson xWithinRange =
+                Filters.and(
+                        Filters.gt("motion.x", (location.getX() - threshold)),
+                        Filters.lt("motion.x", (location.getX() + threshold)));
+        Bson yWithinRange =
+                Filters.and(
+                        Filters.gt("motion.y", (location.getY() - threshold)),
+                        Filters.lt("motion.y", (location.getY() + threshold)));
+
+        return Flowable.fromPublisher(collection.find(and(mapEq, xWithinRange, yWithinRange)))
+                .toList();
     }
 }

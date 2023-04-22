@@ -9,19 +9,19 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
-import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
 import server.player.motion.dto.PlayerMotion;
 import server.player.motion.dto.exceptions.PlayerMotionException;
 
 @Slf4j
-@Singleton
+@Repository
 public class PlayerMotionRepository {
 
     MongoConfiguration configuration;
