@@ -10,11 +10,11 @@ import server.common.dto.ErrorResponseDto;
 
 @Produces
 @Singleton
-@Requires(classes = {MobMotionException.class, ExceptionHandler.class})
-public class MobExceptionHandler implements ExceptionHandler<MobMotionException, HttpResponse<?>> {
+@Requires(classes = {MobInstanceException.class, ExceptionHandler.class})
+public class MobExceptionHandler implements ExceptionHandler<MobInstanceException, HttpResponse<?>> {
 
     @Override
-    public HttpResponse<?> handle(HttpRequest request, MobMotionException exception) {
+    public HttpResponse<?> handle(HttpRequest request, MobInstanceException exception) {
         return HttpResponse.badRequest(new ErrorResponseDto(exception.getMessage()));
     }
 }

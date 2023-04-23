@@ -4,7 +4,6 @@ import static server.player.attributes.types.AttributeTypes.*;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import server.common.dto.NumTag;
 import server.player.attributes.helpers.PlayerAttributeTestHelper;
 import server.player.attributes.levels.types.ClassesAttributeTypes;
 import server.player.attributes.levels.types.LevelAttributeTypes;
@@ -62,7 +60,8 @@ public class PlayerLevelAttributeServiceTest {
         // given
         // user has to pre-initialize
         attributeService.createBaseAttributes(CHARACTER_NAME);
-        Map<String, Integer> expectedTags = buildBaseExpectedNumTagsForCharacterClass(characterClass, 1);
+        Map<String, Integer> expectedTags =
+                buildBaseExpectedNumTagsForCharacterClass(characterClass, 1);
 
         // when
         playerLevelAttributeService.initializeCharacterClass(CHARACTER_NAME, characterClass);
@@ -83,7 +82,8 @@ public class PlayerLevelAttributeServiceTest {
 
         // when
         playerLevelAttributeService.handleLevelUp(CHARACTER_NAME, characterClass);
-        Map<String, Integer> expectedTags = buildBaseExpectedNumTagsForCharacterClass(characterClass, 2);
+        Map<String, Integer> expectedTags =
+                buildBaseExpectedNumTagsForCharacterClass(characterClass, 2);
 
         // then
         PlayerAttributes attributes = attributeService.getPlayerAttributes(CHARACTER_NAME);

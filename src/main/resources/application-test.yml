@@ -53,32 +53,15 @@ datasources:
       validation-timeout: 50000
 
 kafka:
-  bootstrap:
-    servers: 127.0.0.1:9093
-  security:
-    protocol: SASL_PLAINTEXT
-  sasl:
-    mechanism: PLAIN
-    jaas:
-      config: org.apache.kafka.common.security.plain.PlainLoginModule required username="kafka" password="password123";
-  consumers:
-    mmo-server:
-      bootstrap:
-        servers: 127.0.0.1:9093
-      session:
-        timeout:
-          ms: 30000
-      auto:
-        offset:
-          reset: earliest
+  enabled: false
 
 mongodb:
-#  Set username/password as env vars
+  #  Set username/password as env vars
   uri: mongodb://mongo_mmo_server:mongo_password@localhost:27017/mmo_server?authSource=admin
   options:
     maxConnectionIdleTime: 10000
     readConcern: majority
-#  For reactive MongoDB driver:
+  #  For reactive MongoDB driver:
   cluster:
     maxWaitQueueSize: 5
   connectionPool:

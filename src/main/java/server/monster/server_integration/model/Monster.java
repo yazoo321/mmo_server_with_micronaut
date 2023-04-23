@@ -13,11 +13,11 @@ import server.common.dto.Motion;
 @Data
 @Introspected
 @NoArgsConstructor
-public class MobMotion {
+public class Monster {
 
     @BsonCreator
     @JsonCreator
-    public MobMotion(
+    public Monster(
             @JsonProperty("mobId") @BsonProperty("mobId") String mobId,
             @JsonProperty("mobInstanceId") @BsonProperty("mobInstanceId") String mobInstanceId,
             @JsonProperty("motion") @BsonProperty("motion") Motion motion,

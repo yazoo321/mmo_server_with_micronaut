@@ -3,23 +3,24 @@ package server.monster.server_integration.service;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.common.dto.Location;
-import server.monster.server_integration.model.MobMotion;
-import server.monster.server_integration.repository.MobMotionRepository;
+import server.monster.server_integration.model.Monster;
+import server.monster.server_integration.repository.MobRepository;
 
 @Slf4j
 @Service
 public class MobMotionService {
 
-    @Inject MobMotionRepository mobMotionRepository;
+    @Inject MobRepository mobMotionRepository;
 
-    public Single<List<MobMotion>> getMobsNearby(Location location) {
+    public Single<List<Monster>> getMobsNearby(Location location) {
         return mobMotionRepository.getMobsNearby(location);
     }
 
-    public Single<MobMotion> getPlayerMotion(String mobInstanceId) {
+    public Single<Monster> getPlayerMotion(String mobInstanceId) {
         return mobMotionRepository.findMobMotion(mobInstanceId);
     }
 
