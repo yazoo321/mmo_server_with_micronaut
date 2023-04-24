@@ -2,12 +2,10 @@ package server.monster.server_integration.service;
 
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.common.dto.Location;

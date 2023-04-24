@@ -1,9 +1,10 @@
 package server.player.character.service;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import server.player.attributes.levels.service.PlayerLevelAttributeService;
 import server.player.attributes.service.PlayerAttributeService;
 import server.player.character.dto.AccountCharactersResponse;
@@ -13,7 +14,8 @@ import server.player.character.inventory.service.InventoryService;
 import server.player.character.repository.PlayerCharacterRepository;
 import server.player.motion.service.PlayerMotionService;
 
-@Singleton
+@Slf4j
+@Service
 public class PlayerCharacterService {
 
     @Inject PlayerCharacterRepository playerCharacterRepository;
@@ -40,6 +42,7 @@ public class PlayerCharacterService {
 
     public Character createCharacter(
             CreateCharacterRequest createCharacterRequest, String username) {
+        log.info("Creating character: {}", createCharacterRequest.getName());
         createCharacterRequest.setClassName(createCharacterRequest.getClassName().toLowerCase());
 
         Character newCharacter = new Character();
@@ -60,6 +63,7 @@ public class PlayerCharacterService {
                     newCharacter.getName(), createCharacterRequest.getClassName());
             playerMotionService.initializePlayerMotion(newCharacter.getName());
         } catch (Exception e) {
+            log.warn("Create character failed, rolling back changes");
             // we need to rollback the changes
             rollbackChanges(newCharacter.getName());
 

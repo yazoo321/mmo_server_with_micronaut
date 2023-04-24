@@ -7,9 +7,8 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
-import java.util.List;
-
 import jakarta.inject.Singleton;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import server.common.dto.Location;
@@ -38,8 +37,7 @@ public class MobRepository {
     }
 
     public Single<Monster> findMobById(String mobId) {
-        return Single.fromPublisher(
-                mobMotionMongoCollection.find(eq("mobId", mobId)));
+        return Single.fromPublisher(mobMotionMongoCollection.find(eq("mobId", mobId)));
     }
 
     public Single<Monster> insertMobInstance(Monster mobInstance) {

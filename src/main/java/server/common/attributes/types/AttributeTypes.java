@@ -3,7 +3,6 @@ package server.common.attributes.types;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-
 @Getter
 @AllArgsConstructor
 public enum AttributeTypes {
@@ -27,7 +26,6 @@ public enum AttributeTypes {
 
     PHY_CRIT("PHY_CRIT"),
     MGC_CRIT("MGC_CRIT");
-
 
     public final String type;
 }

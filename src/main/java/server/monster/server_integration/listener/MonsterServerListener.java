@@ -1,10 +1,19 @@
 package server.monster.server_integration.listener;
 
 import io.micronaut.configuration.kafka.annotation.*;
+import jakarta.inject.Inject;
 import server.monster.server_integration.model.MobUpdate;
+import server.monster.server_integration.service.MonsterDeathService;
 
 @KafkaListener(groupId = "mmo-server", offsetReset = OffsetReset.EARLIEST)
 public class MonsterServerListener {
+
+    @Inject MonsterDeathService monsterDeathService;
+
+    @Topic("test")
+    public void receive(String data) {
+        System.out.println("got some data: " + data);
+    }
 
     @Topic("mob-updates")
     public void receive(MobUpdate mobUpdate) {
@@ -16,5 +25,9 @@ public class MonsterServerListener {
                 mobUpdate.getMotion(),
                 mobUpdate.getState(),
                 mobUpdate.getTarget());
+
+        if (mobUpdate.getState().equalsIgnoreCase("DEATH")) {
+            monsterDeathService.handleMonsterDeath(mobUpdate);
+        }
     }
 }

@@ -11,7 +11,8 @@ import server.common.dto.ErrorResponseDto;
 @Produces
 @Singleton
 @Requires(classes = {MobInstanceException.class, ExceptionHandler.class})
-public class MobExceptionHandler implements ExceptionHandler<MobInstanceException, HttpResponse<?>> {
+public class MobExceptionHandler
+        implements ExceptionHandler<MobInstanceException, HttpResponse<?>> {
 
     @Override
     public HttpResponse<?> handle(HttpRequest request, MobInstanceException exception) {

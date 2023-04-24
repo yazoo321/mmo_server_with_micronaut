@@ -16,15 +16,10 @@ public class Location {
     @BsonCreator
     @JsonCreator
     public Location(
-            @JsonProperty("map")
-            @BsonProperty("map") String map,
-            @JsonProperty("x")
-            @BsonProperty("x") Integer x,
-            @JsonProperty("y")
-            @BsonProperty("y") Integer y,
-            @JsonProperty("z")
-            @BsonProperty("z") Integer z
-    ) {
+            @JsonProperty("map") @BsonProperty("map") String map,
+            @JsonProperty("x") @BsonProperty("x") Integer x,
+            @JsonProperty("y") @BsonProperty("y") Integer y,
+            @JsonProperty("z") @BsonProperty("z") Integer z) {
         this.map = map;
         this.x = x;
         this.y = y;
@@ -37,6 +32,15 @@ public class Location {
     Integer z;
 
     public boolean matches(Location location) {
-        return this.x.equals(location.getX()) && this.y.equals(location.getY()) && this.z.equals(location.getZ());
+        return this.x.equals(location.getX())
+                && this.y.equals(location.getY())
+                && this.z.equals(location.getZ());
+    }
+
+    public Location(Motion motion) {
+        this.map = motion.getMap();
+        this.x = motion.getX();
+        this.y = motion.getY();
+        this.z = motion.getZ();
     }
 }

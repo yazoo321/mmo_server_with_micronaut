@@ -7,13 +7,12 @@ import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
 import jakarta.inject.Inject;
+import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
 import server.common.dto.Location2D;
 import server.player.motion.model.PlayerMotionList;
 import server.player.motion.model.PlayerMotionMessage;
 import server.player.motion.service.PlayerMotionService;
-
-import java.util.function.Predicate;
 
 @ServerWebSocket("/v1/mob-integration/{map}/{serverInstance}/")
 public class MobIntegrationSocket {
@@ -36,7 +35,10 @@ public class MobIntegrationSocket {
 
     @OnMessage
     public Publisher<PlayerMotionList> onMessage(
-            String serverInstance, String map, PlayerMotionMessage message, WebSocketSession session) {
+            String serverInstance,
+            String map,
+            PlayerMotionMessage message,
+            WebSocketSession session) {
 
         if (message.getUpdate()) {
             playerMotionService.updatePlayerMotion(serverInstance, message.getMotion());

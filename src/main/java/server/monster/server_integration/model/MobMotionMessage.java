@@ -17,9 +17,8 @@ public class MobMotionMessage {
     //        "y":-65466,
     //        "z":-20639
     //    }
-    //}
+    // }
 
     private Motion motion;
     private Boolean update;
-
 }

@@ -1,6 +1,7 @@
 package server.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 @Data
+@JsonInclude
 @Introspected
 @NoArgsConstructor
 @Builder
@@ -18,32 +20,17 @@ public class Motion {
     @BsonCreator
     @JsonCreator
     public Motion(
-            @JsonProperty("map")
-            @BsonProperty("map") String map,
-
-            @JsonProperty("x")
-            @BsonProperty("x") Integer x,
-            @JsonProperty("y")
-            @BsonProperty("y") Integer y,
-            @JsonProperty("z")
-            @BsonProperty("z") Integer z,
-
-            @JsonProperty("pitch")
-            @BsonProperty("pitch") Integer pitch,
-            @JsonProperty("roll")
-            @BsonProperty("roll") Integer roll,
-            @JsonProperty("yaw")
-            @BsonProperty("yaw") Integer yaw,
-
-            @JsonProperty("vx")
-            @BsonProperty("vx") Integer vx,
-            @JsonProperty("vy")
-            @BsonProperty("vy") Integer vy,
-            @JsonProperty("vz")
-            @BsonProperty("vz") Integer vz,
-
-            @JsonProperty("isFalling")
-            @BsonProperty("isFalling") Boolean isFalling) {
+            @JsonProperty("map") @BsonProperty("map") String map,
+            @JsonProperty("x") @BsonProperty("x") Integer x,
+            @JsonProperty("y") @BsonProperty("y") Integer y,
+            @JsonProperty("z") @BsonProperty("z") Integer z,
+            @JsonProperty("pitch") @BsonProperty("pitch") Integer pitch,
+            @JsonProperty("roll") @BsonProperty("roll") Integer roll,
+            @JsonProperty("yaw") @BsonProperty("yaw") Integer yaw,
+            @JsonProperty("vx") @BsonProperty("vx") Integer vx,
+            @JsonProperty("vy") @BsonProperty("vy") Integer vy,
+            @JsonProperty("vz") @BsonProperty("vz") Integer vz,
+            @JsonProperty("isFalling") @BsonProperty("isFalling") Boolean isFalling) {
         this.map = map;
 
         this.x = x;

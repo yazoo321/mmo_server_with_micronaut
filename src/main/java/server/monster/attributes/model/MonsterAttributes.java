@@ -3,13 +3,12 @@ package server.monster.attributes.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-
-import java.util.Map;
 
 @Data
 @Builder
