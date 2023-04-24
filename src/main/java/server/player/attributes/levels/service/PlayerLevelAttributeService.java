@@ -52,10 +52,6 @@ public class PlayerLevelAttributeService {
                     baseAttr.put(c, level);
                     currentAttr.put(c, level);
                 });
-
-        //        attributes.setBaseAttributes(baseAttr);
-        //        attributes.setCurrentAttributes(currentAttr);
-
         attributesRepository.updatePlayerAttributes(playerName, attributes);
 
         return attributes;

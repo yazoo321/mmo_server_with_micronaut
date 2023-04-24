@@ -32,8 +32,6 @@ public class PlayerMotionSocket {
 
     @OnOpen
     public Publisher<String> onOpen(String map, String playerName, WebSocketSession session) {
-        //        log("onOpen", session, playerName, map);
-
         return broadcaster.broadcast(
                 String.format("[%s] Joined %s!", playerName, map), isValid(playerName));
     }
@@ -41,36 +39,19 @@ public class PlayerMotionSocket {
     @OnMessage
     public Publisher<PlayerMotionList> onMessage(
             String playerName, String map, PlayerMotionMessage message, WebSocketSession session) {
-
-        //        log("onMessage", session, playerName, map);
-
         if (message.getUpdate()) {
             playerMotionService.updatePlayerMotion(playerName, message.getMotion());
         }
 
         PlayerMotionList playerMotionList =
                 playerMotionService.getPlayersNearMe(message.getMotion(), playerName);
-        // Another option is to send specific details to user and filter by player name
-        // PlayerMotionList res = playerMotionService.getPlayersNearMe(message, playerName);
-
         return broadcaster.broadcast(playerMotionList, isValid(playerName));
     }
 
     @OnClose
     public Publisher<String> onClose(String playerName, String map, WebSocketSession session) {
-
-        //        log("onClose", session, playerName, map);
         playerMotionService.disconnectPlayer(playerName);
         return broadcaster.broadcast(String.format("[%s] Leaving %s!", playerName, map));
-    }
-
-    private void log(String event, WebSocketSession session, String username, String topic) {
-        LOG.info(
-                "* WebSocket: {} received for session {} from '{}' regarding '{}'",
-                event,
-                session.getId(),
-                username,
-                topic);
     }
 
     private Predicate<WebSocketSession> isValid(String playerName) {

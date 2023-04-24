@@ -3,8 +3,9 @@ package server.player.character.service;
 import jakarta.inject.Inject;
 import java.time.Instant;
 import java.util.List;
+
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import server.player.attributes.levels.service.PlayerLevelAttributeService;
 import server.player.attributes.service.PlayerAttributeService;
 import server.player.character.dto.AccountCharactersResponse;
@@ -15,7 +16,7 @@ import server.player.character.repository.PlayerCharacterRepository;
 import server.player.motion.service.PlayerMotionService;
 
 @Slf4j
-@Service
+@Singleton
 public class PlayerCharacterService {
 
     @Inject PlayerCharacterRepository playerCharacterRepository;

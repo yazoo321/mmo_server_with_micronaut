@@ -26,7 +26,7 @@ public class MongoDbQueryHelper {
                         Filters.gt("location.y", (location.getY() - threshold)),
                         Filters.lt("location.y", (location.getY() + threshold)));
 
-        return Flowable.fromPublisher(collection.find(and(mapEq, and(xWithinRange, yWithinRange))))
+        return Flowable.fromPublisher(collection.find(and(mapEq, xWithinRange, yWithinRange)))
                 .toList()
                 .blockingGet();
     }
@@ -72,12 +72,7 @@ public class MongoDbQueryHelper {
                         Filters.gt("motion.y", (location.getY() - threshold)),
                         Filters.lt("motion.y", (location.getY() + threshold)));
 
-        List<Bson> filters1 = List.of(mapEq, xWithinRange, yWithinRange);
-
-        return Flowable.fromPublisher(collection.find(and(mapEq, xWithinRange)))
-                //                                        xWithinRange,
-                //                                        yWithinRange)))
+        return Flowable.fromPublisher(collection.find(and(mapEq, xWithinRange, yWithinRange)))
                 .toList();
-        //        return Flowable.fromPublisher(collection.find(Filters.and(filters1))).toList();
     }
 }
