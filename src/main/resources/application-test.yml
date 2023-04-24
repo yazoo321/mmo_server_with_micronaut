@@ -79,3 +79,4 @@ mongo-database:
   player-attributes: "playerAttributes"
   player-motion: "playerMotion"
   mob-instance: "mobInstance"
+  mob-attributes: "mobAttributes"

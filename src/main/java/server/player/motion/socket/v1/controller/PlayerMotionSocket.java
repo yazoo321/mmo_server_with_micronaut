@@ -12,9 +12,9 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.common.dto.Location2D;
-import server.player.motion.socket.v1.model.PlayerMotionList;
-import server.player.motion.socket.v1.model.PlayerMotionMessage;
-import server.player.motion.socket.v1.service.PlayerMotionService;
+import server.player.motion.model.PlayerMotionList;
+import server.player.motion.model.PlayerMotionMessage;
+import server.player.motion.service.PlayerMotionService;
 
 @ServerWebSocket("/v1/player-motion/{map}/{playerName}/")
 public class PlayerMotionSocket {

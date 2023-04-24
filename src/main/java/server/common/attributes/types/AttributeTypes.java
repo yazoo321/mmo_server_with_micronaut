@@ -1,4 +1,4 @@
-package server.player.attributes.types;
+package server.common.attributes.types;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

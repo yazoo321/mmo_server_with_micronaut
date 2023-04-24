@@ -1,7 +1,7 @@
 package server.player.attributes.service;
 
-import static server.player.attributes.types.AttributeTypes.*;
-import static server.player.attributes.types.AttributeTypes.CAST_SPEED;
+import static server.common.attributes.types.AttributeTypes.*;
+import static server.common.attributes.types.AttributeTypes.CAST_SPEED;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;

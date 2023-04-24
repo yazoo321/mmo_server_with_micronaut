@@ -1,4 +1,4 @@
-package server.player.motion.socket.v1.model;
+package server.player.motion.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

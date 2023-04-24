@@ -39,25 +39,27 @@ public class MobRepositoryTest {
     void testFindMobMotion() {
         // Create a MobMotion object and insert it into the repository
         Monster mobMotion = createMobInstance(mobInstanceId1,1000, 1000, 1000);
-        mobRepository.insertMobMotion(mobMotion).blockingGet();
+        mobRepository.insertMobInstance(mobMotion).blockingGet();
 
         // Retrieve the MobMotion by its instance ID
         Monster result =
-                mobRepository.findMobMotion(mobMotion.getMobInstanceId()).blockingGet();
+                mobRepository.findMobInstance(mobMotion.getMobInstanceId()).blockingGet();
 
         // Verify that the retrieved MobMotion matches the inserted one
         assertThat(result).usingRecursiveComparison().isEqualTo(mobMotion);
     }
 
+
+
     @Test
     void testInsertMobMotion() {
         // Create a MobMotion object and insert it into the repository
         Monster mobMotion = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
-        Monster mob = mobRepository.insertMobMotion(mobMotion).blockingGet();
+        Monster mob = mobRepository.insertMobInstance(mobMotion).blockingGet();
 
         // Retrieve the MobMotion by its instance ID
         Single<Monster> result =
-                mobRepository.findMobMotion(mobMotion.getMobInstanceId());
+                mobRepository.findMobInstance(mobMotion.getMobInstanceId());
 
         // Verify that the retrieved MobMotion matches the inserted one
         assertThat(result.blockingGet()).usingRecursiveComparison().isEqualTo(mobMotion);
@@ -67,7 +69,7 @@ public class MobRepositoryTest {
     void testUpdateMobMotion() {
         // Create a MobMotion object and insert it into the repository
         Monster mobMotion = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
-        mobRepository.insertMobMotion(mobMotion).blockingGet();
+        mobRepository.insertMobInstance(mobMotion).blockingGet();
 
         // Update the motion of the MobMotion object
         mobMotion.getMotion().setX(42);
@@ -76,7 +78,7 @@ public class MobRepositoryTest {
 
         // Retrieve the updated MobMotion by its instance ID
         Monster result =
-                mobRepository.findMobMotion(mobMotion.getMobInstanceId()).blockingGet();
+                mobRepository.findMobInstance(mobMotion.getMobInstanceId()).blockingGet();
 
         // Verify that the retrieved MobMotion matches the updated one
         assertThat(result).usingRecursiveComparison().isEqualTo(mobMotion);
@@ -86,7 +88,7 @@ public class MobRepositoryTest {
     void testUpdateMotionOnly() {
         // Create a MobMotion object and insert it into the repository
         Monster mob = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
-        mobRepository.insertMobMotion(mob).blockingGet();
+        mobRepository.insertMobInstance(mob).blockingGet();
 
         // Update the motion of the MobMotion object
         mob.getMotion().setX(42);
@@ -94,7 +96,7 @@ public class MobRepositoryTest {
         mobRepository.updateMotionOnly(mob).blockingGet();
 
         // Retrieve the updated MobMotion by its instance ID
-        Monster result = mobRepository.findMobMotion(mob.getMobInstanceId()).blockingGet();
+        Monster result = mobRepository.findMobInstance(mob.getMobInstanceId()).blockingGet();
 
         // Verify that the retrieved MobMotion matches the updated one
         assertThat(result).usingRecursiveComparison().isEqualTo(mob);
@@ -104,7 +106,7 @@ public class MobRepositoryTest {
     void testDeleteMobInstance() {
         // Create a MobMotion object and insert it into the repository
         Monster mobMotion = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
-        mobRepository.insertMobMotion(mobMotion).blockingGet();
+        mobRepository.insertMobInstance(mobMotion).blockingGet();
 
         // Delete the MobMotion object by its instance ID
         mobRepository.deleteMobInstance(mobMotion.getMobInstanceId()).blockingGet();
@@ -112,7 +114,7 @@ public class MobRepositoryTest {
         // Attempt to retrieve the deleted MobMotion by its instance ID
         // Verify that the retrieved result is null
         assertThatThrownBy(() ->
-                mobRepository.findMobMotion(mobMotion.getMobInstanceId()).blockingGet())
+                mobRepository.findMobInstance(mobMotion.getMobInstanceId()).blockingGet())
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -122,9 +124,9 @@ public class MobRepositoryTest {
         Monster mob2 = createMobInstance(mobInstanceId2, 50, 50, 50);
         Monster mob3 = createMobInstance(mobInstanceId3, 5000, 5000, 5000);
 
-        mobRepository.insertMobMotion(mob1).blockingGet();
-        mobRepository.insertMobMotion(mob2).blockingGet();
-        mobRepository.insertMobMotion(mob3).blockingGet();
+        mobRepository.insertMobInstance(mob1).blockingGet();
+        mobRepository.insertMobInstance(mob2).blockingGet();
+        mobRepository.insertMobInstance(mob3).blockingGet();
 
         List<Monster> mobsNearby =
                 mobRepository.getMobsNearby(new Location(TEST_MAP, 0, 0, 0)).blockingGet();

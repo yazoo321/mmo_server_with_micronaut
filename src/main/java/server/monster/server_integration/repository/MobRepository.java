@@ -8,7 +8,6 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import java.util.List;
-import java.util.Optional;
 
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import server.common.dto.Location;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
 import server.monster.server_integration.model.Monster;
-import server.monster.server_integration.model.exceptions.MobInstanceException;
 
 @Slf4j
 @Singleton
@@ -34,14 +32,19 @@ public class MobRepository {
         prepareCollections();
     }
 
-    public Single<Monster> findMobMotion(String mobInstanceId) {
+    public Single<Monster> findMobInstance(String mobInstanceId) {
         return Single.fromPublisher(
                 mobMotionMongoCollection.find(eq("mobInstanceId", mobInstanceId)));
     }
 
-    public Single<Monster> insertMobMotion(Monster mobMotion) {
-        return Single.fromPublisher(mobMotionMongoCollection.insertOne(mobMotion))
-                .map(success -> mobMotion);
+    public Single<Monster> findMobById(String mobId) {
+        return Single.fromPublisher(
+                mobMotionMongoCollection.find(eq("mobId", mobId)));
+    }
+
+    public Single<Monster> insertMobInstance(Monster mobInstance) {
+        return Single.fromPublisher(mobMotionMongoCollection.insertOne(mobInstance))
+                .map(success -> mobInstance);
     }
 
     public Single<Monster> updateMobMotion(Monster mobMotion) {

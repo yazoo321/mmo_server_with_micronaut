@@ -1,4 +1,4 @@
-package server.player.motion.socket.v1.repository;
+package server.player.motion.repository;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.combine;

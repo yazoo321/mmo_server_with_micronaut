@@ -1,6 +1,6 @@
 package server.player.attributes.service;
 
-import static server.player.attributes.types.AttributeTypes.*;
+import static server.common.attributes.types.AttributeTypes.*;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;

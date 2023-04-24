@@ -9,7 +9,7 @@ import jakarta.inject.Singleton;
 import java.util.List;
 import server.configuration.MongoConfiguration;
 import server.player.motion.dto.PlayerMotion;
-import server.player.motion.socket.v1.model.PlayerMotionList;
+import server.player.motion.model.PlayerMotionList;
 
 @Singleton
 public class PlayerMotionUtil {

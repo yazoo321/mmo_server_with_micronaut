@@ -1,4 +1,4 @@
-package server.player.motion.socket.v1.model;
+package server.monster.server_integration.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import server.common.dto.Motion;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerMotionMessage {
+public class MobMotionMessage {
     // sample message:
     //    {
     //    "update": true,

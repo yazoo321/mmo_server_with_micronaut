@@ -11,7 +11,7 @@ import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.inventory.service.InventoryService;
 import server.player.character.repository.PlayerCharacterRepository;
-import server.player.motion.socket.v1.service.PlayerMotionService;
+import server.player.motion.service.PlayerMotionService;
 
 @Singleton
 public class PlayerCharacterService {

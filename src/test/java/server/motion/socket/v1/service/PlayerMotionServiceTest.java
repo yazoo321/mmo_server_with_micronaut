@@ -8,9 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Motion;
 import server.player.motion.dto.PlayerMotion;
-import server.player.motion.socket.v1.model.PlayerMotionList;
-import server.player.motion.socket.v1.repository.PlayerMotionRepository;
-import server.player.motion.socket.v1.service.PlayerMotionService;
+import server.player.motion.model.PlayerMotionList;
+import server.player.motion.repository.PlayerMotionRepository;
+import server.player.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
 @MicronautTest

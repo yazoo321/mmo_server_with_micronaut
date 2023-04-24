@@ -31,9 +31,9 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
 import server.player.motion.dto.PlayerMotion;
-import server.player.motion.socket.v1.model.PlayerMotionList;
-import server.player.motion.socket.v1.model.PlayerMotionMessage;
-import server.player.motion.socket.v1.service.PlayerMotionService;
+import server.player.motion.model.PlayerMotionList;
+import server.player.motion.model.PlayerMotionMessage;
+import server.player.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
