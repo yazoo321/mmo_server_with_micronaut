@@ -1,10 +1,9 @@
 package server.player.character.service;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.List;
-
-import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.player.attributes.levels.service.PlayerLevelAttributeService;
 import server.player.attributes.service.PlayerAttributeService;
@@ -62,7 +61,8 @@ public class PlayerCharacterService {
             attributeService.createBaseAttributes(newCharacter.getName());
             levelAttributeService.initializeCharacterClass(
                     newCharacter.getName(), createCharacterRequest.getClassName());
-            playerMotionService.initializePlayerMotion(newCharacter.getName());
+            // blocking call to ensure we do our rollback if anything happens.
+            playerMotionService.initializePlayerMotion(newCharacter.getName()).blockingGet();
         } catch (Exception e) {
             log.warn("Create character failed, rolling back changes");
             // we need to rollback the changes

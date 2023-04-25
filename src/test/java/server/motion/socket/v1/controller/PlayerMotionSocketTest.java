@@ -18,6 +18,7 @@ import io.micronaut.websocket.annotation.OnMessage;
 import jakarta.inject.Inject;
 import java.net.URI;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -117,8 +118,8 @@ public class PlayerMotionSocketTest {
 
     @Test
     void testBasicMotionUpdateBetween2Players() throws Exception {
-        playerMotionService.initializePlayerMotion(CHARACTER_1);
-        playerMotionService.initializePlayerMotion(CHARACTER_2);
+        playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
+        playerMotionService.initializePlayerMotion(CHARACTER_2).blockingGet();
 
         TestWebSocketClient client1 =
                 createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_1);
@@ -144,7 +145,8 @@ public class PlayerMotionSocketTest {
 
         // Update motion on player 1
         Motion motion = createBaseMotion();
-        PlayerMotionMessage playerMotionMessage = new PlayerMotionMessage(motion, true);
+        PlayerMotionMessage playerMotionMessage =
+                new PlayerMotionMessage(motion, true, Instant.now(), null);
 
         // prepare client 1 to send motion data
         client1.send(playerMotionMessage);

@@ -1,5 +1,6 @@
 package server.player.motion.model;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,4 +22,6 @@ public class PlayerMotionMessage {
 
     private Motion motion;
     private Boolean update;
+    private Instant lastUpdatedAt;
+    private Boolean isServer;
 }

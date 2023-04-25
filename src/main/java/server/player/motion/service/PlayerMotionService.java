@@ -1,5 +1,6 @@
 package server.player.motion.service;
 
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
@@ -31,7 +32,7 @@ public class PlayerMotionService {
                     .yaw(0)
                     .build();
 
-    public PlayerMotion initializePlayerMotion(String playerName) {
+    public Single<PlayerMotion> initializePlayerMotion(String playerName) {
         // can create custom start points for different classes/maps etc
         PlayerMotion playerMotion = new PlayerMotion();
         playerMotion.setMotion(STARTING_MOTION);
@@ -39,22 +40,20 @@ public class PlayerMotionService {
         playerMotion.setIsOnline(false);
         playerMotion.setUpdatedAt(Instant.now());
 
-        playerMotionRepository.insertPlayerMotion(playerMotion);
-
-        return playerMotion;
+        return playerMotionRepository.insertPlayerMotion(playerMotion);
     }
 
     public void deletePlayerMotion(String playerName) {
         playerMotionRepository.deletePlayerMotion(playerName);
     }
 
-    public void updatePlayerMotion(String playerName, Motion motion) {
+    public Single<PlayerMotion> updatePlayerMotion(String playerName, Motion motion) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
-        playerMotionRepository.updatePlayerMotion(playerMotion);
+        return playerMotionRepository.updatePlayerMotion(playerMotion);
     }
 
     public void disconnectPlayer(String playerName) {
-        PlayerMotion motion = playerMotionRepository.findPlayerMotion(playerName);
+        PlayerMotion motion = playerMotionRepository.findPlayerMotion(playerName).blockingGet();
 
         motion.setIsOnline(false);
 
@@ -68,7 +67,7 @@ public class PlayerMotionService {
         return new PlayerMotionList(playerMotions);
     }
 
-    public PlayerMotion getPlayerMotion(String playerName) {
+    public Single<PlayerMotion> getPlayerMotion(String playerName) {
         return playerMotionRepository.findPlayerMotion(playerName);
     }
 }

@@ -13,7 +13,6 @@ import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
@@ -34,37 +33,26 @@ public class PlayerMotionRepository {
         prepareCollections();
     }
 
-    public PlayerMotion findPlayerMotion(String playerName) {
-        try {
-            return Single.fromPublisher(
-                            playerMotionMongoCollection.find(eq("playerName", playerName)))
-                    .blockingGet();
-        } catch (NoSuchElementException e) {
-            log.error("Player motion not found for {}", playerName);
-
-            throw new PlayerMotionException("Failed to find player motion");
-        }
+    public Single<PlayerMotion> findPlayerMotion(String playerName) {
+        return Single.fromPublisher(playerMotionMongoCollection.find(eq("playerName", playerName)))
+                .doOnError(
+                        (exception) -> {
+                            log.error("Player motion not found for {}", playerName);
+                            throw new PlayerMotionException("Failed to find player motion");
+                        });
     }
 
-    public PlayerMotion insertPlayerMotion(PlayerMotion playerMotion) {
-        try {
-            return findPlayerMotion(playerMotion.getPlayerName());
-        } catch (PlayerMotionException e) {
-            Single.fromPublisher(playerMotionMongoCollection.insertOne(playerMotion)).blockingGet();
-        }
-
-        return playerMotion;
+    public Single<PlayerMotion> insertPlayerMotion(PlayerMotion playerMotion) {
+        return Single.fromPublisher(playerMotionMongoCollection.insertOne(playerMotion))
+                .map(success -> playerMotion);
     }
 
-    public PlayerMotion updatePlayerMotion(PlayerMotion playerMotion) {
+    public Single<PlayerMotion> updatePlayerMotion(PlayerMotion playerMotion) {
         // allows us to update player motion async, we can consider doing this less often if working
         // primarily from cache
-        Single.fromPublisher(
-                        playerMotionMongoCollection.findOneAndReplace(
-                                eq("playerName", playerMotion.getPlayerName()), playerMotion))
-                .blockingGet();
-
-        return playerMotion;
+        return Single.fromPublisher(
+                playerMotionMongoCollection.findOneAndReplace(
+                        eq("playerName", playerMotion.getPlayerName()), playerMotion));
     }
 
     public void deletePlayerMotion(String playerName) {
