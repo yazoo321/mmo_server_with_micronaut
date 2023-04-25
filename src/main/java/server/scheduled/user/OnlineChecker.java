@@ -4,7 +4,7 @@ import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import server.player.character.repository.PlayerCharacterRepository;
-import server.player.motion.repository.PlayerMotionRepository;
+import server.motion.repository.PlayerMotionRepository;
 
 @Singleton
 public class OnlineChecker {

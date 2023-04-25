@@ -10,9 +10,9 @@ import jakarta.inject.Inject;
 import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
 import server.common.dto.Location2D;
-import server.player.motion.model.PlayerMotionList;
-import server.player.motion.model.PlayerMotionMessage;
-import server.player.motion.service.PlayerMotionService;
+import server.motion.model.PlayerMotionList;
+import server.motion.model.PlayerMotionMessage;
+import server.motion.service.PlayerMotionService;
 
 @ServerWebSocket("/v1/mob-integration/{map}/{serverInstance}/")
 public class MobIntegrationSocket {

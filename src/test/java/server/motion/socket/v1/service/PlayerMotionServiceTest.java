@@ -7,10 +7,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Motion;
-import server.player.motion.dto.PlayerMotion;
-import server.player.motion.model.PlayerMotionList;
-import server.player.motion.repository.PlayerMotionRepository;
-import server.player.motion.service.PlayerMotionService;
+import server.motion.dto.PlayerMotion;
+import server.motion.model.PlayerMotionList;
+import server.motion.repository.PlayerMotionRepository;
+import server.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
 @MicronautTest

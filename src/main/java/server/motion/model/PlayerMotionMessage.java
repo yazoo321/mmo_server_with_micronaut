@@ -1,4 +1,4 @@
-package server.player.motion.model;
+package server.motion.model;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -11,17 +11,16 @@ import server.common.dto.Motion;
 @NoArgsConstructor
 public class PlayerMotionMessage {
     // sample message:
-    //    {
-    //    "update": true,
-    //    "motion":{
-    //        "x":37293,
-    //        "y":-65466,
-    //        "z":-20639
-    //    }
-    // }
+//        {
+//        "update": true,
+//        "motion":{
+//            "x":37293,
+//            "y":-65466,
+//            "z":-20639
+//        }
+//     }
 
     private Motion motion;
     private Boolean update;
-    private Instant lastUpdatedAt;
-    private Boolean isServer;
+    private Boolean isMob;
 }

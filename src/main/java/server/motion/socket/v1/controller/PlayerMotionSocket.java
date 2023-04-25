@@ -1,4 +1,4 @@
-package server.player.motion.socket.v2.controller;
+package server.motion.socket.v1.controller;
 
 import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
@@ -7,33 +7,28 @@ import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
 import jakarta.inject.Inject;
-import java.time.Instant;
 import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
-import server.monster.server_integration.service.MobInstanceService;
-import server.player.motion.model.PlayerMotionList;
-import server.player.motion.model.PlayerMotionMessage;
-import server.player.motion.service.PlayerMotionService;
+import server.common.dto.Location2D;
+import server.motion.model.PlayerMotionList;
+import server.motion.model.PlayerMotionMessage;
+import server.motion.service.PlayerMotionService;
 
-@ServerWebSocket("/v2/player-motion/{map}/{playerName}/")
-public class PlayerMotionSocketV2 {
+@ServerWebSocket("/v1/player-motion/{map}/{playerName}/")
+public class PlayerMotionSocket {
 
     private final WebSocketBroadcaster broadcaster;
 
-    private static final Integer distanceThreshold = 1000;
+    private static final Location2D distanceThreshold = new Location2D(30, 30);
 
     @Inject PlayerMotionService playerMotionService;
 
-    @Inject MobInstanceService mobInstanceService;
-
-    public PlayerMotionSocketV2(WebSocketBroadcaster broadcaster) {
+    public PlayerMotionSocket(WebSocketBroadcaster broadcaster) {
         this.broadcaster = broadcaster;
     }
 
     @OnOpen
     public Publisher<String> onOpen(String map, String playerName, WebSocketSession session) {
-        // player could also be server instance
-
         return broadcaster.broadcast(
                 String.format("[%s] Joined %s!", playerName, map), isValid(playerName));
     }
@@ -41,24 +36,13 @@ public class PlayerMotionSocketV2 {
     @OnMessage
     public Publisher<PlayerMotionList> onMessage(
             String playerName, String map, PlayerMotionMessage message, WebSocketSession session) {
-
-        if (timeToUpdate(message)) {
-            // update the players motion
-            playerMotionService.updatePlayerMotion(playerName, message.getMotion());
+        if (message.getUpdate()) {
+            playerMotionService.updatePlayerMotion(playerName, message.getMotion()).subscribe();
         }
 
         PlayerMotionList playerMotionList =
                 playerMotionService.getPlayersNearMe(message.getMotion(), playerName);
         return broadcaster.broadcast(playerMotionList, isValid(playerName));
-    }
-
-    private boolean timeToUpdate(PlayerMotionMessage message) {
-        // message asks you to update
-        // last updated at is over 3 seconds
-        // and this is not a server
-        return (message.getUpdate()
-                        || message.getLastUpdatedAt().isBefore(Instant.now().minusMillis(3000)))
-                && !message.getIsServer();
     }
 
     @OnClose

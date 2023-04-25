@@ -1,4 +1,4 @@
-package server.player.motion.dto.exceptions;
+package server.motion.dto.exceptions;
 
 public class PlayerMotionException extends RuntimeException {
     public PlayerMotionException(String message) {

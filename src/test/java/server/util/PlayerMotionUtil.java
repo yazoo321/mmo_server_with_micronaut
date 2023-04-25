@@ -8,8 +8,8 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.util.List;
 import server.configuration.MongoConfiguration;
-import server.player.motion.dto.PlayerMotion;
-import server.player.motion.model.PlayerMotionList;
+import server.motion.dto.PlayerMotion;
+import server.motion.model.PlayerMotionList;
 
 @Singleton
 public class PlayerMotionUtil {

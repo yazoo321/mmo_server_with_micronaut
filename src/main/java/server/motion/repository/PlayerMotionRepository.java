@@ -1,4 +1,4 @@
-package server.player.motion.repository;
+package server.motion.repository;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.combine;
@@ -16,8 +16,8 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
-import server.player.motion.dto.PlayerMotion;
-import server.player.motion.dto.exceptions.PlayerMotionException;
+import server.motion.dto.PlayerMotion;
+import server.motion.dto.exceptions.PlayerMotionException;
 
 @Slf4j
 @Singleton

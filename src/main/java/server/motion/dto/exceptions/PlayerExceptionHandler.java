@@ -1,4 +1,4 @@
-package server.player.motion.dto.exceptions;
+package server.motion.dto.exceptions;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpRequest;

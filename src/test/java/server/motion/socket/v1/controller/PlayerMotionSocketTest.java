@@ -31,10 +31,10 @@ import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
-import server.player.motion.dto.PlayerMotion;
-import server.player.motion.model.PlayerMotionList;
-import server.player.motion.model.PlayerMotionMessage;
-import server.player.motion.service.PlayerMotionService;
+import server.motion.dto.PlayerMotion;
+import server.motion.model.PlayerMotionList;
+import server.motion.model.PlayerMotionMessage;
+import server.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
@@ -146,7 +146,7 @@ public class PlayerMotionSocketTest {
         // Update motion on player 1
         Motion motion = createBaseMotion();
         PlayerMotionMessage playerMotionMessage =
-                new PlayerMotionMessage(motion, true, Instant.now(), null);
+                new PlayerMotionMessage(motion, true,null);
 
         // prepare client 1 to send motion data
         client1.send(playerMotionMessage);

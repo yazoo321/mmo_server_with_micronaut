@@ -10,7 +10,7 @@ import java.util.List;
 import org.bson.conversions.Bson;
 import server.common.dto.Location;
 import server.common.dto.Motion;
-import server.player.motion.dto.PlayerMotion;
+import server.motion.dto.PlayerMotion;
 
 public class MongoDbQueryHelper {
 

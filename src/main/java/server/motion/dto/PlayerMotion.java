@@ -1,4 +1,4 @@
-package server.player.motion.dto;
+package server.motion.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;

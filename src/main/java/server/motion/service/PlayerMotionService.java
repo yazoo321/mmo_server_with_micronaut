@@ -1,4 +1,4 @@
-package server.player.motion.service;
+package server.motion.service;
 
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
@@ -7,9 +7,9 @@ import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
-import server.player.motion.dto.PlayerMotion;
-import server.player.motion.model.PlayerMotionList;
-import server.player.motion.repository.PlayerMotionRepository;
+import server.motion.dto.PlayerMotion;
+import server.motion.model.PlayerMotionList;
+import server.motion.repository.PlayerMotionRepository;
 
 @Slf4j
 @Singleton
