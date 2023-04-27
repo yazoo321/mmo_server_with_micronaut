@@ -17,6 +17,8 @@ public class PlayerMotionService {
 
     @Inject PlayerMotionRepository playerMotionRepository;
 
+    private static int DEFAULT_DISTANCE_THRESHOLD = 1000;
+
     public static final Motion STARTING_MOTION =
             Motion.builder()
                     .map("dreamscape") // Set up default starting location to match your map
@@ -47,6 +49,18 @@ public class PlayerMotionService {
         playerMotionRepository.deletePlayerMotion(playerName);
     }
 
+    public PlayerMotion buildPlayerMotion(String playerName, String map, Motion motion) {
+        motion.setMap(map);
+        return new PlayerMotion(playerName, motion, true, Instant.now());
+
+    }
+
+    // used in v2
+    public Single<PlayerMotion> updatePlayerMotion(PlayerMotion playerMotion) {
+        return playerMotionRepository.updatePlayerMotion(playerMotion);
+    }
+
+    // used in v1
     public Single<PlayerMotion> updatePlayerMotion(String playerName, Motion motion) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
         return playerMotionRepository.updatePlayerMotion(playerMotion);
@@ -65,6 +79,13 @@ public class PlayerMotionService {
         List<PlayerMotion> playerMotions = playerMotionRepository.getPlayersNearby(playerMotion);
 
         return new PlayerMotionList(playerMotions);
+    }
+
+    public Single<List<PlayerMotion>> getNearbyPlayersAsync(Motion motion, String playerName, Integer threshold) {
+        PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
+        threshold = threshold == null ? DEFAULT_DISTANCE_THRESHOLD : threshold;
+
+        return playerMotionRepository.getPlayersNearbyAsync(playerMotion, threshold);
     }
 
     public Single<PlayerMotion> getPlayerMotion(String playerName) {

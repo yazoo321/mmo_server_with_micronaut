@@ -86,7 +86,7 @@ public class MobRepositoryTest {
         // Update the motion of the MobMotion object
         mob.getMotion().setX(42);
         mob.getMotion().setY(84);
-        mobRepository.updateMotionOnly(mob).blockingGet();
+        mobRepository.updateMotionOnly(mob.getMobInstanceId(), mob.getMotion()).blockingGet();
 
         // Retrieve the updated MobMotion by its instance ID
         Monster result = mobRepository.findMobInstance(mob.getMobInstanceId()).blockingGet();

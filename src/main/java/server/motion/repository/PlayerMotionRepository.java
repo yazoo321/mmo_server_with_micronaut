@@ -65,6 +65,11 @@ public class PlayerMotionRepository {
                 playerMotionMongoCollection, playerMotion, 1000);
     }
 
+    public Single<List<PlayerMotion>> getPlayersNearbyAsync(PlayerMotion playerMotion, Integer threshold) {
+        return MongoDbQueryHelper.getNearbyPlayers(
+                playerMotionMongoCollection, playerMotion, threshold);
+    }
+
     public UpdateResult checkAndUpdateUserOnline() {
         // Duplicate functionality of Character service
         LocalDateTime logoutTime = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(10);

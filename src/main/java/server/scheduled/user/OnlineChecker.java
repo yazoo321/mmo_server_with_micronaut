@@ -13,7 +13,8 @@ public class OnlineChecker {
 
     @Inject PlayerMotionRepository playerMotionRepository;
 
-    @Scheduled(fixedDelay = "10s")
+//    This is now handled via websockets connect/disconnect
+//    @Scheduled(fixedDelay = "10s")
     void executeEveryTen() {
         // TODO: this needs refactoring
         // TODO: this is also a very inefficient call, scope down the time range

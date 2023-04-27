@@ -18,7 +18,6 @@ import io.micronaut.websocket.annotation.OnMessage;
 import jakarta.inject.Inject;
 import java.net.URI;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +32,7 @@ import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.PlayerMotionList;
-import server.motion.model.PlayerMotionMessage;
+import server.motion.model.MotionMessage;
 import server.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
@@ -82,7 +81,7 @@ public class PlayerMotionSocketTest {
             messageHistory.add(message);
         }
 
-        abstract void send(PlayerMotionMessage message);
+        abstract void send(MotionMessage message);
     }
 
     private TestWebSocketClient createWebSocketClient(int port, String map, String playerName) {
@@ -145,8 +144,8 @@ public class PlayerMotionSocketTest {
 
         // Update motion on player 1
         Motion motion = createBaseMotion();
-        PlayerMotionMessage playerMotionMessage =
-                new PlayerMotionMessage(motion, true,null);
+        MotionMessage playerMotionMessage =
+                new MotionMessage(motion, true,null);
 
         // prepare client 1 to send motion data
         client1.send(playerMotionMessage);

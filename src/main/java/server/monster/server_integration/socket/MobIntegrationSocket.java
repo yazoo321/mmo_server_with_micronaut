@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
 import server.common.dto.Location2D;
 import server.motion.model.PlayerMotionList;
-import server.motion.model.PlayerMotionMessage;
+import server.motion.model.MotionMessage;
 import server.motion.service.PlayerMotionService;
 
 @ServerWebSocket("/v1/mob-integration/{map}/{serverInstance}/")
@@ -37,7 +37,7 @@ public class MobIntegrationSocket {
     public Publisher<PlayerMotionList> onMessage(
             String serverInstance,
             String map,
-            PlayerMotionMessage message,
+            MotionMessage message,
             WebSocketSession session) {
 
         if (message.getUpdate()) {

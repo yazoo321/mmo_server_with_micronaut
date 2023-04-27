@@ -34,4 +34,8 @@ public class MobInstanceService {
 
         // also need to create mob attributes
     }
+
+    public void updateMobMotion(String mobInstanceId, Motion motion) {
+        mobRepository.updateMotionOnly(mobInstanceId, motion);
+    }
 }

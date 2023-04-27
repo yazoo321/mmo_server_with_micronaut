@@ -8,10 +8,13 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+
+import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import server.common.dto.Location;
+import server.common.dto.Motion;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
 import server.monster.server_integration.model.Monster;
@@ -51,11 +54,13 @@ public class MobRepository {
                         eq("mobInstanceId", mobMotion.getMobInstanceId()), mobMotion));
     }
 
-    public Single<Monster> updateMotionOnly(Monster mobMotion) {
+    public Single<Monster> updateMotionOnly(String mobInstanceId, Motion motion) {
         return Single.fromPublisher(
                 mobMotionMongoCollection.findOneAndUpdate(
-                        eq("mobInstanceId", mobMotion.getMobInstanceId()),
-                        Updates.set("motion", mobMotion.getMotion())));
+                        eq("mobInstanceId", mobInstanceId),
+                        Updates.combine(
+                                Updates.set("motion", motion),
+                                Updates.set("updatedAt", Instant.now()))));
     }
 
     public Single<DeleteResult> deleteMobInstance(String mobInstanceId) {
