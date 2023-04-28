@@ -50,7 +50,7 @@ public class MobRepositoryTest {
     void testInsertMobMotion() {
         // Create a MobMotion object and insert it into the repository
         Monster mobMotion = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
-        Monster mob = mobRepository.insertMobInstance(mobMotion).blockingGet();
+        mobRepository.insertMobInstance(mobMotion).blockingGet();
 
         // Retrieve the MobMotion by its instance ID
         Single<Monster> result = mobRepository.findMobInstance(mobMotion.getMobInstanceId());

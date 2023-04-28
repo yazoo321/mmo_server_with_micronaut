@@ -12,7 +12,9 @@ import jakarta.inject.Inject;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import server.common.dto.Location;
 import server.common.dto.Motion;
@@ -30,6 +32,7 @@ import server.motion.service.PlayerMotionService;
 // whenever that player/mob makes any motion, the player will be updated
 
 // TODO: https://www.confluent.io/blog/real-time-gaming-infrastructure-kafka-ksqldb-websockets/
+@Slf4j
 @ServerWebSocket("/v2/actor-updates/{map}/{playerName}/")
 public class PlayerMotionSocketV2 {
 
@@ -41,22 +44,25 @@ public class PlayerMotionSocketV2 {
 
     @Inject MobInstanceService mobInstanceService;
 
-    ConcurrentSet<WebSocketSession> playerSessionsList;
+    ConcurrentSet<WebSocketSession> sessionsList;
+
+//    Map<String, Set<WebSocketSession>> subscriberMap;
 
     public PlayerMotionSocketV2(WebSocketBroadcaster broadcaster) {
         this.broadcaster = broadcaster;
-        playerSessionsList = new ConcurrentSet<>();
+        sessionsList = new ConcurrentSet<>();
+//        subscriberMap = new HashMap<>();
     }
 
     @OnOpen
     public Publisher<String> onOpen(String map, String playerName, WebSocketSession session) {
         // player could also be server instance
-        session.put(SessionParams.TRACKING_PLAYERS.getType(), List.of());
-        session.put(SessionParams.TRACKING_MOBS.getType(), List.of());
-        playerSessionsList.add(session);
+        session.put(SessionParams.TRACKING_PLAYERS.getType(), Set.of());
+        session.put(SessionParams.TRACKING_MOBS.getType(), Set.of());
+        sessionsList.add(session);
 
         return broadcaster.broadcast(
-                String.format("[%s] Joined %s!", playerName, map), isValid(playerName));
+                String.format("[%s] Joined %s!", playerName, map));
     }
 
     @OnMessage
@@ -65,16 +71,30 @@ public class PlayerMotionSocketV2 {
 
         if (timeToUpdate(message, (Instant) session.asMap().get(SessionParams.LAST_UPDATED_AT.getType()))) {
             // update the players motion
+            log.info("Updating player {} motion", playerName);
             return handlePlayerUpdate(playerName, map, message, session);
         }
 
         if (null != message.getMobInstanceId() && !message.getMobInstanceId().isBlank()) {
             // knowing whether we create or update is more efficient for db
+
             if (message.getUpdate()) {
-                mobInstanceService.updateMobMotion(message.getMobInstanceId(), message.getMotion());
+                log.info("updating mob with ID: {}", message.getMobInstanceId());
+                mobInstanceService.updateMobMotion(message.getMobInstanceId(), message.getMotion())
+                        .doOnError((error) -> log.error("Error updating mob motion, {}", error.getMessage()))
+                        .doOnSuccess((success) -> log.info("successfully updated mob, {}", success.getMobId()))
+                        .subscribe();
             } else {
-                mobInstanceService.createMob(message.getMobInstanceId(), message.getMotion());
+                log.info("creating mob with ID: {}", message.getMobInstanceId());
+                mobInstanceService.createMob(message.getMobInstanceId(), message.getMotion())
+                        .doOnError((error) -> log.error("Error creating mob, {}", error.getMessage()))
+                        .doOnSuccess((success) -> log.info("successfully created mob"))
+                        .blockingGet();
             }
+
+            return broadcaster.broadcast(
+                    mobInstanceService.buildMobMotionResult(message.getMobInstanceId(), message.getMotion()),
+                    isValid(message.getMobInstanceId()));
         }
 
         return null;
@@ -84,7 +104,9 @@ public class PlayerMotionSocketV2 {
         session.put(SessionParams.LAST_UPDATED_AT.getType(), Instant.now());
         PlayerMotion playerMotion = playerMotionService.buildPlayerMotion(playerName, map, message.getMotion());
         session.put(SessionParams.MOTION.getType(), playerMotion.getMotion());
-        playerMotionService.updatePlayerMotion(playerMotion).subscribe();
+        playerMotionService.updatePlayerMotion(playerMotion)
+                .doOnError((error) -> log.error("Error updating player motion, {}", error.getMessage()))
+                .subscribe();
 
         MotionResult motionResult = MotionResult.builder().playerMotion(playerMotion).build();
 
@@ -93,19 +115,22 @@ public class PlayerMotionSocketV2 {
     }
 
     private boolean timeToUpdate(MotionMessage message, Instant lastUpdated) {
+        if (message.getMobInstanceId() != null) {
+            return false;
+        }
+
         if (lastUpdated == null) {
             return true;
         }
 
-        return (message.getUpdate() // either server tells us to update (there's been motion)
-                || Instant.now().isAfter(lastUpdated.plusMillis(3000))) // or its time to periodically update
-                && message.getMobInstanceId() == null; // and it's not a mob
+        return message.getUpdate() // either server tells us to update (there's been motion)
+                || Instant.now().isAfter(lastUpdated.plusMillis(3000)); // or its time to periodically update
     }
 
     @OnClose
     public Publisher<String> onClose(String playerName, String map, WebSocketSession session) {
         playerMotionService.disconnectPlayer(playerName);
-        playerSessionsList.remove(session);
+//        playerSessionsList.remove(session);
 
         return broadcaster.broadcast(String.format("[%s] Leaving %s!", playerName, map));
     }
@@ -113,10 +138,17 @@ public class PlayerMotionSocketV2 {
     private Predicate<WebSocketSession> isValid(String playerOrMob) {
         // we will report to player every time they call update about other players nearby
         return s -> {
-            List<String> playersTrackedInSession = (List<String>) s.asMap().get(
+//            if (subscriberMap.containsKey(playerOrMob)) {
+//                Set<WebSocketSession> sessions = subscriberMap.get(playerOrMob);
+//                return sessions.contains(s);
+//            }
+//            return false;
+
+
+            Set<String> playersTrackedInSession = (Set<String>) s.asMap().get(
                     SessionParams.TRACKING_PLAYERS.getType());
 
-            List<String> mobsTrackedInSession = (List<String>) s.asMap().get(
+            Set<String> mobsTrackedInSession =  (Set<String>) s.asMap().get(
                     SessionParams.TRACKING_MOBS.getType());
 
             return playersTrackedInSession.contains(playerOrMob) ||
@@ -125,8 +157,9 @@ public class PlayerMotionSocketV2 {
     }
 
     @Scheduled(fixedDelay = "1s")
-    public void syncNearbyPlayers() {
-        playerSessionsList.parallelStream().forEach(session -> {
+    public void syncSessionNearbyData() {
+
+        sessionsList.parallelStream().forEach(session -> {
             String playerName = session.getUriVariables().get("playerName", String.class, null);
             Motion motion = (Motion) session.asMap().get(SessionParams.MOTION.getType());
             if (motion == null) {
@@ -136,17 +169,23 @@ public class PlayerMotionSocketV2 {
             // sync nearby players
             playerMotionService.getNearbyPlayersAsync(motion, playerName, DISTANCE_THRESHOLD)
                     .doAfterSuccess(list -> {
-                        List<String> names = list.stream().map(PlayerMotion::getPlayerName).toList();
+                        Set<String> playerNames = list.stream().map(PlayerMotion::getPlayerName)
+                                .collect(Collectors.toSet());
                         // update the names that we follow
-                        session.put(SessionParams.TRACKING_PLAYERS.getType(), names);
-                    }).subscribe();
+                        session.put(SessionParams.TRACKING_PLAYERS.getType(), playerNames);
+                    })
+                    .doOnError((error) -> log.error("error getting nearby players, {}", error.getMessage()))
+                    .subscribe();
 
             // sync nearby mobs
             mobInstanceService.getMobsNearby(new Location(motion))
                     .doAfterSuccess(mobList -> {
-                        List<String> mobInstanceIds = mobList.stream().map(Monster::getMobInstanceId).toList();
+                        Set<String> mobInstanceIds = mobList.stream().map(Monster::getMobInstanceId)
+                                .collect(Collectors.toSet());
                         session.put(SessionParams.TRACKING_MOBS.getType(), mobInstanceIds);
-                    }).subscribe();
+                    })
+                    .doOnError((error) -> log.error("error getting nearby mobs, {}", error.getMessage()))
+                    .subscribe();
         });
     }
 }
