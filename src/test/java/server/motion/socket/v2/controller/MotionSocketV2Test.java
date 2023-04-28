@@ -15,13 +15,14 @@ import io.micronaut.websocket.annotation.ClientWebSocket;
 import io.micronaut.websocket.annotation.OnMessage;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
 import server.monster.server_integration.model.Monster;
-import server.monster.server_integration.service.MobInstanceService;
 import server.motion.dto.MotionResult;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.MotionMessage;
@@ -38,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import static org.awaitility.Awaitility.await;
 
 @MicronautTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
 public class MotionSocketV2Test {
 
@@ -74,6 +76,15 @@ public class MotionSocketV2Test {
 
     @BeforeEach
     void setup() {
+        cleanup();
+    }
+
+    @AfterAll
+    void tearDown() {
+        cleanup();
+    }
+
+    private void cleanup() {
         playerMotionUtil.deleteAllPlayerMotionData();
         playerMotionUtil.deleteAllMobInstanceData();
     }
