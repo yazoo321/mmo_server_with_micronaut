@@ -5,6 +5,7 @@ import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import server.motion.service.PlayerMotionService;
 import server.player.attributes.levels.service.PlayerLevelAttributeService;
 import server.player.attributes.service.PlayerAttributeService;
 import server.player.character.dto.AccountCharactersResponse;
@@ -12,7 +13,6 @@ import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.inventory.service.InventoryService;
 import server.player.character.repository.PlayerCharacterRepository;
-import server.motion.service.PlayerMotionService;
 
 @Slf4j
 @Singleton

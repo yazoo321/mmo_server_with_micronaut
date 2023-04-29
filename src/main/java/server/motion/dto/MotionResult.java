@@ -16,5 +16,4 @@ public class MotionResult {
     // the result is either player motion or monster
     PlayerMotion playerMotion;
     Monster monster;
-
 }

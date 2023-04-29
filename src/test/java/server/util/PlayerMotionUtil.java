@@ -43,9 +43,10 @@ public class PlayerMotionUtil {
     }
 
     public void deleteMobInstancesWithIds(List<String> mobInstanceIds) {
-        Single.fromPublisher(monsterMongoCollection.deleteMany(
-                Filters.all("mobInstanceId", mobInstanceIds)
-        )).blockingGet();
+        Single.fromPublisher(
+                        monsterMongoCollection.deleteMany(
+                                Filters.all("mobInstanceId", mobInstanceIds)))
+                .blockingGet();
     }
 
     public static boolean playerMotionListEquals(PlayerMotionList pml1, PlayerMotionList pml2) {

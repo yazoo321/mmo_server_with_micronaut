@@ -10,8 +10,8 @@ import jakarta.inject.Inject;
 import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
 import server.common.dto.Location2D;
-import server.motion.model.PlayerMotionList;
 import server.motion.model.MotionMessage;
+import server.motion.model.PlayerMotionList;
 import server.motion.service.PlayerMotionService;
 
 @ServerWebSocket("/v1/mob-integration/{map}/{serverInstance}/")
@@ -35,10 +35,7 @@ public class MobIntegrationSocket {
 
     @OnMessage
     public Publisher<PlayerMotionList> onMessage(
-            String serverInstance,
-            String map,
-            MotionMessage message,
-            WebSocketSession session) {
+            String serverInstance, String map, MotionMessage message, WebSocketSession session) {
 
         if (message.getUpdate()) {
             playerMotionService.updatePlayerMotion(serverInstance, message.getMotion());

@@ -65,7 +65,8 @@ public class PlayerMotionRepository {
                 playerMotionMongoCollection, playerMotion, 1000);
     }
 
-    public Single<List<PlayerMotion>> getPlayersNearbyAsync(PlayerMotion playerMotion, Integer threshold) {
+    public Single<List<PlayerMotion>> getPlayersNearbyAsync(
+            PlayerMotion playerMotion, Integer threshold) {
         return MongoDbQueryHelper.getNearbyPlayers(
                 playerMotionMongoCollection, playerMotion, threshold);
     }

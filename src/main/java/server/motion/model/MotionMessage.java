@@ -9,16 +9,16 @@ import server.common.dto.Motion;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MotionMessage {
-// sample message:
-//        {
-//        "update": true,
-//        "motion":{
-//            "x":37293,
-//            "y":-65466,
-//            "z":-20639
-//        }
-//        "mobInstanceId:"some_instance_id_1"
-//     }
+    // sample message:
+    //        {
+    //        "update": true,
+    //        "motion":{
+    //            "x":37293,
+    //            "y":-65466,
+    //            "z":-20639
+    //        }
+    //        "mobInstanceId:"some_instance_id_1"
+    //     }
 
     private Motion motion;
     private Boolean update;

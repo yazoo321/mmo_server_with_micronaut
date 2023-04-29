@@ -52,7 +52,6 @@ public class PlayerMotionService {
     public PlayerMotion buildPlayerMotion(String playerName, String map, Motion motion) {
         motion.setMap(map);
         return new PlayerMotion(playerName, motion, true, Instant.now());
-
     }
 
     // used in v2
@@ -81,7 +80,8 @@ public class PlayerMotionService {
         return new PlayerMotionList(playerMotions);
     }
 
-    public Single<List<PlayerMotion>> getNearbyPlayersAsync(Motion motion, String playerName, Integer threshold) {
+    public Single<List<PlayerMotion>> getNearbyPlayersAsync(
+            Motion motion, String playerName, Integer threshold) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
         threshold = threshold == null ? DEFAULT_DISTANCE_THRESHOLD : threshold;
 

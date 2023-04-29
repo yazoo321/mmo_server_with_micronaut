@@ -1,13 +1,11 @@
 package server.monster.server_integration.service;
 
-import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.result.InsertOneResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.common.dto.Location;
@@ -29,7 +27,6 @@ public class MobInstanceService {
     public Single<InsertOneResult> createMob(String mobId, Motion motion) {
         Monster mob = new Monster();
         // TODO: choose whether we need mob ID or not
-        mob.setMobId(mobId);
         mob.setMobInstanceId(mobId);
         mob.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
         mob.setMotion(motion);
@@ -49,8 +46,6 @@ public class MobInstanceService {
         monster.setMotion(motion);
         // we don't populate other info here
 
-        return MotionResult.builder()
-                .monster(monster)
-                .build();
+        return MotionResult.builder().monster(monster).build();
     }
 }

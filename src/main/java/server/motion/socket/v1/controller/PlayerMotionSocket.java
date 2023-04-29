@@ -9,17 +9,15 @@ import io.micronaut.websocket.annotation.ServerWebSocket;
 import jakarta.inject.Inject;
 import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
-import server.common.dto.Location2D;
-import server.motion.model.PlayerMotionList;
 import server.motion.model.MotionMessage;
+import server.motion.model.PlayerMotionList;
 import server.motion.service.PlayerMotionService;
 
+@Deprecated
 @ServerWebSocket("/v1/player-motion/{map}/{playerName}/")
 public class PlayerMotionSocket {
 
     private final WebSocketBroadcaster broadcaster;
-
-    private static final Location2D distanceThreshold = new Location2D(30, 30);
 
     @Inject PlayerMotionService playerMotionService;
 

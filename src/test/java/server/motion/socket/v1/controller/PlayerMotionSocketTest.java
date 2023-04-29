@@ -31,8 +31,8 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
-import server.motion.model.PlayerMotionList;
 import server.motion.model.MotionMessage;
+import server.motion.model.PlayerMotionList;
 import server.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
@@ -144,8 +144,7 @@ public class PlayerMotionSocketTest {
 
         // Update motion on player 1
         Motion motion = createBaseMotion();
-        MotionMessage playerMotionMessage =
-                new MotionMessage(motion, true,null);
+        MotionMessage playerMotionMessage = new MotionMessage(motion, true, null);
 
         // prepare client 1 to send motion data
         client1.send(playerMotionMessage);

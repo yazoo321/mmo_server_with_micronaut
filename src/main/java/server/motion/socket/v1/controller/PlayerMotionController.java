@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import server.motion.dto.PlayerMotion;
 import server.motion.service.PlayerMotionService;
 
+@Deprecated
 @Controller("/player-motion")
 public class PlayerMotionController {
 

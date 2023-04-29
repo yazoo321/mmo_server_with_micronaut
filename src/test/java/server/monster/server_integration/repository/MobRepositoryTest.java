@@ -1,19 +1,20 @@
 package server.monster.server_integration.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import org.assertj.core.data.TemporalUnitOffset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.monster.server_integration.model.Monster;
+
+import static org.assertj.core.api.Assertions.*;
 
 @MicronautTest
 public class MobRepositoryTest {
@@ -92,7 +93,10 @@ public class MobRepositoryTest {
         Monster result = mobRepository.findMobInstance(mob.getMobInstanceId()).blockingGet();
 
         // Verify that the retrieved MobMotion matches the updated one
-        assertThat(result).usingRecursiveComparison().isEqualTo(mob);
+        assertThat(result).usingRecursiveComparison()
+                .ignoringFields("updatedAt")
+                .isEqualTo(mob);
+        assertThat(result.getUpdatedAt()).isCloseTo(mob.getUpdatedAt(), within(1, ChronoUnit.SECONDS));
     }
 
     @Test
@@ -138,7 +142,6 @@ public class MobRepositoryTest {
         motion.setZ(z);
         Monster monster = new Monster();
         monster.setMotion(motion);
-        monster.setMobId(UUID.randomUUID().toString());
         monster.setMobInstanceId(mobInstanceId);
         monster.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MILLIS));
 

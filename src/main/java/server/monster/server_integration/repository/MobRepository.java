@@ -2,7 +2,6 @@ package server.monster.server_integration.repository;
 
 import static com.mongodb.client.model.Filters.eq;
 
-import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
@@ -10,7 +9,6 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -62,7 +60,9 @@ public class MobRepository {
                         eq("mobInstanceId", mobInstanceId),
                         Updates.combine(
                                 Updates.set("motion", motion),
-                                Updates.set("updatedAt", Instant.now().truncatedTo(ChronoUnit.MICROS)))));
+                                Updates.set(
+                                        "updatedAt",
+                                        Instant.now().truncatedTo(ChronoUnit.MICROS)))));
     }
 
     public Single<DeleteResult> deleteMobInstance(String mobInstanceId) {
