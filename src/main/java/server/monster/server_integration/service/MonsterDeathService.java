@@ -16,6 +16,7 @@ import server.monster.server_integration.model.MobUpdate;
 public class MonsterDeathService {
 
     // this service will be responsible for followup after monster has been killed
+    // This service is in progress / pre-mvp
 
     @Inject ItemService itemService;
 

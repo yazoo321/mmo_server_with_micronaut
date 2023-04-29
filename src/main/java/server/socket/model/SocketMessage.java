@@ -15,7 +15,8 @@ public class SocketMessage {
     Monster monster;
     PlayerMotion playerMotion;
 
-    String mobInstanceId;
+    String mobId; // mob id used by server to identify mesh etc to use
+    String mobInstanceId; // mob instance ID is the unique mob identifier
 
     String playerName;
     String serverName;

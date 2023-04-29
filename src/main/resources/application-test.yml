@@ -53,7 +53,26 @@ datasources:
       validation-timeout: 50000
 
 kafka:
+# By default, keep disabled in tests
   enabled: false
+  bootstrap:
+    servers: 127.0.0.1:9093
+  security:
+    protocol: SASL_PLAINTEXT
+  sasl:
+    mechanism: PLAIN
+    jaas:
+      config: org.apache.kafka.common.security.plain.PlainLoginModule required username="kafka" password="password123";
+  consumers:
+    mmo-server:
+      bootstrap:
+        servers: 127.0.0.1:9093
+      session:
+        timeout:
+          ms: 30000
+      auto:
+        offset:
+          reset: earliest
 
 mongodb:
   #  Set username/password as env vars

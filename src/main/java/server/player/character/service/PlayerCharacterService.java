@@ -1,9 +1,11 @@
 package server.player.character.service;
 
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.motion.service.PlayerMotionService;
 import server.player.attributes.levels.service.PlayerLevelAttributeService;
@@ -38,6 +40,10 @@ public class PlayerCharacterService {
         List<Character> characterList = playerCharacterRepository.findByName(names);
 
         return new AccountCharactersResponse(characterList);
+    }
+
+    public Single<List<Character>> getCharactersByNames(Set<String> playerNames) {
+        return playerCharacterRepository.findByNames(playerNames);
     }
 
     public Character createCharacter(

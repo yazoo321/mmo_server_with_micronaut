@@ -18,14 +18,17 @@ public class Monster {
     @BsonCreator
     @JsonCreator
     public Monster(
+            @JsonProperty("mobId") @BsonProperty("mobId") String mobId,
             @JsonProperty("mobInstanceId") @BsonProperty("mobInstanceId") String mobInstanceId,
             @JsonProperty("motion") @BsonProperty("motion") Motion motion,
             @JsonProperty("updatedAt") @BsonProperty("updatedAt") Instant updatedAt) {
+        this.mobId = mobId;
         this.mobInstanceId = mobInstanceId;
         this.motion = motion;
         this.updatedAt = updatedAt;
     }
 
+    String mobId;
     String mobInstanceId;
     Motion motion;
     Instant updatedAt;

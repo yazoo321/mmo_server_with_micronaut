@@ -29,6 +29,8 @@ public class SocketProcessOutgoingService {
             handlePlayerMotionUpdate(socketMessage);
         }
 
+        if (updateType.equals(MessageType.CREATE_MOB.getType())) {}
+
         if (updateType.equals(MessageType.MOB_MOTION.getType())) {
             handleMobMotionUpdate(socketMessage);
         }
@@ -56,6 +58,10 @@ public class SocketProcessOutgoingService {
     // update motion for monster
     private void handleMobMotionUpdate(SocketMessage message) {
         updateProducer.sendMobMotionUpdate(message.getMonster());
+    }
+
+    private void handleCreateMob(SocketMessage message) {
+        updateProducer.sendCreateMob(message.getMonster());
     }
 
     // handle player combat action

@@ -36,6 +36,11 @@ public class MobInstanceService {
         // also need to create mob attributes
     }
 
+    public Single<InsertOneResult> createMob(Monster mob) {
+        mob.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
+        return mobRepository.insertMobInstance(mob);
+    }
+
     public Single<Monster> updateMobMotion(String mobInstanceId, Motion motion) {
         return mobRepository.updateMotionOnly(mobInstanceId, motion);
     }

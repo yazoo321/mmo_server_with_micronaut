@@ -39,7 +39,6 @@ import server.util.PlayerMotionUtil;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Property(name = "spec.name", value = "PlayerMotionSocketTest")
 public class MotionSocketV2Test {
 
     @Inject BeanContext beanContext;
@@ -83,7 +82,6 @@ public class MotionSocketV2Test {
         playerMotionUtil.deleteAllMobInstanceData();
     }
 
-    @Requires(property = "spec.name", value = "PlayerMotionSocketTest")
     @ClientWebSocket
     abstract static class TestWebSocketClient implements AutoCloseable {
 

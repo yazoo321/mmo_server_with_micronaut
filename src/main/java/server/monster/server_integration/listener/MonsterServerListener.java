@@ -2,32 +2,42 @@ package server.monster.server_integration.listener;
 
 import io.micronaut.configuration.kafka.annotation.*;
 import jakarta.inject.Inject;
-import server.monster.server_integration.model.MobUpdate;
-import server.monster.server_integration.service.MonsterDeathService;
+import lombok.extern.slf4j.Slf4j;
+import server.monster.server_integration.model.Monster;
+import server.monster.server_integration.producer.MonsterServerProducer;
+import server.monster.server_integration.service.MobInstanceService;
 
-@KafkaListener(groupId = "mmo-server", offsetReset = OffsetReset.EARLIEST)
+@Slf4j
+@KafkaListener(groupId = "mmo-server", offsetReset = OffsetReset.LATEST)
 public class MonsterServerListener {
 
-    @Inject MonsterDeathService monsterDeathService;
+    MonsterServerProducer monsterServerProducer;
 
-    @Topic("test")
-    public void receive(String data) {
-        System.out.println("got some data: " + data);
+    public MonsterServerListener(
+            @KafkaClient("mob-server-client") MonsterServerProducer monsterServerProducer) {
+        this.monsterServerProducer = monsterServerProducer;
     }
 
-    @Topic("mob-updates")
-    public void receive(MobUpdate mobUpdate) {
-        System.out.printf(
-                "Got a mob update, mob id: %s, mob instance id: %s, mote: %s, state: %s, target:"
-                        + " %s%n",
-                mobUpdate.getMobId(),
-                mobUpdate.getMobInstanceId(),
-                mobUpdate.getMotion(),
-                mobUpdate.getState(),
-                mobUpdate.getTarget());
+    @Inject MobInstanceService mobInstanceService;
 
-        if (mobUpdate.getState().equalsIgnoreCase("DEATH")) {
-            monsterDeathService.handleMonsterDeath(mobUpdate);
-        }
+    @Topic("create-mob")
+    public void receiveCreateMob(Monster monster) {
+        mobInstanceService
+                .createMob(monster)
+                .doOnError(error -> log.error("Error on creating mob, {}", error.getMessage()))
+                .subscribe();
+    }
+
+    @Topic("mob-motion-update")
+    public void receiveUpdateMob(Monster monster) {
+        mobInstanceService
+                .updateMobMotion(monster.getMobInstanceId(), monster.getMotion())
+                .doOnError(
+                        error ->
+                                log.error(
+                                        "Error processing mob motion update, {}",
+                                        error.getMessage()))
+                .subscribe();
+        monsterServerProducer.sendMobUpdateResult(monster);
     }
 }

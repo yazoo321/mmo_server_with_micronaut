@@ -13,6 +13,7 @@ import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
@@ -40,6 +41,12 @@ public class PlayerMotionRepository {
                             log.error("Player motion not found for {}", playerName);
                             throw new PlayerMotionException("Failed to find player motion");
                         });
+    }
+
+    public Single<List<PlayerMotion>> findPlayersMotion(Set<String> playerName) {
+        return Flowable.fromPublisher(
+                        playerMotionMongoCollection.find(eq("playerName", playerName)))
+                .toList();
     }
 
     public Single<PlayerMotion> insertPlayerMotion(PlayerMotion playerMotion) {

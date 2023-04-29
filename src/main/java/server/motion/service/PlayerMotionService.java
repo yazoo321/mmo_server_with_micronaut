@@ -1,14 +1,17 @@
 package server.motion.service;
 
+import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.PlayerMotionList;
+import server.motion.producer.PlayerMotionUpdateProducer;
 import server.motion.repository.PlayerMotionRepository;
 
 @Slf4j
@@ -16,6 +19,14 @@ import server.motion.repository.PlayerMotionRepository;
 public class PlayerMotionService {
 
     @Inject PlayerMotionRepository playerMotionRepository;
+
+    PlayerMotionUpdateProducer playerMotionUpdateProducer;
+
+    public PlayerMotionService(
+            @KafkaClient("player-motion-client")
+                    PlayerMotionUpdateProducer playerMotionUpdateProducer) {
+        this.playerMotionUpdateProducer = playerMotionUpdateProducer;
+    }
 
     private static int DEFAULT_DISTANCE_THRESHOLD = 1000;
 
@@ -90,5 +101,13 @@ public class PlayerMotionService {
 
     public Single<PlayerMotion> getPlayerMotion(String playerName) {
         return playerMotionRepository.findPlayerMotion(playerName);
+    }
+
+    public Single<List<PlayerMotion>> getPlayersMotion(Set<String> playerNames) {
+        return playerMotionRepository.findPlayersMotion(playerNames);
+    }
+
+    public void relayPlayerMotion(PlayerMotion playerMotion) {
+        playerMotionUpdateProducer.sendPlayerMotionResult(playerMotion);
     }
 }
