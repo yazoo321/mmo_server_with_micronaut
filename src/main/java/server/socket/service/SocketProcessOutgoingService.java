@@ -27,27 +27,19 @@ public class SocketProcessOutgoingService {
         // TODO: Make this more pretty
         if (updateType.equals(MessageType.PLAYER_MOTION.getType())) {
             handlePlayerMotionUpdate(socketMessage);
-        }
+        } else if (updateType.equals(MessageType.CREATE_MOB.getType())) {
 
-        if (updateType.equals(MessageType.CREATE_MOB.getType())) {}
-
-        if (updateType.equals(MessageType.MOB_MOTION.getType())) {
+        } else if (updateType.equals(MessageType.MOB_MOTION.getType())) {
             handleMobMotionUpdate(socketMessage);
-        }
-
-        if (updateType.equals(MessageType.PLAYER_COMBAT.getType())) {
+        } else if (updateType.equals(MessageType.PLAYER_COMBAT.getType())) {
             handlePlayerCombatAction(socketMessage);
-        }
-
-        if (updateType.equals(MessageType.MOB_COMBAT.getType())) {
+        } else if (updateType.equals(MessageType.MOB_COMBAT.getType())) {
             handleMobCombatAction(socketMessage);
-        }
-
-        if (updateType.equals(MessageType.INVENTORY_UPDATE.getType())) {
+        } else if (updateType.equals(MessageType.INVENTORY_UPDATE.getType())) {
             handleInventoryInteraction(socketMessage);
+        } else {
+            log.error("Did not recognise update type, {}", updateType);
         }
-
-        log.error("Did not recognise update type, {}", updateType);
     }
 
     // update motion for player

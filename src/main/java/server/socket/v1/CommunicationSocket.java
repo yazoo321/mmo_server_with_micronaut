@@ -20,22 +20,18 @@ public class CommunicationSocket {
     // Receive message, process and push to kafka
     // Kafka listener will receive response and will determine who to publish the updates to
 
-    @Inject
-    SocketProcessOutgoingService socketProcessService;
+    @Inject SocketProcessOutgoingService socketProcessService;
 
     ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
 
     @OnOpen
-    public void onOpen(
-            WebSocketSession session) {
+    public void onOpen(WebSocketSession session) {
         // TODO: get player/server name via headers
         socketSessions.add(session);
     }
 
     @OnMessage
-    public void onMessage(
-            SocketMessage message,
-            WebSocketSession session) {
+    public void onMessage(SocketMessage message, WebSocketSession session) {
         // TODO: get player/server name via injected headers
         updateSessionParams(session, message);
 
@@ -47,8 +43,10 @@ public class CommunicationSocket {
         String serverName = message.getServerName();
 
         // this is temporary, until we get this via open session.
-        String sessionPlayerName = (String) session.asMap().get(SessionParams.PLAYER_NAME.getType());
-        String sessionServerName = (String) session.asMap().get(SessionParams.SERVER_NAME.getType());
+        String sessionPlayerName =
+                (String) session.asMap().get(SessionParams.PLAYER_NAME.getType());
+        String sessionServerName =
+                (String) session.asMap().get(SessionParams.SERVER_NAME.getType());
 
         if (playerName != null && !playerName.equals(sessionPlayerName)) {
             session.put(SessionParams.PLAYER_NAME.getType(), playerName);
@@ -65,8 +63,7 @@ public class CommunicationSocket {
     }
 
     @OnClose
-    public void onClose(
-            WebSocketSession session) {
+    public void onClose(WebSocketSession session) {
         socketSessions.remove(session);
     }
 

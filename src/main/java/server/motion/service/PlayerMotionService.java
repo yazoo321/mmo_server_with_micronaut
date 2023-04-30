@@ -65,9 +65,8 @@ public class PlayerMotionService {
         return new PlayerMotion(playerName, motion, true, Instant.now());
     }
 
-    // used in v2
     public Single<PlayerMotion> updatePlayerMotion(PlayerMotion playerMotion) {
-        return playerMotionRepository.updatePlayerMotion(playerMotion);
+        return playerMotionRepository.updateMotion(playerMotion);
     }
 
     // used in v1

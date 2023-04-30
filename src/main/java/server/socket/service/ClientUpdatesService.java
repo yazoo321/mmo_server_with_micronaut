@@ -12,6 +12,7 @@ import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.SessionParams;
 import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
 
 @Slf4j
@@ -21,6 +22,8 @@ public class ClientUpdatesService {
     // broadcaster is a singleton, so should have the sessions available
     @Inject WebSocketBroadcaster broadcaster;
 
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
+
     public void sendMotionUpdatesToSubscribedClients(PlayerMotion playerMotion) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
@@ -29,8 +32,8 @@ public class ClientUpdatesService {
                         .build();
 
         broadcaster
-                .broadcastAsync(socketResponse, isValid(playerMotion.getPlayerName()))
-                .completeAsync(null);
+                .broadcast(socketResponse, isValid(playerMotion.getPlayerName()))
+                .subscribe(socketResponseSubscriber);
     }
 
     public void sendMotionUpdatesToSubscribedClients(Monster monster) {
@@ -41,8 +44,8 @@ public class ClientUpdatesService {
                         .build();
 
         broadcaster
-                .broadcastAsync(socketResponse, isValid(monster.getMobInstanceId()))
-                .completeAsync(null);
+                .broadcast(socketResponse, isValid(monster.getMobInstanceId()))
+                .subscribe(socketResponseSubscriber);
     }
 
     private Predicate<WebSocketSession> isValid(String playerOrMob) {

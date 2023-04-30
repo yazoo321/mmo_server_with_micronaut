@@ -4,14 +4,17 @@ import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +48,7 @@ public class PlayerMotionRepository {
 
     public Single<List<PlayerMotion>> findPlayersMotion(Set<String> playerName) {
         return Flowable.fromPublisher(
-                        playerMotionMongoCollection.find(eq("playerName", playerName)))
+                        playerMotionMongoCollection.find(in("playerName", playerName)))
                 .toList();
     }
 
@@ -54,12 +57,32 @@ public class PlayerMotionRepository {
                 .map(success -> playerMotion);
     }
 
+    public Single<PlayerMotion> setPlayerOnline(String playerName) {
+        return Single.fromPublisher(
+                playerMotionMongoCollection.findOneAndUpdate(
+                        eq("playerName"), set("isOnline", true)));
+    }
+
     public Single<PlayerMotion> updatePlayerMotion(PlayerMotion playerMotion) {
         // allows us to update player motion async, we can consider doing this less often if working
         // primarily from cache
+        playerMotion.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
         return Single.fromPublisher(
                 playerMotionMongoCollection.findOneAndReplace(
                         eq("playerName", playerMotion.getPlayerName()), playerMotion));
+    }
+
+    public Single<PlayerMotion> updateMotion(PlayerMotion playerMotion) {
+        return Single.fromPublisher(
+                        playerMotionMongoCollection.findOneAndUpdate(
+                                eq("playerName", playerMotion.getPlayerName()),
+                                Updates.combine(
+                                        Updates.set("motion", playerMotion.getMotion()),
+                                        Updates.set("isOnline", true),
+                                        Updates.set(
+                                                "updatedAt",
+                                                Instant.now().truncatedTo(ChronoUnit.MICROS)))))
+                .map(success -> playerMotion);
     }
 
     public void deletePlayerMotion(String playerName) {

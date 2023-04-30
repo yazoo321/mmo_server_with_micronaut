@@ -18,8 +18,8 @@ public class SocketResponse {
 
     String messageType;
 
-    Set<String> newPlayers; // players that will be synced soon
     Set<String> lostPlayers; // players that will no longer be synced (out of range, etc)
+    Set<String> lostMobs;
 
     Map<String, PlayerMotion> playerMotion;
     Map<String, Character> playerData;

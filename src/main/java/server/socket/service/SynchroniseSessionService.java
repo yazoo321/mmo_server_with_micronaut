@@ -21,6 +21,7 @@ import server.motion.service.PlayerMotionService;
 import server.player.character.dto.Character;
 import server.player.character.service.PlayerCharacterService;
 import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
 import server.socket.v1.CommunicationSocket;
 
@@ -40,6 +41,8 @@ public class SynchroniseSessionService {
 
     @Inject WebSocketBroadcaster broadcaster;
 
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
+
     private final int DISTANCE_THRESHOLD = 1000;
 
     private void evaluateNewPlayers(Set<String> playerNames, WebSocketSession session) {
@@ -50,12 +53,12 @@ public class SynchroniseSessionService {
 
         Set<String> newPlayers =
                 playerNames.stream()
-                        .filter(previouslyTracked::contains)
+                        .filter(i -> !previouslyTracked.contains(i))
                         .collect(Collectors.toSet());
 
         Set<String> lostPlayers =
                 previouslyTracked.stream()
-                        .filter(playerNames::contains)
+                        .filter(i -> !playerNames.contains(i))
                         .collect(Collectors.toSet());
 
         handleNewPlayers(session, newPlayers);
@@ -94,7 +97,7 @@ public class SynchroniseSessionService {
                                             .playerMotion(playerMotionMap)
                                             .build();
 
-                            session.send(response).subscribe(null);
+                            session.send(response).subscribe(socketResponseSubscriber);
                         })
                 .subscribe();
     }
@@ -123,7 +126,7 @@ public class SynchroniseSessionService {
                                             .playerData(characterMap)
                                             .build();
 
-                            session.send(response).subscribe(null);
+                            session.send(response).subscribe(socketResponseSubscriber);
                         })
                 .subscribe();
     }
@@ -139,7 +142,7 @@ public class SynchroniseSessionService {
                         .lostPlayers(lostPlayers)
                         .build();
 
-        session.send(socketResponse).subscribe(null);
+        session.send(socketResponse).subscribe(socketResponseSubscriber);
     }
 
     @Scheduled(fixedDelay = "1s")
@@ -166,6 +169,9 @@ public class SynchroniseSessionService {
                                     .getNearbyPlayersAsync(motion, playerName, DISTANCE_THRESHOLD)
                                     .doAfterSuccess(
                                             list -> {
+                                                if (list == null || list.isEmpty()) {
+                                                    return;
+                                                }
                                                 Set<String> playerNames =
                                                         list.stream()
                                                                 .map(PlayerMotion::getPlayerName)
@@ -189,6 +195,9 @@ public class SynchroniseSessionService {
                                     .getMobsNearby(new Location(motion))
                                     .doAfterSuccess(
                                             mobList -> {
+                                                if (mobList == null || mobList.isEmpty()) {
+                                                    return;
+                                                }
                                                 Set<String> mobInstanceIds =
                                                         mobList.stream()
                                                                 .map(Monster::getMobInstanceId)
