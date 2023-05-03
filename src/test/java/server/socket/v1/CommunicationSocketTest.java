@@ -71,7 +71,7 @@ public class CommunicationSocketTest {
 
     private final String MOB_SERVER_NAME = "UE_SERVER_MAP_1";
 
-    private final int TIMEOUT = 50;
+    private final int TIMEOUT = 10;
 
     @BeforeEach
     void setup() {
@@ -161,7 +161,7 @@ public class CommunicationSocketTest {
         playerClient3.send(char3OutOfRange);
 
         // let server sync up
-        // TODO: Make this parameterized through application-test.yml
+        // TODO: Make this parameterized
         Thread.sleep(1000);
 
         playerClient1.send(char1WithinRange);
@@ -347,7 +347,7 @@ public class CommunicationSocketTest {
         msg.setMobId(mobInstanceId);
         msg.setMobInstanceId(mobInstanceId);
         msg.setMonster(mob);
-        msg.setServerName("SERVER_1");
+        msg.setServerName(MOB_SERVER_NAME);
 
         return msg;
     }

@@ -160,7 +160,7 @@ public class MotionSocketV2Test {
         playerClient3.send(playerMotionOutOfRange);
 
         // let server sync up
-        // TODO: Make this parameterized through application-test.yml
+        // TODO: Make this parameterized
         Thread.sleep(1000);
 
         PlayerMotion expectedPlayerMotion = new PlayerMotion();
