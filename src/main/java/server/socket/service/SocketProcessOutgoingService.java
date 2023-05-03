@@ -28,7 +28,7 @@ public class SocketProcessOutgoingService {
         if (updateType.equals(MessageType.PLAYER_MOTION.getType())) {
             handlePlayerMotionUpdate(socketMessage);
         } else if (updateType.equals(MessageType.CREATE_MOB.getType())) {
-
+            handleCreateMob(socketMessage);
         } else if (updateType.equals(MessageType.MOB_MOTION.getType())) {
             handleMobMotionUpdate(socketMessage);
         } else if (updateType.equals(MessageType.PLAYER_COMBAT.getType())) {

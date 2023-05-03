@@ -6,6 +6,8 @@ import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -43,7 +45,9 @@ public class SynchroniseSessionService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-    private final int DISTANCE_THRESHOLD = 1000;
+    private final int DISTANCE_THRESHOLD_PLAYER = 1_000;
+    private final int DISTANCE_THRESHOLD_SERVER = 10_000;
+
 
     private void evaluateNewPlayers(Set<String> playerNames, WebSocketSession session) {
         Set<String> previouslyTracked =
@@ -63,6 +67,66 @@ public class SynchroniseSessionService {
 
         handleNewPlayers(session, newPlayers);
         handleLostPlayers(session, lostPlayers);
+    }
+
+    private Set<String> evaluateNewMobs(List<Monster> mobList, WebSocketSession session) {
+        Set<String> mobInstanceIds =
+                mobList.stream()
+                        .map(Monster::getMobInstanceId)
+                        .collect(Collectors.toSet());
+
+        Set<String> previouslyTracked =
+                (Set<String>)
+                        session.asMap()
+                                .getOrDefault(SessionParams.TRACKING_MOBS.getType(), Set.of());
+
+        Set<Monster> newMobs = mobList.stream().filter(i -> !previouslyTracked.contains(i.getMobInstanceId()))
+                .collect(Collectors.toSet());
+
+        handleNewMobs(session, newMobs);
+
+        Set<String> lostMobs =
+                previouslyTracked.stream()
+                        .filter(i -> !mobInstanceIds.contains(i))
+                        .collect(Collectors.toSet());
+
+
+        handleLostMobs(session, lostMobs);
+
+        return mobInstanceIds;
+    }
+
+    private void handleNewMobs(WebSocketSession session, Set<Monster> mobs) {
+        // later we may need additional calls to get attributes etc.
+        if (mobs == null || mobs.isEmpty()) {
+            return;
+        }
+
+        Map<String, Monster> mobMap = mobs.stream().collect(Collectors.toMap(Monster::getMobInstanceId,
+                Function.identity()));
+
+        SocketResponse response =
+                SocketResponse.builder()
+                        .messageType(
+                                SocketResponseType.MOB_MOTION_UPDATE.getType())
+                        .monsters(mobMap)
+                        .build();
+
+        session.send(response).subscribe(socketResponseSubscriber);
+    }
+
+    private void handleLostMobs(WebSocketSession session, Set<String> lostMobs) {
+        if (lostMobs == null || lostMobs.isEmpty()) {
+            return;
+        }
+
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.REMOVE_MOBS.getType())
+                        .lostMobs(lostMobs)
+                        .build();
+
+        session.send(socketResponse).subscribe(socketResponseSubscriber);
     }
 
     private void handleNewPlayers(WebSocketSession session, Set<String> newPlayers) {
@@ -165,8 +229,15 @@ public class SynchroniseSessionService {
                             }
                             // sync nearby players
                             // TODO: Make these calls via Kafka
+
+                            String serverName = (String) session.asMap().get(SessionParams.SERVER_NAME.getType());
+                            boolean isServer = serverName != null && !serverName.isBlank();
+
+                            int distanceThreshold = isServer ?
+                                    DISTANCE_THRESHOLD_SERVER : DISTANCE_THRESHOLD_PLAYER;
+
                             playerMotionService
-                                    .getNearbyPlayersAsync(motion, playerName, DISTANCE_THRESHOLD)
+                                    .getNearbyPlayersAsync(motion, playerName, distanceThreshold)
                                     .doAfterSuccess(
                                             list -> {
                                                 if (list == null || list.isEmpty()) {
@@ -190,7 +261,11 @@ public class SynchroniseSessionService {
                                                             error.getMessage()))
                                     .subscribe();
 
-                            // sync nearby mobs
+                            if (isServer) {
+                                return;
+                            }
+                            
+                            // sync nearby mobs, if this is a player only
                             mobInstanceService
                                     .getMobsNearby(new Location(motion))
                                     .doAfterSuccess(
@@ -198,10 +273,8 @@ public class SynchroniseSessionService {
                                                 if (mobList == null || mobList.isEmpty()) {
                                                     return;
                                                 }
-                                                Set<String> mobInstanceIds =
-                                                        mobList.stream()
-                                                                .map(Monster::getMobInstanceId)
-                                                                .collect(Collectors.toSet());
+                                                Set<String> mobInstanceIds =  evaluateNewMobs(mobList, session);
+
                                                 session.put(
                                                         SessionParams.TRACKING_MOBS.getType(),
                                                         mobInstanceIds);

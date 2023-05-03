@@ -1,17 +1,21 @@
 package server.monster.server_integration.repository;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
+import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import server.common.dto.Location;
@@ -68,6 +72,12 @@ public class MobRepository {
     public Single<DeleteResult> deleteMobInstance(String mobInstanceId) {
         return Single.fromPublisher(
                 mobMotionMongoCollection.deleteOne(eq("mobInstanceId", mobInstanceId)));
+    }
+
+    public Single<List<Monster>> getMobsByInstanceIds(Set<String> mobInstanceIds) {
+        return Flowable.fromPublisher(
+                mobMotionMongoCollection.find(in("mobInstanceId", mobInstanceIds))
+        ).toList();
     }
 
     public Single<List<Monster>> getMobsNearby(Location location) {

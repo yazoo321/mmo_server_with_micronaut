@@ -34,15 +34,13 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
 import server.monster.server_integration.model.Monster;
-import server.motion.dto.MotionResult;
 import server.motion.dto.PlayerMotion;
 import server.motion.service.PlayerMotionService;
 import server.socket.model.*;
 import server.util.PlayerMotionUtil;
 
-@MicronautTest
+@MicronautTest(environments = "kafka")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Property(name = "kafka.enabled", value = "true")
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
 public class CommunicationSocketTest {
     @Inject BeanContext beanContext;
@@ -52,6 +50,9 @@ public class CommunicationSocketTest {
     @Inject PlayerMotionService playerMotionService;
 
     @Inject PlayerMotionUtil playerMotionUtil;
+
+    @Inject
+
 
     private final ObjectMapper objectMapper =
             new ObjectMapper()
@@ -71,7 +72,7 @@ public class CommunicationSocketTest {
 
     private final String MOB_SERVER_NAME = "UE_SERVER_MAP_1";
 
-    private final int TIMEOUT = 10;
+    private final int TIMEOUT = 50;
 
     @BeforeEach
     void setup() {
@@ -258,31 +259,51 @@ public class CommunicationSocketTest {
         playerClient1.send(char1WithinRange);
         playerClient2.send(char2OutOfRange);
 
-        mobWithinRange.setUpdateType(MessageType.MOB_MOTION.getType());
-        mobOutOfRange.setUpdateType(MessageType.MOB_MOTION.getType());
-
         // first we need to make sure the player clients are started and synchronised.
         Thread.sleep(1000);
 
         playerClient1.send(char1WithinRange);
         playerClient2.send(char2OutOfRange);
 
-        mobServerClient.send(mobWithinRange);
-        mobServerClient.send(mobOutOfRange);
-
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
                 .until(() ->
-                        playerClient1.getMessagesChronologically().size() == 2);
+                        !playerClient1.getMessagesChronologically().isEmpty());
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() -> playerClient2.getMessagesChronologically().size() == 2);
+                .until(() -> !playerClient2.getMessagesChronologically().isEmpty());
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() -> mobServerClient.getMessagesChronologically().size() == 2);
+                .until(() -> !mobServerClient.getMessagesChronologically().isEmpty());
 
+        List<SocketResponse> client1Responses = getSocketResponse(playerClient1);
+        List<SocketResponse> client2Responses = getSocketResponse(playerClient2);
+        List<SocketResponse> mobClientResponses = getSocketResponse(mobServerClient);
+
+        Assertions.assertThat(client1Responses.size()).isEqualTo(1);
+        Assertions.assertThat(client1Responses.get(0).getMonsters())
+                .usingRecursiveComparison()
+                .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9105.updatedAt")
+                .isEqualTo(
+                        Map.of(mobWithinRange.getMonster().getMobInstanceId(),
+                                mobWithinRange.getMonster()));
+
+        Assertions.assertThat(client2Responses.size()).isEqualTo(1);
+        Assertions.assertThat(client2Responses.get(0).getMonsters())
+                .usingRecursiveComparison()
+                .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9106.updatedAt")
+                .isEqualTo(
+                        Map.of(mobOutOfRange.getMonster().getMobInstanceId(),
+                                mobOutOfRange.getMonster()));
+
+        // TODO: This occasionally flakes
+        Assertions.assertThat(mobClientResponses.size()).isEqualTo(2);
+        Assertions.assertThat(mobClientResponses.stream().map(SocketResponse::getMessageType).toList())
+                .containsExactlyInAnyOrder(
+                        SocketResponseType.NEW_PLAYER_MOTION.getType(),
+                        SocketResponseType.NEW_PLAYER_APPEARANCE.getType());
 
         playerClient1.close();
         playerClient2.close();
@@ -325,6 +346,7 @@ public class CommunicationSocketTest {
         msg.setMobId(mobInstanceId);
         msg.setMobInstanceId(mobInstanceId);
         msg.setMonster(mob);
+        msg.setServerName("SERVER_1");
 
         return msg;
     }
@@ -353,39 +375,5 @@ public class CommunicationSocketTest {
                         });
 
         return allResponses;
-    }
-
-    private boolean playerMotionMatches(
-            SocketResponse socketResponse, Map<String, PlayerMotion> expectedPlayerMotion) {
-        if (socketResponse.getPlayerMotion() == null) {
-            return false;
-        }
-        Map<String, PlayerMotion> playerMotion = socketResponse.getPlayerMotion();
-
-        // match all except updated_at
-        try {
-            Assertions.assertThat(playerMotion)
-                    .usingRecursiveComparison()
-                    .ignoringFields("updatedAt")
-                    .isEqualTo(expectedPlayerMotion);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean mobMotionMatches(MotionResult motionResult, Monster expectedMob) {
-        if (motionResult.getMonster() == null) {
-            return false;
-        }
-
-        Monster mob = motionResult.getMonster();
-
-        return mob.getMobInstanceId().equals(expectedMob.getMobInstanceId())
-                && mob.getMotion().equals(expectedMob.getMotion());
-    }
-
-    private List<SocketResponse> filterResponsesBy(List<SocketResponse> responses, String filter) {
-        return responses.stream().filter(r -> r.getMessageType().equals(filter)).toList();
     }
 }

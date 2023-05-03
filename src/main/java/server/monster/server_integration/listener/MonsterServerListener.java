@@ -8,7 +8,12 @@ import server.monster.server_integration.producer.MonsterServerProducer;
 import server.monster.server_integration.service.MobInstanceService;
 
 @Slf4j
-@KafkaListener(groupId = "mmo-server", offsetReset = OffsetReset.LATEST)
+@KafkaListener(
+        groupId = "mmo-server",
+        offsetReset = OffsetReset.EARLIEST,
+        offsetStrategy = OffsetStrategy.SYNC,
+        clientId = "mob_repo_client"
+)
 public class MonsterServerListener {
 
     MonsterServerProducer monsterServerProducer;

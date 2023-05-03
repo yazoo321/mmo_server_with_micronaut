@@ -27,6 +27,30 @@ jpa:
       packages:
         - 'com.org.mmo_server.repository.model'
 
+kafka:
+  streams:
+    default:
+      processing.guarantee: "exactly_once"
+      auto.offset.reset: "earliest"
+  bootstrap:
+    servers: 127.0.0.1:9093
+  security:
+    protocol: SASL_PLAINTEXT
+  sasl:
+    mechanism: PLAIN
+    jaas:
+      config: org.apache.kafka.common.security.plain.PlainLoginModule required username="kafka" password="password123";
+  consumers:
+    mmo-server:
+      bootstrap:
+        servers: 127.0.0.1:9093
+      session:
+        timeout:
+          ms: 30000
+      auto:
+        offset:
+          reset: earliest
+
 datasources:
   default:
     url: jdbc:postgresql://127.0.0.1/mmo_server
@@ -52,31 +76,11 @@ datasources:
       connection-test-query: "SELECT 1"
       validation-timeout: 50000
 
-kafka:
-  bootstrap:
-    servers: 127.0.0.1:9093
-  security:
-    protocol: SASL_PLAINTEXT
-  sasl:
-    mechanism: PLAIN
-    jaas:
-      config: org.apache.kafka.common.security.plain.PlainLoginModule required username="kafka" password="password123";
-  consumers:
-    mmo-server:
-      bootstrap:
-        servers: 127.0.0.1:9093
-      session:
-        timeout:
-          ms: 30000
-      auto:
-        offset:
-          reset: earliest
-
 mongodb:
 #  Set username/password as env vars
   uri: mongodb://mongo_mmo_server:mongo_password@localhost:27017/mmo_server?authSource=admin
   options:
-    maxConnectionIdleTime: 10000
+    maxConnectionIdleTime: 15000
     readConcern: majority
 #  For reactive MongoDB driver:
   cluster:

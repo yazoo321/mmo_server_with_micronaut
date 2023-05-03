@@ -39,7 +39,7 @@ public class ClientUpdatesService {
     public void sendMotionUpdatesToSubscribedClients(Monster monster) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
-                        .messageType(SocketResponseType.PLAYER_MOTION_UPDATE.getType())
+                        .messageType(SocketResponseType.MOB_MOTION_UPDATE.getType())
                         .monsters(Map.of(monster.getMobInstanceId(), monster))
                         .build();
 
@@ -51,7 +51,10 @@ public class ClientUpdatesService {
     private Predicate<WebSocketSession> isValid(String playerOrMob) {
         // we will report to player every time they call update about other players nearby
         return s -> {
-            Set<String> mobs =
+            String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
+            boolean isServer = serverName != null && !serverName.isBlank();
+            // server does not track mobs
+            Set<String> mobs = isServer ? Set.of() :
                     (Set<String>)
                             s.asMap().getOrDefault(SessionParams.TRACKING_MOBS.getType(), Set.of());
             Set<String> players =

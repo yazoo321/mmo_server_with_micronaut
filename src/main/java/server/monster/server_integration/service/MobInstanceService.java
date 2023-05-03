@@ -6,6 +6,8 @@ import jakarta.inject.Inject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.common.dto.Location;
@@ -22,6 +24,10 @@ public class MobInstanceService {
 
     public Single<List<Monster>> getMobsNearby(Location location) {
         return mobRepository.getMobsNearby(location);
+    }
+
+    public Single<List<Monster>> getMobsByIds(Set<String> mobInstanceIds) {
+        return mobRepository.getMobsByInstanceIds(mobInstanceIds);
     }
 
     public Single<InsertOneResult> createMob(String mobId, Motion motion) {
