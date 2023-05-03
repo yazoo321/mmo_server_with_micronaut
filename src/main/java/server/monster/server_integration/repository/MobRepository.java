@@ -15,7 +15,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import server.common.dto.Location;
@@ -76,8 +75,8 @@ public class MobRepository {
 
     public Single<List<Monster>> getMobsByInstanceIds(Set<String> mobInstanceIds) {
         return Flowable.fromPublisher(
-                mobMotionMongoCollection.find(in("mobInstanceId", mobInstanceIds))
-        ).toList();
+                        mobMotionMongoCollection.find(in("mobInstanceId", mobInstanceIds)))
+                .toList();
     }
 
     public Single<List<Monster>> getMobsNearby(Location location) {

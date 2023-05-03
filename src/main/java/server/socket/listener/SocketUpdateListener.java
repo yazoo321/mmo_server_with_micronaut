@@ -15,8 +15,7 @@ import server.socket.service.ClientUpdatesService;
         groupId = "mmo-server",
         offsetReset = OffsetReset.EARLIEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "socket_listener"
-)
+        clientId = "socket_listener")
 public class SocketUpdateListener {
 
     @Inject ClientUpdatesService clientUpdatesService;

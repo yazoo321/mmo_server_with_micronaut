@@ -206,6 +206,4 @@ dockerCompose {
 	stopContainers = false
 	// do not wait for debug port
 	tcpPortsToIgnoreWhenWaiting = [5005]
-	// Mac M1 fix:
-	executable = '/usr/local/bin/docker-compose-v1'
 }

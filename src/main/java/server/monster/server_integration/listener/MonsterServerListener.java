@@ -12,8 +12,7 @@ import server.monster.server_integration.service.MobInstanceService;
         groupId = "mmo-server",
         offsetReset = OffsetReset.EARLIEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "mob_repo_client"
-)
+        clientId = "mob_repo_client")
 public class MonsterServerListener {
 
     MonsterServerProducer monsterServerProducer;

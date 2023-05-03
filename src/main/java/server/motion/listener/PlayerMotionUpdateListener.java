@@ -14,8 +14,7 @@ import server.motion.service.PlayerMotionService;
         groupId = "mmo-server",
         offsetReset = OffsetReset.EARLIEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "player_motion_client"
-)
+        clientId = "player_motion_client")
 public class PlayerMotionUpdateListener {
 
     @Inject PlayerMotionService playerMotionService;

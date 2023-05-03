@@ -54,9 +54,14 @@ public class ClientUpdatesService {
             String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
             boolean isServer = serverName != null && !serverName.isBlank();
             // server does not track mobs
-            Set<String> mobs = isServer ? Set.of() :
-                    (Set<String>)
-                            s.asMap().getOrDefault(SessionParams.TRACKING_MOBS.getType(), Set.of());
+            Set<String> mobs =
+                    isServer
+                            ? Set.of()
+                            : (Set<String>)
+                                    s.asMap()
+                                            .getOrDefault(
+                                                    SessionParams.TRACKING_MOBS.getType(),
+                                                    Set.of());
             Set<String> players =
                     (Set<String>)
                             s.asMap()

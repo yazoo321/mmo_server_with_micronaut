@@ -52,12 +52,11 @@ public class CommunicationSocketTest {
     @Inject PlayerMotionUtil playerMotionUtil;
 
     @Inject
-
-
     private final ObjectMapper objectMapper =
             new ObjectMapper()
                     .registerModule(new JavaTimeModule())
                     .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
     private final ObjectReader objectReader = objectMapper.reader();
 
     private static final String MAP_1 = "map1";
@@ -267,8 +266,7 @@ public class CommunicationSocketTest {
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() ->
-                        !playerClient1.getMessagesChronologically().isEmpty());
+                .until(() -> !playerClient1.getMessagesChronologically().isEmpty());
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
@@ -287,7 +285,8 @@ public class CommunicationSocketTest {
                 .usingRecursiveComparison()
                 .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9105.updatedAt")
                 .isEqualTo(
-                        Map.of(mobWithinRange.getMonster().getMobInstanceId(),
+                        Map.of(
+                                mobWithinRange.getMonster().getMobInstanceId(),
                                 mobWithinRange.getMonster()));
 
         Assertions.assertThat(client2Responses.size()).isEqualTo(1);
@@ -295,12 +294,14 @@ public class CommunicationSocketTest {
                 .usingRecursiveComparison()
                 .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9106.updatedAt")
                 .isEqualTo(
-                        Map.of(mobOutOfRange.getMonster().getMobInstanceId(),
+                        Map.of(
+                                mobOutOfRange.getMonster().getMobInstanceId(),
                                 mobOutOfRange.getMonster()));
 
         // TODO: This occasionally flakes
         Assertions.assertThat(mobClientResponses.size()).isEqualTo(2);
-        Assertions.assertThat(mobClientResponses.stream().map(SocketResponse::getMessageType).toList())
+        Assertions.assertThat(
+                        mobClientResponses.stream().map(SocketResponse::getMessageType).toList())
                 .containsExactlyInAnyOrder(
                         SocketResponseType.NEW_PLAYER_MOTION.getType(),
                         SocketResponseType.NEW_PLAYER_APPEARANCE.getType());
