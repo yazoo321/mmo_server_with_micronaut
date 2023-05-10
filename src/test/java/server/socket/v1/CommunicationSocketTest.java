@@ -177,13 +177,13 @@ public class CommunicationSocketTest {
 
         SocketResponse expectedMotionResponseForClient1 =
                 SocketResponse.builder()
-                        .messageType(SocketResponseType.NEW_PLAYER_MOTION.getType())
+                        .messageType(SocketResponseType.PLAYER_MOTION_UPDATE.getType())
                         .playerMotion(Map.of(CHARACTER_2, char2WithinRange.getPlayerMotion()))
                         .build();
 
         SocketResponse expectedMotionResponseForClient2 =
                 SocketResponse.builder()
-                        .messageType(SocketResponseType.NEW_PLAYER_MOTION.getType())
+                        .messageType(SocketResponseType.PLAYER_MOTION_UPDATE.getType())
                         .playerMotion(Map.of(CHARACTER_1, char1WithinRange.getPlayerMotion()))
                         .build();
 
@@ -197,7 +197,7 @@ public class CommunicationSocketTest {
                                 r ->
                                         r.getMessageType()
                                                 .equals(
-                                                        SocketResponseType.NEW_PLAYER_MOTION
+                                                        SocketResponseType.PLAYER_MOTION_UPDATE
                                                                 .getType()))
                         .toList();
 
@@ -213,7 +213,7 @@ public class CommunicationSocketTest {
                                 r ->
                                         r.getMessageType()
                                                 .equals(
-                                                        SocketResponseType.NEW_PLAYER_MOTION
+                                                        SocketResponseType.PLAYER_MOTION_UPDATE
                                                                 .getType()))
                         .toList();
 
@@ -303,8 +303,8 @@ public class CommunicationSocketTest {
         Assertions.assertThat(
                         mobClientResponses.stream().map(SocketResponse::getMessageType).toList())
                 .containsExactlyInAnyOrder(
-                        SocketResponseType.NEW_PLAYER_MOTION.getType(),
-                        SocketResponseType.NEW_PLAYER_APPEARANCE.getType());
+                        SocketResponseType.PLAYER_MOTION_UPDATE.getType(),
+                        SocketResponseType.PLAYER_APPEARANCE.getType());
 
         playerClient1.close();
         playerClient2.close();

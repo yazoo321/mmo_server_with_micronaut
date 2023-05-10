@@ -63,14 +63,14 @@ public class PlayerMotionRepository {
                         eq("playerName"), set("isOnline", true)));
     }
 
-    public Single<PlayerMotion> updatePlayerMotion(PlayerMotion playerMotion) {
-        // allows us to update player motion async, we can consider doing this less often if working
-        // primarily from cache
-        playerMotion.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
-        return Single.fromPublisher(
-                playerMotionMongoCollection.findOneAndReplace(
-                        eq("playerName", playerMotion.getPlayerName()), playerMotion));
-    }
+//    public Single<PlayerMotion> updatePlayerMotion(PlayerMotion playerMotion) {
+//        // allows us to update player motion async, we can consider doing this less often if working
+//        // primarily from cache
+//        playerMotion.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
+//        return Single.fromPublisher(
+//                playerMotionMongoCollection.findOneAndReplace(
+//                        eq("playerName", playerMotion.getPlayerName()), playerMotion));
+//    }
 
     public Single<PlayerMotion> updateMotion(PlayerMotion playerMotion) {
         return Single.fromPublisher(
@@ -101,17 +101,15 @@ public class PlayerMotionRepository {
                 playerMotionMongoCollection, playerMotion, threshold);
     }
 
-    public UpdateResult checkAndUpdateUserOnline() {
+    public Flowable<UpdateResult> checkAndUpdateUserOnline() {
         // Duplicate functionality of Character service
-        LocalDateTime logoutTime = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(10);
+        Instant logoutTime = Instant.now().minusSeconds(300);
 
         // if is online and not updated in the last 20 seconds, set to logged out.
         return Flowable.fromPublisher(
                         playerMotionMongoCollection.updateMany(
                                 combine(eq("isOnline", true), lt("updatedAt", logoutTime)),
-                                set("isOnline", false)))
-                .firstElement()
-                .blockingGet();
+                                set("isOnline", false)));
     }
 
     private void prepareCollections() {

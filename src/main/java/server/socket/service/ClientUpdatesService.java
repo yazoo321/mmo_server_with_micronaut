@@ -29,6 +29,7 @@ public class ClientUpdatesService {
                 SocketResponse.builder()
                         .messageType(SocketResponseType.PLAYER_MOTION_UPDATE.getType())
                         .playerMotion(Map.of(playerMotion.getPlayerName(), playerMotion))
+                        .playerKeys(Set.of(playerMotion.getPlayerName()))
                         .build();
 
         broadcaster
@@ -41,6 +42,7 @@ public class ClientUpdatesService {
                 SocketResponse.builder()
                         .messageType(SocketResponseType.MOB_MOTION_UPDATE.getType())
                         .monsters(Map.of(monster.getMobInstanceId(), monster))
+                        .mobKeys(Set.of(monster.getMobInstanceId()))
                         .build();
 
         broadcaster

@@ -106,6 +106,7 @@ public class SynchroniseSessionService {
         SocketResponse response =
                 SocketResponse.builder()
                         .messageType(SocketResponseType.MOB_MOTION_UPDATE.getType())
+                        .mobKeys(mobMap.keySet())
                         .monsters(mobMap)
                         .build();
 
@@ -154,8 +155,10 @@ public class SynchroniseSessionService {
                             SocketResponse response =
                                     SocketResponse.builder()
                                             .messageType(
-                                                    SocketResponseType.NEW_PLAYER_MOTION.getType())
+                                                    SocketResponseType.PLAYER_MOTION_UPDATE
+                                                            .getType())
                                             .playerMotion(playerMotionMap)
+                                            .playerKeys(playerMotionMap.keySet())
                                             .build();
 
                             session.send(response).subscribe(socketResponseSubscriber);
@@ -182,11 +185,10 @@ public class SynchroniseSessionService {
                             SocketResponse response =
                                     SocketResponse.builder()
                                             .messageType(
-                                                    SocketResponseType.NEW_PLAYER_APPEARANCE
-                                                            .getType())
+                                                    SocketResponseType.PLAYER_APPEARANCE.getType())
                                             .playerData(characterMap)
+                                            .playerKeys(characterMap.keySet())
                                             .build();
-
                             session.send(response).subscribe(socketResponseSubscriber);
                         })
                 .subscribe();

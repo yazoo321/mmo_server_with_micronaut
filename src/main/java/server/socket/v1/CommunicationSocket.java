@@ -38,6 +38,11 @@ public class CommunicationSocket {
         socketProcessService.processMessage(message);
     }
 
+    @OnClose
+    public void onClose(WebSocketSession session) {
+        socketSessions.remove(session);
+    }
+
     private void updateSessionParams(WebSocketSession session, SocketMessage message) {
         String playerName = message.getPlayerName();
         String serverName = message.getServerName();
@@ -62,10 +67,6 @@ public class CommunicationSocket {
         }
     }
 
-    @OnClose
-    public void onClose(WebSocketSession session) {
-        socketSessions.remove(session);
-    }
 
     public ConcurrentSet<WebSocketSession> getLiveSessions() {
         return socketSessions;

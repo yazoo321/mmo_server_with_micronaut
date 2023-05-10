@@ -21,6 +21,9 @@ public class SocketResponse {
     Set<String> lostPlayers; // players that will no longer be synced (out of range, etc)
     Set<String> lostMobs;
 
+    Set<String> playerKeys;
+    Set<String> mobKeys;
+
     Map<String, PlayerMotion> playerMotion;
     Map<String, Character> playerData;
     Map<String, Monster> monsters;

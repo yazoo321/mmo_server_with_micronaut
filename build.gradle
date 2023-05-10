@@ -154,7 +154,10 @@ dependencies {
 	implementation("io.swagger.core.v3:swagger-annotations")
 
 	// Flowable
-	implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
+	implementation("io.micronaut.rxjava3:micronaut-rxjava3:2.4.1")
+	implementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client:2.4.1")
+
+//	implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
 
 	// Lombok:
 	compileOnly 'org.projectlombok:lombok:1.18.26'

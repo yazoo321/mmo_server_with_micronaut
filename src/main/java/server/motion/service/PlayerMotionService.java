@@ -72,7 +72,7 @@ public class PlayerMotionService {
     // used in v1
     public Single<PlayerMotion> updatePlayerMotion(String playerName, Motion motion) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
-        return playerMotionRepository.updatePlayerMotion(playerMotion);
+        return playerMotionRepository.updateMotion(playerMotion);
     }
 
     public void disconnectPlayer(String playerName) {
@@ -80,7 +80,7 @@ public class PlayerMotionService {
 
         motion.setIsOnline(false);
 
-        playerMotionRepository.updatePlayerMotion(motion);
+        playerMotionRepository.updateMotion(motion);
     }
 
     public PlayerMotionList getPlayersNearMe(Motion motion, String playerName) {

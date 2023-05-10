@@ -3,9 +3,11 @@ package server.monster.server_integration.repository;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
+import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
@@ -51,11 +53,11 @@ public class MobRepository {
         return Single.fromPublisher(mobMotionMongoCollection.insertOne(mobInstance));
     }
 
-    public Single<Monster> updateMobMotion(Monster mobMotion) {
-        return Single.fromPublisher(
-                mobMotionMongoCollection.findOneAndReplace(
-                        eq("mobInstanceId", mobMotion.getMobInstanceId()), mobMotion));
-    }
+//    public Single<Monster> updateMobMotion(Monster mobMotion) {
+//        return Single.fromPublisher(
+//                mobMotionMongoCollection.findOneAndReplace(
+//                        eq("mobInstanceId", mobMotion.getMobInstanceId()), mobMotion));
+//    }
 
     public Single<Monster> updateMotionOnly(String mobInstanceId, Motion motion) {
         return Single.fromPublisher(
@@ -81,6 +83,14 @@ public class MobRepository {
 
     public Single<List<Monster>> getMobsNearby(Location location) {
         return MongoDbQueryHelper.nearbyMobMotionFinder(mobMotionMongoCollection, location, 1000);
+    }
+
+    public Single<DeleteResult> deleteMobsNotUpdatedWithin(Instant time) {
+        return Single.fromPublisher(
+                mobMotionMongoCollection.deleteMany(
+                        Filters.lt("updatedAt", time)
+                )
+        );
     }
 
     private void prepareCollections() {

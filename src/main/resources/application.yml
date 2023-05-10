@@ -13,6 +13,9 @@ micronaut:
     consumer:
       type: fixed
       nThreads: 15
+    io:
+      type: fixed
+      nThreads: 75
 jackson:
   serialization:
     writeDatesAsTimestamps: false

@@ -58,23 +58,23 @@ public class MobRepositoryTest {
         assertThat(result.blockingGet()).usingRecursiveComparison().isEqualTo(mobMotion);
     }
 
-    @Test
-    void testUpdateMobMotion() {
-        // Create a MobMotion object and insert it into the repository
-        Monster mobMotion = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
-        mobRepository.insertMobInstance(mobMotion).blockingGet();
-
-        // Update the motion of the MobMotion object
-        mobMotion.getMotion().setX(42);
-        mobMotion.getMotion().setY(84);
-        mobRepository.updateMobMotion(mobMotion).blockingGet();
-
-        // Retrieve the updated MobMotion by its instance ID
-        Monster result = mobRepository.findMobInstance(mobMotion.getMobInstanceId()).blockingGet();
-
-        // Verify that the retrieved MobMotion matches the updated one
-        assertThat(result).usingRecursiveComparison().isEqualTo(mobMotion);
-    }
+//    @Test
+//    void testUpdateMobMotion() {
+//        // Create a MobMotion object and insert it into the repository
+//        Monster mobMotion = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
+//        mobRepository.insertMobInstance(mobMotion).blockingGet();
+//
+//        // Update the motion of the MobMotion object
+//        mobMotion.getMotion().setX(42);
+//        mobMotion.getMotion().setY(84);
+//        mobRepository.updateMobMotion(mobMotion).blockingGet();
+//
+//        // Retrieve the updated MobMotion by its instance ID
+//        Monster result = mobRepository.findMobInstance(mobMotion.getMobInstanceId()).blockingGet();
+//
+//        // Verify that the retrieved MobMotion matches the updated one
+//        assertThat(result).usingRecursiveComparison().isEqualTo(mobMotion);
+//    }
 
     @Test
     void testUpdateMotionOnly() {
