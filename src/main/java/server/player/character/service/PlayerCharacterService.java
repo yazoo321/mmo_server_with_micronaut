@@ -1,9 +1,13 @@
 package server.player.character.service;
 
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
+import server.motion.service.PlayerMotionService;
 import server.player.attributes.levels.service.PlayerLevelAttributeService;
 import server.player.attributes.service.PlayerAttributeService;
 import server.player.character.dto.AccountCharactersResponse;
@@ -11,8 +15,8 @@ import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.inventory.service.InventoryService;
 import server.player.character.repository.PlayerCharacterRepository;
-import server.player.motion.socket.v1.service.PlayerMotionService;
 
+@Slf4j
 @Singleton
 public class PlayerCharacterService {
 
@@ -38,8 +42,13 @@ public class PlayerCharacterService {
         return new AccountCharactersResponse(characterList);
     }
 
+    public Single<List<Character>> getCharactersByNames(Set<String> playerNames) {
+        return playerCharacterRepository.findByNames(playerNames);
+    }
+
     public Character createCharacter(
             CreateCharacterRequest createCharacterRequest, String username) {
+        log.info("Creating character: {}", createCharacterRequest.getName());
         createCharacterRequest.setClassName(createCharacterRequest.getClassName().toLowerCase());
 
         Character newCharacter = new Character();
@@ -58,8 +67,10 @@ public class PlayerCharacterService {
             attributeService.createBaseAttributes(newCharacter.getName());
             levelAttributeService.initializeCharacterClass(
                     newCharacter.getName(), createCharacterRequest.getClassName());
-            playerMotionService.initializePlayerMotion(newCharacter.getName());
+            // blocking call to ensure we do our rollback if anything happens.
+            playerMotionService.initializePlayerMotion(newCharacter.getName()).blockingGet();
         } catch (Exception e) {
+            log.warn("Create character failed, rolling back changes");
             // we need to rollback the changes
             rollbackChanges(newCharacter.getName());
 

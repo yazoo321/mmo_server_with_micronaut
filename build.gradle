@@ -3,7 +3,7 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 buildscript {
 	ext {
 		FLWAY_VERSION = "9.8.1"
-		JOOQ_VERSION = "8.1"
+		JOOQ_VERSION = "7.1.1"
 	}
 	configurations['classpath'].resolutionStrategy.eachDependency {
 		if (requested.group == 'org.jooq') {
@@ -147,28 +147,35 @@ dependencies {
 	implementation("io.micronaut:micronaut-runtime")
 	implementation("io.micronaut:micronaut-validation")
 	runtimeOnly("ch.qos.logback:logback-classic")
-	annotationProcessor('io.micronaut.data:micronaut-data-processor:3.9.3')
+	annotationProcessor('io.micronaut.data:micronaut-data-processor:3.9.6')
+
+	// swagger
+	annotationProcessor("io.micronaut.openapi:micronaut-openapi:4.8.7")
+	implementation("io.swagger.core.v3:swagger-annotations")
 
 	// Flowable
-	implementation "io.reactivex.rxjava3:rxjava:3.1.5"
+	implementation("io.micronaut.rxjava3:micronaut-rxjava3:2.4.1")
+	implementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client:2.4.1")
+
+//	implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
 
 	// Lombok:
-	compileOnly 'org.projectlombok:lombok:1.18.24'
-	annotationProcessor 'org.projectlombok:lombok:1.18.24'
+	compileOnly 'org.projectlombok:lombok:1.18.26'
+	annotationProcessor 'org.projectlombok:lombok:1.18.26'
 
 	// Micronaut inject
-	annotationProcessor(platform('io.micronaut:micronaut-bom:3.8.0'))
+	annotationProcessor(platform('io.micronaut:micronaut-bom:3.8.7'))
 	annotationProcessor("io.micronaut:micronaut-inject-java")
 	implementation(platform('io.micronaut:micronaut-bom:3.7.4'))
 	implementation("io.micronaut:micronaut-inject")
 
 	// database configs
 	implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-	jooqGenerator 'org.postgresql:postgresql:42.5.1'
-	implementation 'org.postgresql:postgresql:42.5.1'
+	jooqGenerator 'org.postgresql:postgresql:42.5.4'
+	implementation 'org.postgresql:postgresql:42.5.4'
 
 	// transactional annotation
-	implementation("io.micronaut.spring:micronaut-spring:4.4.0")
+	implementation('io.micronaut.spring:micronaut-spring:4.5.1')
 
 	// MongoDB
 	implementation "io.micronaut.mongodb:micronaut-mongo-reactive:4.6.0"
@@ -177,14 +184,14 @@ dependencies {
 	implementation("io.micronaut.kafka:micronaut-kafka")
 
 	// Serializer
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
 
 	// test
-	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.1'
-	testImplementation 'org.assertj:assertj-core:3.23.1'
+	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.2'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
 	testImplementation "io.micronaut.test:micronaut-test-junit5"
-	testImplementation 'org.mockito:mockito-core:4.11.0'
-	testImplementation 'io.projectreactor:reactor-core:3.5.1'
+	testImplementation 'org.mockito:mockito-core:5.2.0'
+	testImplementation 'io.projectreactor:reactor-core:3.5.4'
 	testImplementation 'org.awaitility:awaitility:4.2.0'
 }
 
@@ -202,6 +209,4 @@ dockerCompose {
 	stopContainers = false
 	// do not wait for debug port
 	tcpPortsToIgnoreWhenWaiting = [5005]
-	// Mac M1 fix:
-//    executable = '/usr/local/bin/docker-compose-v1'
 }

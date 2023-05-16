@@ -53,7 +53,7 @@ Docker will be used to spin up the dependencies, including any DBs (postgres, mo
 now Kafka + Zookeeper.
 
 ## Kafka
-More in-depth Kafka instructions here: 
+More in-depth Kafka instructions here:
 https://unreal-mmo-dev.com/2023/04/17/37-how-to-connect-your-java-micronaut-springboot-with-kafka-sasl/
 
 There was a very useful video covering some details that can be found here:
@@ -63,6 +63,19 @@ Kafka is spun up using 'docker-compose' so check the relevant entries there.
 the './configs' directory contains the necessary configs for SASL enabled Kafka
 Do note that you will need to change these for production use.
 
+Some useful kafka CLI commands:
+```aidl
+// create topic:
+kafka-topics --create --bootstrap-server localhost:9093 --replication-factor 1 --partitions 1 --topic test
+--command-config /etc/kafka/configs/config.properties
+
+// producer example:
+kafka-console-producer --broker-list localhost:9093 --topic test --producer.config /etc/kafka/configs/config.properties
+
+// consumer example:
+kafka-console-consumer --bootstrap-server localhost:9093 --topic test --from-beginning --partition 0
+--consumer.config /etc/kafka/configs/config.properties
+```
 Micronaut also offers some useful documentation: https://guides.micronaut.io/latest/micronaut-kafka-maven-java.html
 
 

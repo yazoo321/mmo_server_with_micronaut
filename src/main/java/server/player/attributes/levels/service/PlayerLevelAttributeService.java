@@ -1,11 +1,11 @@
 package server.player.attributes.levels.service;
 
 import jakarta.inject.Inject;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import server.common.dto.NumTag;
-import server.player.attributes.levels.types.ClassesAttributeTypes;
-import server.player.attributes.levels.types.LevelAttributeTypes;
+import java.util.Map;
+import server.common.attributes.types.ClassesAttributeTypes;
+import server.common.attributes.types.LevelAttributeTypes;
 import server.player.attributes.model.PlayerAttributes;
 import server.player.attributes.repository.PlayerAttributesRepository;
 import server.player.attributes.service.PlayerAttributeService;
@@ -29,15 +29,17 @@ public class PlayerLevelAttributeService {
         }
 
         PlayerAttributes attributes = playerAttributeService.getPlayerAttributes(playerName);
-        List<NumTag> baseAttr = attributes.getBaseAttributes();
-        List<NumTag> currentAttr = attributes.getCurrentAttributes();
+        Map<String, Integer> baseAttr = attributes.getBaseAttributes();
+        Map<String, Integer> currentAttr = attributes.getCurrentAttributes();
 
-        List<NumTag> toAdd =
-                new ArrayList<>(
-                        List.of(
+        Map<String, Integer> toAdd =
+                new HashMap<>(
+                        Map.of(
                                 // base level attr
-                                new NumTag(LevelAttributeTypes.LEVEL.type, 1),
-                                new NumTag(LevelAttributeTypes.XP.type, 0)));
+                                LevelAttributeTypes.LEVEL.type, 1,
+                                LevelAttributeTypes.XP.type, 0));
+        baseAttr.putAll(toAdd);
+        currentAttr.putAll(toAdd);
 
         // next add the levels for other classes
         // This will set each class level to 0, except for the class the user chose at character
@@ -47,16 +49,9 @@ public class PlayerLevelAttributeService {
         AVAILABLE_CLASSES.forEach(
                 c -> {
                     Integer level = c.equalsIgnoreCase(playerClass) ? 1 : 0;
-                    toAdd.add(new NumTag(c, level));
+                    baseAttr.put(c, level);
+                    currentAttr.put(c, level);
                 });
-
-        // store to base and current
-        baseAttr.addAll(toAdd);
-        currentAttr.addAll(toAdd);
-
-        attributes.setBaseAttributes(baseAttr);
-        attributes.setCurrentAttributes(currentAttr);
-
         attributesRepository.updatePlayerAttributes(playerName, attributes);
 
         return attributes;
@@ -66,16 +61,11 @@ public class PlayerLevelAttributeService {
         // TODO: Handle validation, does user have enough xp for level up? Are they able to level in
         // this class?
         PlayerAttributes attributes = playerAttributeService.getPlayerAttributes(playerName);
-        List<NumTag> baseAttr = attributes.getBaseAttributes();
-        List<NumTag> currentAttr = attributes.getCurrentAttributes();
+        Map<String, Integer> baseAttr = attributes.getBaseAttributes();
+        Map<String, Integer> currentAttr = attributes.getCurrentAttributes();
 
-        NumTag classLevelBase = PlayerAttributeService.findTag(baseAttr, classToLevel);
-        // TODO: This can be evaluated using a hook, which calls to evaluate all 'current'
-        // attributes.
-        NumTag classLevelCurrent = PlayerAttributeService.findTag(currentAttr, classToLevel);
-
-        classLevelBase.setValue(classLevelBase.getValue() + 1);
-        classLevelCurrent.setValue(classLevelCurrent.getValue() + 1);
+        baseAttr.put(classToLevel, baseAttr.get(classToLevel) + 1);
+        currentAttr.put(classToLevel, currentAttr.get(classToLevel) + 1);
 
         attributesRepository.updatePlayerAttributes(playerName, attributes);
     }
@@ -84,10 +74,10 @@ public class PlayerLevelAttributeService {
         // we may keep XP in base + current (tech debt), but only need to add in one place
 
         PlayerAttributes attributes = playerAttributeService.getPlayerAttributes(playerName);
-        List<NumTag> baseAttr = attributes.getBaseAttributes();
+        Map<String, Integer> baseAttr = attributes.getBaseAttributes();
 
-        NumTag currentXp = PlayerAttributeService.findTag(baseAttr, LevelAttributeTypes.XP.type);
-        currentXp.setValue(currentXp.getValue() + xpToAdd);
+        baseAttr.put(
+                LevelAttributeTypes.XP.type, baseAttr.get(LevelAttributeTypes.XP.type) + xpToAdd);
 
         attributesRepository.updatePlayerAttributes(playerName, attributes);
     }

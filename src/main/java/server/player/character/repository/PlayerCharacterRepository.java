@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import server.common.dto.Motion;
@@ -112,6 +113,10 @@ public class PlayerCharacterRepository {
 
     public List<Character> findByName(List<String> names) {
         return Flowable.fromPublisher(characters.find(in("name", names))).toList().blockingGet();
+    }
+
+    public Single<List<Character>> findByNames(Set<String> playerNames) {
+        return Flowable.fromPublisher(characters.find(in("name", playerNames))).toList();
     }
 
     public List<Character> findByAccount(String accountName) {

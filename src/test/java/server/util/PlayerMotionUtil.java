@@ -2,14 +2,16 @@ package server.util;
 
 import static com.mongodb.client.model.Filters.ne;
 
+import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.util.List;
 import server.configuration.MongoConfiguration;
-import server.player.motion.dto.PlayerMotion;
-import server.player.motion.socket.v1.model.PlayerMotionList;
+import server.monster.server_integration.model.Monster;
+import server.motion.dto.PlayerMotion;
+import server.motion.model.PlayerMotionList;
 
 @Singleton
 public class PlayerMotionUtil {
@@ -17,6 +19,7 @@ public class PlayerMotionUtil {
     MongoConfiguration configuration;
     MongoClient mongoClient;
     MongoCollection<PlayerMotion> motionCollection;
+    MongoCollection<Monster> monsterMongoCollection;
 
     public PlayerMotionUtil(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
@@ -26,6 +29,23 @@ public class PlayerMotionUtil {
 
     public void deleteAllPlayerMotionData() {
         Single.fromPublisher(motionCollection.deleteMany(ne("playerName", "deleteAll")))
+                .blockingGet();
+    }
+
+    public void deleteMotionForPlayers(List<String> playerNames) {
+        Single.fromPublisher(motionCollection.deleteMany(Filters.all("playerName", playerNames)))
+                .blockingGet();
+    }
+
+    public void deleteAllMobInstanceData() {
+        Single.fromPublisher(monsterMongoCollection.deleteMany(ne("mobInstanceId", "deleteAll")))
+                .blockingGet();
+    }
+
+    public void deleteMobInstancesWithIds(List<String> mobInstanceIds) {
+        Single.fromPublisher(
+                        monsterMongoCollection.deleteMany(
+                                Filters.all("mobInstanceId", mobInstanceIds)))
                 .blockingGet();
     }
 
@@ -57,5 +77,9 @@ public class PlayerMotionUtil {
                 mongoClient
                         .getDatabase(configuration.getDatabaseName())
                         .getCollection(configuration.getPlayerMotion(), PlayerMotion.class);
+        this.monsterMongoCollection =
+                mongoClient
+                        .getDatabase(configuration.getDatabaseName())
+                        .getCollection(configuration.getMobInstance(), Monster.class);
     }
 }

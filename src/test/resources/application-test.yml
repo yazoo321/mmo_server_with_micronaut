@@ -1,0 +1,79 @@
+micronaut:
+  application:
+    name: mmo_server
+  server:
+    port: 8081
+  router:
+    static-resources:
+      default:
+        enabled: true
+        mapping: /**
+        paths: classpath:public
+  executors:
+    consumer:
+      type: fixed
+      nThreads: 15
+jackson:
+  serialization:
+    writeDatesAsTimestamps: false
+jooq:
+  datasources:
+    default:
+      sql-dialect: 'POSTGRES'
+jpa:
+  default:
+    entity-scan:
+      classpath: true
+      packages:
+        - 'com.org.mmo_server.repository.model'
+
+datasources:
+  default:
+    url: jdbc:postgresql://127.0.0.1/mmo_server
+    username: mmo_server
+    password: password123
+    driverClassName: org.postgresql.Driver
+    hikari:
+      pool-name: ca-pool
+      minimum-idle: 2
+      maximum-pool-size: 5
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        useLocalSessionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+      leak-detection-threshold: 60000
+      connection-test-query: "SELECT 1"
+      validation-timeout: 50000
+
+mongodb:
+  #  Set username/password as env vars
+  uri: mongodb://mongo_mmo_server:mongo_password@localhost:27017/mmo_server?authSource=admin
+  options:
+    maxConnectionIdleTime: 10000
+    readConcern: majority
+  #  For reactive MongoDB driver:
+  cluster:
+    maxWaitQueueSize: 5
+  connectionPool:
+    maxSize: 20
+
+# MongoDB collections
+mongo-database:
+  database-name: "mmo-server"
+  player-character-collection: "characters"
+  items-collection: "items"
+  item-instances-collection: "item-instances"
+  dropped-items-collection: "dropped-items"
+  inventory-collection: "inventory"
+  equip-collection: "equip"
+  player-attributes: "playerAttributes"
+  player-motion: "playerMotion"
+  mob-instance: "mobInstance"
+  mob-attributes: "mobAttributes"

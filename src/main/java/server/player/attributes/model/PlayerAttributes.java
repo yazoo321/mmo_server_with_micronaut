@@ -3,16 +3,12 @@ package server.player.attributes.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import server.common.dto.NumTag;
-import server.common.dto.Tag;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Builder
@@ -23,15 +19,13 @@ public class PlayerAttributes {
     @BsonCreator
     @JsonCreator
     public PlayerAttributes(
-            @JsonProperty("playerName")
-            @BsonProperty("playerName") String playerName,
-            @JsonProperty("baseAttributes")
-            @BsonProperty("baseAttributes") List<NumTag> baseAttributes,
-            @JsonProperty("attributesAdded")
-            @BsonProperty("attributesAdded") List<NumTag> attributesAdded,
-            @JsonProperty("currentAttributes")
-            @BsonProperty("currentAttributes") List<NumTag> currentAttributes
-    ) {
+            @JsonProperty("playerName") @BsonProperty("playerName") String playerName,
+            @JsonProperty("baseAttributes") @BsonProperty("baseAttributes")
+                    Map<String, Integer> baseAttributes,
+            @JsonProperty("attributesAdded") @BsonProperty("attributesAdded")
+                    Map<String, Integer> attributesAdded,
+            @JsonProperty("currentAttributes") @BsonProperty("currentAttributes")
+                    Map<String, Integer> currentAttributes) {
         this.playerName = playerName;
         this.baseAttributes = baseAttributes;
         this.attributesAdded = attributesAdded;
@@ -39,8 +33,7 @@ public class PlayerAttributes {
     }
 
     String playerName;
-    List<NumTag> baseAttributes;
-    List<NumTag> attributesAdded;
-    List<NumTag> currentAttributes;
-
+    Map<String, Integer> baseAttributes;
+    Map<String, Integer> attributesAdded;
+    Map<String, Integer> currentAttributes;
 }

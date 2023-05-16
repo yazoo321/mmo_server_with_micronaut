@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
-import server.player.motion.dto.PlayerMotion;
-import server.player.motion.socket.v1.model.PlayerMotionList;
-import server.player.motion.socket.v1.model.PlayerMotionMessage;
-import server.player.motion.socket.v1.service.PlayerMotionService;
+import server.motion.dto.PlayerMotion;
+import server.motion.model.MotionMessage;
+import server.motion.model.PlayerMotionList;
+import server.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
 
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
@@ -81,7 +81,7 @@ public class PlayerMotionSocketTest {
             messageHistory.add(message);
         }
 
-        abstract void send(PlayerMotionMessage message);
+        abstract void send(MotionMessage message);
     }
 
     private TestWebSocketClient createWebSocketClient(int port, String map, String playerName) {
@@ -116,9 +116,9 @@ public class PlayerMotionSocketTest {
     }
 
     @Test
-    void testSomeStuff() throws Exception {
-        playerMotionService.initializePlayerMotion(CHARACTER_1);
-        playerMotionService.initializePlayerMotion(CHARACTER_2);
+    void testBasicMotionUpdateBetween2Players() throws Exception {
+        playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
+        playerMotionService.initializePlayerMotion(CHARACTER_2).blockingGet();
 
         TestWebSocketClient client1 =
                 createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_1);
@@ -144,7 +144,7 @@ public class PlayerMotionSocketTest {
 
         // Update motion on player 1
         Motion motion = createBaseMotion();
-        PlayerMotionMessage playerMotionMessage = new PlayerMotionMessage(motion, true);
+        MotionMessage playerMotionMessage = new MotionMessage(motion, true, null);
 
         // prepare client 1 to send motion data
         client1.send(playerMotionMessage);
@@ -161,7 +161,7 @@ public class PlayerMotionSocketTest {
         // client 1 will send motion and there's nothing around, so empty result returned
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(3, ChronoUnit.SECONDS))
-                .until(() -> getPlayerMotionList(client1).getPlayerMotionList() == null);
+                .until(() -> getPlayerMotionList(client1).getPlayerMotionList().isEmpty());
 
         // client 2 will now make some motion
         client2.send(playerMotionMessage);

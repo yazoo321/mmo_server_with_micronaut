@@ -6,7 +6,7 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.player.attributes.levels.types.ClassesAttributeTypes;
+import server.common.attributes.types.ClassesAttributeTypes;
 import server.player.character.dto.Character;
 import server.player.character.dto.CreateCharacterRequest;
 import server.player.character.repository.PlayerCharacterRepository;
