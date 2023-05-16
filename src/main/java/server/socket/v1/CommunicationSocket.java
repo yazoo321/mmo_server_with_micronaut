@@ -9,6 +9,7 @@ import io.netty.util.internal.ConcurrentSet;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import server.motion.model.SessionParams;
+import server.motion.service.PlayerMotionService;
 import server.socket.model.SocketMessage;
 import server.socket.service.SocketProcessOutgoingService;
 
@@ -21,6 +22,8 @@ public class CommunicationSocket {
     // Kafka listener will receive response and will determine who to publish the updates to
 
     @Inject SocketProcessOutgoingService socketProcessService;
+    @Inject
+    PlayerMotionService playerMotionService;
 
     ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
 
@@ -40,6 +43,7 @@ public class CommunicationSocket {
 
     @OnClose
     public void onClose(WebSocketSession session) {
+        playerMotionService.disconnectPlayer(SessionParams.PLAYER_NAME.getType());
         socketSessions.remove(session);
     }
 

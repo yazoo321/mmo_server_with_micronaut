@@ -63,15 +63,6 @@ public class PlayerMotionRepository {
                         eq("playerName"), set("isOnline", true)));
     }
 
-//    public Single<PlayerMotion> updatePlayerMotion(PlayerMotion playerMotion) {
-//        // allows us to update player motion async, we can consider doing this less often if working
-//        // primarily from cache
-//        playerMotion.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
-//        return Single.fromPublisher(
-//                playerMotionMongoCollection.findOneAndReplace(
-//                        eq("playerName", playerMotion.getPlayerName()), playerMotion));
-//    }
-
     public Single<PlayerMotion> updateMotion(PlayerMotion playerMotion) {
         return Single.fromPublisher(
                         playerMotionMongoCollection.findOneAndUpdate(
