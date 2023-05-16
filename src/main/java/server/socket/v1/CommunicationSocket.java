@@ -22,8 +22,7 @@ public class CommunicationSocket {
     // Kafka listener will receive response and will determine who to publish the updates to
 
     @Inject SocketProcessOutgoingService socketProcessService;
-    @Inject
-    PlayerMotionService playerMotionService;
+    @Inject PlayerMotionService playerMotionService;
 
     ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
 
@@ -70,7 +69,6 @@ public class CommunicationSocket {
             session.put(SessionParams.MOTION.getType(), message.getMonster().getMotion());
         }
     }
-
 
     public ConcurrentSet<WebSocketSession> getLiveSessions() {
         return socketSessions;

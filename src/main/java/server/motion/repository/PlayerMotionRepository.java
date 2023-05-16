@@ -12,8 +12,6 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
@@ -98,9 +96,9 @@ public class PlayerMotionRepository {
 
         // if is online and not updated in the last 20 seconds, set to logged out.
         return Flowable.fromPublisher(
-                        playerMotionMongoCollection.updateMany(
-                                combine(eq("isOnline", true), lt("updatedAt", logoutTime)),
-                                set("isOnline", false)));
+                playerMotionMongoCollection.updateMany(
+                        combine(eq("isOnline", true), lt("updatedAt", logoutTime)),
+                        set("isOnline", false)));
     }
 
     private void prepareCollections() {
