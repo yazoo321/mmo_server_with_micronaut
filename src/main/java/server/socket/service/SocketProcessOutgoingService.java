@@ -35,8 +35,8 @@ public class SocketProcessOutgoingService {
             handlePlayerCombatAction(socketMessage);
         } else if (updateType.equals(MessageType.MOB_COMBAT.getType())) {
             handleMobCombatAction(socketMessage);
-        } else if (updateType.equals(MessageType.INVENTORY_UPDATE.getType())) {
-            handleInventoryInteraction(socketMessage);
+        } else if (updateType.equals(MessageType.PICKUP_ITEM.getType())) {
+            handlePickupItem(socketMessage);
         } else {
             log.error("Did not recognise update type, {}", updateType);
         }
@@ -67,7 +67,11 @@ public class SocketProcessOutgoingService {
     }
 
     // handle inventory interaction
-    private void handleInventoryInteraction(SocketMessage message) {
+    private void handlePickupItem(SocketMessage message) {
+        // TODO: TBD
+    }
+
+    private void handleDropItem(SocketMessage message) {
         // TODO: TBD
     }
 }
