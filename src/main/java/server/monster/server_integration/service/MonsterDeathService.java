@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.common.dto.Location;
 import server.common.dto.Motion;
-import server.items.dropped.model.DroppedItem;
+import server.items.model.DroppedItem;
 import server.items.service.ItemService;
 import server.monster.server_integration.model.MobUpdate;
 

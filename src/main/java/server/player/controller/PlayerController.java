@@ -4,10 +4,10 @@ import io.micronaut.http.annotation.*;
 import jakarta.inject.Inject;
 import java.util.List;
 import javax.validation.Valid;
-import server.player.character.dto.AccountCharactersResponse;
-import server.player.character.dto.Character;
-import server.player.character.dto.CreateCharacterRequest;
-import server.player.character.service.PlayerCharacterService;
+import server.player.model.AccountCharactersResponse;
+import server.player.model.Character;
+import server.player.model.CreateCharacterRequest;
+import server.player.service.PlayerCharacterService;
 
 // @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/player")

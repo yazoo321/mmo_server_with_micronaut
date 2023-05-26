@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
-import server.items.dropped.model.DroppedItem;
+import server.items.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;

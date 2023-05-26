@@ -4,11 +4,11 @@ import io.micronaut.http.annotation.*;
 import jakarta.inject.Inject;
 import java.util.List;
 import server.common.dto.Location;
-import server.items.dropped.model.DroppedItem;
-import server.items.dropped.model.DroppedItemResponse;
+import server.items.model.DroppedItem;
+import server.items.model.DroppedItemResponse;
 import server.items.model.Item;
 import server.items.service.ItemService;
-import server.player.character.inventory.model.response.GenericInventoryData;
+import server.items.inventory.model.response.GenericInventoryData;
 
 @Controller("/v1/items")
 public class ItemController {

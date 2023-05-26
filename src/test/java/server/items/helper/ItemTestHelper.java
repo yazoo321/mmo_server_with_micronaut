@@ -15,24 +15,24 @@ import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.common.dto.Tag;
 import server.configuration.MongoConfiguration;
-import server.items.accessories.Belt;
-import server.items.accessories.Cape;
-import server.items.accessories.Neck;
-import server.items.accessories.Ring;
-import server.items.armour.*;
-import server.items.dropped.model.DroppedItem;
+import server.items.types.accessories.Belt;
+import server.items.types.accessories.Cape;
+import server.items.types.accessories.Neck;
+import server.items.types.accessories.Ring;
+import server.items.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
 import server.items.model.ItemInstance;
 import server.items.model.Stacking;
 import server.items.service.ItemService;
-import server.items.weapons.Shield;
-import server.items.weapons.Weapon;
-import server.player.character.equippable.model.EquippedItems;
-import server.player.character.inventory.model.CharacterItem;
-import server.player.character.inventory.model.Inventory;
-import server.player.character.inventory.repository.InventoryRepository;
-import server.player.character.inventory.service.InventoryService;
+import server.items.types.armour.*;
+import server.items.types.weapons.Shield;
+import server.items.types.weapons.Weapon;
+import server.items.equippable.model.EquippedItems;
+import server.items.inventory.model.CharacterItem;
+import server.items.inventory.model.Inventory;
+import server.items.inventory.repository.InventoryRepository;
+import server.items.inventory.service.InventoryService;
 
 @Singleton
 public class ItemTestHelper {

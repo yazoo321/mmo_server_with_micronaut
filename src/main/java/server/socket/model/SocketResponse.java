@@ -6,10 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import server.items.dropped.model.DroppedItem;
+import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
-import server.player.character.dto.Character;
+import server.player.model.Character;
 
 @Data
 @Builder

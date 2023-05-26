@@ -9,12 +9,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
-import server.items.dropped.model.DroppedItem;
+import server.items.model.DroppedItem;
 import server.items.helper.ItemTestHelper;
 import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
 import server.items.types.ItemType;
-import server.items.weapons.Weapon;
+import server.items.types.weapons.Weapon;
 
 @MicronautTest
 public class ItemServiceTest {

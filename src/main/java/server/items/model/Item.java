@@ -11,15 +11,15 @@ import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.common.dto.Tag;
-import server.items.accessories.Belt;
-import server.items.accessories.Cape;
-import server.items.accessories.Neck;
-import server.items.accessories.Ring;
-import server.items.armour.*;
-import server.items.consumable.Consumable;
-import server.items.weapons.Shield;
-import server.items.weapons.Weapon;
-import server.player.character.equippable.model.EquippedItems;
+import server.items.types.accessories.Belt;
+import server.items.types.accessories.Cape;
+import server.items.types.accessories.Neck;
+import server.items.types.accessories.Ring;
+import server.items.types.consumable.Consumable;
+import server.items.types.armour.*;
+import server.items.types.weapons.Shield;
+import server.items.types.weapons.Weapon;
+import server.items.equippable.model.EquippedItems;
 
 import java.util.List;
 

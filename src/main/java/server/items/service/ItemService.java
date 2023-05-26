@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
-import server.items.dropped.model.DroppedItem;
+import server.items.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;

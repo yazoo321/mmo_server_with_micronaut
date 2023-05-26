@@ -6,7 +6,7 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Motion;
-import server.items.dropped.model.DroppedItem;
+import server.items.model.DroppedItem;
 import server.items.service.ItemService;
 import server.motion.model.SessionParams;
 import server.socket.model.SocketResponse;

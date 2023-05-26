@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
-import server.player.character.inventory.model.response.GenericInventoryData;
+import server.items.inventory.model.response.GenericInventoryData;
 
 @Data
 @NoArgsConstructor

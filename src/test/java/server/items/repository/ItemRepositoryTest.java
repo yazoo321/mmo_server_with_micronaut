@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import server.items.helper.ItemTestHelper;
 import server.items.model.Item;
 import server.items.types.ItemType;
-import server.items.weapons.Weapon;
+import server.items.types.weapons.Weapon;
 
 @MicronautTest
 public class ItemRepositoryTest {

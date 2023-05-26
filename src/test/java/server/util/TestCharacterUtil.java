@@ -1,6 +1,6 @@
 package server.util;
 
-import server.player.character.dto.Character;
+import server.player.model.Character;
 
 import java.util.Map;
 
