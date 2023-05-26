@@ -30,13 +30,14 @@ public class SynchronisePlayerService {
 
     private static final Integer DEFAULT_DISTANCE_THRESHOLD = 1000;
 
-    public void handleSynchronisePlayers(
-            Motion motion, String playerName, WebSocketSession session) {
+    public void handleSynchronisePlayers(Motion motion, WebSocketSession session) {
         int distanceThreshold = DEFAULT_DISTANCE_THRESHOLD;
+
+        String playerName = (String) session.asMap().get(SessionParams.PLAYER_NAME.getType());
 
         playerMotionService
                 .getNearbyPlayersAsync(motion, playerName, distanceThreshold)
-                .doAfterSuccess(
+                .doOnSuccess(
                         list -> {
                             if (list == null || list.isEmpty()) {
                                 return;

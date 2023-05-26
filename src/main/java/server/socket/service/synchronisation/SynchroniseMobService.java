@@ -27,9 +27,15 @@ public class SynchroniseMobService {
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     public void handleSynchroniseMobs(Motion motion, WebSocketSession session) {
+        String playerName = (String) session.asMap().getOrDefault(SessionParams.PLAYER_NAME.getType(), "");
+        if (playerName.isBlank()) {
+            // don't synchronise mobs if its server session
+            return;
+        }
+
         mobInstanceService
                 .getMobsNearby(new Location(motion))
-                .doAfterSuccess(
+                .doOnSuccess(
                         mobList -> {
                             if (mobList == null || mobList.isEmpty()) {
                                 return;

@@ -29,10 +29,6 @@ public class SynchroniseSessionService {
         sessions.parallelStream()
                 .forEach(
                         session -> {
-                            String playerName =
-                                    (String)
-                                            session.asMap()
-                                                    .get(SessionParams.PLAYER_NAME.getType());
                             Motion motion =
                                     (Motion) session.asMap().get(SessionParams.MOTION.getType());
                             if (motion == null) {
@@ -40,19 +36,7 @@ public class SynchroniseSessionService {
                                 return;
                             }
 
-                            String serverName =
-                                    (String)
-                                            session.asMap()
-                                                    .get(SessionParams.SERVER_NAME.getType());
-                            boolean isServer = serverName != null && !serverName.isBlank();
-
-                            synchronisePlayerService.handleSynchronisePlayers(
-                                    motion, playerName, session);
-
-                            if (isServer) {
-                                return;
-                            }
-
+                            synchronisePlayerService.handleSynchronisePlayers(motion, session);
                             synchroniseMobService.handleSynchroniseMobs(motion, session);
                         });
     }

@@ -1,5 +1,6 @@
 package server.items.service;
 
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
@@ -55,6 +56,10 @@ public class ItemService {
 
     public List<DroppedItem> getItemsInMap(Location location) {
         return itemRepository.getItemsNear(location);
+    }
+
+    public Single<List<DroppedItem>> getItemsInMapAsync(Location location) {
+        return itemRepository.getItemsNearAsync(location);
     }
 
     public void deleteDroppedItem(String droppedItemId) {

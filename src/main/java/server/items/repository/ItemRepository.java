@@ -43,6 +43,10 @@ public class ItemRepository {
         return MongoDbQueryHelper.betweenLocation(droppedItemCollection, location, 1000);
     }
 
+    public Single<List<DroppedItem>> getItemsNearAsync(Location location) {
+        return MongoDbQueryHelper.betweenLocationAsync(droppedItemCollection, location, 1000);
+    }
+
     public DroppedItem createDroppedItem(DroppedItem droppedItem) {
         return Single.fromPublisher(droppedItemCollection.insertOne(droppedItem))
                 .map(success -> droppedItem)

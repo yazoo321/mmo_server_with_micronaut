@@ -17,6 +17,11 @@ public class MongoDbQueryHelper {
 
     public static <T> List<T> betweenLocation(
             MongoCollection<T> collection, Location location, Integer threshold) {
+        return betweenLocationAsync(collection, location, threshold).blockingGet();
+    }
+
+    public static <T> Single<List<T>> betweenLocationAsync(
+            MongoCollection<T> collection, Location location, Integer threshold) {
         Bson mapEq = Filters.eq("location.map", location.getMap());
         Bson xWithinRange =
                 Filters.and(
@@ -28,8 +33,7 @@ public class MongoDbQueryHelper {
                         Filters.lt("location.y", (location.getY() + threshold)));
 
         return Flowable.fromPublisher(collection.find(and(mapEq, xWithinRange, yWithinRange)))
-                .toList()
-                .blockingGet();
+                .toList();
     }
 
     public static <T> List<T> nearbyMotionFinder(
