@@ -1,9 +1,12 @@
 package server.socket.service.synchronisation;
 
-
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
@@ -15,28 +18,20 @@ import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Singleton
 public class SynchronisePlayerService {
 
-    @Inject
-    PlayerMotionService playerMotionService;
+    @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    PlayerCharacterService playerCharacterService;
+    @Inject PlayerCharacterService playerCharacterService;
 
-    @Inject
-    SocketResponseSubscriber socketResponseSubscriber;
-
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     private static final Integer DEFAULT_DISTANCE_THRESHOLD = 1000;
 
-    public void handleSynchronisePlayers(Motion motion, String playerName, WebSocketSession session) {
+    public void handleSynchronisePlayers(
+            Motion motion, String playerName, WebSocketSession session) {
         int distanceThreshold = DEFAULT_DISTANCE_THRESHOLD;
 
         playerMotionService
@@ -53,15 +48,11 @@ public class SynchronisePlayerService {
 
                             evaluateNewPlayers(playerNames, session);
                             // update the names that we follow
-                            session.put(
-                                    SessionParams.TRACKING_PLAYERS.getType(),
-                                    playerNames);
+                            session.put(SessionParams.TRACKING_PLAYERS.getType(), playerNames);
                         })
                 .doOnError(
                         (error) ->
-                                log.error(
-                                        "error getting nearby players, {}",
-                                        error.getMessage()))
+                                log.error("error getting nearby players, {}", error.getMessage()))
                 .subscribe();
     }
 
@@ -165,5 +156,4 @@ public class SynchronisePlayerService {
                         })
                 .subscribe();
     }
-
 }

@@ -3,6 +3,11 @@ package server.socket.service.synchronisation;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Motion;
@@ -13,21 +18,13 @@ import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Singleton
 public class SynchroniseMobService {
 
-    @Inject
-    MobInstanceService mobInstanceService;
+    @Inject MobInstanceService mobInstanceService;
 
-    @Inject
-    SocketResponseSubscriber socketResponseSubscriber;
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     public void handleSynchroniseMobs(Motion motion, WebSocketSession session) {
         mobInstanceService
@@ -37,18 +34,12 @@ public class SynchroniseMobService {
                             if (mobList == null || mobList.isEmpty()) {
                                 return;
                             }
-                            Set<String> mobInstanceIds =
-                                    evaluateNewMobs(mobList, session);
+                            Set<String> mobInstanceIds = evaluateNewMobs(mobList, session);
 
-                            session.put(
-                                    SessionParams.TRACKING_MOBS.getType(),
-                                    mobInstanceIds);
+                            session.put(SessionParams.TRACKING_MOBS.getType(), mobInstanceIds);
                         })
                 .doOnError(
-                        (error) ->
-                                log.error(
-                                        "error getting nearby mobs, {}",
-                                        error.getMessage()))
+                        (error) -> log.error("error getting nearby mobs, {}", error.getMessage()))
                 .subscribe();
     }
 
@@ -111,5 +102,4 @@ public class SynchroniseMobService {
 
         session.send(socketResponse).subscribe(socketResponseSubscriber);
     }
-
 }

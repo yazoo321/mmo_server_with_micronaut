@@ -18,12 +18,9 @@ public class SynchroniseSessionService {
 
     @Inject CommunicationSocket socket;
 
-    @Inject
-    SynchronisePlayerService synchronisePlayerService;
+    @Inject SynchronisePlayerService synchronisePlayerService;
 
-    @Inject
-    SynchroniseMobService synchroniseMobService;
-
+    @Inject SynchroniseMobService synchroniseMobService;
 
     @Scheduled(fixedDelay = "1s")
     public void evaluateNearbyPlayers() {
@@ -49,14 +46,14 @@ public class SynchroniseSessionService {
                                                     .get(SessionParams.SERVER_NAME.getType());
                             boolean isServer = serverName != null && !serverName.isBlank();
 
-                            synchronisePlayerService.handleSynchronisePlayers(motion, playerName, session);
+                            synchronisePlayerService.handleSynchronisePlayers(
+                                    motion, playerName, session);
 
                             if (isServer) {
                                 return;
                             }
 
                             synchroniseMobService.handleSynchroniseMobs(motion, session);
-                        }
-                );
+                        });
     }
 }

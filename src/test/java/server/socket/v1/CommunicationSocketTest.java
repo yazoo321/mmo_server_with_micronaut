@@ -298,7 +298,8 @@ public class CommunicationSocketTest {
                                 mobOutOfRange.getMonster().getMobInstanceId(),
                                 mobOutOfRange.getMonster()));
 
-        Assertions.assertThat(mobClientResponses.size()).isLessThan(4); // we can get 2x motion updates and 1x appearance update
+        Assertions.assertThat(mobClientResponses.size())
+                .isLessThan(4); // we can get 2x motion updates and 1x appearance update
 
         Assertions.assertThat(
                         mobClientResponses.stream().map(SocketResponse::getMessageType).toList())
