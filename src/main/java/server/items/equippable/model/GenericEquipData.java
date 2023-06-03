@@ -8,6 +8,7 @@ import server.items.inventory.model.Inventory;
 
 import java.util.List;
 
+@Deprecated // now part of Generic Inventory
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,5 +20,4 @@ public class GenericEquipData {
     List<EquippedItems> equippedItemsList;
 
     Inventory inventory;
-
 }

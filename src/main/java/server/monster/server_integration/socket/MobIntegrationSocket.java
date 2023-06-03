@@ -6,6 +6,7 @@ import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
@@ -14,6 +15,7 @@ import server.motion.model.MotionMessage;
 import server.motion.model.PlayerMotionList;
 import server.motion.service.PlayerMotionService;
 
+@Deprecated // use CommunicationSocket instead
 @ServerWebSocket("/v1/mob-integration/{map}/{serverInstance}/")
 public class MobIntegrationSocket {
 
@@ -34,17 +36,15 @@ public class MobIntegrationSocket {
     }
 
     @OnMessage
-    public Publisher<PlayerMotionList> onMessage(
+    public Single<PlayerMotionList> onMessage(
             String serverInstance, String map, MotionMessage message, WebSocketSession session) {
 
         if (message.getUpdate()) {
             playerMotionService.updatePlayerMotion(serverInstance, message.getMotion());
         }
 
-        PlayerMotionList playerMotionList =
-                playerMotionService.getPlayersNearMe(message.getMotion(), serverInstance);
-
-        return broadcaster.broadcast(playerMotionList);
+        return playerMotionService.getPlayersNearMe(message.getMotion(), serverInstance)
+                .doOnSuccess(broadcaster::broadcast);
     }
 
     @OnClose

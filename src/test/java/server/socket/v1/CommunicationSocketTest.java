@@ -71,7 +71,7 @@ public class CommunicationSocketTest {
 
     private final String MOB_SERVER_NAME = "UE_SERVER_MAP_1";
 
-    private final int TIMEOUT = 10;
+    private final int TIMEOUT = 5;
 
     @BeforeEach
     void setup() {

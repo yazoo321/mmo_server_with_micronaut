@@ -2,6 +2,7 @@ package server.socket.producer;
 
 import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
+import server.items.inventory.model.response.GenericInventoryData;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 
@@ -16,4 +17,17 @@ public interface UpdateProducer {
 
     @Topic("player-motion-update")
     void sendPlayerMotionUpdate(PlayerMotion playerMotion);
+
+//    @Topic("drop-item")
+//    void sendDropItemUpdate(GenericInventoryData request);
+
+//    @Topic("pickup-item")
+//    void sendPickupItemUpdate(GenericInventoryData request);
+
+    @Topic("pickup-item-success")
+    void pickupItemSuccess(GenericInventoryData request);
+
+    @Topic("drop-item-success")
+    void dropItemSuccess(GenericInventoryData request);
+
 }

@@ -2,9 +2,13 @@ package server.items.repository;
 
 import static com.mongodb.client.model.Filters.*;
 
+import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
@@ -19,6 +23,7 @@ import server.items.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.model.exceptions.ItemException;
+import server.socket.producer.UpdateProducer;
 
 @Slf4j
 @Singleton
@@ -38,108 +43,63 @@ public class ItemRepository {
         prepareCollections();
     }
 
-    public List<DroppedItem> getItemsNear(Location location) {
-        // filter by map + location of X, Y, Z co-ordinates
+    public Single<List<DroppedItem>> getItemsNear(Location location) {
         return MongoDbQueryHelper.betweenLocation(droppedItemCollection, location, 1000);
     }
 
-    public Single<List<DroppedItem>> getItemsNearAsync(Location location) {
-        return MongoDbQueryHelper.betweenLocationAsync(droppedItemCollection, location, 1000);
-    }
-
-    public DroppedItem createDroppedItem(DroppedItem droppedItem) {
+    public Single<DroppedItem> createDroppedItem(DroppedItem droppedItem) {
         return Single.fromPublisher(droppedItemCollection.insertOne(droppedItem))
-                .map(success -> droppedItem)
-                .blockingGet();
+                .map(success -> droppedItem);
     }
 
-    public DroppedItem findDroppedItemById(String droppedItemId) {
-        try {
-            return Single.fromPublisher(
-                            droppedItemCollection.find(eq("droppedItemId", droppedItemId)))
-                    .blockingGet();
-        } catch (NoSuchElementException e) {
-            log.warn("Could not find the dropped item by ID!");
-            throw new ItemException("Could not find the dropped item by ID!");
-        }
+    public Single<DroppedItem> findDroppedItemById(String droppedItemId) {
+        return Single.fromPublisher(
+                droppedItemCollection.find(eq("droppedItemId", droppedItemId)))
+                .doOnError(e -> {
+                    throw new ItemException("Failed to find dropped item by id");
+                });
     }
 
-    public Item createItem(Item item) {
-        try {
-            return findByItemId(item.getItemId());
-            // if item is found, we want to ignore creating this item and just return the found
-            // item.
-        } catch (ItemException e) {
-            return Single.fromPublisher(itemCollection.insertOne(item))
-                    .map(success -> item)
-                    .blockingGet();
-        }
+    public Single<Item> createItem(Item item) {
+        return Single.fromPublisher(itemCollection.replaceOne(
+                eq("itemId", item.getItemId()),
+                item,
+                new ReplaceOptions().upsert(true)
+        )).map(res -> item);
     }
 
-    public Item findByItemId(String itemId) {
-        try {
-            return Single.fromPublisher(itemCollection.find(eq("itemId", itemId))).blockingGet();
-        } catch (NoSuchElementException e) {
-            log.error("Could not find the item by ID! It no longer exists");
-            throw new ItemException("Could not find the item by ID! It no longer exists");
-        }
+    public Single<Item> findByItemId(String itemId) {
+        return Single.fromPublisher(itemCollection.find(eq("itemId", itemId)));
     }
 
-    public ItemInstance createItemInstance(ItemInstance itemInstance) {
-        try {
-            return Single.fromPublisher(itemInstanceCollection.insertOne(itemInstance))
-                    .map(success -> itemInstance)
-                    .blockingGet();
-        } catch (Exception e) {
-            log.error("Failed to create item instance, {}", e.getMessage());
-
-            throw new ItemException("Failed to create item instance");
-        }
+    public Single<ItemInstance> createItemInstance(ItemInstance itemInstance) {
+        return Single.fromPublisher(itemInstanceCollection.insertOne(itemInstance))
+                .map(success -> itemInstance);
     }
 
-    public ItemInstance findItemInstanceById(String instanceId) {
-        try {
-            return Single.fromPublisher(
-                            itemInstanceCollection.find(eq("itemInstanceId", instanceId)))
-                    .blockingGet();
-        } catch (NoSuchElementException e) {
-            log.error("Could not find the item instance by ID! It no longer exists");
-            throw new ItemException("Could not find the item instance by ID! It no longer exists");
-        }
+    public Single<ItemInstance> findItemInstanceById(String instanceId) {
+        return Single.fromPublisher(
+                itemInstanceCollection.find(eq("itemInstanceId", instanceId)));
     }
 
-    public List<ItemInstance> findItemByItemInstanceIds(List<String> itemInstanceIds) {
+    public Single<List<ItemInstance>> findItemByItemInstanceIds(List<String> itemInstanceIds) {
         if (null == itemInstanceIds || itemInstanceIds.isEmpty()) {
-            return new ArrayList<>();
+            return Single.just(new ArrayList<>());
         }
 
-        try {
-            return Flowable.fromPublisher(
-                            itemInstanceCollection.find(in("itemInstanceId", itemInstanceIds)))
-                    .toList()
-                    .blockingGet();
-        } catch (NoSuchElementException e) {
-            log.error("Could not find the instances for given instance IDs, {}", itemInstanceIds);
-            throw new ItemException("Could not find the instances for given instance IDs");
-        }
+        return Flowable.fromPublisher(
+                        itemInstanceCollection.find(in("itemInstanceId", itemInstanceIds)))
+                .toList();
     }
 
-    public void deleteDroppedItem(String droppedItemId) {
-        try {
-            Single.fromPublisher(
-                            droppedItemCollection.deleteOne(eq("droppedItemId", droppedItemId)))
-                    .blockingGet();
-        } catch (NoSuchElementException e) {
-            // this could be race condition
-            log.warn("Deleting dropped item failed as item was not found!");
-            throw new ItemException("Deleting dropped item failed as item was not found!");
-        }
+    public Single<DeleteResult> deleteDroppedItem(String droppedItemId) {
+        return Single.fromPublisher(
+                droppedItemCollection.deleteOne(eq("droppedItemId", droppedItemId)));
     }
 
-    public void deleteTimedOutDroppedItems() {
+    public Single<DeleteResult> deleteTimedOutDroppedItems() {
         LocalDateTime cutoffTime = LocalDateTime.now().minusSeconds(DROPPED_ITEM_TIMEOUT_SECONDS);
-        Single.fromPublisher(droppedItemCollection.deleteMany(gt("droppedAt", cutoffTime)))
-                .blockingGet();
+        return Single.fromPublisher(droppedItemCollection.deleteMany(gt("droppedAt", cutoffTime)));
     }
 
     private void prepareCollections() {

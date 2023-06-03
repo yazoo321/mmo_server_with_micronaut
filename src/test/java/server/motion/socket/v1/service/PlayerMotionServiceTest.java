@@ -98,7 +98,7 @@ public class PlayerMotionServiceTest {
         playerMotionService.updatePlayerMotion(TEST_CHARACTER_NAME, motion).blockingGet();
 
         // When
-        PlayerMotionList actual = playerMotionService.getPlayersNearMe(motion, "FAKE_NAME");
+        PlayerMotionList actual = playerMotionService.getPlayersNearMe(motion, "FAKE_NAME").blockingGet();
 
         // Then
         List<PlayerMotion> playerMotions = actual.getPlayerMotionList();
@@ -121,12 +121,12 @@ public class PlayerMotionServiceTest {
         playerMotion.setIsOnline(true);
 
         // update motion and set them online
-        playerMotionService.updatePlayerMotion(TEST_CHARACTER_NAME, motion);
+        playerMotionService.updatePlayerMotion(TEST_CHARACTER_NAME, motion).blockingGet();
 
         // When
         motion.setX(10000);
         motion.setY(10000);
-        PlayerMotionList actual = playerMotionService.getPlayersNearMe(motion, "FAKE_NAME");
+        PlayerMotionList actual = playerMotionService.getPlayersNearMe(motion, "FAKE_NAME").blockingGet();
 
         // Then
         List<PlayerMotion> playerMotions = actual.getPlayerMotionList();

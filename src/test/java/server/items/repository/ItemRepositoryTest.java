@@ -28,7 +28,7 @@ public class ItemRepositoryTest {
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
 
         // When
-        Item found = itemRepository.findByItemId(weapon.getItemId());
+        Item found = itemRepository.findByItemId(weapon.getItemId()).blockingGet();
 
         // Then
         Assertions.assertThat(found).usingRecursiveComparison().isEqualTo(weapon);

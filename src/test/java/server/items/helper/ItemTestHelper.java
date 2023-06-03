@@ -3,6 +3,7 @@ package server.items.helper;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.ne;
 
+import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
@@ -96,7 +97,7 @@ public class ItemTestHelper {
     }
 
     public DroppedItem createAndInsertDroppedItem(Location location, Item item) {
-        return itemService.createNewDroppedItem(item.getItemId(), location);
+        return itemService.createNewDroppedItem(item.getItemId(), location).blockingGet();
     }
 
     public Inventory prepareInventory(String characterName) {
@@ -123,9 +124,10 @@ public class ItemTestHelper {
                         inventory.getMaxSize(), inventory.getCharacterItems()));
         items.add(characterItem);
 
-        inventoryRepository.updateInventoryItems(characterName, items);
+        UpdateResult res = inventoryRepository.updateInventoryItems(characterName, items).blockingGet();
 
-        return characterItem;
+        return res.wasAcknowledged() ? characterItem : null;
+//        return characterItem;
     }
 
     public Inventory insertInventory(Inventory inventory) {

@@ -79,12 +79,7 @@ public class PlayerMotionRepository {
                 .blockingGet();
     }
 
-    public List<PlayerMotion> getPlayersNearby(PlayerMotion playerMotion) {
-        return MongoDbQueryHelper.nearbyMotionFinder(
-                playerMotionMongoCollection, playerMotion, 1000);
-    }
-
-    public Single<List<PlayerMotion>> getPlayersNearbyAsync(
+    public Single<List<PlayerMotion>> getPlayersNearby(
             PlayerMotion playerMotion, Integer threshold) {
         return MongoDbQueryHelper.getNearbyPlayers(
                 playerMotionMongoCollection, playerMotion, threshold);

@@ -37,7 +37,7 @@ public class SynchroniseDroppedItemsService {
             return;
         }
 
-        itemService.getItemsInMapAsync(new Location(motion))
+        itemService.getItemsInMap(new Location(motion))
                 .doOnError(e -> log.error("Failed to get items in map, {}", e.getMessage()))
                 .doOnSuccess(droppedItems -> {
                     Map<String, DroppedItem> droppedItemsMap =

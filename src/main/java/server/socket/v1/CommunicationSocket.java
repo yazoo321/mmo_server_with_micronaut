@@ -37,7 +37,7 @@ public class CommunicationSocket {
         // TODO: get player/server name via injected headers
         updateSessionParams(session, message);
 
-        socketProcessService.processMessage(message);
+        socketProcessService.processMessage(message, session);
     }
 
     @OnClose

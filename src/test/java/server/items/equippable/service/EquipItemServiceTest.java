@@ -163,10 +163,10 @@ public class EquipItemServiceTest {
         CharacterItem characterItem = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance);
 
         // When
-        equipItemService.equipItem("override", CHARACTER_NAME);
+        equipItemService.equipItem("override", CHARACTER_NAME).blockingGet();
 
         // Then
-        List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
+        List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME).blockingGet();
         Assertions.assertThat(equipped)
                 .usingRecursiveComparison()
                 .ignoringFields(
@@ -218,13 +218,13 @@ public class EquipItemServiceTest {
         CharacterItem i1 = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance1);
         CharacterItem i2 = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance2);
 
-        equipItemService.equipItem(instance1.getItemInstanceId(), CHARACTER_NAME);
+        EquippedItems items = equipItemService.equipItem(instance1.getItemInstanceId(), CHARACTER_NAME).blockingGet();
 
         // When
-        equipItemService.equipItem(instance2.getItemInstanceId(), CHARACTER_NAME);
+        items = equipItemService.equipItem(instance2.getItemInstanceId(), CHARACTER_NAME).blockingGet();
 
         // Then
-        List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME);
+        List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME).blockingGet();
         Assertions.assertThat(equipped.size()).isEqualTo(1);
 
         Assertions.assertThat(equipped)

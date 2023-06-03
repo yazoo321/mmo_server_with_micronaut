@@ -1,6 +1,7 @@
 package server.items.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.reactivex.rxjava3.exceptions.CompositeException;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -53,7 +54,7 @@ public class ItemServiceTest {
                         LocalDateTime.now());
 
         // When
-        DroppedItem actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop);
+        DroppedItem actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop).blockingGet();
 
         // Then
         Assertions.assertThat(actual)
@@ -71,7 +72,7 @@ public class ItemServiceTest {
                 itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
-        DroppedItem actual = itemService.getDroppedItemById(expectedDroppedItem.getDroppedItemId());
+        DroppedItem actual = itemService.getDroppedItemById(expectedDroppedItem.getDroppedItemId()).blockingGet();
 
         // Then
         Assertions.assertThat(actual)
@@ -105,7 +106,7 @@ public class ItemServiceTest {
         // don't expect third item to appear as its out of range
 
         // When
-        List<DroppedItem> actual = itemService.getItemsInMap(searchRadius);
+        List<DroppedItem> actual = itemService.getItemsInMap(searchRadius).blockingGet();
 
         Assertions.assertThat(actual)
                 .usingRecursiveComparison()
@@ -121,11 +122,13 @@ public class ItemServiceTest {
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
-        itemService.deleteDroppedItem(droppedItem.getDroppedItemId());
+        itemService.deleteDroppedItem(droppedItem.getDroppedItemId()).blockingGet();
 
         // Then
+        // TODO: Check for ItemException nested
         org.junit.jupiter.api.Assertions.assertThrows(
-                ItemException.class,
-                () -> itemService.getDroppedItemById(droppedItem.getDroppedItemId()));
+                CompositeException.class,
+                () ->
+                        itemService.getDroppedItemById(droppedItem.getDroppedItemId()).blockingGet());
     }
 }

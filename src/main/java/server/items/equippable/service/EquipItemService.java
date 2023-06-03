@@ -1,8 +1,13 @@
 package server.items.equippable.service;
 
+import com.mongodb.client.result.DeleteResult;
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location2D;
@@ -24,58 +29,66 @@ public class EquipItemService {
 
     @Inject InventoryService inventoryService;
 
-    @Inject ItemRepository itemRepository;
-
-    public EquippedItems equipItem(String itemInstanceId, String characterName) {
+    public Single<EquippedItems> equipItem(String itemInstanceId, String characterName) {
         // in order to equip item, first un-equip item from slot if one exists
+        return inventoryService.getInventory(characterName)
+                .doOnError(e -> log.error("Failed to get character inventory, {}", e.getMessage()))
+                .flatMap(inventory -> {
+                    List<CharacterItem> items = inventory.getCharacterItems();
+                    ItemInstance instance = getCharacterItemByInstance(items, itemInstanceId).getItemInstance();
 
-        Inventory inventory = inventoryService.getInventory(characterName);
-        List<CharacterItem> items = inventory.getCharacterItems();
+                    String slotType = instance.getItem().getCategory();
 
-        ItemInstance instance = getCharacterItemByInstance(items, itemInstanceId).getItemInstance();
+                    // TODO: Make this async
+                    EquippedItems equippedItem = equipRepository.getCharacterItemSlot(characterName, slotType).blockingGet();
+                    if (equippedItem != null) {
+                        // TODO: Make this async
+                        items = unequipItem(equippedItem.getItemInstance().getItemInstanceId(), characterName)
+                                .blockingGet()
+                                .getCharacterItems();
+                    }
 
-        String slotType = instance.getItem().getCategory();
+                    // the items object has been refreshed, need to re-sync object
+                    CharacterItem characterItem = getCharacterItemByInstance(items, itemInstanceId);
 
-        EquippedItems equippedItem = equipRepository.getCharacterItemSlot(characterName, slotType);
+                    equippedItem =
+                            characterItem
+                                    .getItemInstance()
+                                    .getItem()
+                                    .createEquippedItem(characterName, instance);
 
-        if (equippedItem != null) {
-            items =
-                    unequipItem(equippedItem.getItemInstance().getItemInstanceId(), characterName)
-                            .getCharacterItems();
-        }
+                    // setting location to 'invalid' value, to not show it in inventory
+                    characterItem.setLocation(new Location2D(-1, -1));
+                    // TODO: Make this async
+                    inventoryService.updateInventoryItems(characterName, items).blockingGet();
 
-        // the items object has been refreshed, need to re-sync object
-        CharacterItem characterItem = getCharacterItemByInstance(items, itemInstanceId);
+                    return equipRepository.insert(equippedItem);
+                });
 
-        equippedItem =
-                characterItem
-                        .getItemInstance()
-                        .getItem()
-                        .createEquippedItem(characterName, instance);
-
-        // setting location to 'invalid' value, to not show it in inventory
-        characterItem.setLocation(new Location2D(-1, -1));
-        inventoryService.updateInventoryItems(characterName, items);
-
-        return equipRepository.insert(equippedItem);
     }
 
-    public Inventory unequipItem(String itemInstanceId, String characterName) {
-        inventoryService.unequipItem(itemInstanceId, characterName);
-        boolean success = equipRepository.deleteEquippedItem(itemInstanceId);
-
-        if (!success) {
-            log.error(
-                    "error with unequip item, potential duplicate record created, itemInstanceId:"
-                            + " {}",
-                    itemInstanceId);
-            throw new EquipException("Did not delete equipped item successfully");
-        }
-
-        return inventoryService.getInventory(characterName);
+    public Single<Inventory> unequipItem(String itemInstanceId, String characterName) {
+        return inventoryService.unequipItem(itemInstanceId, characterName)
+                .doOnError(e -> {
+                    log.warn("Failed to unequip item, {}", e.getMessage());
+                    throw new EquipException("Failed to unequip item");
+                })
+                .flatMap(itemList -> {
+                    // TODO: Make async
+                    equipRepository.deleteEquippedItem(itemInstanceId).blockingGet();
+                    return inventoryService.getInventory(characterName);
+                });
+//                .flatMap(itemList ->
+//                        equipRepository.deleteEquippedItem(itemInstanceId)
+//                                .doOnError(e -> {
+//                                    log.warn("Failed to unequip item, {}", e.getMessage());
+//                                    throw new EquipException("Failed to delete equipped item");
+//                                })
+//                                .flatMap(res -> inventoryService.getInventory(characterName)))
+//                                .subscribe();
     }
 
-    public List<EquippedItems> getEquippedItems(String characterName) {
+    public Single<List<EquippedItems>> getEquippedItems(String characterName) {
         return equipRepository.getEquippedItemsForCharacter(characterName);
     }
 
@@ -92,15 +105,4 @@ public class EquipItemService {
                         () -> new InventoryException("The item trying to equip does not exist"));
     }
 
-    public void getModifiersOfEquippedItems(String characterName) {
-        List<EquippedItems> equippedItems =
-                equipRepository.getEquippedItemsForCharacter(characterName);
-
-        List<ItemInstance> itemInstances =
-                equippedItems.stream()
-                        .map(EquippedItems::getItemInstance)
-                        .collect(Collectors.toList());
-
-        // TBD
-    }
 }
