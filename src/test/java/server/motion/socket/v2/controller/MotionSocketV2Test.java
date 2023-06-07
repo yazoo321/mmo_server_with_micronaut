@@ -34,6 +34,7 @@ import server.motion.dto.PlayerMotion;
 import server.motion.model.MotionMessage;
 import server.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
+import server.util.websocket.TestWebSocketClient;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -80,28 +81,7 @@ public class MotionSocketV2Test {
         playerMotionUtil.deleteAllMobInstanceData();
     }
 
-    @ClientWebSocket
-    abstract static class TestWebSocketClient implements AutoCloseable {
-
-        private final Deque<String> messageHistory = new ConcurrentLinkedDeque<>();
-
-        public String getLatestMessage() {
-            return messageHistory.peekLast();
-        }
-
-        public List<String> getMessagesChronologically() {
-            return new ArrayList<>(messageHistory);
-        }
-
-        @OnMessage
-        void onMessage(String message) {
-            messageHistory.add(message);
-        }
-
-        abstract void send(MotionMessage message);
-    }
-
-    private MotionSocketV2Test.TestWebSocketClient createWebSocketClient(
+    private TestWebSocketClient createWebSocketClient(
             int port, String map, String playerName) {
         WebSocketClient webSocketClient = beanContext.getBean(WebSocketClient.class);
         URI uri =
@@ -113,7 +93,7 @@ public class MotionSocketV2Test {
                         .path("{playerName}")
                         .expand(CollectionUtils.mapOf("map", map, "playerName", playerName));
         Publisher<TestWebSocketClient> client =
-                webSocketClient.connect(MotionSocketV2Test.TestWebSocketClient.class, uri);
+                webSocketClient.connect(TestWebSocketClient.class, uri);
         // requires to install reactor
         return Flux.from(client).blockFirst();
     }
@@ -139,11 +119,11 @@ public class MotionSocketV2Test {
         playerMotionService.initializePlayerMotion(CHARACTER_2).blockingGet();
         playerMotionService.initializePlayerMotion(CHARACTER_3).blockingGet();
 
-        MotionSocketV2Test.TestWebSocketClient playerClient1 =
+        TestWebSocketClient playerClient1 =
                 createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_1);
-        MotionSocketV2Test.TestWebSocketClient playerClient2 =
+        TestWebSocketClient playerClient2 =
                 createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_2);
-        MotionSocketV2Test.TestWebSocketClient playerClient3 =
+        TestWebSocketClient playerClient3 =
                 createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_3);
 
         Motion motionWithinRange = createBaseMotion();
@@ -213,11 +193,11 @@ public class MotionSocketV2Test {
         playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         playerMotionService.initializePlayerMotion(CHARACTER_2).blockingGet();
 
-        MotionSocketV2Test.TestWebSocketClient playerClient1 =
+        TestWebSocketClient playerClient1 =
                 createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_1);
-        MotionSocketV2Test.TestWebSocketClient playerClient2 =
+        TestWebSocketClient playerClient2 =
                 createWebSocketClient(embeddedServer.getPort(), MAP_1, CHARACTER_2);
-        MotionSocketV2Test.TestWebSocketClient mobServerClient =
+        TestWebSocketClient mobServerClient =
                 createWebSocketClient(embeddedServer.getPort(), MAP_1, MOB_SERVER_NAME);
 
         Motion motionWithinRange = createBaseMotion();
@@ -297,7 +277,7 @@ public class MotionSocketV2Test {
         mobServerClient.close();
     }
 
-    private MotionResult getMotionResult(MotionSocketV2Test.TestWebSocketClient client) {
+    private MotionResult getMotionResult(TestWebSocketClient client) {
         try {
             return objectReader.readValue(client.getLatestMessage(), MotionResult.class);
         } catch (Exception e) {

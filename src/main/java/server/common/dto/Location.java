@@ -43,4 +43,28 @@ public class Location {
         this.y = motion.getY();
         this.z = motion.getZ();
     }
+
+    public boolean withinThreshold(Location l2, int threshold) {
+        if (l2 == null || l2.getX() == null || l2.getY() == null || l2.getMap() == null) {
+            return false;
+        }
+
+        if (!this.getMap().equalsIgnoreCase(l2.getMap())) {
+            return false;
+        }
+
+        int x = l2.getX();
+        int y = l2.getY();
+
+        if (this.getX() < (x - threshold) || this.getX() > (x + threshold)) {
+            return false;
+        }
+
+        if (this.getY() < (y - threshold) || this.getY() > (y + threshold)) {
+            return false;
+        }
+
+        // can add Z if we want to.
+        return true;
+    }
 }

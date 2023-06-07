@@ -5,10 +5,8 @@ import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import server.items.inventory.model.Inventory;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.inventory.service.InventoryService;
-import server.items.service.ItemService;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.producer.UpdateProducer;
@@ -28,10 +26,35 @@ public class ItemSocketIntegration {
     public ItemSocketIntegration(
             @KafkaClient("update-producer") UpdateProducer updateProducer) {
         this.updateProducer = updateProducer;
+
     }
 
     public void handleDropItem(GenericInventoryData request, WebSocketSession session) {
+        inventoryService.dropItem(request.getCharacterName(), request.getItemInventoryLocation(),
+                request.getLocation())
+                .doOnError(e -> {
+                    log.warn("Failed to pickup item, {}", e.getMessage()); // could be inventory full
+                    SocketResponse response = SocketResponse.builder()
+                            .messageType(SocketResponseType.INVENTORY_ERROR.getType())
+                            .error(e.getMessage())
+                            .build();
+                    session.send(response);
+                })
+                .doOnSuccess(droppedItem -> {
+                    // we don't need the dropped item now, this will need to be refactored later
+                    inventoryService.getInventory(request.getCharacterName())
+                            .doOnSuccess(inventory -> {
 
+                                GenericInventoryData inventoryData = new GenericInventoryData();
+                                inventoryData.setInventory(inventory);
+                                SocketResponse response = SocketResponse.builder()
+                                        .messageType(SocketResponseType.INVENTORY_UPDATE.getType())
+                                        .inventoryData(inventoryData)
+                                        .build();
+                                session.send(response);
+                            })
+                            .subscribe();
+                });
     }
 
     public void handlePickupItem(GenericInventoryData request, WebSocketSession session) {

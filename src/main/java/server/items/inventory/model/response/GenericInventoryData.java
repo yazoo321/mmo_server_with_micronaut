@@ -9,6 +9,7 @@ import server.common.dto.Location2D;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.model.GenericEquipData;
 import server.items.inventory.model.Inventory;
+import server.items.model.DroppedItem;
 import server.items.model.Item;
 
 import java.util.List;
@@ -30,4 +31,5 @@ public class GenericInventoryData {
     GenericEquipData equipData;
     EquippedItems equippedItems;
     List<EquippedItems> equippedItemsList;
+    List<DroppedItem> droppedItems;
 }

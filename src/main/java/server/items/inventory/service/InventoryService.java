@@ -120,7 +120,6 @@ public class InventoryService {
                     return itemService.dropExistingItem(
                             characterItem.getItemInstance().getItemInstanceId(), location);
                 });
-
     }
 
     public Single<Inventory> getInventory(String characterName) {

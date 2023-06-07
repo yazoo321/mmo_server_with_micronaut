@@ -4,10 +4,15 @@ import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import server.common.dto.Location;
+import server.common.dto.Motion;
+import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.SessionParams;
@@ -48,6 +53,76 @@ public class ClientUpdatesService {
         broadcaster
                 .broadcast(socketResponse, isValid(monster.getMobInstanceId()))
                 .subscribe(socketResponseSubscriber);
+    }
+
+    public void sendDroppedItemUpdates(DroppedItem droppedItem) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.ADD_ITEMS_TO_MAP.getType())
+                        .droppedItems(Map.of(droppedItem.getItemInstance().getItemInstanceId(), droppedItem))
+                        .build();
+
+        broadcaster
+                .broadcast(socketResponse, listensToItemDrops(droppedItem))
+                .subscribe(socketResponseSubscriber);
+    }
+
+    public void sendItemPickupUpdates(String itemInstanceId) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.REMOVE_ITEMS_FROM_MAP.getType())
+                        .itemInstanceIds(List.of(itemInstanceId))
+                        .build();
+
+        broadcaster
+                .broadcast(socketResponse, listensToItemPickup(itemInstanceId))
+                .subscribe(socketResponseSubscriber);
+    }
+
+
+    private Predicate<WebSocketSession> listensToItemPickup(String itemInstanceId) {
+        return s -> {
+            String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
+
+            if (!serverName.isBlank()) {
+                return false;
+                // servers don't need item updates
+            }
+
+            List<String> trackedItems = (List<String>) s.asMap().getOrDefault(
+                    SessionParams.DROPPED_ITEMS.getType(), List.of());
+
+            if (trackedItems.contains(itemInstanceId)) {
+                trackedItems.remove(itemInstanceId);
+
+                return true;
+            }
+
+            return false;
+        };
+    }
+
+
+
+    private Predicate<WebSocketSession> listensToItemDrops(DroppedItem droppedItem) {
+        return s -> {
+            String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
+
+            if (!serverName.isBlank()) {
+                return false;
+                // servers don't need item updates
+            }
+
+            Motion motion = (Motion) s.asMap().getOrDefault(SessionParams.MOTION.getType(), null);
+
+            if (motion == null) {
+                return false;
+            }
+
+            int defaultThresholdDistance = 1000;
+            Location location = new Location(motion);
+            return location.withinThreshold(droppedItem.getLocation(), defaultThresholdDistance);
+        };
     }
 
     private Predicate<WebSocketSession> isValid(String playerOrMob) {

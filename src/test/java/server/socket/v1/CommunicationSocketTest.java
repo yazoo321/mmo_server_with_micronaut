@@ -109,7 +109,7 @@ public class CommunicationSocketTest {
         abstract void send(SocketMessage message);
     }
 
-    private CommunicationSocketTest.TestWebSocketClient createWebSocketClient(int port) {
+    private TestWebSocketClient createWebSocketClient(int port) {
         WebSocketClient webSocketClient = beanContext.getBean(WebSocketClient.class);
         URI uri =
                 UriBuilder.of("ws://localhost")
@@ -118,8 +118,8 @@ public class CommunicationSocketTest {
                         .path("communication-socket")
                         .build();
 
-        Publisher<CommunicationSocketTest.TestWebSocketClient> client =
-                webSocketClient.connect(CommunicationSocketTest.TestWebSocketClient.class, uri);
+        Publisher<TestWebSocketClient> client =
+                webSocketClient.connect(TestWebSocketClient.class, uri);
         return Flux.from(client).blockFirst();
     }
 
@@ -144,11 +144,11 @@ public class CommunicationSocketTest {
         playerMotionService.initializePlayerMotion(CHARACTER_2).blockingGet();
         playerMotionService.initializePlayerMotion(CHARACTER_3).blockingGet();
 
-        CommunicationSocketTest.TestWebSocketClient playerClient1 =
+        TestWebSocketClient playerClient1 =
                 createWebSocketClient(embeddedServer.getPort());
-        CommunicationSocketTest.TestWebSocketClient playerClient2 =
+        TestWebSocketClient playerClient2 =
                 createWebSocketClient(embeddedServer.getPort());
-        CommunicationSocketTest.TestWebSocketClient playerClient3 =
+        TestWebSocketClient playerClient3 =
                 createWebSocketClient(embeddedServer.getPort());
 
         SocketMessage char1WithinRange = createMessageForMotionWithinRange(CHARACTER_1);
@@ -235,11 +235,11 @@ public class CommunicationSocketTest {
         playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         playerMotionService.initializePlayerMotion(CHARACTER_2).blockingGet();
 
-        CommunicationSocketTest.TestWebSocketClient playerClient1 =
+        TestWebSocketClient playerClient1 =
                 createWebSocketClient(embeddedServer.getPort());
-        CommunicationSocketTest.TestWebSocketClient playerClient2 =
+        TestWebSocketClient playerClient2 =
                 createWebSocketClient(embeddedServer.getPort());
-        CommunicationSocketTest.TestWebSocketClient mobServerClient =
+        TestWebSocketClient mobServerClient =
                 createWebSocketClient(embeddedServer.getPort());
 
         SocketMessage char1WithinRange = createMessageForMotionWithinRange(CHARACTER_1);
@@ -363,7 +363,7 @@ public class CommunicationSocketTest {
     }
 
     private List<SocketResponse> getSocketResponse(
-            CommunicationSocketTest.TestWebSocketClient client) {
+            TestWebSocketClient client) {
         List<SocketResponse> allResponses = new ArrayList<>();
         client.getMessagesChronologically()
                 .forEach(
