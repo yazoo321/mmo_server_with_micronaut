@@ -1,27 +1,32 @@
 package server.items.types.weapons;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import server.common.dto.Tag;
+import server.items.equippable.model.EquippedItems;
+import server.items.equippable.model.types.ShieldSlot;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
 import server.items.model.ItemInstance;
 import server.items.model.Stacking;
 import server.items.types.ItemType;
-import server.items.equippable.model.EquippedItems;
-import server.items.equippable.model.types.ShieldSlot;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @JsonTypeName("SHIELD")
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class Shield extends Item {
 
-    public Shield(String itemId, String itemName, List<Tag> tags, Stacking stacking, Integer value, ItemConfig config) {
+    public Shield(
+            String itemId,
+            String itemName,
+            List<Tag> tags,
+            Stacking stacking,
+            Integer value,
+            ItemConfig config) {
         super(itemId, itemName, ItemType.SHIELD.getType(), tags, stacking, value, config);
     }
 
@@ -29,5 +34,4 @@ public class Shield extends Item {
     public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
         return new ShieldSlot(characterName, itemInstance);
     }
-
 }

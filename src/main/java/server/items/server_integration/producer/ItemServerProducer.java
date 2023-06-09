@@ -9,5 +9,4 @@ public interface ItemServerProducer {
 
     @Topic("drop-item-result")
     void sendDropItemResult(DroppedItem droppedItem);
-
 }

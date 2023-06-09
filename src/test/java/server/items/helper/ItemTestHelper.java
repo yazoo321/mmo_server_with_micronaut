@@ -16,24 +16,24 @@ import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.common.dto.Tag;
 import server.configuration.MongoConfiguration;
-import server.items.types.accessories.Belt;
-import server.items.types.accessories.Cape;
-import server.items.types.accessories.Neck;
-import server.items.types.accessories.Ring;
+import server.items.equippable.model.EquippedItems;
+import server.items.inventory.model.CharacterItem;
+import server.items.inventory.model.Inventory;
+import server.items.inventory.repository.InventoryRepository;
+import server.items.inventory.service.InventoryService;
 import server.items.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemConfig;
 import server.items.model.ItemInstance;
 import server.items.model.Stacking;
 import server.items.service.ItemService;
+import server.items.types.accessories.Belt;
+import server.items.types.accessories.Cape;
+import server.items.types.accessories.Neck;
+import server.items.types.accessories.Ring;
 import server.items.types.armour.*;
 import server.items.types.weapons.Shield;
 import server.items.types.weapons.Weapon;
-import server.items.equippable.model.EquippedItems;
-import server.items.inventory.model.CharacterItem;
-import server.items.inventory.model.Inventory;
-import server.items.inventory.repository.InventoryRepository;
-import server.items.inventory.service.InventoryService;
 
 @Singleton
 public class ItemTestHelper {
@@ -124,10 +124,11 @@ public class ItemTestHelper {
                         inventory.getMaxSize(), inventory.getCharacterItems()));
         items.add(characterItem);
 
-        UpdateResult res = inventoryRepository.updateInventoryItems(characterName, items).blockingGet();
+        UpdateResult res =
+                inventoryRepository.updateInventoryItems(characterName, items).blockingGet();
 
         return res.wasAcknowledged() ? characterItem : null;
-//        return characterItem;
+        //        return characterItem;
     }
 
     public Inventory insertInventory(Inventory inventory) {

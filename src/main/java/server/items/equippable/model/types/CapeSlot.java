@@ -11,7 +11,7 @@ import server.items.types.ItemType;
 @Data
 @NoArgsConstructor
 @JsonTypeName("CAPE")
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class CapeSlot extends EquippedItems {
 
     public CapeSlot(String characterName, ItemInstance itemInstance) {

@@ -11,14 +11,11 @@ import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.websocket.WebSocketClient;
-import io.micronaut.websocket.annotation.ClientWebSocket;
-import io.micronaut.websocket.annotation.OnMessage;
 import jakarta.inject.Inject;
 import java.net.URI;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
@@ -81,8 +78,7 @@ public class MotionSocketV2Test {
         playerMotionUtil.deleteAllMobInstanceData();
     }
 
-    private TestWebSocketClient createWebSocketClient(
-            int port, String map, String playerName) {
+    private TestWebSocketClient createWebSocketClient(int port, String map, String playerName) {
         WebSocketClient webSocketClient = beanContext.getBean(WebSocketClient.class);
         URI uri =
                 UriBuilder.of("ws://localhost")

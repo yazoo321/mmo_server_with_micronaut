@@ -40,5 +40,4 @@ public class SocketUpdateListener {
     void itemRemovedFromMap(String itemInstanceId) {
         clientUpdatesService.sendItemPickupUpdates(itemInstanceId);
     }
-
 }

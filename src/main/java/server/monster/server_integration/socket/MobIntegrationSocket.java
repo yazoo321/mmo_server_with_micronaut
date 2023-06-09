@@ -43,7 +43,8 @@ public class MobIntegrationSocket {
             playerMotionService.updatePlayerMotion(serverInstance, message.getMotion());
         }
 
-        return playerMotionService.getPlayersNearMe(message.getMotion(), serverInstance)
+        return playerMotionService
+                .getPlayersNearMe(message.getMotion(), serverInstance)
                 .doOnSuccess(broadcaster::broadcast);
     }
 

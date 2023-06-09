@@ -1,10 +1,8 @@
 package server.items.model;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import server.items.model.DroppedItem;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor

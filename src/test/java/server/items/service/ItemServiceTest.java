@@ -10,10 +10,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
-import server.items.model.DroppedItem;
 import server.items.helper.ItemTestHelper;
+import server.items.model.DroppedItem;
 import server.items.model.ItemInstance;
-import server.items.model.exceptions.ItemException;
 import server.items.types.ItemType;
 import server.items.types.weapons.Weapon;
 
@@ -54,7 +53,8 @@ public class ItemServiceTest {
                         LocalDateTime.now());
 
         // When
-        DroppedItem actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop).blockingGet();
+        DroppedItem actual =
+                itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop).blockingGet();
 
         // Then
         Assertions.assertThat(actual)
@@ -72,7 +72,10 @@ public class ItemServiceTest {
                 itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
-        DroppedItem actual = itemService.getDroppedItemById(expectedDroppedItem.getDroppedItemId()).blockingGet();
+        DroppedItem actual =
+                itemService
+                        .getDroppedItemById(expectedDroppedItem.getDroppedItemId())
+                        .blockingGet();
 
         // Then
         Assertions.assertThat(actual)
@@ -128,7 +131,6 @@ public class ItemServiceTest {
         // TODO: Check for ItemException nested
         org.junit.jupiter.api.Assertions.assertThrows(
                 CompositeException.class,
-                () ->
-                        itemService.getDroppedItemById(droppedItem.getDroppedItemId()).blockingGet());
+                () -> itemService.getDroppedItemById(droppedItem.getDroppedItemId()).blockingGet());
     }
 }

@@ -11,7 +11,7 @@ import server.items.types.ItemType;
 @Data
 @NoArgsConstructor
 @JsonTypeName("GLOVES")
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class GlovesSlot extends EquippedItems {
 
     public GlovesSlot(String characterName, ItemInstance itemInstance) {

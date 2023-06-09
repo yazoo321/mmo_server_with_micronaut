@@ -11,11 +11,10 @@ import server.items.types.ItemType;
 @Data
 @NoArgsConstructor
 @JsonTypeName("WEAPON")
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class WeaponSlot1 extends EquippedItems {
 
     public WeaponSlot1(String characterName, ItemInstance itemInstance) {
         super(characterName, itemInstance, ItemType.WEAPON.getType());
     }
-
 }

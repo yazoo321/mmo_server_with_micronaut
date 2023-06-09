@@ -6,19 +6,15 @@ import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
-import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import java.util.function.Predicate;
-
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import server.motion.model.MotionMessage;
-import server.motion.model.PlayerMotionList;
 import server.motion.service.PlayerMotionService;
 import server.motion.socket.model.PlayerMotionListSubscriber;
-import server.socket.model.SocketResponseSubscriber;
 
-@Deprecated  // use CommunicationSocket instead
+@Deprecated // use CommunicationSocket instead
 @Slf4j
 @ServerWebSocket("/v1/player-motion/{map}/{playerName}/")
 public class PlayerMotionSocket {
@@ -27,8 +23,7 @@ public class PlayerMotionSocket {
 
     @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    PlayerMotionListSubscriber subscriber;
+    @Inject PlayerMotionListSubscriber subscriber;
 
     public PlayerMotionSocket(WebSocketBroadcaster broadcaster) {
         this.broadcaster = broadcaster;
@@ -47,10 +42,12 @@ public class PlayerMotionSocket {
             playerMotionService.updatePlayerMotion(playerName, message.getMotion()).subscribe();
         }
 
-        playerMotionService.getPlayersNearMe(message.getMotion(), playerName)
-                .doOnSuccess(motionList -> {
-                    session.send(motionList).subscribe(subscriber);
-                })
+        playerMotionService
+                .getPlayersNearMe(message.getMotion(), playerName)
+                .doOnSuccess(
+                        motionList -> {
+                            session.send(motionList).subscribe(subscriber);
+                        })
                 .subscribe();
     }
 

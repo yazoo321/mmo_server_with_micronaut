@@ -5,8 +5,8 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import server.items.inventory.model.Inventory;
 import server.items.inventory.model.response.GenericInventoryData;
-import server.items.model.DroppedItem;
 import server.items.inventory.service.InventoryService;
+import server.items.model.DroppedItem;
 
 @Deprecated // use websocket comms instead
 @Controller("/v1/inventory")

@@ -8,22 +8,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
-import server.items.inventory.model.response.GenericInventoryData;
-import server.items.inventory.service.InventoryService;
-import server.items.model.DroppedItem;
 import server.items.helper.ItemTestHelper;
-import server.items.service.ItemService;
-import server.items.types.ItemType;
-import server.items.types.weapons.Weapon;
 import server.items.inventory.model.CharacterItem;
 import server.items.inventory.model.Inventory;
 import server.items.inventory.model.exceptions.InventoryException;
+import server.items.inventory.model.response.GenericInventoryData;
+import server.items.model.DroppedItem;
+import server.items.service.ItemService;
+import server.items.types.ItemType;
+import server.items.types.weapons.Weapon;
 
 @MicronautTest
 public class InventoryServiceTest {
 
-    @Inject
-    InventoryService inventoryService;
+    @Inject InventoryService inventoryService;
 
     @Inject ItemService itemService;
 
@@ -114,7 +112,6 @@ public class InventoryServiceTest {
         request.setCharacterName(CHARACTER_NAME);
         request.setDroppedItemId(droppedItem.getDroppedItemId());
         org.junit.jupiter.api.Assertions.assertThrows(
-                InventoryException.class,
-                () -> inventoryService.pickupItem(request).blockingGet());
+                InventoryException.class, () -> inventoryService.pickupItem(request).blockingGet());
     }
 }

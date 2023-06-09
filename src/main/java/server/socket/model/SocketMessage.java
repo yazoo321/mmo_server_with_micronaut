@@ -3,9 +3,9 @@ package server.socket.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import server.items.inventory.model.response.GenericInventoryData;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
-import server.items.inventory.model.response.GenericInventoryData;
 
 @Data
 @NoArgsConstructor

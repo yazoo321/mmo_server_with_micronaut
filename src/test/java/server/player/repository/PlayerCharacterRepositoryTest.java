@@ -11,15 +11,13 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.player.model.Character;
 import server.player.exceptions.CharacterException;
-import server.player.repository.PlayerCharacterRepository;
+import server.player.model.Character;
 
 @MicronautTest
 public class PlayerCharacterRepositoryTest {
 
-    @Inject
-    PlayerCharacterRepository playerCharacterRepository;
+    @Inject PlayerCharacterRepository playerCharacterRepository;
 
     private static final String CHAR_1 = "char1";
     private static final String CHAR_2 = "char2";

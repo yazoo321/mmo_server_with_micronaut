@@ -4,20 +4,16 @@ import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 
 import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import server.configuration.MongoConfiguration;
 import server.items.equippable.model.EquippedItems;
-import server.items.equippable.model.exceptions.EquipException;
 
 @Slf4j
 @Singleton
@@ -48,10 +44,9 @@ public class EquipRepository {
 
     public Maybe<EquippedItems> getCharacterItemSlot(String characterName, String slotType) {
         return Flowable.fromPublisher(
-                equippedItemsCollection.find(
-                        and(
-                                eq("characterName", characterName),
-                                eq("category", slotType)))).firstElement();
+                        equippedItemsCollection.find(
+                                and(eq("characterName", characterName), eq("category", slotType))))
+                .firstElement();
     }
 
     public Single<DeleteResult> deleteEquippedItem(String itemInstanceId) {

@@ -4,7 +4,6 @@ import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +58,10 @@ public class ClientUpdatesService {
         SocketResponse socketResponse =
                 SocketResponse.builder()
                         .messageType(SocketResponseType.ADD_ITEMS_TO_MAP.getType())
-                        .droppedItems(Map.of(droppedItem.getItemInstance().getItemInstanceId(), droppedItem))
+                        .droppedItems(
+                                Map.of(
+                                        droppedItem.getItemInstance().getItemInstanceId(),
+                                        droppedItem))
                         .build();
 
         broadcaster
@@ -79,7 +81,6 @@ public class ClientUpdatesService {
                 .subscribe(socketResponseSubscriber);
     }
 
-
     private Predicate<WebSocketSession> listensToItemPickup(String itemInstanceId) {
         return s -> {
             String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
@@ -89,8 +90,10 @@ public class ClientUpdatesService {
                 // servers don't need item updates
             }
 
-            List<String> trackedItems = (List<String>) s.asMap().getOrDefault(
-                    SessionParams.DROPPED_ITEMS.getType(), List.of());
+            List<String> trackedItems =
+                    (List<String>)
+                            s.asMap()
+                                    .getOrDefault(SessionParams.DROPPED_ITEMS.getType(), List.of());
 
             if (trackedItems.contains(itemInstanceId)) {
                 trackedItems.remove(itemInstanceId);
@@ -101,8 +104,6 @@ public class ClientUpdatesService {
             return false;
         };
     }
-
-
 
     private Predicate<WebSocketSession> listensToItemDrops(DroppedItem droppedItem) {
         return s -> {

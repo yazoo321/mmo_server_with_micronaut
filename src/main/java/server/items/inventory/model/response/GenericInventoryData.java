@@ -1,6 +1,6 @@
 package server.items.inventory.model.response;
 
-
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,8 +11,6 @@ import server.items.equippable.model.GenericEquipData;
 import server.items.inventory.model.Inventory;
 import server.items.model.DroppedItem;
 import server.items.model.Item;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor

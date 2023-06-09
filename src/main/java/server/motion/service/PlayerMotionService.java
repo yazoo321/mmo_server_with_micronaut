@@ -85,7 +85,8 @@ public class PlayerMotionService {
 
     public Single<PlayerMotionList> getPlayersNearMe(Motion motion, String playerName) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
-        return playerMotionRepository.getPlayersNearby(playerMotion, DEFAULT_DISTANCE_THRESHOLD)
+        return playerMotionRepository
+                .getPlayersNearby(playerMotion, DEFAULT_DISTANCE_THRESHOLD)
                 .doOnError(e -> log.error("Failed to get players motion, {}", e.getMessage()))
                 .map(PlayerMotionList::new);
     }

@@ -3,7 +3,6 @@ package server.common.mongo.query;
 import static com.mongodb.client.model.Filters.and;
 
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;

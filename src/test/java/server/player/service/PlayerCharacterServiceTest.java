@@ -10,7 +10,6 @@ import server.common.attributes.types.ClassesAttributeTypes;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
 import server.player.repository.PlayerCharacterRepository;
-import server.player.service.PlayerCharacterService;
 import server.util.TestCharacterUtil;
 
 @MicronautTest
@@ -18,8 +17,7 @@ public class PlayerCharacterServiceTest {
 
     // This test will be very similar to
     // PlayerCharacterRepository test as there's limited functionality
-    @Inject
-    PlayerCharacterService playerCharacterService;
+    @Inject PlayerCharacterService playerCharacterService;
 
     @Inject PlayerCharacterRepository playerCharacterRepository;
 

@@ -6,7 +6,6 @@ import jakarta.inject.Singleton;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import server.motion.model.PlayerMotionList;
-import server.socket.model.SocketResponse;
 
 @Singleton
 @Requires(beans = WebSocketBroadcaster.class)

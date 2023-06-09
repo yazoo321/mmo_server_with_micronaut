@@ -18,8 +18,7 @@ public class SocketProcessOutgoingService {
 
     UpdateProducer updateProducer;
 
-    @Inject
-    ItemSocketIntegration itemSocketIntegration;
+    @Inject ItemSocketIntegration itemSocketIntegration;
 
     public SocketProcessOutgoingService(
             @KafkaClient("update-producer") UpdateProducer updateProducer) {

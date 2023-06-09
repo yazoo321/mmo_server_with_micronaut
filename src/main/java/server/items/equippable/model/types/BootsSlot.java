@@ -11,7 +11,7 @@ import server.items.types.ItemType;
 @Data
 @NoArgsConstructor
 @JsonTypeName("BOOTS")
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class BootsSlot extends EquippedItems {
 
     public BootsSlot(String characterName, ItemInstance itemInstance) {

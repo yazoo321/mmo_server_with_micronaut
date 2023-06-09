@@ -25,45 +25,74 @@ public class ItemService {
 
     ItemServerProducer itemServerProducer;
 
-    public ItemService(
-            @KafkaClient("item-client") ItemServerProducer itemServerProducer) {
+    public ItemService(@KafkaClient("item-client") ItemServerProducer itemServerProducer) {
         this.itemServerProducer = itemServerProducer;
     }
 
     public Single<DroppedItem> createNewDroppedItem(String itemId, Location location) {
         LocalDateTime now = LocalDateTime.now();
 
-        return itemRepository.findByItemId(itemId)
-                .doOnError(e -> log.error("Failed to find item when creating dropped item, {}", e.getMessage()))
-                .flatMap(foundItem -> {
-                    String itemInstanceId = UUID.randomUUID().toString();
-                    String droppedItemId =
-                            UUID.randomUUID().toString(); // generate unique ID for the dropped item
+        return itemRepository
+                .findByItemId(itemId)
+                .doOnError(
+                        e ->
+                                log.error(
+                                        "Failed to find item when creating dropped item, {}",
+                                        e.getMessage()))
+                .flatMap(
+                        foundItem -> {
+                            String itemInstanceId = UUID.randomUUID().toString();
+                            String droppedItemId =
+                                    UUID.randomUUID()
+                                            .toString(); // generate unique ID for the dropped item
 
-                    ItemInstance instance = new ItemInstance(itemId, itemInstanceId, foundItem);
-                    return itemRepository.createItemInstance(instance)
-                            .doOnError(e -> log.error("failed to generate item instance for dropped item, {}", e.getMessage()))
-                            .flatMap(ins -> {
-                                DroppedItem droppedItem = new DroppedItem(droppedItemId, location, instance, now);
-                                return itemRepository.createDroppedItem(droppedItem);
-                            });
-
-                });
+                            ItemInstance instance =
+                                    new ItemInstance(itemId, itemInstanceId, foundItem);
+                            return itemRepository
+                                    .createItemInstance(instance)
+                                    .doOnError(
+                                            e ->
+                                                    log.error(
+                                                            "failed to generate item instance for"
+                                                                    + " dropped item, {}",
+                                                            e.getMessage()))
+                                    .flatMap(
+                                            ins -> {
+                                                DroppedItem droppedItem =
+                                                        new DroppedItem(
+                                                                droppedItemId,
+                                                                location,
+                                                                instance,
+                                                                now);
+                                                return itemRepository.createDroppedItem(
+                                                        droppedItem);
+                                            });
+                        });
     }
-
 
     public Single<DroppedItem> dropExistingItem(String itemInstanceId, Location location) {
         LocalDateTime now = LocalDateTime.now();
         String uuid = UUID.randomUUID().toString(); // generate unique ID for the dropped item
-        return itemRepository.findItemInstanceById(itemInstanceId)
-                .doOnError(e -> log.error("Failed to get item instance to drop item, {}", e.getMessage()))
-                .flatMap(itemInstance -> {
-                    DroppedItem droppedItem = new DroppedItem(uuid, location, itemInstance, now);
-                    return itemRepository.createDroppedItem(droppedItem)
-                            .doOnError(e -> log.error("failed to create dropped item, {}", e.getMessage()))
-                            .map(item -> item);
-                });
-
+        return itemRepository
+                .findItemInstanceById(itemInstanceId)
+                .doOnError(
+                        e ->
+                                log.error(
+                                        "Failed to get item instance to drop item, {}",
+                                        e.getMessage()))
+                .flatMap(
+                        itemInstance -> {
+                            DroppedItem droppedItem =
+                                    new DroppedItem(uuid, location, itemInstance, now);
+                            return itemRepository
+                                    .createDroppedItem(droppedItem)
+                                    .doOnError(
+                                            e ->
+                                                    log.error(
+                                                            "failed to create dropped item, {}",
+                                                            e.getMessage()))
+                                    .map(item -> item);
+                        });
     }
 
     public Single<DroppedItem> getDroppedItemById(String droppedItemId) {

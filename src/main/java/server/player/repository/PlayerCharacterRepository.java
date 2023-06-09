@@ -22,8 +22,8 @@ import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import server.common.dto.Motion;
 import server.configuration.MongoConfiguration;
-import server.player.model.Character;
 import server.player.exceptions.CharacterException;
+import server.player.model.Character;
 
 @Singleton
 public class PlayerCharacterRepository {

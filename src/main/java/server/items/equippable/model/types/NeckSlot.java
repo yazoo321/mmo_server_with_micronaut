@@ -11,7 +11,7 @@ import server.items.types.ItemType;
 @Data
 @NoArgsConstructor
 @JsonTypeName("NECK")
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class NeckSlot extends EquippedItems {
 
     public NeckSlot(String characterName, ItemInstance itemInstance) {

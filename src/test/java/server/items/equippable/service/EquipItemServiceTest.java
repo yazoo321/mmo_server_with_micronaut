@@ -12,22 +12,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import server.common.dto.Location2D;
+import server.items.equippable.model.EquippedItems;
 import server.items.equippable.model.types.*;
-import server.items.equippable.service.EquipItemService;
 import server.items.helper.ItemTestHelper;
+import server.items.inventory.model.CharacterItem;
+import server.items.inventory.model.Inventory;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.types.ItemType;
-import server.items.equippable.model.EquippedItems;
-import server.items.inventory.model.CharacterItem;
-import server.items.inventory.model.Inventory;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EquipItemServiceTest {
 
-    @Inject
-    EquipItemService equipItemService;
+    @Inject EquipItemService equipItemService;
 
     @Inject ItemTestHelper itemTestHelper;
 
@@ -166,7 +164,8 @@ public class EquipItemServiceTest {
         equipItemService.equipItem("override", CHARACTER_NAME).blockingGet();
 
         // Then
-        List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME).blockingGet();
+        List<EquippedItems> equipped =
+                equipItemService.getEquippedItems(CHARACTER_NAME).blockingGet();
         Assertions.assertThat(equipped)
                 .usingRecursiveComparison()
                 .ignoringFields(
@@ -218,13 +217,20 @@ public class EquipItemServiceTest {
         CharacterItem i1 = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance1);
         CharacterItem i2 = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance2);
 
-        EquippedItems items = equipItemService.equipItem(instance1.getItemInstanceId(), CHARACTER_NAME).blockingGet();
+        EquippedItems items =
+                equipItemService
+                        .equipItem(instance1.getItemInstanceId(), CHARACTER_NAME)
+                        .blockingGet();
 
         // When
-        items = equipItemService.equipItem(instance2.getItemInstanceId(), CHARACTER_NAME).blockingGet();
+        items =
+                equipItemService
+                        .equipItem(instance2.getItemInstanceId(), CHARACTER_NAME)
+                        .blockingGet();
 
         // Then
-        List<EquippedItems> equipped = equipItemService.getEquippedItems(CHARACTER_NAME).blockingGet();
+        List<EquippedItems> equipped =
+                equipItemService.getEquippedItems(CHARACTER_NAME).blockingGet();
         Assertions.assertThat(equipped.size()).isEqualTo(1);
 
         Assertions.assertThat(equipped)

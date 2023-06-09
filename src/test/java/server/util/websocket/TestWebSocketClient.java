@@ -2,13 +2,12 @@ package server.util.websocket;
 
 import io.micronaut.websocket.annotation.ClientWebSocket;
 import io.micronaut.websocket.annotation.OnMessage;
-import server.motion.model.MotionMessage;
-import server.socket.model.SocketMessage;
-
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import server.motion.model.MotionMessage;
+import server.socket.model.SocketMessage;
 
 @ClientWebSocket
 public abstract class TestWebSocketClient implements AutoCloseable {
