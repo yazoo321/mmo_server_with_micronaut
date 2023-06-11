@@ -86,12 +86,14 @@ public class ItemService {
                                     new DroppedItem(uuid, location, itemInstance, now);
                             return itemRepository
                                     .createDroppedItem(droppedItem)
+                                    .map(item -> {
+                                        return item;
+                                    })
                                     .doOnError(
                                             e ->
                                                     log.error(
                                                             "failed to create dropped item, {}",
-                                                            e.getMessage()))
-                                    .map(item -> item);
+                                                            e.getMessage()));
                         });
     }
 

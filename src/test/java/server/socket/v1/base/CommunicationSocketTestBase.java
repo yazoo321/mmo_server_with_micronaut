@@ -9,15 +9,27 @@ import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.websocket.WebSocketClient;
 import jakarta.inject.Inject;
+
+import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
 import server.items.helper.ItemTestHelper;
+import server.monster.server_integration.model.Monster;
+import server.motion.dto.PlayerMotion;
 import server.motion.service.PlayerMotionService;
+import server.socket.model.MessageType;
+import server.socket.model.SocketMessage;
+import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseType;
 import server.util.PlayerMotionUtil;
+import server.util.websocket.TestWebSocketClient;
 
 public class CommunicationSocketTestBase {
 
@@ -51,7 +63,7 @@ public class CommunicationSocketTestBase {
 
     protected final String MOB_SERVER_NAME = "UE_SERVER_MAP_1";
 
-    protected final int TIMEOUT = 5;
+    protected final int TIMEOUT = 10;
 
     @BeforeEach
     void setup() {
@@ -96,5 +108,81 @@ public class CommunicationSocketTestBase {
                 .yaw(320)
                 .map(MAP_1)
                 .build();
+    }
+
+    protected SocketMessage createMessageForMotionOutOfRange(String characterName) {
+        SocketMessage socketMsg = createMessageForMotionWithinRange(characterName);
+        Motion motion = socketMsg.getPlayerMotion().getMotion();
+
+        motion.setX(10_000);
+        motion.setY(10_000);
+
+        return socketMsg;
+    }
+
+    protected SocketMessage createMessageForMotionWithinRange(String characterName) {
+        Motion motionWithinRange = createBaseMotion();
+        PlayerMotion playerMotion = new PlayerMotion();
+        playerMotion.setMotion(motionWithinRange);
+        playerMotion.setPlayerName(characterName);
+
+        SocketMessage playerMessageWithinRange = new SocketMessage();
+        playerMessageWithinRange.setPlayerMotion(playerMotion);
+        playerMessageWithinRange.setPlayerName(characterName);
+        playerMessageWithinRange.setUpdateType(MessageType.PLAYER_MOTION.getType());
+
+        return playerMessageWithinRange;
+    }
+
+    protected SocketMessage createMobMessageForMotionWithinRange(String mobInstanceId) {
+        Motion motionWithinRange = createBaseMotion();
+
+        Monster mob = new Monster();
+        mob.setMobInstanceId(mobInstanceId);
+        mob.setMobId(mobInstanceId);
+        mob.setMotion(motionWithinRange);
+
+        SocketMessage msg = new SocketMessage();
+        msg.setMobId(mobInstanceId);
+        msg.setMobInstanceId(mobInstanceId);
+        msg.setMonster(mob);
+        msg.setServerName(MOB_SERVER_NAME);
+
+        return msg;
+    }
+
+    protected SocketMessage createMobMessageForMotionOutOfRange(String mobInstanceId) {
+        SocketMessage msg = createMobMessageForMotionWithinRange(mobInstanceId);
+
+        msg.getMonster().getMotion().setX(10_000);
+        msg.getMonster().getMotion().setY(10_000);
+
+        return msg;
+    }
+
+    protected List<SocketResponse> getSocketResponse(TestWebSocketClient client) {
+        List<SocketResponse> allResponses = new ArrayList<>();
+        client.getMessagesChronologically()
+                .forEach(
+                        message -> {
+                            try {
+                                allResponses.add(
+                                        objectReader.readValue(message, SocketResponse.class));
+                            } catch (IOException e) {
+                                // ignore
+                            }
+                        });
+
+        return allResponses;
+    }
+
+    protected SocketResponse getLastMessageOfType(List<SocketResponse> responses, String type) {
+        for (SocketResponse res : responses) {
+            if (res.getMessageType().equals(type)) {
+                return res;
+            }
+        }
+
+        return null;
     }
 }

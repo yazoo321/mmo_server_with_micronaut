@@ -149,7 +149,9 @@ public class InventoryService {
 
                             List<CharacterItem> itemsList = inventory.getCharacterItems();
                             itemsList.remove(characterItem);
-                            inventoryRepository.updateInventoryItems(characterName, itemsList);
+
+                            // TODO: Make async
+                            inventoryRepository.updateInventoryItems(characterName, itemsList).blockingGet();
 
                             // TODO: if dropItem fails, we need to revert the removal of item from
                             // inventory.

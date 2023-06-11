@@ -31,8 +31,8 @@ public interface UpdateProducer {
     //    void dropItemSuccess(GenericInventoryData request);
 
     @Topic("item-added-to-map")
-    void pickupItemSuccess(DroppedItem droppedItem);
+    void addItemToMap(DroppedItem droppedItem);
 
     @Topic("item-removed-from-map")
-    void dropItemSuccess(String itemInstanceId);
+    void removeItemFromMap(String itemInstanceId);
 }

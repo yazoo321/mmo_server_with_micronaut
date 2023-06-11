@@ -109,7 +109,7 @@ public class ClientUpdatesService {
         return s -> {
             String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
 
-            if (!serverName.isBlank()) {
+            if (serverName != null && !serverName.isBlank()) {
                 return false;
                 // servers don't need item updates
             }

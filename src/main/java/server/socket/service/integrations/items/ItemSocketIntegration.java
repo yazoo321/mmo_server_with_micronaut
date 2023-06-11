@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.inventory.service.InventoryService;
 import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
 import server.socket.producer.UpdateProducer;
 
@@ -20,6 +21,9 @@ public class ItemSocketIntegration {
     // here we can have access to session, so we can provide results back before publishing changes
 
     @Inject InventoryService inventoryService;
+
+    @Inject
+    SocketResponseSubscriber socketResponseSubscriber;
 
     UpdateProducer updateProducer;
 
@@ -44,12 +48,12 @@ public class ItemSocketIntegration {
                                                     SocketResponseType.INVENTORY_ERROR.getType())
                                             .error(e.getMessage())
                                             .build();
-                            session.send(response);
+                            session.send(response).subscribe(socketResponseSubscriber);
                         })
                 .doOnSuccess(
                         droppedItem -> {
-                            // we don't need the dropped item now, this will need to be refactored
-                            // later
+                            updateProducer.addItemToMap(droppedItem);
+
                             inventoryService
                                     .getInventory(request.getCharacterName())
                                     .doOnSuccess(
@@ -65,10 +69,10 @@ public class ItemSocketIntegration {
                                                                                 .getType())
                                                                 .inventoryData(inventoryData)
                                                                 .build();
-                                                session.send(response);
+                                                session.send(response).subscribe(socketResponseSubscriber);
                                             })
                                     .subscribe();
-                        });
+                        }).subscribe();
     }
 
     public void handlePickupItem(GenericInventoryData request, WebSocketSession session) {
@@ -85,7 +89,7 @@ public class ItemSocketIntegration {
                                                     SocketResponseType.INVENTORY_ERROR.getType())
                                             .error(e.getMessage())
                                             .build();
-                            session.send(response);
+                            session.send(response).subscribe(socketResponseSubscriber);
                         })
                 .doOnSuccess(
                         inventory -> {
@@ -97,7 +101,7 @@ public class ItemSocketIntegration {
                                                     SocketResponseType.INVENTORY_UPDATE.getType())
                                             .inventoryData(inventoryData)
                                             .build();
-                            session.send(response);
+                            session.send(response).subscribe(socketResponseSubscriber);
                         })
                 .subscribe();
     }
