@@ -4,9 +4,8 @@ import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
@@ -90,10 +89,10 @@ public class ClientUpdatesService {
                 // servers don't need item updates
             }
 
-            List<String> trackedItems =
-                    (List<String>)
+            Set<String> trackedItems =
+                    (Set<String>)
                             s.asMap()
-                                    .getOrDefault(SessionParams.DROPPED_ITEMS.getType(), List.of());
+                                    .getOrDefault(SessionParams.DROPPED_ITEMS.getType(), Set.of());
 
             if (trackedItems.contains(itemInstanceId)) {
                 trackedItems.remove(itemInstanceId);
@@ -122,7 +121,17 @@ public class ClientUpdatesService {
 
             int defaultThresholdDistance = 1000;
             Location location = new Location(motion);
-            return location.withinThreshold(droppedItem.getLocation(), defaultThresholdDistance);
+            if (location.withinThreshold(droppedItem.getLocation(), defaultThresholdDistance)) {
+                Set<String> trackedItems = (Set<String>) s.asMap()
+                        .getOrDefault(SessionParams.DROPPED_ITEMS.getType(), new HashSet<>());
+
+                trackedItems.add(droppedItem.getItemInstance().getItemInstanceId());
+                s.put(SessionParams.DROPPED_ITEMS.getType(), trackedItems);
+
+                return true;
+            }
+
+            return false;
         };
     }
 

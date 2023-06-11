@@ -90,6 +90,24 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
                 .usingRecursiveComparison()
                 .ignoringFields("item.category")
                 .isEqualTo(createdItem);
+
+
+        // now have character 2 pickup this item
+        SocketMessage pickupMessage = pickupRequestForCharacter(CHARACTER_2, client1DroppedItem.getDroppedItems()
+                .get(instanceIds.get(0)).getDroppedItemId());
+
+        playerClient2.send(pickupMessage);
+
+        await().pollDelay(300, TimeUnit.MILLISECONDS)
+                .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
+                .until(() -> {
+                    List<String> resTypes = getSocketResponse(playerClient2)
+                            .stream()
+                            .map(SocketResponse::getMessageType)
+                            .toList();
+                    return resTypes.contains(SocketResponseType.ADD_ITEMS_TO_MAP.getType());
+                });
+
     }
 
     private void initializeCharacters(TestWebSocketClient client1, TestWebSocketClient client2) {
@@ -111,6 +129,18 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
         genericInventoryData.setLocation(dropLocation);
 
         message.setInventoryRequest(genericInventoryData);
+
+        return message;
+    }
+
+    private SocketMessage pickupRequestForCharacter(String characterName, String dropItemId) {
+        SocketMessage message = new SocketMessage();
+        message.setUpdateType(MessageType.PICKUP_ITEM.getType());
+        GenericInventoryData inventoryData = new GenericInventoryData();
+        inventoryData.setCharacterName(characterName);
+        inventoryData.setDroppedItemId(dropItemId);
+
+        message.setInventoryRequest(inventoryData);
 
         return message;
     }

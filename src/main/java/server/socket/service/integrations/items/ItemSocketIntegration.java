@@ -93,6 +93,8 @@ public class ItemSocketIntegration {
                         })
                 .doOnSuccess(
                         inventory -> {
+                            updateProducer.removeItemFromMap(request.getItemInstanceId());
+
                             GenericInventoryData inventoryData = new GenericInventoryData();
                             inventoryData.setInventory(inventory);
                             SocketResponse response =
