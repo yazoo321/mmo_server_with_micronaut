@@ -42,9 +42,6 @@ public class ItemService {
                 .flatMap(
                         foundItem -> {
                             String itemInstanceId = UUID.randomUUID().toString();
-                            String droppedItemId =
-                                    UUID.randomUUID()
-                                            .toString(); // generate unique ID for the dropped item
 
                             ItemInstance instance =
                                     new ItemInstance(itemId, itemInstanceId, foundItem);
@@ -60,7 +57,7 @@ public class ItemService {
                                             ins -> {
                                                 DroppedItem droppedItem =
                                                         new DroppedItem(
-                                                                droppedItemId,
+                                                                itemInstanceId,
                                                                 location,
                                                                 instance,
                                                                 now);
@@ -97,16 +94,16 @@ public class ItemService {
                         });
     }
 
-    public Single<DroppedItem> getDroppedItemById(String droppedItemId) {
-        return itemRepository.findDroppedItemById(droppedItemId);
+    public Single<DroppedItem> getDroppedItemByInstanceId(String instanceId) {
+        return itemRepository.findDroppedItemByInstanceId(instanceId);
     }
 
     public Single<List<DroppedItem>> getItemsInMap(Location location) {
         return itemRepository.getItemsNear(location);
     }
 
-    public Single<DeleteResult> deleteDroppedItem(String droppedItemId) {
-        return itemRepository.deleteDroppedItem(droppedItemId);
+    public Single<DeleteResult> deleteDroppedItem(String itemInstanceId) {
+        return itemRepository.deleteDroppedItem(itemInstanceId);
     }
 
     public List<Item> createItems(List<Item> items) {

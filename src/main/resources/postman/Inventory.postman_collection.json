@@ -324,7 +324,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"droppedItemId\": \"a541a5b0-b421-480e-ad04-e87a908b92c0\"\r\n}",
+					"raw": "{\r\n    \"itemInstanceId\": \"a541a5b0-b421-480e-ad04-e87a908b92c0\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

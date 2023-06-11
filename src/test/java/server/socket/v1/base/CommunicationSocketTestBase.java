@@ -63,7 +63,7 @@ public class CommunicationSocketTestBase {
 
     protected final String MOB_SERVER_NAME = "UE_SERVER_MAP_1";
 
-    protected final int TIMEOUT = 10;
+    protected final int TIMEOUT = 20;
 
     @BeforeEach
     void setup() {

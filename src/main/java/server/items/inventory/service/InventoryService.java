@@ -29,7 +29,7 @@ public class InventoryService {
 
     public Single<Inventory> pickupItem(GenericInventoryData request) {
         return itemService
-                .getDroppedItemById(request.getDroppedItemId())
+                .getDroppedItemByInstanceId(request.getItemInstanceId())
                 .doOnError(
                         e -> {
                             log.error("Failed to find dropped item, {}", e.getMessage());
@@ -74,7 +74,7 @@ public class InventoryService {
                                                 // TODO: make async..
                                                 itemService
                                                         .deleteDroppedItem(
-                                                                request.getDroppedItemId())
+                                                                request.getItemInstanceId())
                                                         .blockingGet();
                                                 inventoryRepository
                                                         .updateInventoryItems(

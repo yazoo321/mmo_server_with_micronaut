@@ -48,11 +48,11 @@ public class ItemRepository {
                 .map(success -> droppedItem);
     }
 
-    public Single<DroppedItem> findDroppedItemById(String droppedItemId) {
-        return Single.fromPublisher(droppedItemCollection.find(eq("droppedItemId", droppedItemId)))
+    public Single<DroppedItem> findDroppedItemByInstanceId(String itemInstanceId) {
+        return Single.fromPublisher(droppedItemCollection.find(eq("itemInstanceId", itemInstanceId)))
                 .doOnError(
                         e -> {
-                            throw new ItemException("Failed to find dropped item by id");
+                            throw new ItemException("Failed to find dropped item by instance id");
                         });
     }
 
@@ -88,9 +88,9 @@ public class ItemRepository {
                 .toList();
     }
 
-    public Single<DeleteResult> deleteDroppedItem(String droppedItemId) {
+    public Single<DeleteResult> deleteDroppedItem(String itemInstanceId) {
         return Single.fromPublisher(
-                droppedItemCollection.deleteOne(eq("droppedItemId", droppedItemId)));
+                droppedItemCollection.deleteOne(eq("itemInstanceId", itemInstanceId)));
     }
 
     public Single<DeleteResult> deleteTimedOutDroppedItems() {

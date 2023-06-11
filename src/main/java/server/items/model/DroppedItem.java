@@ -20,17 +20,18 @@ public class DroppedItem {
     @BsonCreator
     @JsonCreator
     public DroppedItem(
-            @JsonProperty("droppedItemId") @BsonProperty("droppedItemId") String droppedItemId,
+            @JsonProperty("itemInstanceId") @BsonProperty("itemInstanceId") String itemInstanceId,
             @JsonProperty("location") @BsonProperty("location") Location location,
             @JsonProperty("itemInstance") @BsonProperty("itemInstance") ItemInstance itemInstance,
             @JsonProperty("updatedAt") @BsonProperty("updatedAt") LocalDateTime droppedAt) {
-        this.droppedItemId = droppedItemId;
+        this.itemInstanceId = itemInstanceId;
         this.location = location;
         this.itemInstance = itemInstance;
         this.droppedAt = droppedAt;
     }
 
-    String droppedItemId;
+    // denormalized for faster search
+    String itemInstanceId;
     Location location;
     ItemInstance itemInstance;
 

@@ -94,7 +94,7 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 
         // now have character 2 pickup this item
         SocketMessage pickupMessage = pickupRequestForCharacter(CHARACTER_2, client1DroppedItem.getDroppedItems()
-                .get(instanceIds.get(0)).getDroppedItemId());
+                .get(instanceIds.get(0)).getItemInstanceId());
 
         playerClient2.send(pickupMessage);
 
@@ -133,12 +133,12 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
         return message;
     }
 
-    private SocketMessage pickupRequestForCharacter(String characterName, String dropItemId) {
+    private SocketMessage pickupRequestForCharacter(String characterName, String itemInstanceId) {
         SocketMessage message = new SocketMessage();
         message.setUpdateType(MessageType.PICKUP_ITEM.getType());
         GenericInventoryData inventoryData = new GenericInventoryData();
         inventoryData.setCharacterName(characterName);
-        inventoryData.setDroppedItemId(dropItemId);
+        inventoryData.setItemInstanceId(itemInstanceId);
 
         message.setInventoryRequest(inventoryData);
 

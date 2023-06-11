@@ -43,7 +43,7 @@ public class InventoryServiceTest {
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
         GenericInventoryData request = new GenericInventoryData();
         request.setCharacterName(CHARACTER_NAME);
-        request.setDroppedItemId(droppedItem.getDroppedItemId());
+        request.setItemInstanceId(droppedItem.getItemInstanceId());
 
         // When
         inventoryService.pickupItem(request).blockingGet();
@@ -68,7 +68,7 @@ public class InventoryServiceTest {
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
         GenericInventoryData request = new GenericInventoryData();
         request.setCharacterName(CHARACTER_NAME);
-        request.setDroppedItemId(droppedItem.getDroppedItemId());
+        request.setItemInstanceId(droppedItem.getItemInstanceId());
         // TODO: make test not rely on service call
         inventoryService.pickupItem(request).blockingGet();
 
@@ -100,7 +100,7 @@ public class InventoryServiceTest {
             DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
             GenericInventoryData request = new GenericInventoryData();
             request.setCharacterName(CHARACTER_NAME);
-            request.setDroppedItemId(droppedItem.getDroppedItemId());
+            request.setItemInstanceId(droppedItem.getItemInstanceId());
             inventoryService.pickupItem(request).blockingGet();
         }
 
@@ -110,7 +110,7 @@ public class InventoryServiceTest {
         // next `pickup` will error out
         GenericInventoryData request = new GenericInventoryData();
         request.setCharacterName(CHARACTER_NAME);
-        request.setDroppedItemId(droppedItem.getDroppedItemId());
+        request.setItemInstanceId(droppedItem.getItemInstanceId());
         org.junit.jupiter.api.Assertions.assertThrows(
                 InventoryException.class, () -> inventoryService.pickupItem(request).blockingGet());
     }
