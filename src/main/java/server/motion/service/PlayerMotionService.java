@@ -20,13 +20,13 @@ public class PlayerMotionService {
 
     @Inject PlayerMotionRepository playerMotionRepository;
 
-    PlayerMotionUpdateProducer playerMotionUpdateProducer;
+    @Inject PlayerMotionUpdateProducer playerMotionUpdateProducer;
 
-    public PlayerMotionService(
-            @KafkaClient("player-motion-client")
-                    PlayerMotionUpdateProducer playerMotionUpdateProducer) {
-        this.playerMotionUpdateProducer = playerMotionUpdateProducer;
-    }
+//    public PlayerMotionService(
+//            @KafkaClient("player-motion-client")
+//                    PlayerMotionUpdateProducer playerMotionUpdateProducer) {
+//        this.playerMotionUpdateProducer = playerMotionUpdateProducer;
+//    }
 
     private static int DEFAULT_DISTANCE_THRESHOLD = 1000;
 

@@ -18,18 +18,6 @@ public interface UpdateProducer {
     @Topic("player-motion-update")
     void sendPlayerMotionUpdate(PlayerMotion playerMotion);
 
-    //    @Topic("drop-item")
-    //    void sendDropItemUpdate(GenericInventoryData request);
-
-    //    @Topic("pickup-item")
-    //    void sendPickupItemUpdate(GenericInventoryData request);
-
-    //    @Topic("pickup-item-success")
-    //    void pickupItemSuccess(GenericInventoryData request);
-    //
-    //    @Topic("drop-item-success")
-    //    void dropItemSuccess(GenericInventoryData request);
-
     @Topic("item-added-to-map")
     void addItemToMap(DroppedItem droppedItem);
 

@@ -3,10 +3,7 @@ package server.socket.service.synchronisation;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +50,7 @@ public class SynchroniseDroppedItemsService {
                             Set<String> trackedItems = getTrackedItems(session);
 
                             handleNewItems(currentItems, trackedItems, droppedItemsMap, session);
-                            handleLostItems(currentItems, trackedItems, droppedItemsMap, session);
+                            handleLostItems(currentItems, trackedItems, session);
 
                             session.asMap()
                                     .put(SessionParams.DROPPED_ITEMS.getType(), currentItems);
@@ -63,7 +60,8 @@ public class SynchroniseDroppedItemsService {
 
     private Set<String> getTrackedItems(WebSocketSession session) {
         return (Set<String>)
-                session.asMap().getOrDefault(SessionParams.DROPPED_ITEMS.getType(), List.of());
+                session.asMap()
+                        .getOrDefault(SessionParams.DROPPED_ITEMS.getType(), new HashSet<>());
     }
 
     private Set<String> getLostItemIds(Set<String> currentItems, Set<String> trackedItems) {
@@ -98,20 +96,21 @@ public class SynchroniseDroppedItemsService {
     }
 
     private void handleLostItems(
-            Set<String> currentItems,
-            Set<String> trackedItems,
-            Map<String, DroppedItem> droppedItemsMap,
-            WebSocketSession session) {
+            Set<String> currentItems, Set<String> trackedItems, WebSocketSession session) {
         Set<String> lostItemIds = getLostItemIds(currentItems, trackedItems);
 
-        Map<String, DroppedItem> lostItemMap = new HashMap<>();
-        lostItemIds.forEach(id -> lostItemMap.put(id, droppedItemsMap.get(id)));
+        if (lostItemIds.isEmpty()) {
+            return;
+        }
 
+        trackedItems.removeAll(lostItemIds);
+        
         SocketResponse socketResponse =
                 SocketResponse.builder()
                         .messageType(SocketResponseType.REMOVE_ITEMS_FROM_MAP.getType())
-                        .droppedItems(lostItemMap)
+                        .itemInstanceIds(lostItemIds)
                         .build();
+
 
         session.send(socketResponse).subscribe(socketResponseSubscriber);
     }

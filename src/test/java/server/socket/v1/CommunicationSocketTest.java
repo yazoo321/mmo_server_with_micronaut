@@ -4,19 +4,14 @@ import static org.awaitility.Awaitility.await;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import server.common.dto.Motion;
-import server.monster.server_integration.model.Monster;
-import server.motion.dto.PlayerMotion;
 import server.socket.model.*;
 import server.util.websocket.TestWebSocketClient;
 
@@ -53,8 +48,7 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() ->
-                        playerClient1.getMessagesChronologically().size() == 2);
+                .until(() -> playerClient1.getMessagesChronologically().size() == 2);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
@@ -193,5 +187,4 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
         playerClient2.close();
         mobServerClient.close();
     }
-
 }

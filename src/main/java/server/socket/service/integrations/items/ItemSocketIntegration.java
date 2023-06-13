@@ -22,14 +22,9 @@ public class ItemSocketIntegration {
 
     @Inject InventoryService inventoryService;
 
-    @Inject
-    SocketResponseSubscriber socketResponseSubscriber;
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-    UpdateProducer updateProducer;
-
-    public ItemSocketIntegration(@KafkaClient("update-producer") UpdateProducer updateProducer) {
-        this.updateProducer = updateProducer;
-    }
+    @Inject UpdateProducer updateProducer;
 
     public void handleDropItem(GenericInventoryData request, WebSocketSession session) {
         inventoryService
@@ -69,10 +64,12 @@ public class ItemSocketIntegration {
                                                                                 .getType())
                                                                 .inventoryData(inventoryData)
                                                                 .build();
-                                                session.send(response).subscribe(socketResponseSubscriber);
+                                                session.send(response)
+                                                        .subscribe(socketResponseSubscriber);
                                             })
                                     .subscribe();
-                        }).subscribe();
+                        })
+                .subscribe();
     }
 
     public void handlePickupItem(GenericInventoryData request, WebSocketSession session) {

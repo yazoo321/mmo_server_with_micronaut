@@ -22,6 +22,10 @@ public abstract class TestWebSocketClient implements AutoCloseable {
         return new ArrayList<>(messageHistory);
     }
 
+    public void clearMessageHistory() {
+        this.messageHistory.clear();
+    }
+
     @OnMessage
     void onMessage(String message) {
         messageHistory.add(message);

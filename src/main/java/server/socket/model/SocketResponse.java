@@ -1,6 +1,5 @@
 package server.socket.model;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -32,7 +31,7 @@ public class SocketResponse {
     Map<String, Monster> monsters;
 
     Map<String, DroppedItem> droppedItems;
-    List<String> itemInstanceIds;
+    Set<String> itemInstanceIds;
 
     GenericInventoryData inventoryData;
     String error;

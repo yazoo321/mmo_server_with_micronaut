@@ -15,12 +15,12 @@ import server.monster.server_integration.service.MobInstanceService;
         clientId = "mob_repo_client")
 public class MonsterServerListener {
 
-    MonsterServerProducer monsterServerProducer;
+    @Inject MonsterServerProducer monsterServerProducer;
 
-    public MonsterServerListener(
-            @KafkaClient("mob-server-client") MonsterServerProducer monsterServerProducer) {
-        this.monsterServerProducer = monsterServerProducer;
-    }
+//    public MonsterServerListener(
+//            @KafkaClient("mob-server-client") MonsterServerProducer monsterServerProducer) {
+//        this.monsterServerProducer = monsterServerProducer;
+//    }
 
     @Inject MobInstanceService mobInstanceService;
 

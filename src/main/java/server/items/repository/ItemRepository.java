@@ -49,7 +49,8 @@ public class ItemRepository {
     }
 
     public Single<DroppedItem> findDroppedItemByInstanceId(String itemInstanceId) {
-        return Single.fromPublisher(droppedItemCollection.find(eq("itemInstanceId", itemInstanceId)))
+        return Single.fromPublisher(
+                        droppedItemCollection.find(eq("itemInstanceId", itemInstanceId)))
                 .doOnError(
                         e -> {
                             throw new ItemException("Failed to find dropped item by instance id");

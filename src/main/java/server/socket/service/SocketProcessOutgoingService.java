@@ -16,15 +16,15 @@ public class SocketProcessOutgoingService {
     // this service determines what happens with the outgoing message - specifically where it gets
     // sent
 
-    UpdateProducer updateProducer;
+    @Inject UpdateProducer updateProducer;
 
     @Inject ItemSocketIntegration itemSocketIntegration;
 
-    public SocketProcessOutgoingService(
-            @KafkaClient("update-producer") UpdateProducer updateProducer) {
-        // advised this way vs direct inject
-        this.updateProducer = updateProducer;
-    }
+//    public SocketProcessOutgoingService(
+//            @KafkaClient("update-producer") UpdateProducer updateProducer) {
+//        // advised this way vs direct inject
+//        this.updateProducer = updateProducer;
+//    }
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
         String updateType = socketMessage.getUpdateType();

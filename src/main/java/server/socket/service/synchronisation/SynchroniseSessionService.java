@@ -22,6 +22,8 @@ public class SynchroniseSessionService {
 
     @Inject SynchroniseMobService synchroniseMobService;
 
+    @Inject SynchroniseDroppedItemsService synchroniseDroppedItemsService;
+
     @Scheduled(fixedDelay = "1s")
     public void evaluateNearbyPlayers() {
         ConcurrentSet<WebSocketSession> sessions = socket.getLiveSessions();
@@ -38,6 +40,8 @@ public class SynchroniseSessionService {
 
                             synchronisePlayerService.handleSynchronisePlayers(motion, session);
                             synchroniseMobService.handleSynchroniseMobs(motion, session);
+                            synchroniseDroppedItemsService.handleSynchroniseDroppedItems(
+                                    motion, session);
                         });
     }
 }

@@ -4,7 +4,6 @@ import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.util.*;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +71,7 @@ public class ClientUpdatesService {
         SocketResponse socketResponse =
                 SocketResponse.builder()
                         .messageType(SocketResponseType.REMOVE_ITEMS_FROM_MAP.getType())
-                        .itemInstanceIds(List.of(itemInstanceId))
+                        .itemInstanceIds(Set.of(itemInstanceId))
                         .build();
 
         broadcaster
@@ -91,8 +90,7 @@ public class ClientUpdatesService {
 
             Set<String> trackedItems =
                     (Set<String>)
-                            s.asMap()
-                                    .getOrDefault(SessionParams.DROPPED_ITEMS.getType(), Set.of());
+                            s.asMap().getOrDefault(SessionParams.DROPPED_ITEMS.getType(), Set.of());
 
             if (trackedItems.contains(itemInstanceId)) {
                 trackedItems.remove(itemInstanceId);
@@ -122,8 +120,13 @@ public class ClientUpdatesService {
             int defaultThresholdDistance = 1000;
             Location location = new Location(motion);
             if (location.withinThreshold(droppedItem.getLocation(), defaultThresholdDistance)) {
-                Set<String> trackedItems = (Set<String>) s.asMap()
-                        .getOrDefault(SessionParams.DROPPED_ITEMS.getType(), new HashSet<>());
+                // automatically make it listen to this items events
+                Set<String> trackedItems =
+                        (Set<String>)
+                                s.asMap()
+                                        .getOrDefault(
+                                                SessionParams.DROPPED_ITEMS.getType(),
+                                                new HashSet<>());
 
                 trackedItems.add(droppedItem.getItemInstance().getItemInstanceId());
                 s.put(SessionParams.DROPPED_ITEMS.getType(), trackedItems);

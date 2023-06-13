@@ -131,6 +131,9 @@ public class ItemServiceTest {
         // TODO: Check for ItemException nested
         org.junit.jupiter.api.Assertions.assertThrows(
                 CompositeException.class,
-                () -> itemService.getDroppedItemByInstanceId(droppedItem.getItemInstanceId()).blockingGet());
+                () ->
+                        itemService
+                                .getDroppedItemByInstanceId(droppedItem.getItemInstanceId())
+                                .blockingGet());
     }
 }

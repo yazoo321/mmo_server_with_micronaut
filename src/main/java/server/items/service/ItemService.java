@@ -23,11 +23,11 @@ public class ItemService {
 
     @Inject ItemRepository itemRepository;
 
-    ItemServerProducer itemServerProducer;
+    @Inject ItemServerProducer itemServerProducer;
 
-    public ItemService(@KafkaClient("item-client") ItemServerProducer itemServerProducer) {
-        this.itemServerProducer = itemServerProducer;
-    }
+//    public ItemService(@KafkaClient("item-client") ItemServerProducer itemServerProducer) {
+//        this.itemServerProducer = itemServerProducer;
+//    }
 
     public Single<DroppedItem> createNewDroppedItem(String itemId, Location location) {
         LocalDateTime now = LocalDateTime.now();
@@ -83,9 +83,10 @@ public class ItemService {
                                     new DroppedItem(uuid, location, itemInstance, now);
                             return itemRepository
                                     .createDroppedItem(droppedItem)
-                                    .map(item -> {
-                                        return item;
-                                    })
+                                    .map(
+                                            item -> {
+                                                return item;
+                                            })
                                     .doOnError(
                                             e ->
                                                     log.error(
