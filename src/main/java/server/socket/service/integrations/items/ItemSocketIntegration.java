@@ -1,6 +1,5 @@
 package server.socket.service.integrations.items;
 
-import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;

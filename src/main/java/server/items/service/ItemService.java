@@ -1,7 +1,6 @@
 package server.items.service;
 
 import com.mongodb.client.result.DeleteResult;
-import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;

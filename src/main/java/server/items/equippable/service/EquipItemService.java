@@ -89,17 +89,6 @@ public class EquipItemService {
                             equipRepository.deleteEquippedItem(itemInstanceId).blockingGet();
                             return inventoryService.getInventory(characterName);
                         });
-        //                .flatMap(itemList ->
-        //                        equipRepository.deleteEquippedItem(itemInstanceId)
-        //                                .doOnError(e -> {
-        //                                    log.warn("Failed to unequip item, {}",
-        // e.getMessage());
-        //                                    throw new EquipException("Failed to delete equipped
-        // item");
-        //                                })
-        //                                .flatMap(res ->
-        // inventoryService.getInventory(characterName)))
-        //                                .subscribe();
     }
 
     public Single<List<EquippedItems>> getEquippedItems(String characterName) {

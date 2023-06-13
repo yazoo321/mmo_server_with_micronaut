@@ -104,13 +104,12 @@ public class SynchroniseDroppedItemsService {
         }
 
         trackedItems.removeAll(lostItemIds);
-        
+
         SocketResponse socketResponse =
                 SocketResponse.builder()
                         .messageType(SocketResponseType.REMOVE_ITEMS_FROM_MAP.getType())
                         .itemInstanceIds(lostItemIds)
                         .build();
-
 
         session.send(socketResponse).subscribe(socketResponseSubscriber);
     }
