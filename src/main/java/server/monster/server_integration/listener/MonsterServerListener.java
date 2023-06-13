@@ -17,11 +17,6 @@ public class MonsterServerListener {
 
     @Inject MonsterServerProducer monsterServerProducer;
 
-//    public MonsterServerListener(
-//            @KafkaClient("mob-server-client") MonsterServerProducer monsterServerProducer) {
-//        this.monsterServerProducer = monsterServerProducer;
-//    }
-
     @Inject MobInstanceService mobInstanceService;
 
     @Topic("create-mob")

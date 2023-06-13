@@ -25,10 +25,6 @@ public class ItemService {
 
     @Inject ItemServerProducer itemServerProducer;
 
-//    public ItemService(@KafkaClient("item-client") ItemServerProducer itemServerProducer) {
-//        this.itemServerProducer = itemServerProducer;
-//    }
-
     public Single<DroppedItem> createNewDroppedItem(String itemId, Location location) {
         LocalDateTime now = LocalDateTime.now();
 

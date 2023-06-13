@@ -20,12 +20,6 @@ public class SocketProcessOutgoingService {
 
     @Inject ItemSocketIntegration itemSocketIntegration;
 
-//    public SocketProcessOutgoingService(
-//            @KafkaClient("update-producer") UpdateProducer updateProducer) {
-//        // advised this way vs direct inject
-//        this.updateProducer = updateProducer;
-//    }
-
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
         String updateType = socketMessage.getUpdateType();
 
