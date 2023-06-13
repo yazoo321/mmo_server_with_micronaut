@@ -1,15 +1,18 @@
 package server.items.controller;
 
 import io.micronaut.http.annotation.*;
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
-import server.items.dropped.model.DroppedItem;
-import server.items.dropped.model.DroppedItemResponse;
+import server.items.inventory.model.response.GenericInventoryData;
+import server.items.model.DroppedItem;
+import server.items.model.DroppedItemResponse;
 import server.items.model.Item;
 import server.items.service.ItemService;
-import server.player.character.inventory.model.response.GenericInventoryData;
 
+@Slf4j
 @Controller("/v1/items")
 public class ItemController {
 
@@ -24,17 +27,20 @@ public class ItemController {
     }
 
     @Post("/spawn-item")
-    public DroppedItem spawnItem(@Body GenericInventoryData inventoryData) {
+    public Single<DroppedItem> spawnItem(@Body GenericInventoryData inventoryData) {
         // TODO: this will be changed to a loot service. e.g. when mob is killed, spawn random items
         return itemService.createNewDroppedItem(
                 inventoryData.getItemId(), inventoryData.getLocation());
     }
 
     @Get("/dropped")
-    public DroppedItemResponse getDroppedItems(
+    public Single<DroppedItemResponse> getDroppedItems(
             @QueryValue String map, @QueryValue Integer x, @QueryValue Integer y) {
         Location location = new Location(map, x, y, null);
 
-        return new DroppedItemResponse(itemService.getItemsInMap(location));
+        return itemService
+                .getItemsInMap(location)
+                .doOnError(e -> log.error("Failed to get items in map, {}", e.getMessage()))
+                .map(DroppedItemResponse::new);
     }
 }

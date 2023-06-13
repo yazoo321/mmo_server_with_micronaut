@@ -1,6 +1,5 @@
 package server.motion.service;
 
-import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -20,13 +19,7 @@ public class PlayerMotionService {
 
     @Inject PlayerMotionRepository playerMotionRepository;
 
-    PlayerMotionUpdateProducer playerMotionUpdateProducer;
-
-    public PlayerMotionService(
-            @KafkaClient("player-motion-client")
-                    PlayerMotionUpdateProducer playerMotionUpdateProducer) {
-        this.playerMotionUpdateProducer = playerMotionUpdateProducer;
-    }
+    @Inject PlayerMotionUpdateProducer playerMotionUpdateProducer;
 
     private static int DEFAULT_DISTANCE_THRESHOLD = 1000;
 
@@ -83,11 +76,12 @@ public class PlayerMotionService {
         playerMotionRepository.updateMotion(motion);
     }
 
-    public PlayerMotionList getPlayersNearMe(Motion motion, String playerName) {
+    public Single<PlayerMotionList> getPlayersNearMe(Motion motion, String playerName) {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
-        List<PlayerMotion> playerMotions = playerMotionRepository.getPlayersNearby(playerMotion);
-
-        return new PlayerMotionList(playerMotions);
+        return playerMotionRepository
+                .getPlayersNearby(playerMotion, DEFAULT_DISTANCE_THRESHOLD)
+                .doOnError(e -> log.error("Failed to get players motion, {}", e.getMessage()))
+                .map(PlayerMotionList::new);
     }
 
     public Single<List<PlayerMotion>> getNearbyPlayersAsync(
@@ -95,7 +89,7 @@ public class PlayerMotionService {
         PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
         threshold = threshold == null ? DEFAULT_DISTANCE_THRESHOLD : threshold;
 
-        return playerMotionRepository.getPlayersNearbyAsync(playerMotion, threshold);
+        return playerMotionRepository.getPlayersNearby(playerMotion, threshold);
     }
 
     public Single<PlayerMotion> getPlayerMotion(String playerName) {

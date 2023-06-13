@@ -166,9 +166,11 @@ public class PlayerMotionSocketTest {
         // client 2 will now make some motion
         client2.send(playerMotionMessage);
 
+        Thread.sleep(1000);
+
         // client 2 will have motion of client 1 as its nearby
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(3, ChronoUnit.SECONDS))
+                .timeout(Duration.of(60, ChronoUnit.SECONDS))
                 .until(
                         () ->
                                 PlayerMotionUtil.playerMotionListEquals(

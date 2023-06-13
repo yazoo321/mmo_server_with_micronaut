@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import server.items.helper.ItemTestHelper;
 import server.items.model.Item;
 import server.items.types.ItemType;
-import server.items.weapons.Weapon;
+import server.items.types.weapons.Weapon;
 
 @MicronautTest
 public class ItemRepositoryTest {
@@ -28,7 +28,7 @@ public class ItemRepositoryTest {
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
 
         // When
-        Item found = itemRepository.findByItemId(weapon.getItemId());
+        Item found = itemRepository.findByItemId(weapon.getItemId()).blockingGet();
 
         // Then
         Assertions.assertThat(found).usingRecursiveComparison().isEqualTo(weapon);

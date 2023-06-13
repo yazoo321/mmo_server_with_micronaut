@@ -11,7 +11,9 @@ public enum MessageType {
     PLAYER_MOTION("PLAYER_MOTION"),
     MOB_COMBAT("MOB_COMBAT"),
     PLAYER_COMBAT("PLAYER_COMBAT"),
-    INVENTORY_UPDATE("INVENTORY_UPDATE");
+    PICKUP_ITEM("PICKUP_ITEM"),
+
+    DROP_ITEM("DROP_ITEM");
 
     public final String type;
 }

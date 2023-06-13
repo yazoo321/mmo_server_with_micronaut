@@ -11,7 +11,8 @@ public enum SessionParams {
     TRACKING_PLAYERS("TRACKING_PLAYERS"),
     TRACKING_MOBS("TRACKING_MOBS"),
     PLAYER_NAME("PLAYER_NAME"),
-    SERVER_NAME("SERVER_NAME");
+    SERVER_NAME("SERVER_NAME"),
+    DROPPED_ITEMS("DROPPED_ITEMS");
 
     public final String type;
 }

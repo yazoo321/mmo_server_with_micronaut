@@ -1,6 +1,7 @@
 package server.items.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.reactivex.rxjava3.exceptions.CompositeException;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -9,12 +10,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
-import server.items.dropped.model.DroppedItem;
 import server.items.helper.ItemTestHelper;
+import server.items.model.DroppedItem;
 import server.items.model.ItemInstance;
-import server.items.model.exceptions.ItemException;
 import server.items.types.ItemType;
-import server.items.weapons.Weapon;
+import server.items.types.weapons.Weapon;
 
 @MicronautTest
 public class ItemServiceTest {
@@ -47,18 +47,19 @@ public class ItemServiceTest {
 
         DroppedItem expectedDroppedItem =
                 new DroppedItem(
-                        "droppedItemId",
+                        "itemInstanceId",
                         locationToDrop,
                         new ItemInstance(weapon.getItemId(), "itemInstanceId", weapon),
                         LocalDateTime.now());
 
         // When
-        DroppedItem actual = itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop);
+        DroppedItem actual =
+                itemService.createNewDroppedItem(weapon.getItemId(), locationToDrop).blockingGet();
 
         // Then
         Assertions.assertThat(actual)
                 .usingRecursiveComparison()
-                .ignoringFields("droppedItemId", "droppedAt", "itemInstance.itemInstanceId")
+                .ignoringFields("itemInstanceId", "droppedAt", "itemInstance.itemInstanceId")
                 .isEqualTo(expectedDroppedItem);
     }
 
@@ -71,7 +72,10 @@ public class ItemServiceTest {
                 itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
-        DroppedItem actual = itemService.getDroppedItemById(expectedDroppedItem.getDroppedItemId());
+        DroppedItem actual =
+                itemService
+                        .getDroppedItemByInstanceId(expectedDroppedItem.getItemInstanceId())
+                        .blockingGet();
 
         // Then
         Assertions.assertThat(actual)
@@ -105,7 +109,7 @@ public class ItemServiceTest {
         // don't expect third item to appear as its out of range
 
         // When
-        List<DroppedItem> actual = itemService.getItemsInMap(searchRadius);
+        List<DroppedItem> actual = itemService.getItemsInMap(searchRadius).blockingGet();
 
         Assertions.assertThat(actual)
                 .usingRecursiveComparison()
@@ -121,11 +125,15 @@ public class ItemServiceTest {
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(locationToDrop, weapon);
 
         // When
-        itemService.deleteDroppedItem(droppedItem.getDroppedItemId());
+        itemService.deleteDroppedItem(droppedItem.getItemInstanceId()).blockingGet();
 
         // Then
+        // TODO: Check for ItemException nested
         org.junit.jupiter.api.Assertions.assertThrows(
-                ItemException.class,
-                () -> itemService.getDroppedItemById(droppedItem.getDroppedItemId()));
+                CompositeException.class,
+                () ->
+                        itemService
+                                .getDroppedItemByInstanceId(droppedItem.getItemInstanceId())
+                                .blockingGet());
     }
 }

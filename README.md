@@ -6,6 +6,13 @@ Currently working on:
 # Documentation within blog:
 Each of the posts contains a video overview.
 
+## Websocket communication, player and mob motion sync
+- Part 1: Overview of architecture: https://unreal-mmo-dev.com/2023/05/10/39-how-to-synchronize-motion-effectively-with-ue-and-custom-server/
+- Part 2: Dive into the backend flow https://unreal-mmo-dev.com/2023/05/11/40-how-to-make-a-good-backend-for-your-mmo-game-and-unreal-engine/
+- Part 3: Unreal Engine integration sample: https://unreal-mmo-dev.com/2023/05/14/41-how-to-turn-your-unreal-engine-to-mmo-using-custom-server-and-websockets/
+- Part 4: How to smooth player/mob motion https://unreal-mmo-dev.com/2023/05/14/42-how-to-make-smooth-motion-for-your-actors-in-ue/
+- Part 5: How to spawn mobs and sync them to this server: https://unreal-mmo-dev.com/2023/05/15/43-how-to-spawn-and-control-mobs-using-unreal-engine-for-mmo/
+
 ## Character creation examples:
 - Part 1: overview using N-Hance Assets: https://ylazarev.com/2022/08/10/20-unreal-engine-mmo-style-character-creation-with-n-hance-assets/
 - Part 2: Complex nested options: https://ylazarev.com/2022/08/17/21-unreal-engine-character-creation-part-2-complex-nested-options/

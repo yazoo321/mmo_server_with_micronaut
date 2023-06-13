@@ -6,6 +6,7 @@ import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.socket.service.ClientUpdatesService;
@@ -28,5 +29,15 @@ public class SocketUpdateListener {
     @Topic("mob-motion-update-result")
     void receiveMobMotionUpdate(Monster monster) {
         clientUpdatesService.sendMotionUpdatesToSubscribedClients(monster);
+    }
+
+    @Topic("item-added-to-map")
+    void itemAddedToMap(DroppedItem droppedItem) {
+        clientUpdatesService.sendDroppedItemUpdates(droppedItem);
+    }
+
+    @Topic("item-removed-from-map")
+    void itemRemovedFromMap(String itemInstanceId) {
+        clientUpdatesService.sendItemPickupUpdates(itemInstanceId);
     }
 }
