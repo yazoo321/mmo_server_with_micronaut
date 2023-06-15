@@ -114,3 +114,9 @@ micronaut + postgres + jooq + flyway + lombok.
 It contains a very simple migration file (`resources/db/postgres/V1__create_user_table.sql`)
 to create a base users table and
 an entry with a user. Modify this based on your requirements.
+
+## Sample request to socket
+
+The inventory sample requests can be found in: `resources/inventory/inventorySampleRequests`
+
+Motion sample requests can be found in: `resources/motion/updateMotionRequest`

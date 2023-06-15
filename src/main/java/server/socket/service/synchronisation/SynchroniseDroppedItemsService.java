@@ -83,8 +83,17 @@ public class SynchroniseDroppedItemsService {
             WebSocketSession session) {
         Set<String> newItemIds = getNewItemIds(currentItems, trackedItems);
 
+        if (newItemIds.isEmpty()) {
+            return;
+        }
+
+        trackedItems.addAll(newItemIds);
+        session.put(SessionParams.DROPPED_ITEMS.getType(), trackedItems);
+
         Map<String, DroppedItem> newItemsMap = new HashMap<>();
         newItemIds.forEach(id -> newItemsMap.put(id, droppedItemsMap.get(id)));
+
+
 
         SocketResponse socketResponse =
                 SocketResponse.builder()

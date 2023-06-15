@@ -9,6 +9,8 @@ import server.socket.model.SocketMessage;
 import server.socket.producer.UpdateProducer;
 import server.socket.service.integrations.items.ItemSocketIntegration;
 
+import java.security.InvalidParameterException;
+
 @Slf4j
 @Singleton
 public class SocketProcessOutgoingService {
@@ -21,6 +23,10 @@ public class SocketProcessOutgoingService {
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
         String updateType = socketMessage.getUpdateType();
+
+        if (updateType == null) {
+            throw new InvalidParameterException("message type missing");
+        }
 
         // TODO: Make this more pretty
         if (updateType.equals(MessageType.PLAYER_MOTION.getType())) {

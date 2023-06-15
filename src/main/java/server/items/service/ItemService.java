@@ -14,15 +14,12 @@ import server.items.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.repository.ItemRepository;
-import server.items.server_integration.producer.ItemServerProducer;
 
 @Slf4j
 @Singleton
 public class ItemService {
 
     @Inject ItemRepository itemRepository;
-
-    @Inject ItemServerProducer itemServerProducer;
 
     public Single<DroppedItem> createNewDroppedItem(String itemId, Location location) {
         LocalDateTime now = LocalDateTime.now();
@@ -64,7 +61,6 @@ public class ItemService {
 
     public Single<DroppedItem> dropExistingItem(String itemInstanceId, Location location) {
         LocalDateTime now = LocalDateTime.now();
-        String uuid = UUID.randomUUID().toString(); // generate unique ID for the dropped item
         return itemRepository
                 .findItemInstanceById(itemInstanceId)
                 .doOnError(
@@ -75,13 +71,10 @@ public class ItemService {
                 .flatMap(
                         itemInstance -> {
                             DroppedItem droppedItem =
-                                    new DroppedItem(uuid, location, itemInstance, now);
+                                    new DroppedItem(itemInstanceId, location, itemInstance, now);
                             return itemRepository
                                     .createDroppedItem(droppedItem)
-                                    .map(
-                                            item -> {
-                                                return item;
-                                            })
+                                    .map(item -> item)
                                     .doOnError(
                                             e ->
                                                     log.error(
