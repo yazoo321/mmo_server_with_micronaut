@@ -42,8 +42,13 @@ public class CommunicationSocket {
 
     @OnClose
     public void onClose(WebSocketSession session) {
-        playerMotionService.disconnectPlayer(SessionParams.PLAYER_NAME.getType());
         socketSessions.remove(session);
+        String playerName = (String) session.asMap().get(SessionParams.PLAYER_NAME.getType());
+        if (playerName == null) {
+            log.error("player name should not be null on disconnect");
+            return;
+        }
+        playerMotionService.disconnectPlayer(playerName);
     }
 
     private void updateSessionParams(WebSocketSession session, SocketMessage message) {

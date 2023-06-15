@@ -55,10 +55,10 @@ public class PlayerMotionRepository {
                 .map(success -> playerMotion);
     }
 
-    public Single<PlayerMotion> setPlayerOnline(String playerName) {
+    public Single<PlayerMotion> setPlayerOnlineStatus(String playerName, boolean isOnline) {
         return Single.fromPublisher(
                 playerMotionMongoCollection.findOneAndUpdate(
-                        eq("playerName"), set("isOnline", true)));
+                        eq("playerName", playerName), set("isOnline", isOnline)));
     }
 
     public Single<PlayerMotion> updateMotion(PlayerMotion playerMotion) {

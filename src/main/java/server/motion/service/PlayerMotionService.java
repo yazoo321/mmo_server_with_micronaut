@@ -69,11 +69,7 @@ public class PlayerMotionService {
     }
 
     public void disconnectPlayer(String playerName) {
-        PlayerMotion motion = playerMotionRepository.findPlayerMotion(playerName).blockingGet();
-
-        motion.setIsOnline(false);
-
-        playerMotionRepository.updateMotion(motion);
+        playerMotionRepository.setPlayerOnlineStatus(playerName, false).subscribe();
     }
 
     public Single<PlayerMotionList> getPlayersNearMe(Motion motion, String playerName) {

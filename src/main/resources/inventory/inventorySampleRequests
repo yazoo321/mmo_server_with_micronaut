@@ -5,11 +5,10 @@ All requests will go to following URL:
 Pickup item:
 {
     "playerName": "testChar1",
-        "updateType": "PICKUP_ITEM",
-        "inventoryRequest": {
-            "characterName": "testChar1",
-            "itemInstanceId": "ed040881-7d6c-4ed6-90b4-ce28fbc5d3f0"
-        }
+    "updateType": "PICKUP_ITEM",
+    "inventoryRequest": {
+        "characterName": "testChar1",
+        "itemInstanceId": "ed040881-7d6c-4ed6-90b4-ce28fbc5d3f0"
     }
 }
 
@@ -17,19 +16,18 @@ Pickup item:
 2. Drop item
 {
     "playerName": "testChar1",
-        "updateType": "DROP_ITEM",
-        "inventoryRequest": {
-            "characterName": "testChar1",
-            "itemInventoryLocation": {
-                "x": 0,
-                "y": 0
-            },
-            "location": {
-                "map": "test",
-                "x": 105,
-                "y": 105,
-                "z": 110
-            }
+    "updateType": "DROP_ITEM",
+    "inventoryRequest": {
+        "characterName": "testChar1",
+        "itemInventoryLocation": {
+            "x": 0,
+            "y": 0
+        },
+        "location": {
+            "map": "test",
+            "x": 105,
+            "y": 105,
+            "z": 110
         }
     }
 }

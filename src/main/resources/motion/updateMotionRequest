@@ -3,21 +3,20 @@ URL: ws://localhost:8081/v1/communication-socket
 Payload:
 {
     "playerName": "testChar2",
-        "updateType": "PLAYER_MOTION",
-        "playerMotion": {
-            "playerName": "testChar2",
-            "motion": {
-                "map": "test",
-                "x": 100,
-                "y": 100,
-                "z": 100,
-                "vx": 50,
-                "vy": 50,
-                "vz": 50,
-                "pitch": 20,
-                "roll": 20,
-                "yaw": 20
-            }
+    "updateType": "PLAYER_MOTION",
+    "playerMotion": {
+        "playerName": "testChar2",
+        "motion": {
+            "map": "test",
+            "x": 100,
+            "y": 100,
+            "z": 100,
+            "vx": 50,
+            "vy": 50,
+            "vz": 50,
+            "pitch": 20,
+            "roll": 20,
+            "yaw": 20
         }
     }
 }
