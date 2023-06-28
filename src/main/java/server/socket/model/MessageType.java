@@ -13,6 +13,7 @@ public enum MessageType {
     PLAYER_COMBAT("PLAYER_COMBAT"),
     PICKUP_ITEM("PICKUP_ITEM"),
 
+    FETCH_INVENTORY("FETCH_INVENTORY"),
     DROP_ITEM("DROP_ITEM");
 
     public final String type;
