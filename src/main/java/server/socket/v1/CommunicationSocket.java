@@ -8,6 +8,7 @@ import io.micronaut.websocket.annotation.ServerWebSocket;
 import io.netty.util.internal.ConcurrentSet;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import server.common.dto.Motion;
 import server.motion.model.SessionParams;
 import server.motion.service.PlayerMotionService;
 import server.socket.model.SocketMessage;
@@ -68,11 +69,17 @@ public class CommunicationSocket {
             session.put(SessionParams.SERVER_NAME.getType(), serverName);
         }
 
-        if (message.getPlayerMotion() != null && message.getPlayerMotion().getMotion() != null) {
+        if (message.getPlayerMotion() != null && motionValid(message.getPlayerMotion().getMotion())) {
             session.put(SessionParams.MOTION.getType(), message.getPlayerMotion().getMotion());
-        } else if (message.getMonster() != null && message.getMonster().getMotion() != null) {
+        } else if (message.getMonster() != null &&  motionValid(message.getMonster().getMotion())) {
             session.put(SessionParams.MOTION.getType(), message.getMonster().getMotion());
         }
+    }
+
+    private boolean motionValid(Motion motion) {
+        return motion != null && motion.getMap() != null &&
+                !motion.getMap().isBlank() &&
+                !motion.getMap().equalsIgnoreCase("false");
     }
 
     public ConcurrentSet<WebSocketSession> getLiveSessions() {

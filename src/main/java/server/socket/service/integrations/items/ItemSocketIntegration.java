@@ -103,4 +103,25 @@ public class ItemSocketIntegration {
                         })
                 .subscribe();
     }
+
+    public void handleFetchInventory(GenericInventoryData request, WebSocketSession session) {
+        inventoryService
+                .getInventory(request.getCharacterName())
+                .doOnError(e -> log.error("Failed to fetch inventory, {}", e.getMessage()))
+                .doOnSuccess(
+                        inventory -> {
+                            GenericInventoryData inventoryData = new GenericInventoryData();
+                            inventoryData.setInventory(inventory);
+
+                            SocketResponse res =
+                                    SocketResponse.builder()
+                                            .inventoryData(inventoryData)
+                                            .messageType(
+                                                    SocketResponseType.INVENTORY_UPDATE.getType())
+                                            .build();
+
+                            session.send(res).subscribe(socketResponseSubscriber);
+                        })
+                .subscribe();
+    }
 }

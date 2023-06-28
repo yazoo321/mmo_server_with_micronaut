@@ -63,7 +63,7 @@ public class PlayerCharacterService {
 
         try {
             // call relevant services to initialise data
-            inventoryService.createInventoryForNewCharacter(newCharacter.getName());
+            inventoryService.createInventoryForNewCharacter(newCharacter.getName()).blockingGet();
             attributeService.createBaseAttributes(newCharacter.getName());
             levelAttributeService.initializeCharacterClass(
                     newCharacter.getName(), createCharacterRequest.getClassName());
