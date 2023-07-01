@@ -30,7 +30,7 @@ public class EquipItemsController {
             @Body GenericEquipData equipData, @Header String characterName) {
 
         return equipItemService
-                .unequipItem(equipData.getItemInstanceId(), characterName)
+                .unequipItemAndGetInventory(equipData.getItemInstanceId(), characterName)
                 .doOnError(e -> log.error("Failed to unequip item, {}", e.getMessage()))
                 .map(i -> GenericEquipData.builder().inventory(i).build());
     }

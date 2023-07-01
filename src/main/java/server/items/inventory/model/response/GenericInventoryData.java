@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.items.equippable.model.EquippedItems;
-import server.items.equippable.model.GenericEquipData;
 import server.items.inventory.model.Inventory;
 import server.items.model.DroppedItem;
 import server.items.model.Item;
@@ -25,8 +24,6 @@ public class GenericInventoryData {
     Location location;
     Inventory inventory;
 
-    GenericEquipData equipData;
-    EquippedItems equippedItems;
-    List<EquippedItems> equippedItemsList;
+    List<EquippedItems> equippedItems;
     List<DroppedItem> droppedItems;
 }

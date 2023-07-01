@@ -69,17 +69,19 @@ public class CommunicationSocket {
             session.put(SessionParams.SERVER_NAME.getType(), serverName);
         }
 
-        if (message.getPlayerMotion() != null && motionValid(message.getPlayerMotion().getMotion())) {
+        if (message.getPlayerMotion() != null
+                && motionValid(message.getPlayerMotion().getMotion())) {
             session.put(SessionParams.MOTION.getType(), message.getPlayerMotion().getMotion());
-        } else if (message.getMonster() != null &&  motionValid(message.getMonster().getMotion())) {
+        } else if (message.getMonster() != null && motionValid(message.getMonster().getMotion())) {
             session.put(SessionParams.MOTION.getType(), message.getMonster().getMotion());
         }
     }
 
     private boolean motionValid(Motion motion) {
-        return motion != null && motion.getMap() != null &&
-                !motion.getMap().isBlank() &&
-                !motion.getMap().equalsIgnoreCase("false");
+        return motion != null
+                && motion.getMap() != null
+                && !motion.getMap().isBlank()
+                && !motion.getMap().equalsIgnoreCase("false");
     }
 
     public ConcurrentSet<WebSocketSession> getLiveSessions() {

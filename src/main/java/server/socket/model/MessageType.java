@@ -12,9 +12,10 @@ public enum MessageType {
     MOB_COMBAT("MOB_COMBAT"),
     PLAYER_COMBAT("PLAYER_COMBAT"),
     PICKUP_ITEM("PICKUP_ITEM"),
-
     FETCH_INVENTORY("FETCH_INVENTORY"),
-    DROP_ITEM("DROP_ITEM");
+    DROP_ITEM("DROP_ITEM"),
+    EQUIP_ITEM("EQUIP_ITEM"),
+    UN_EQUIP_ITEM("UN_EQUIP_ITEM");
 
     public final String type;
 }

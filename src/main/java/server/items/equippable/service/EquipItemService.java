@@ -45,7 +45,7 @@ public class EquipItemService {
                             if (equippedItem != null) {
                                 // TODO: Make this async
                                 items =
-                                        unequipItem(
+                                        unequipItemAndGetInventory(
                                                         equippedItem
                                                                 .getItemInstance()
                                                                 .getItemInstanceId(),
@@ -75,7 +75,25 @@ public class EquipItemService {
                         });
     }
 
-    public Single<Inventory> unequipItem(String itemInstanceId, String characterName) {
+    public Single<String> unequipItem(String itemInstanceId, String characterName) {
+        return inventoryService
+                .unequipItem(itemInstanceId, characterName)
+                .doOnError(
+                        e -> {
+                            log.warn("Failed to unequip item, {}", e.getMessage());
+                            throw new EquipException("Failed to unequip item");
+                        })
+                .map(
+                        itemList -> {
+                            // TODO: Make async
+                            equipRepository.deleteEquippedItem(itemInstanceId).blockingGet();
+
+                            return itemInstanceId;
+                        });
+    }
+
+    public Single<Inventory> unequipItemAndGetInventory(
+            String itemInstanceId, String characterName) {
         return inventoryService
                 .unequipItem(itemInstanceId, characterName)
                 .doOnError(

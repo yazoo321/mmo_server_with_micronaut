@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.security.InvalidParameterException;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import server.motion.dto.PlayerMotion;
 import server.socket.model.MessageType;
@@ -22,6 +23,16 @@ public class SocketProcessOutgoingService {
 
     @Inject ItemSocketIntegration itemSocketIntegration;
 
+    Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap =
+            Map.of(
+                    MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate,
+                    MessageType.CREATE_MOB.getType(), this::handleCreateMob,
+                    MessageType.MOB_MOTION.getType(), this::handleMobMotionUpdate,
+                    MessageType.PICKUP_ITEM.getType(), this::handlePickupItem,
+                    MessageType.DROP_ITEM.getType(), this::handleDropItem,
+                    MessageType.FETCH_INVENTORY.getType(), this::handleFetchInventory,
+                    MessageType.EQUIP_ITEM.getType(), this::handleEquipItem);
+
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
         String updateType = socketMessage.getUpdateType();
 
@@ -29,30 +40,15 @@ public class SocketProcessOutgoingService {
             throw new InvalidParameterException("message type missing");
         }
 
-        // TODO: Make this more pretty
-        if (updateType.equals(MessageType.PLAYER_MOTION.getType())) {
-            handlePlayerMotionUpdate(socketMessage);
-        } else if (updateType.equals(MessageType.CREATE_MOB.getType())) {
-            handleCreateMob(socketMessage);
-        } else if (updateType.equals(MessageType.MOB_MOTION.getType())) {
-            handleMobMotionUpdate(socketMessage);
-        } else if (updateType.equals(MessageType.PLAYER_COMBAT.getType())) {
-            handlePlayerCombatAction(socketMessage);
-        } else if (updateType.equals(MessageType.MOB_COMBAT.getType())) {
-            handleMobCombatAction(socketMessage);
-        } else if (updateType.equals(MessageType.PICKUP_ITEM.getType())) {
-            handlePickupItem(socketMessage, session);
-        } else if (updateType.equals(MessageType.DROP_ITEM.getType())) {
-            handleDropItem(socketMessage, session);
-        } else if (updateType.equals(MessageType.FETCH_INVENTORY.getType())) {
-            handleFetchInventory(socketMessage, session);
+        if (functionMap.containsKey(updateType)) {
+            functionMap.get(updateType).accept(socketMessage, session);
         } else {
             log.error("Did not recognise update type, {}", updateType);
         }
     }
 
     // update motion for player
-    private void handlePlayerMotionUpdate(SocketMessage message) {
+    private void handlePlayerMotionUpdate(SocketMessage message, WebSocketSession session) {
         PlayerMotion motion = message.getPlayerMotion();
 
         Map<String, String> validateFields =
@@ -79,35 +75,13 @@ public class SocketProcessOutgoingService {
         updateProducer.sendPlayerMotionUpdate(message.getPlayerMotion());
     }
 
-    private boolean validate(String value, String name) {
-        if (!isValid(value)) {
-            log.error("{} is not valid in player motion!", name);
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isValid(String data) {
-        return data != null && !data.isBlank();
-    }
-
     // update motion for monster
-    private void handleMobMotionUpdate(SocketMessage message) {
+    private void handleMobMotionUpdate(SocketMessage message, WebSocketSession session) {
         updateProducer.sendMobMotionUpdate(message.getMonster());
     }
 
-    private void handleCreateMob(SocketMessage message) {
+    private void handleCreateMob(SocketMessage message, WebSocketSession session) {
         updateProducer.sendCreateMob(message.getMonster());
-    }
-
-    // handle player combat action
-    private void handlePlayerCombatAction(SocketMessage message) {
-        // TODO: TBD
-    }
-
-    // handle mob combat action
-    private void handleMobCombatAction(SocketMessage message) {
-        // TODO: TBD
     }
 
     // handle inventory interaction
@@ -121,5 +95,23 @@ public class SocketProcessOutgoingService {
 
     private void handleFetchInventory(SocketMessage message, WebSocketSession session) {
         itemSocketIntegration.handleFetchInventory(message.getInventoryRequest(), session);
+    }
+
+    private void handleEquipItem(SocketMessage message, WebSocketSession session) {
+        itemSocketIntegration.handleEquipItem(message.getInventoryRequest(), session);
+    }
+
+    private void handleUnEquipItem(SocketMessage message, WebSocketSession session) {}
+
+    private boolean validate(String value, String name) {
+        if (!isValid(value)) {
+            log.error("{} is not valid in player motion!", name);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValid(String data) {
+        return data != null && !data.isBlank();
     }
 }
