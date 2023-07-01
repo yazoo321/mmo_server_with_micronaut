@@ -4,7 +4,7 @@ import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import server.items.model.DroppedItem;
 
-@KafkaClient(id = "update-producer")
+@KafkaClient(id = "item-update-producer")
 public interface ItemUpdateProducer {
 
     @Topic("item-added-to-map")

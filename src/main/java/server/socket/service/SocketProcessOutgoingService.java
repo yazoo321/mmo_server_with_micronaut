@@ -53,21 +53,22 @@ public class SocketProcessOutgoingService {
 
         Map<String, String> validateFields =
                 Map.of(
-                        motion.getPlayerName(),
                         "Player name",
-                        "i",
+                        motion.getPlayerName(),
                         "b",
-                        motion.getMotion().getMap(),
+                        "i",
                         "Map",
-                        motion.getMotion().getX().toString(),
+                        motion.getMotion().getMap(),
                         "X co-ordinate",
-                        motion.getMotion().getY().toString(),
+                        motion.getMotion().getX().toString(),
                         "Y co-ordinate",
-                        motion.getMotion().getZ().toString(),
-                        "Z co-ordinate");
+                        motion.getMotion().getY().toString(),
+                        "Z co-ordinate",
+                        motion.getMotion().getZ().toString()
+                );
 
         for (Map.Entry<String, String> entry : validateFields.entrySet()) {
-            if (!validate(entry.getValue(), entry.getKey())) {
+            if (!validate(entry.getKey(), entry.getValue())) {
                 return;
             }
         }

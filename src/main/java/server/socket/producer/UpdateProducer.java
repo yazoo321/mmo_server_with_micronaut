@@ -6,7 +6,7 @@ import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 
-@KafkaClient(id = "update-producer")
+@KafkaClient(id = "motion-update-producer")
 public interface UpdateProducer {
 
     @Topic("mob-motion-update")
