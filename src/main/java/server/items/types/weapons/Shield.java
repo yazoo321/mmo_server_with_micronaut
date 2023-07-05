@@ -2,9 +2,12 @@ package server.items.types.weapons;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
+import java.util.Map;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import server.attribute.stats.types.AttributeTypes;
 import server.common.dto.Tag;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.model.types.ShieldSlot;
@@ -23,11 +26,11 @@ public class Shield extends Item {
     public Shield(
             String itemId,
             String itemName,
-            List<Tag> tags,
+            Map<String, Double> itemEffects,
             Stacking stacking,
             Integer value,
             ItemConfig config) {
-        super(itemId, itemName, ItemType.SHIELD.getType(), tags, stacking, value, config);
+        super(itemId, itemName, ItemType.SHIELD.getType(), itemEffects, stacking, value, config);
     }
 
     @Override

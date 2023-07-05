@@ -1,7 +1,7 @@
 package server.player.attributes.service;
 
-import static server.common.attributes.types.AttributeTypes.*;
-import static server.common.attributes.types.AttributeTypes.CAST_SPEED;
+import static server.attribute.stats.types.AttributeTypes.*;
+import static server.attribute.stats.types.AttributeTypes.CAST_SPEED;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
@@ -102,10 +102,10 @@ public class PlayerAttributeServiceTest {
                 Arguments.of(INT.type, -5),
 
                 // others
-                Arguments.of(HP.type, 5),
-                Arguments.of(HP.type, -5),
-                Arguments.of(MP.type, 5),
-                Arguments.of(MP.type, -5),
+                Arguments.of(CURRENT_HP.type, 5),
+                Arguments.of(CURRENT_HP.type, -5),
+                Arguments.of(CURRENT_MP.type, 5),
+                Arguments.of(CURRENT_MP.type, -5),
                 Arguments.of(ATTACK_SPEED.type, 25),
                 Arguments.of(ATTACK_SPEED.type, -25),
                 Arguments.of(CAST_SPEED.type, 25),
@@ -160,8 +160,8 @@ public class PlayerAttributeServiceTest {
         Map<String, Integer> current =
                 new HashMap<>(
                         Map.of(
-                                HP.type, 100,
-                                MP.type, 100,
+                                CURRENT_HP.type, 100,
+                                CURRENT_MP.type, 100,
                                 PHY_AMP.type, 0,
                                 MAG_AMP.type, 0,
                                 DEF.type, 10,

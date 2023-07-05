@@ -179,7 +179,7 @@ public class InventoryService {
         inventory.setGold(0);
         inventory.setMaxSize(new Location2D(4, 10));
 
-        return inventoryRepository.insert(inventory);
+        return inventoryRepository.upsert(inventory);
     }
 
     public Single<UpdateResult> updateInventoryMaxSize(Inventory inventory) {

@@ -2,9 +2,12 @@ package server.items.types.armour;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
+import java.util.Map;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import server.attribute.stats.types.AttributeTypes;
 import server.common.dto.Tag;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.model.types.BootsSlot;
@@ -23,11 +26,11 @@ public class Boots extends Item {
     public Boots(
             String itemId,
             String itemName,
-            List<Tag> tags,
+            Map<String, Double> itemEffects,
             Stacking stacking,
             Integer value,
             ItemConfig config) {
-        super(itemId, itemName, ItemType.BOOTS.getType(), tags, stacking, value, config);
+        super(itemId, itemName, ItemType.BOOTS.getType(), itemEffects, stacking, value, config);
     }
 
     @Override

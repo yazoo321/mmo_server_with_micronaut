@@ -3,7 +3,7 @@ package server.common.attributes.service;
 import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Map;
-import server.common.attributes.types.AttributeTypes;
+import server.attribute.stats.types.AttributeTypes;
 
 @Singleton
 public class AttributeService {

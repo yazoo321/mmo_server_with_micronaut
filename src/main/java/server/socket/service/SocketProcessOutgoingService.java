@@ -11,6 +11,7 @@ import server.motion.dto.PlayerMotion;
 import server.socket.model.MessageType;
 import server.socket.model.SocketMessage;
 import server.socket.producer.UpdateProducer;
+import server.socket.service.integrations.attributes.StatsSocketIntegration;
 import server.socket.service.integrations.items.ItemSocketIntegration;
 
 @Slf4j
@@ -23,6 +24,9 @@ public class SocketProcessOutgoingService {
 
     @Inject ItemSocketIntegration itemSocketIntegration;
 
+    @Inject
+    StatsSocketIntegration attributeSocketIntegration;
+
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap =
             Map.of(
                     MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate,
@@ -31,7 +35,10 @@ public class SocketProcessOutgoingService {
                     MessageType.PICKUP_ITEM.getType(), this::handlePickupItem,
                     MessageType.DROP_ITEM.getType(), this::handleDropItem,
                     MessageType.FETCH_INVENTORY.getType(), this::handleFetchInventory,
-                    MessageType.EQUIP_ITEM.getType(), this::handleEquipItem);
+                    MessageType.EQUIP_ITEM.getType(), this::handleEquipItem,
+                    MessageType.UN_EQUIP_ITEM.getType(), this::handleUnEquipItem,
+                    MessageType.FETCH_STATS.getType(), this::handleFetchStats
+            );
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
         String updateType = socketMessage.getUpdateType();
@@ -102,7 +109,13 @@ public class SocketProcessOutgoingService {
         itemSocketIntegration.handleEquipItem(message.getInventoryRequest(), session);
     }
 
-    private void handleUnEquipItem(SocketMessage message, WebSocketSession session) {}
+    private void handleUnEquipItem(SocketMessage message, WebSocketSession session) {
+        itemSocketIntegration.handleUnEquipItem(message.getInventoryRequest(), session);
+    }
+
+    private void handleFetchStats(SocketMessage message, WebSocketSession session) {
+        attributeSocketIntegration.handleFetchStats(message.getPlayerName(), session);
+    }
 
     private boolean validate(String value, String name) {
         if (!isValid(value)) {

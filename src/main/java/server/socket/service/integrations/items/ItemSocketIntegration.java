@@ -110,12 +110,14 @@ public class ItemSocketIntegration {
                                             .messageType(
                                                     SocketResponseType.ADD_EQUIP_ITEM.getType())
                                             .build();
-                        });
+                            session.send(res).subscribe(socketResponseSubscriber);
+                        })
+                .subscribe();
     }
 
     public void handleUnEquipItem(GenericInventoryData request, WebSocketSession session) {
         equipItemService
-                .unequipItem(request.getItemInstanceId(), request.getCharacterName())
+                .unEquipItem(request.getItemInstanceId(), request.getCharacterName())
                 .doOnError(e -> log.error("Failed to un-equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         unequippedItemInstanceId -> {
