@@ -14,6 +14,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @Builder
 @Introspected
 @NoArgsConstructor
+@Deprecated // use Stats instead
 public class PlayerAttributes {
 
     @BsonCreator

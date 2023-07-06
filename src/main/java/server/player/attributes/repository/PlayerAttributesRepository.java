@@ -17,6 +17,7 @@ import server.player.attributes.model.PlayerAttributes;
 
 @Slf4j
 @Singleton
+@Deprecated // use Stats instead
 public class PlayerAttributesRepository {
     MongoConfiguration configuration;
     MongoClient mongoClient;

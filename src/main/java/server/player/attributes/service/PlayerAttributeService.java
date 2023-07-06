@@ -14,6 +14,7 @@ import server.player.attributes.model.PlayerAttributes;
 import server.player.attributes.repository.PlayerAttributesRepository;
 
 @Singleton
+@Deprecated // use Stats instead
 @Slf4j
 public class PlayerAttributeService {
 

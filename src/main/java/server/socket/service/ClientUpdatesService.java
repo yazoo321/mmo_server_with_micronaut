@@ -186,7 +186,8 @@ public class ClientUpdatesService {
 
     private Predicate<WebSocketSession> listensToMotionUpdate(String playerOrMob) {
         // we will report to player every time they call update about other players nearby
-        return s -> sessionListensToPlayerOrMob(s, playerOrMob);
+        return s ->
+                sessionListensToPlayerOrMob(s, playerOrMob);
     }
 
 }

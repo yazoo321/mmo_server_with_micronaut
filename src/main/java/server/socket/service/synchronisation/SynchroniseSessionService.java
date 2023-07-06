@@ -24,7 +24,7 @@ public class SynchroniseSessionService {
 
     @Inject SynchroniseDroppedItemsService synchroniseDroppedItemsService;
 
-    @Scheduled(fixedDelay = "1s")
+    @Scheduled(fixedDelay = "500ms")
     public void evaluateNearbyPlayers() {
         ConcurrentSet<WebSocketSession> sessions = socket.getLiveSessions();
 
