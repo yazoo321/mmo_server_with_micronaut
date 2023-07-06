@@ -11,7 +11,6 @@ import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
-import server.player.attributes.model.PlayerAttributes;
 import server.player.model.Character;
 
 @Data

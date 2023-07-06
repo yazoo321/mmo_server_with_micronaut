@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Location;
-import server.common.dto.Location2D;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.Inventory;
 import server.items.model.DroppedItem;

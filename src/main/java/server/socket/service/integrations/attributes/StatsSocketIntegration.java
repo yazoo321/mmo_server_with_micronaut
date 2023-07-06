@@ -12,22 +12,25 @@ import server.socket.model.SocketResponseSubscriber;
 @Singleton
 public class StatsSocketIntegration {
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
-    @Inject
-    SocketResponseSubscriber socketResponseSubscriber;
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     public void handleFetchStats(String playerName, WebSocketSession session) {
-        statsService.getStatsFor(playerName)
-                .doOnSuccess(stats -> {
-                    SocketResponse response = SocketResponse.builder()
-                            .stats(stats)
-                            .build();
+        statsService
+                .getStatsFor(playerName)
+                .doOnSuccess(
+                        stats -> {
+                            SocketResponse response = SocketResponse.builder().stats(stats).build();
 
-                    session.send(response).subscribe(socketResponseSubscriber);
-                })
-                .doOnError(e -> log.error("Failed to fetch stats for {}, {}", playerName, e.getMessage()))
+                            session.send(response).subscribe(socketResponseSubscriber);
+                        })
+                .doOnError(
+                        e ->
+                                log.error(
+                                        "Failed to fetch stats for {}, {}",
+                                        playerName,
+                                        e.getMessage()))
                 .subscribe();
     }
 }

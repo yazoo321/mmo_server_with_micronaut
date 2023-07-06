@@ -12,7 +12,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import server.common.dto.Location;
-import server.common.dto.Location2D;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.Item;
 import server.items.model.ItemInstance;

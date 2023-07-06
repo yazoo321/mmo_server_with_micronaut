@@ -159,35 +159,33 @@ public class ClientUpdatesService {
                 isServer
                         ? Set.of()
                         : (Set<String>)
-                        s.asMap()
-                                .getOrDefault(
-                                        SessionParams.TRACKING_MOBS.getType(),
-                                        Set.of());
+                                s.asMap()
+                                        .getOrDefault(
+                                                SessionParams.TRACKING_MOBS.getType(), Set.of());
         Set<String> players =
                 (Set<String>)
-                        s.asMap()
-                                .getOrDefault(
-                                        SessionParams.TRACKING_PLAYERS.getType(), Set.of());
+                        s.asMap().getOrDefault(SessionParams.TRACKING_PLAYERS.getType(), Set.of());
 
         return mobs.contains(playerOrMob) || players.contains(playerOrMob);
     }
 
     private boolean sessionIsThePlayerOrMob(WebSocketSession s, String playerOrMob) {
-        String playerName = (String) s.asMap().getOrDefault(SessionParams.PLAYER_NAME.getType(), "");
-        String serverName = (String) s.asMap().getOrDefault(SessionParams.SERVER_NAME.getType(), "");
+        String playerName =
+                (String) s.asMap().getOrDefault(SessionParams.PLAYER_NAME.getType(), "");
+        String serverName =
+                (String) s.asMap().getOrDefault(SessionParams.SERVER_NAME.getType(), "");
 
         return playerName.equalsIgnoreCase(playerOrMob) || serverName.equalsIgnoreCase(playerOrMob);
     }
 
-
     private Predicate<WebSocketSession> listensToUpdateFor(String playerOrMob) {
-        return s -> (sessionIsThePlayerOrMob(s, playerOrMob) || sessionListensToPlayerOrMob(s, playerOrMob));
+        return s ->
+                (sessionIsThePlayerOrMob(s, playerOrMob)
+                        || sessionListensToPlayerOrMob(s, playerOrMob));
     }
 
     private Predicate<WebSocketSession> listensToMotionUpdate(String playerOrMob) {
         // we will report to player every time they call update about other players nearby
-        return s ->
-                sessionListensToPlayerOrMob(s, playerOrMob);
+        return s -> sessionListensToPlayerOrMob(s, playerOrMob);
     }
-
 }

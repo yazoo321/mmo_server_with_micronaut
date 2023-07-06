@@ -7,11 +7,9 @@ import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.conversions.Bson;
@@ -53,7 +51,7 @@ public class ItemRepository {
 
     public Single<DroppedItem> findDroppedItemByInstanceId(String itemInstanceId) {
         return Single.fromPublisher(
-                        droppedItemCollection.find(eq("itemInstanceId", itemInstanceId)));
+                droppedItemCollection.find(eq("itemInstanceId", itemInstanceId)));
     }
 
     public Single<Item> upsertItem(Item item) {
@@ -70,7 +68,8 @@ public class ItemRepository {
     public Single<ItemInstance> upsertItemInstance(ItemInstance itemInstance) {
         Bson filter = Filters.eq("itemInstanceId", itemInstance.getItemInstanceId());
         ReplaceOptions options = new ReplaceOptions().upsert(true);
-        return Single.fromPublisher(itemInstanceCollection.replaceOne(filter, itemInstance, options))
+        return Single.fromPublisher(
+                        itemInstanceCollection.replaceOne(filter, itemInstance, options))
                 .map(res -> itemInstance);
     }
 

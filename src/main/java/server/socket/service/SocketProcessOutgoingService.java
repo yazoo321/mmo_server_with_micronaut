@@ -24,8 +24,7 @@ public class SocketProcessOutgoingService {
 
     @Inject ItemSocketIntegration itemSocketIntegration;
 
-    @Inject
-    StatsSocketIntegration attributeSocketIntegration;
+    @Inject StatsSocketIntegration attributeSocketIntegration;
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap =
             Map.of(
@@ -37,8 +36,7 @@ public class SocketProcessOutgoingService {
                     MessageType.FETCH_INVENTORY.getType(), this::handleFetchInventory,
                     MessageType.EQUIP_ITEM.getType(), this::handleEquipItem,
                     MessageType.UN_EQUIP_ITEM.getType(), this::handleUnEquipItem,
-                    MessageType.FETCH_STATS.getType(), this::handleFetchStats
-            );
+                    MessageType.FETCH_STATS.getType(), this::handleFetchStats);
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
         String updateType = socketMessage.getUpdateType();
@@ -71,8 +69,7 @@ public class SocketProcessOutgoingService {
                         "Y co-ordinate",
                         motion.getMotion().getY().toString(),
                         "Z co-ordinate",
-                        motion.getMotion().getZ().toString()
-                );
+                        motion.getMotion().getZ().toString());
 
         for (Map.Entry<String, String> entry : validateFields.entrySet()) {
             if (!validate(entry.getKey(), entry.getValue())) {

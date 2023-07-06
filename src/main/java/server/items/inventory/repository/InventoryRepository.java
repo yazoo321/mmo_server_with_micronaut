@@ -12,7 +12,6 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.util.List;
-
 import org.bson.conversions.Bson;
 import server.configuration.MongoConfiguration;
 import server.items.inventory.model.CharacterItem;

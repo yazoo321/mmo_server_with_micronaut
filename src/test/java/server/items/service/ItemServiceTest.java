@@ -1,13 +1,11 @@
 package server.items.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.reactivex.rxjava3.exceptions.CompositeException;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

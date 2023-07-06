@@ -3,11 +3,9 @@ package server.items.equippable.service;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
@@ -29,8 +27,7 @@ public class EquipItemService {
 
     @Inject InventoryService inventoryService;
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
     public Single<EquippedItems> equipItem(String itemInstanceId, String characterName) {
         // in order to equip item, first un-equip item from slot if one exists
@@ -80,13 +77,14 @@ public class EquipItemService {
                                     .updateInventoryItems(characterName, items)
                                     .blockingGet();
 
+                            return equipRepository
+                                    .insert(equippedItem)
+                                    .map(
+                                            equippedItems -> {
+                                                updateCharacterItemStats(characterName);
 
-                            return equipRepository.insert(equippedItem)
-                                    .map(equippedItems -> {
-                                        updateCharacterItemStats(characterName);
-
-                                        return equippedItems;
-                                    });
+                                                return equippedItems;
+                                            });
                         });
     }
 
@@ -98,13 +96,14 @@ public class EquipItemService {
                             log.warn("Failed to unequip item, {}", e.getMessage());
                             throw new EquipException("Failed to unequip item");
                         })
-                .map(itemList -> {
-                    // TODO: Make async
-                    equipRepository.deleteEquippedItem(itemInstanceId).blockingGet();
-                    updateCharacterItemStats(characterName);
+                .map(
+                        itemList -> {
+                            // TODO: Make async
+                            equipRepository.deleteEquippedItem(itemInstanceId).blockingGet();
+                            updateCharacterItemStats(characterName);
 
-                    return itemInstanceId;
-                });
+                            return itemInstanceId;
+                        });
     }
 
     public Single<Inventory> unequipItemAndGetInventory(
@@ -132,12 +131,20 @@ public class EquipItemService {
 
     public void updateCharacterItemStats(String playerName) {
         getEquippedItems(playerName)
-                .doOnError(e -> log.error("Failed to update character item stats, {}", e.getMessage()))
-                .doOnSuccess(items -> {
-                    Map<String, Double> effects = new HashMap<>();
-                    items.forEach(i -> Stats.mergeLeft(effects, i.getItemInstance().getItem().getItemEffects()));
-                    statsService.updateItemStats(playerName, effects);
-                })
+                .doOnError(
+                        e -> log.error("Failed to update character item stats, {}", e.getMessage()))
+                .doOnSuccess(
+                        items -> {
+                            Map<String, Double> effects = new HashMap<>();
+                            items.forEach(
+                                    i ->
+                                            Stats.mergeLeft(
+                                                    effects,
+                                                    i.getItemInstance()
+                                                            .getItem()
+                                                            .getItemEffects()));
+                            statsService.updateItemStats(playerName, effects);
+                        })
                 .subscribe();
     }
 }

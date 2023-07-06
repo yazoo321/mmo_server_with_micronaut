@@ -9,13 +9,10 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.util.*;
-
 import server.attribute.stats.types.AttributeTypes;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
-import server.common.dto.Tag;
 import server.configuration.MongoConfiguration;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.CharacterItem;

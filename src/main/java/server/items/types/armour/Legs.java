@@ -1,14 +1,10 @@
 package server.items.types.armour;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.List;
 import java.util.Map;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import server.attribute.stats.types.AttributeTypes;
-import server.common.dto.Tag;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.model.types.LegsSlot;
 import server.items.model.Item;

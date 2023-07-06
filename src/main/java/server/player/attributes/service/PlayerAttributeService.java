@@ -5,10 +5,8 @@ import static server.attribute.stats.types.AttributeTypes.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import server.common.dto.Tag;
 import server.items.equippable.service.EquipItemService;
 import server.player.attributes.model.PlayerAttributes;
 import server.player.attributes.repository.PlayerAttributesRepository;
@@ -20,8 +18,7 @@ public class PlayerAttributeService {
 
     @Inject PlayerAttributesRepository attributesRepository;
 
-    @Inject
-    EquipItemService equipItemService;
+    @Inject EquipItemService equipItemService;
 
     public PlayerAttributes createBaseAttributes(String playerName) {
         // at point of creating new character, reference all the base attributes that we use
@@ -45,12 +42,11 @@ public class PlayerAttributeService {
                                 ATTACK_SPEED.type, 50,
                                 CAST_SPEED.type, 50,
                                 PHY_CRIT.type, 5,
-                                MGC_CRIT.type, 5
-                        ));
-        current.putAll(Map.of(
-                MAX_HP.type, 100,
-                MAX_MP.type, 100
-        ));
+                                MGC_CRIT.type, 5));
+        current.putAll(
+                Map.of(
+                        MAX_HP.type, 100,
+                        MAX_MP.type, 100));
 
         current.putAll(baseAttributes);
 
@@ -69,7 +65,8 @@ public class PlayerAttributeService {
 
     public void addPlayerAttribute(String playerName, String attribute) {
         PlayerAttributes attributes = attributesRepository.findPlayerAttributes(playerName);
-        Integer points = attributes.getAttributePoints() == null ? 0 : attributes.getAttributePoints();
+        Integer points =
+                attributes.getAttributePoints() == null ? 0 : attributes.getAttributePoints();
         if (points < 1) {
             throw new RuntimeException("No points left to add");
         }
@@ -83,7 +80,7 @@ public class PlayerAttributeService {
         points--;
         attributes.setAttributePoints(points);
         attributesRepository.updatePlayerAttributes(playerName, attributes);
-//        evaluateCurrentAttributes(playerName);
+        //        evaluateCurrentAttributes(playerName);
     }
 
     public void modifyCurrentAttribute(String playerName, String attribute, Integer value) {
@@ -103,38 +100,38 @@ public class PlayerAttributeService {
 
     public Map<String, Integer> getPlayerCurrentAttributes(String playerName) {
         return attributesRepository.findPlayerAttributes(playerName).getCurrentAttributes();
-
     }
 
-//    public void evaluateCurrentAttributes(String playerName) {
-//        PlayerAttributes attributes = getPlayerAttributes(playerName);
-//        Map<String, Integer> currentAttributes = attributes.getCurrentAttributes();
-//
-//
-//        equipItemService.getEquippedItems(playerName)
-//               .map(equippedItems -> {
-//                   equippedItems.forEach(item -> {
-//                       List<Tag> tags = item.getItemInstance().getItem().getTags();
-//                       tags.forEach(tag -> {
-//                           try {
-//                               Integer val = Integer.parseInt(tag.getValue());
-//                               val += currentAttributes.getOrDefault(tag.getName(), 0);
-//                               currentAttributes.put(tag.getName(), val);
-//                           } catch (NumberFormatException e) {
-//                               // we don't support anything other than int for now.
-//                               log.warn("Evaluate current attributes threw exception, invalid types included");
-//                           }
-//                       });
-//                   });
-//
-//                   attributesRepository.updateCurrentAttributes(playerName, currentAttributes)
-//                           .doOnSuccess(attr -> {
-//
-//                           })
-//                           .subscribe();
-//               })
-//               .subscribe();
-//    }
+    //    public void evaluateCurrentAttributes(String playerName) {
+    //        PlayerAttributes attributes = getPlayerAttributes(playerName);
+    //        Map<String, Integer> currentAttributes = attributes.getCurrentAttributes();
+    //
+    //
+    //        equipItemService.getEquippedItems(playerName)
+    //               .map(equippedItems -> {
+    //                   equippedItems.forEach(item -> {
+    //                       List<Tag> tags = item.getItemInstance().getItem().getTags();
+    //                       tags.forEach(tag -> {
+    //                           try {
+    //                               Integer val = Integer.parseInt(tag.getValue());
+    //                               val += currentAttributes.getOrDefault(tag.getName(), 0);
+    //                               currentAttributes.put(tag.getName(), val);
+    //                           } catch (NumberFormatException e) {
+    //                               // we don't support anything other than int for now.
+    //                               log.warn("Evaluate current attributes threw exception, invalid
+    // types included");
+    //                           }
+    //                       });
+    //                   });
+    //
+    //                   attributesRepository.updateCurrentAttributes(playerName, currentAttributes)
+    //                           .doOnSuccess(attr -> {
+    //
+    //                           })
+    //                           .subscribe();
+    //               })
+    //               .subscribe();
+    //    }
 
     // TODO: Function to evaluate current attributes based on items, statuses, etc.
 

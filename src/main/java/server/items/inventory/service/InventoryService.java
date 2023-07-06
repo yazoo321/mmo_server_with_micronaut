@@ -141,7 +141,15 @@ public class InventoryService {
                 .flatMap(
                         inventory -> {
                             List<CharacterItem> itemsList = inventory.getCharacterItems();
-                            List<CharacterItem> characterItem = itemsList.stream().filter(ci -> ci.getItemInstance().getItemInstanceId().equalsIgnoreCase(itemInstanceId)).toList();
+                            List<CharacterItem> characterItem =
+                                    itemsList.stream()
+                                            .filter(
+                                                    ci ->
+                                                            ci.getItemInstance()
+                                                                    .getItemInstanceId()
+                                                                    .equalsIgnoreCase(
+                                                                            itemInstanceId))
+                                            .toList();
 
                             if (characterItem == null || characterItem.isEmpty()) {
                                 throw new InventoryException("character item not found");
@@ -157,7 +165,8 @@ public class InventoryService {
 
                             // TODO: if dropItem fails, we need to revert the removal of item from
                             // inventory.
-                            return itemService.dropExistingItem(item.getItemInstance().getItemInstanceId(), location);
+                            return itemService.dropExistingItem(
+                                    item.getItemInstance().getItemInstanceId(), location);
                         });
     }
 

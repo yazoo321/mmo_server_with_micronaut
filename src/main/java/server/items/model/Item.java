@@ -5,16 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
-import java.util.List;
 import java.util.Map;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import server.attribute.stats.types.AttributeTypes;
-import server.common.dto.Tag;
 import server.items.equippable.model.EquippedItems;
 import server.items.types.accessories.Belt;
 import server.items.types.accessories.Cape;
@@ -62,7 +58,8 @@ public abstract class Item {
             @JsonProperty("itemId") @BsonProperty("itemId") String itemId,
             @JsonProperty("itemName") @BsonProperty("itemName") String itemName,
             @JsonProperty("category") @BsonProperty("category") String category,
-            @JsonProperty("itemEffects") @BsonProperty("itemEffects") Map<String, Double> itemEffects,
+            @JsonProperty("itemEffects") @BsonProperty("itemEffects")
+                    Map<String, Double> itemEffects,
             @JsonProperty("stacking") @BsonProperty("stacking") Stacking stacking,
             @JsonProperty("value") @BsonProperty("value") Integer value,
             @JsonProperty("config") @BsonProperty("config") ItemConfig itemConfig) {

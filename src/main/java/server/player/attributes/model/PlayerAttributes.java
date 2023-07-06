@@ -25,9 +25,7 @@ public class PlayerAttributes {
                     Map<String, Integer> baseAttributes,
             @JsonProperty("currentAttributes") @BsonProperty("currentAttributes")
                     Map<String, Integer> currentAttributes,
-            @JsonProperty("points") @BsonProperty("points")
-                    Integer attributePoints
-    ) {
+            @JsonProperty("points") @BsonProperty("points") Integer attributePoints) {
         this.playerName = playerName;
         this.baseAttributes = baseAttributes;
         this.currentAttributes = currentAttributes;

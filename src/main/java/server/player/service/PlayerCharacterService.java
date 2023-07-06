@@ -31,8 +31,7 @@ public class PlayerCharacterService {
 
     @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
     public AccountCharactersResponse getAccountCharacters(String username) {
         List<Character> characterList = playerCharacterRepository.findByAccount(username);

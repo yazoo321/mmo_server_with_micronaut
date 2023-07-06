@@ -73,7 +73,9 @@ public class InventoryServiceTest {
         inventoryService.pickupItem(request).blockingGet();
 
         // When
-        inventoryService.dropItem(CHARACTER_NAME, droppedItem.getItemInstanceId(), location).blockingGet();
+        inventoryService
+                .dropItem(CHARACTER_NAME, droppedItem.getItemInstanceId(), location)
+                .blockingGet();
 
         // Then
         List<DroppedItem> itemList = itemService.getItemsInMap(location).blockingGet();
