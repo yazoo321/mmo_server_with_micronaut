@@ -25,7 +25,7 @@ public class InventoryController {
     public Single<DroppedItem> dropItem(
             @Body GenericInventoryData dropRequest, @Header String characterName) {
         return inventoryService.dropItem(
-                characterName, dropRequest.getItemInventoryLocation(), dropRequest.getLocation());
+                characterName, dropRequest.getItemInstanceId(), dropRequest.getLocation());
     }
 
     @Get

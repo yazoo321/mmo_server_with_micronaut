@@ -34,7 +34,7 @@ public class ItemSocketIntegration {
         inventoryService
                 .dropItem(
                         request.getCharacterName(),
-                        request.getItemInventoryLocation(),
+                        request.getItemInstanceId(),
                         request.getLocation())
                 .doOnError(
                         e -> {

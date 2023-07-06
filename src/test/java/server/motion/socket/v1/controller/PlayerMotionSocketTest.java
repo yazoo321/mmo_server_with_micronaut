@@ -170,7 +170,7 @@ public class PlayerMotionSocketTest {
 
         // client 2 will have motion of client 1 as its nearby
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(60, ChronoUnit.SECONDS))
+                .timeout(Duration.of(10, ChronoUnit.SECONDS))
                 .until(
                         () ->
                                 PlayerMotionUtil.playerMotionListEquals(

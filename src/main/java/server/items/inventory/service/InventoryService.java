@@ -133,22 +133,22 @@ public class InventoryService {
     }
 
     public Single<DroppedItem> dropItem(
-            String characterName, Location2D inventoryLocation, Location location)
+            String characterName, String itemInstanceId, Location location)
             throws InventoryException {
         return inventoryRepository
                 .getCharacterInventory(characterName)
                 .doOnError(e -> log.error("Failed to get character inventory, {}", e.getMessage()))
                 .flatMap(
                         inventory -> {
-                            CharacterItem characterItem =
-                                    getItemAtLocation(inventoryLocation, inventory);
+                            List<CharacterItem> itemsList = inventory.getCharacterItems();
+                            List<CharacterItem> characterItem = itemsList.stream().filter(ci -> ci.getItemInstance().getItemInstanceId().equalsIgnoreCase(itemInstanceId)).toList();
 
-                            if (characterItem == null) {
+                            if (characterItem == null || characterItem.isEmpty()) {
                                 throw new InventoryException("character item not found");
                             }
 
-                            List<CharacterItem> itemsList = inventory.getCharacterItems();
-                            itemsList.remove(characterItem);
+                            CharacterItem item = characterItem.get(0);
+                            itemsList.remove(item);
 
                             // TODO: Make async
                             inventoryRepository
@@ -157,8 +157,7 @@ public class InventoryService {
 
                             // TODO: if dropItem fails, we need to revert the removal of item from
                             // inventory.
-                            return itemService.dropExistingItem(
-                                    characterItem.getItemInstance().getItemInstanceId(), location);
+                            return itemService.dropExistingItem(item.getItemInstance().getItemInstanceId(), location);
                         });
     }
 

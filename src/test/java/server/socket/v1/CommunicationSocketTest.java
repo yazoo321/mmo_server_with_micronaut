@@ -47,7 +47,7 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
         playerClient2.send(char2WithinRange);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(60, ChronoUnit.SECONDS))
+                .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
                 .until(() ->
                         playerClient1.getMessagesChronologically().size() == 2);
 

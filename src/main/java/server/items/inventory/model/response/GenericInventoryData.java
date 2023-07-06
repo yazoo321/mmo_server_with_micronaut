@@ -20,7 +20,6 @@ public class GenericInventoryData {
     String itemInstanceId;
     String itemId;
     String characterName;
-    Location2D itemInventoryLocation;
     Location location;
     Inventory inventory;
 
