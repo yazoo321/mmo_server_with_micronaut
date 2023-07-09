@@ -40,11 +40,6 @@ public class InventoryService {
                             ItemInstance instance = droppedItem.getItemInstance();
                             return inventoryRepository
                                     .getCharacterInventory(request.getCharacterName())
-                                    .doOnError(
-                                            e ->
-                                                    log.error(
-                                                            "Failed to get character inventory, {}",
-                                                            e.getMessage()))
                                     .flatMap(
                                             inventory -> {
                                                 // check for example if inventory is full
@@ -53,10 +48,9 @@ public class InventoryService {
                                                 Location2D position =
                                                         getNextAvailableSlot(
                                                                 inventory.getMaxSize(),
-                                                                inventory.getCharacterItems());
+                                                                items);
 
                                                 if (position == null) {
-                                                    // no inventory slots left
                                                     throw new InventoryException(
                                                             "No available slots in inventory");
                                                 }
@@ -69,17 +63,15 @@ public class InventoryService {
 
                                                 items.add(newCharacterItem);
 
-                                                // delete the dropped item first (this is a x get)
-                                                // to prevent duplication
-                                                // TODO: make async..
+                                                // these should be chained.
                                                 itemService
                                                         .deleteDroppedItem(
                                                                 request.getItemInstanceId())
-                                                        .blockingGet();
+                                                        .subscribe();
                                                 inventoryRepository
                                                         .updateInventoryItems(
                                                                 request.getCharacterName(), items)
-                                                        .blockingGet();
+                                                        .subscribe();
 
                                                 return getInventory(request.getCharacterName());
                                             });
@@ -97,7 +89,7 @@ public class InventoryService {
                                             inventory.getMaxSize(), inventory.getCharacterItems());
 
                             if (loc == null) {
-                                throw new EquipException("Inventory full to unequip item");
+                                throw new EquipException("Inventory full to un-equip item");
                             }
 
                             List<CharacterItem> items = inventory.getCharacterItems();
@@ -123,10 +115,9 @@ public class InventoryService {
                             }
 
                             foundItem.setLocation(loc);
-                            // TODO: Make this async
                             inventoryRepository
                                     .updateInventoryItems(characterName, items)
-                                    .blockingGet();
+                                    .subscribe();
 
                             return items;
                         });
@@ -158,10 +149,9 @@ public class InventoryService {
                             CharacterItem item = characterItem.get(0);
                             itemsList.remove(item);
 
-                            // TODO: Make async
                             inventoryRepository
                                     .updateInventoryItems(characterName, itemsList)
-                                    .blockingGet();
+                                    .subscribe();
 
                             // TODO: if dropItem fails, we need to revert the removal of item from
                             // inventory.
