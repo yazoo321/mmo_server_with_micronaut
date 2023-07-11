@@ -10,7 +10,7 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.*;
-import server.attribute.stats.types.AttributeTypes;
+import server.attribute.stats.types.StatsTypes;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
 import server.configuration.MongoConfiguration;
@@ -177,8 +177,8 @@ public class ItemTestHelper {
 
         switch (type) {
             case "WEAPON":
-                itemEffects.put(AttributeTypes.WEAPON_DAMAGE.getType(), 10.0);
-                itemEffects.put(AttributeTypes.BASE_ATTACK_SPEED.getType(), 1.2);
+                itemEffects.put(StatsTypes.WEAPON_DAMAGE.getType(), 10.0);
+                itemEffects.put(StatsTypes.BASE_ATTACK_SPEED.getType(), 1.2);
 
                 return new Weapon(
                         UUID.randomUUID().toString(),
@@ -188,7 +188,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "HELM":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Helm(
                         UUID.randomUUID().toString(),
                         "leather helm",
@@ -197,7 +197,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "CHEST":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Chest(
                         UUID.randomUUID().toString(),
                         "leather armour",
@@ -206,7 +206,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "BELT":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Belt(
                         UUID.randomUUID().toString(),
                         "leather belt",
@@ -215,7 +215,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "BRACERS":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Bracers(
                         UUID.randomUUID().toString(),
                         "iron bracers",
@@ -224,7 +224,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "CAPE":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Cape(
                         UUID.randomUUID().toString(),
                         "green cape",
@@ -233,7 +233,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "GLOVES":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Gloves(
                         UUID.randomUUID().toString(),
                         "leather gloves",
@@ -242,7 +242,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "LEGS":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Legs(
                         UUID.randomUUID().toString(),
                         "leather pants",
@@ -251,7 +251,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "SHOULDER":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Shoulder(
                         UUID.randomUUID().toString(),
                         "leather shoulder pads",
@@ -260,7 +260,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "NECK":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Neck(
                         UUID.randomUUID().toString(),
                         "leather shoulder pads",
@@ -269,7 +269,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "BOOTS":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Boots(
                         UUID.randomUUID().toString(),
                         "leather boots",
@@ -278,7 +278,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "RING":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Ring(
                         UUID.randomUUID().toString(),
                         "gold ring",
@@ -287,7 +287,7 @@ public class ItemTestHelper {
                         1000,
                         itemConfig);
             case "SHIELD":
-                itemEffects.put(AttributeTypes.DEF.getType(), 20.0);
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Shield(
                         UUID.randomUUID().toString(),
                         "bronze shield",

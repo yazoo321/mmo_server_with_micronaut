@@ -11,7 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import server.attribute.stats.types.AttributeTypes;
+import server.attribute.stats.types.StatsTypes;
 
 @Data
 @Builder
@@ -54,53 +54,43 @@ public class Stats {
         statusEffects = new HashMap<>();
     }
 
-    public int getBaseStat(AttributeTypes stat) {
+    public int getBaseStat(StatsTypes stat) {
         return baseStats.getOrDefault(stat, 0);
     }
 
-    public void applyItemEffect(AttributeTypes stat, double value) {
-        itemEffects.put(stat.getType(), value);
-        recalculateDerivedStats();
-    }
-
-    public void removeItemEffect(AttributeTypes stat) {
-        itemEffects.remove(stat);
-        recalculateDerivedStats();
-    }
-
-    public Double getDerived(AttributeTypes type) {
+    public Double getDerived(StatsTypes type) {
         return derivedStats.getOrDefault(type.getType(), 0.0);
     }
 
     public Map<String, Double> recalculateDerivedStats() {
         Map<String, Double> updatedDerived = new HashMap<>();
-        int strength = getBaseStat(AttributeTypes.STR);
-        int dexterity = getBaseStat(AttributeTypes.DEX);
-        int stamina = getBaseStat(AttributeTypes.STA);
-        int intelligence = getBaseStat(AttributeTypes.INT);
+        int strength = getBaseStat(StatsTypes.STR);
+        int dexterity = getBaseStat(StatsTypes.DEX);
+        int stamina = getBaseStat(StatsTypes.STA);
+        int intelligence = getBaseStat(StatsTypes.INT);
 
-        updatedDerived.put(AttributeTypes.MAX_HP.getType(), 100.0 + stamina * 10);
-        updatedDerived.put(AttributeTypes.MAX_MP.getType(), 50.0 + intelligence * 5);
-
-        updatedDerived.put(
-                AttributeTypes.CURRENT_HP.getType(),
-                getDerived(AttributeTypes.CURRENT_HP)
-                                > updatedDerived.get(AttributeTypes.MAX_HP.getType())
-                        ? updatedDerived.get(AttributeTypes.MAX_HP.getType())
-                        : getDerived(AttributeTypes.CURRENT_HP));
+        updatedDerived.put(StatsTypes.MAX_HP.getType(), 100.0 + stamina * 10);
+        updatedDerived.put(StatsTypes.MAX_MP.getType(), 50.0 + intelligence * 5);
 
         updatedDerived.put(
-                AttributeTypes.CURRENT_MP.getType(),
-                getDerived(AttributeTypes.CURRENT_MP)
-                                > updatedDerived.get(AttributeTypes.MAX_MP.getType())
-                        ? updatedDerived.get(AttributeTypes.MAX_MP.getType())
-                        : getDerived(AttributeTypes.CURRENT_MP));
+                StatsTypes.CURRENT_HP.getType(),
+                getDerived(StatsTypes.CURRENT_HP)
+                                > updatedDerived.get(StatsTypes.MAX_HP.getType())
+                        ? updatedDerived.get(StatsTypes.MAX_HP.getType())
+                        : getDerived(StatsTypes.CURRENT_HP));
 
-        updatedDerived.put(AttributeTypes.ATTACK_SPEED.getType(), 50.0 + dexterity);
-        updatedDerived.put(AttributeTypes.CAST_SPEED.getType(), 50.0 + intelligence);
-        updatedDerived.put(AttributeTypes.PHY_AMP.getType(), 1 + strength * 0.01);
-        updatedDerived.put(AttributeTypes.MAG_AMP.getType(), 1 + intelligence * 0.01);
-        updatedDerived.put(AttributeTypes.PHY_CRIT.getType(), 5 + dexterity * 0.1);
+        updatedDerived.put(
+                StatsTypes.CURRENT_MP.getType(),
+                getDerived(StatsTypes.CURRENT_MP)
+                                > updatedDerived.get(StatsTypes.MAX_MP.getType())
+                        ? updatedDerived.get(StatsTypes.MAX_MP.getType())
+                        : getDerived(StatsTypes.CURRENT_MP));
+
+        updatedDerived.put(StatsTypes.ATTACK_SPEED.getType(), 50.0 + dexterity);
+        updatedDerived.put(StatsTypes.CAST_SPEED.getType(), 50.0 + intelligence);
+        updatedDerived.put(StatsTypes.PHY_AMP.getType(), 1 + strength * 0.01);
+        updatedDerived.put(StatsTypes.MAG_AMP.getType(), 1 + intelligence * 0.01);
+        updatedDerived.put(StatsTypes.PHY_CRIT.getType(), 5 + dexterity * 0.1);
 
         // add other effects, such as item and statuses (buffs etc)
         Map<String, Double> otherEffects = mergeStats(itemEffects, statusEffects);

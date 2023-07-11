@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AttributeTypes {
+public enum StatsTypes {
     // BASE
     STR("STR"),
     DEX("DEX"),
