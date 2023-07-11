@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import server.attribute.stats.model.Stats;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
@@ -36,5 +37,6 @@ public class SocketResponse {
     GenericInventoryData inventoryData;
     String error;
 
+    Stats stats;
     // other data to be added, e.g. inventory updates
 }

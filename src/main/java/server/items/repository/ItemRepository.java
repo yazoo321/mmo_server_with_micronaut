@@ -2,24 +2,23 @@ package server.items.repository;
 
 import static com.mongodb.client.model.Filters.*;
 
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.conversions.Bson;
 import server.common.dto.Location;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.configuration.MongoConfiguration;
 import server.items.model.DroppedItem;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
-import server.items.model.exceptions.ItemException;
 
 @Slf4j
 @Singleton
@@ -44,25 +43,21 @@ public class ItemRepository {
     }
 
     public Single<DroppedItem> createDroppedItem(DroppedItem droppedItem) {
-        return Single.fromPublisher(droppedItemCollection.insertOne(droppedItem))
-                .map(success -> droppedItem);
+        Bson filter = Filters.eq("itemInstanceId", droppedItem.getItemInstanceId());
+        ReplaceOptions options = new ReplaceOptions().upsert(true);
+        return Single.fromPublisher(droppedItemCollection.replaceOne(filter, droppedItem, options))
+                .map(res -> droppedItem);
     }
 
     public Single<DroppedItem> findDroppedItemByInstanceId(String itemInstanceId) {
         return Single.fromPublisher(
-                        droppedItemCollection.find(eq("itemInstanceId", itemInstanceId)))
-                .doOnError(
-                        e -> {
-                            throw new ItemException("Failed to find dropped item by instance id");
-                        });
+                droppedItemCollection.find(eq("itemInstanceId", itemInstanceId)));
     }
 
-    public Single<Item> createItem(Item item) {
-        return Single.fromPublisher(
-                        itemCollection.replaceOne(
-                                eq("itemId", item.getItemId()),
-                                item,
-                                new ReplaceOptions().upsert(true)))
+    public Single<Item> upsertItem(Item item) {
+        Bson filter = Filters.eq("itemId", item.getItemId());
+        ReplaceOptions options = new ReplaceOptions().upsert(true);
+        return Single.fromPublisher(itemCollection.replaceOne(filter, item, options))
                 .map(res -> item);
     }
 
@@ -70,23 +65,16 @@ public class ItemRepository {
         return Single.fromPublisher(itemCollection.find(eq("itemId", itemId)));
     }
 
-    public Single<ItemInstance> createItemInstance(ItemInstance itemInstance) {
-        return Single.fromPublisher(itemInstanceCollection.insertOne(itemInstance))
-                .map(success -> itemInstance);
+    public Single<ItemInstance> upsertItemInstance(ItemInstance itemInstance) {
+        Bson filter = Filters.eq("itemInstanceId", itemInstance.getItemInstanceId());
+        ReplaceOptions options = new ReplaceOptions().upsert(true);
+        return Single.fromPublisher(
+                        itemInstanceCollection.replaceOne(filter, itemInstance, options))
+                .map(res -> itemInstance);
     }
 
     public Single<ItemInstance> findItemInstanceById(String instanceId) {
         return Single.fromPublisher(itemInstanceCollection.find(eq("itemInstanceId", instanceId)));
-    }
-
-    public Single<List<ItemInstance>> findItemByItemInstanceIds(List<String> itemInstanceIds) {
-        if (null == itemInstanceIds || itemInstanceIds.isEmpty()) {
-            return Single.just(new ArrayList<>());
-        }
-
-        return Flowable.fromPublisher(
-                        itemInstanceCollection.find(in("itemInstanceId", itemInstanceIds)))
-                .toList();
     }
 
     public Single<DeleteResult> deleteDroppedItem(String itemInstanceId) {

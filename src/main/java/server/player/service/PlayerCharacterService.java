@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.service.StatsService;
 import server.items.inventory.service.InventoryService;
 import server.motion.service.PlayerMotionService;
 import server.player.attributes.levels.service.PlayerLevelAttributeService;
@@ -29,6 +30,8 @@ public class PlayerCharacterService {
     @Inject PlayerLevelAttributeService levelAttributeService;
 
     @Inject PlayerMotionService playerMotionService;
+
+    @Inject StatsService statsService;
 
     public AccountCharactersResponse getAccountCharacters(String username) {
         List<Character> characterList = playerCharacterRepository.findByAccount(username);
@@ -62,6 +65,7 @@ public class PlayerCharacterService {
         newCharacter = playerCharacterRepository.createNew(newCharacter);
 
         try {
+            statsService.initializePlayerStats(newCharacter.getName());
             // call relevant services to initialise data
             inventoryService.createInventoryForNewCharacter(newCharacter.getName()).blockingGet();
             attributeService.createBaseAttributes(newCharacter.getName());
@@ -86,6 +90,7 @@ public class PlayerCharacterService {
         inventoryService.clearAllDataForCharacter(playerName);
         playerMotionService.deletePlayerMotion(playerName);
         playerCharacterRepository.deleteByCharacterName(playerName);
+        statsService.deleteStatsFor(playerName);
     }
 
     // TODO: Support deletes

@@ -14,6 +14,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @Builder
 @Introspected
 @NoArgsConstructor
+@Deprecated // use Stats instead
 public class PlayerAttributes {
 
     @BsonCreator
@@ -22,18 +23,17 @@ public class PlayerAttributes {
             @JsonProperty("playerName") @BsonProperty("playerName") String playerName,
             @JsonProperty("baseAttributes") @BsonProperty("baseAttributes")
                     Map<String, Integer> baseAttributes,
-            @JsonProperty("attributesAdded") @BsonProperty("attributesAdded")
-                    Map<String, Integer> attributesAdded,
             @JsonProperty("currentAttributes") @BsonProperty("currentAttributes")
-                    Map<String, Integer> currentAttributes) {
+                    Map<String, Integer> currentAttributes,
+            @JsonProperty("points") @BsonProperty("points") Integer attributePoints) {
         this.playerName = playerName;
         this.baseAttributes = baseAttributes;
-        this.attributesAdded = attributesAdded;
         this.currentAttributes = currentAttributes;
+        this.attributePoints = attributePoints;
     }
 
     String playerName;
     Map<String, Integer> baseAttributes;
-    Map<String, Integer> attributesAdded;
     Map<String, Integer> currentAttributes;
+    Integer attributePoints;
 }

@@ -104,4 +104,5 @@ mongo-database:
   player-motion: "playerMotion"
   mob-instance: "mobInstance"
   mob-attributes: "mobAttributes"
+  actorStats: "actorStats"
 

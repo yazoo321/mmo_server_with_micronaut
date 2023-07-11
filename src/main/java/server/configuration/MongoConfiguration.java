@@ -18,4 +18,6 @@ public class MongoConfiguration {
     private String playerMotion;
     private String mobInstance;
     private String mobAttributes;
+
+    private String actorStats;
 }

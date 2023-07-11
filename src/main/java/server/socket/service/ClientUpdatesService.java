@@ -7,6 +7,7 @@ import jakarta.inject.Singleton;
 import java.util.*;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.Stats;
 import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.items.model.DroppedItem;
@@ -35,7 +36,7 @@ public class ClientUpdatesService {
                         .build();
 
         broadcaster
-                .broadcast(socketResponse, isValid(playerMotion.getPlayerName()))
+                .broadcast(socketResponse, listensToMotionUpdate(playerMotion.getPlayerName()))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -48,7 +49,7 @@ public class ClientUpdatesService {
                         .build();
 
         broadcaster
-                .broadcast(socketResponse, isValid(monster.getMobInstanceId()))
+                .broadcast(socketResponse, listensToMotionUpdate(monster.getMobInstanceId()))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -76,6 +77,18 @@ public class ClientUpdatesService {
 
         broadcaster
                 .broadcast(socketResponse, listensToItemPickup(itemInstanceId))
+                .subscribe(socketResponseSubscriber);
+    }
+
+    public void sendStatsUpdates(Stats stats) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.UPDATE_DERIVED_ATTRIBUTES.getType())
+                        .stats(stats)
+                        .build();
+
+        broadcaster
+                .broadcast(socketResponse, listensToUpdateFor(stats.getActorId()))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -138,27 +151,41 @@ public class ClientUpdatesService {
         };
     }
 
-    private Predicate<WebSocketSession> isValid(String playerOrMob) {
-        // we will report to player every time they call update about other players nearby
-        return s -> {
-            String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
-            boolean isServer = serverName != null && !serverName.isBlank();
-            // server does not track mobs
-            Set<String> mobs =
-                    isServer
-                            ? Set.of()
-                            : (Set<String>)
-                                    s.asMap()
-                                            .getOrDefault(
-                                                    SessionParams.TRACKING_MOBS.getType(),
-                                                    Set.of());
-            Set<String> players =
-                    (Set<String>)
-                            s.asMap()
-                                    .getOrDefault(
-                                            SessionParams.TRACKING_PLAYERS.getType(), Set.of());
+    private boolean sessionListensToPlayerOrMob(WebSocketSession s, String playerOrMob) {
+        String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
+        boolean isServer = serverName != null && !serverName.isBlank();
+        // server does not track mobs
+        Set<String> mobs =
+                isServer
+                        ? Set.of()
+                        : (Set<String>)
+                                s.asMap()
+                                        .getOrDefault(
+                                                SessionParams.TRACKING_MOBS.getType(), Set.of());
+        Set<String> players =
+                (Set<String>)
+                        s.asMap().getOrDefault(SessionParams.TRACKING_PLAYERS.getType(), Set.of());
 
-            return mobs.contains(playerOrMob) || players.contains(playerOrMob);
-        };
+        return mobs.contains(playerOrMob) || players.contains(playerOrMob);
+    }
+
+    private boolean sessionIsThePlayerOrMob(WebSocketSession s, String playerOrMob) {
+        String playerName =
+                (String) s.asMap().getOrDefault(SessionParams.PLAYER_NAME.getType(), "");
+        String serverName =
+                (String) s.asMap().getOrDefault(SessionParams.SERVER_NAME.getType(), "");
+
+        return playerName.equalsIgnoreCase(playerOrMob) || serverName.equalsIgnoreCase(playerOrMob);
+    }
+
+    private Predicate<WebSocketSession> listensToUpdateFor(String playerOrMob) {
+        return s ->
+                (sessionIsThePlayerOrMob(s, playerOrMob)
+                        || sessionListensToPlayerOrMob(s, playerOrMob));
+    }
+
+    private Predicate<WebSocketSession> listensToMotionUpdate(String playerOrMob) {
+        // we will report to player every time they call update about other players nearby
+        return s -> sessionListensToPlayerOrMob(s, playerOrMob);
     }
 }

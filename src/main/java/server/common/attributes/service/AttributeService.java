@@ -3,7 +3,7 @@ package server.common.attributes.service;
 import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Map;
-import server.common.attributes.types.AttributeTypes;
+import server.attribute.stats.types.StatsTypes;
 
 @Singleton
 public class AttributeService {
@@ -14,7 +14,7 @@ public class AttributeService {
                         .filter(
                                 attribute -> {
                                     try {
-                                        AttributeTypes.valueOf(attribute);
+                                        StatsTypes.valueOf(attribute);
                                         return true;
                                     } catch (IllegalArgumentException ex) {
                                         return false;

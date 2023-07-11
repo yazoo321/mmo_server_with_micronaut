@@ -38,7 +38,7 @@ public class ItemService {
                             ItemInstance instance =
                                     new ItemInstance(itemId, itemInstanceId, foundItem);
                             return itemRepository
-                                    .createItemInstance(instance)
+                                    .upsertItemInstance(instance)
                                     .doOnError(
                                             e ->
                                                     log.error(
@@ -99,7 +99,7 @@ public class ItemService {
         List<Item> created = new ArrayList<>();
         // this is almost never used so can be blocking
         for (Item i : items) {
-            created.add(itemRepository.createItem(i).blockingGet());
+            created.add(itemRepository.upsertItem(i).blockingGet());
         }
 
         return created;

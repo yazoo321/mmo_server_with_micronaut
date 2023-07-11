@@ -1,11 +1,10 @@
 package server.items.types.accessories;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import server.common.dto.Tag;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.model.types.RingSlot1;
 import server.items.model.Item;
@@ -23,11 +22,11 @@ public class Ring extends Item {
     public Ring(
             String itemId,
             String itemName,
-            List<Tag> tags,
+            Map<String, Double> itemEffects,
             Stacking stacking,
             Integer value,
             ItemConfig config) {
-        super(itemId, itemName, ItemType.RING.getType(), tags, stacking, value, config);
+        super(itemId, itemName, ItemType.RING.getType(), itemEffects, stacking, value, config);
     }
 
     @Override

@@ -1,11 +1,13 @@
 package server.player.attributes.repository;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import server.configuration.MongoConfiguration;
@@ -13,6 +15,7 @@ import server.player.attributes.model.PlayerAttributes;
 
 @Slf4j
 @Singleton
+@Deprecated // use Stats instead
 public class PlayerAttributesRepository {
     MongoConfiguration configuration;
     MongoClient mongoClient;
@@ -46,6 +49,15 @@ public class PlayerAttributesRepository {
                         playerAttributesCollection.findOneAndReplace(
                                 eq("playerName", playerName), attributes))
                 .blockingGet();
+    }
+
+    public Single<Map<String, Integer>> updateCurrentAttributes(
+            String playerName, Map<String, Integer> currentAttributes) {
+        return Single.fromPublisher(
+                        playerAttributesCollection.updateOne(
+                                eq("playerName", playerName),
+                                set("currentAttributes", currentAttributes)))
+                .map(res -> currentAttributes);
     }
 
     public void deletePlayerAttributes(String playerName) {

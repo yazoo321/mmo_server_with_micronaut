@@ -1,19 +1,21 @@
-package server.common.attributes.types;
+package server.attribute.stats.types;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AttributeTypes {
+public enum StatsTypes {
     // BASE
     STR("STR"),
     DEX("DEX"),
     INT("INT"),
     STA("STA"),
 
-    HP("HP"),
-    MP("MP"),
+    MAX_HP("MAX_HP"),
+    MAX_MP("MAX_MP"),
+    CURRENT_HP("CURRENT_HP"),
+    CURRENT_MP("CURRENT_MP"),
 
     PHY_AMP("PHY_AMP"),
     MAG_AMP("MAG_AMP"),
@@ -24,8 +26,12 @@ public enum AttributeTypes {
     ATTACK_SPEED("ATTACK_SPEED"),
     CAST_SPEED("CAST_SPEED"),
 
+    BASE_ATTACK_SPEED("BASE_ATTACK_SPEED"),
+
     PHY_CRIT("PHY_CRIT"),
-    MGC_CRIT("MGC_CRIT");
+    MGC_CRIT("MGC_CRIT"),
+
+    WEAPON_DAMAGE("WEAPON_DAMAGE");
 
     public final String type;
 }

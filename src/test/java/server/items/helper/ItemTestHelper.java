@@ -9,12 +9,10 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import server.attribute.stats.types.StatsTypes;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
-import server.common.dto.Tag;
 import server.configuration.MongoConfiguration;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.CharacterItem;
@@ -174,124 +172,126 @@ public class ItemTestHelper {
 
     public static Item createTestItemOfType(String type) {
         Stacking stacOpts = new Stacking(false, 1, 1);
-        List<Tag> tags = new ArrayList<>();
+        Map<String, Double> itemEffects = new HashMap<>();
         ItemConfig itemConfig = new ItemConfig("icon", "mesh");
 
         switch (type) {
             case "WEAPON":
-                tags.add(new Tag("damage", "30"));
+                itemEffects.put(StatsTypes.WEAPON_DAMAGE.getType(), 10.0);
+                itemEffects.put(StatsTypes.BASE_ATTACK_SPEED.getType(), 1.2);
+
                 return new Weapon(
                         UUID.randomUUID().toString(),
                         "sharp sword",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "HELM":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Helm(
                         UUID.randomUUID().toString(),
                         "leather helm",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "CHEST":
-                tags.add(new Tag("armour", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Chest(
                         UUID.randomUUID().toString(),
                         "leather armour",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "BELT":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Belt(
                         UUID.randomUUID().toString(),
                         "leather belt",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "BRACERS":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Bracers(
                         UUID.randomUUID().toString(),
                         "iron bracers",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "CAPE":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Cape(
                         UUID.randomUUID().toString(),
                         "green cape",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "GLOVES":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Gloves(
                         UUID.randomUUID().toString(),
                         "leather gloves",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "LEGS":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Legs(
                         UUID.randomUUID().toString(),
                         "leather pants",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "SHOULDER":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Shoulder(
                         UUID.randomUUID().toString(),
                         "leather shoulder pads",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "NECK":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Neck(
                         UUID.randomUUID().toString(),
                         "leather shoulder pads",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "BOOTS":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Boots(
                         UUID.randomUUID().toString(),
                         "leather boots",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "RING":
-                tags.add(new Tag("armour", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Ring(
                         UUID.randomUUID().toString(),
                         "gold ring",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);
             case "SHIELD":
-                tags.add(new Tag("armor", "10"));
+                itemEffects.put(StatsTypes.DEF.getType(), 20.0);
                 return new Shield(
                         UUID.randomUUID().toString(),
                         "bronze shield",
-                        tags,
+                        itemEffects,
                         stacOpts,
                         1000,
                         itemConfig);

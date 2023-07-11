@@ -12,7 +12,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import server.common.dto.Location;
-import server.common.dto.Location2D;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
@@ -45,12 +44,12 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 
         Location dropLocation = new Location(createBaseMotion());
         SocketMessage dropRequestChar1 =
-                dropRequestForCharacter(CHARACTER_1, new Location2D(0, 0), dropLocation);
+                dropRequestForCharacter(CHARACTER_1, createdItem.getItemInstanceId(), dropLocation);
 
         playerClient1.send(dropRequestChar1);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(30, ChronoUnit.SECONDS))
+                .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
                 .until(
                         () -> {
                             List<String> resTypes =
@@ -159,12 +158,12 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
     }
 
     private SocketMessage dropRequestForCharacter(
-            String characterName, Location2D inventoryLocation, Location dropLocation) {
+            String characterName, String itemInstanceId, Location dropLocation) {
         SocketMessage message = new SocketMessage();
         message.setUpdateType(MessageType.DROP_ITEM.getType());
         GenericInventoryData genericInventoryData = new GenericInventoryData();
         genericInventoryData.setCharacterName(characterName);
-        genericInventoryData.setItemInventoryLocation(inventoryLocation);
+        genericInventoryData.setItemInstanceId(itemInstanceId);
         genericInventoryData.setLocation(dropLocation);
 
         message.setInventoryRequest(genericInventoryData);

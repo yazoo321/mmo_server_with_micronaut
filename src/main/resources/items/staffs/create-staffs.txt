@@ -1,16 +1,13 @@
 {
-
     "items": [
         {
             "itemId": "17000",
             "itemName": "Staff of divinity",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "35"
-                }
-            ],
+            "itemEffects": {
+                "BASE_ATTACK_SPEED": 1.8,
+                "WEAPON_DAMAGE": 10,
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -25,12 +22,10 @@
             "itemId": "17001",
             "itemName": "Staff of divinity",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "300"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 2.0,
+               "WEAPON_DAMAGE": 30,
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -45,12 +40,10 @@
             "itemId": "17002",
             "itemName": "Lifestealer staff",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "250"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 2.3,
+               "WEAPON_DAMAGE": 60,
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -65,12 +58,10 @@
             "itemId": "17003",
             "itemName": "Wooden stick",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "3"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 0.8,
+               "WEAPON_DAMAGE": 10
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -85,12 +76,10 @@
             "itemId": "17004",
             "itemName": "Apprentice's staff",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "35"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 1.0,
+               "WEAPON_DAMAGE": 40
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -105,12 +94,10 @@
             "itemId": "17005",
             "itemName": "Chipped arnana stick",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "50"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 0.9,
+               "WEAPON_DAMAGE": 5.0
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -125,12 +112,10 @@
             "itemId": "17006",
             "itemName": "Empowered stick",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "60"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 1.3,
+               "WEAPON_DAMAGE": 50
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,

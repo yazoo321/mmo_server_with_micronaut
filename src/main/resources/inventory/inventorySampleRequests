@@ -31,3 +31,36 @@ Pickup item:
         }
     }
 }
+
+3. Equip item
+{
+    "playerName": "testChar1",
+    "updateType": "EQUIP_ITEM",
+    "inventoryRequest": {
+        "characterName": "testChar1",
+        "itemInstanceId": "38d8e69e-b05e-418c-9ece-cb97095b099a"
+    }
+}
+
+4. Un-equip item
+{
+    "playerName": "testChar1",
+    "updateType": "UN_EQUIP_ITEM",
+    "inventoryRequest": {
+        "characterName": "testChar1",
+        "itemInstanceId": "38d8e69e-b05e-418c-9ece-cb97095b099a"
+    }
+}
+
+
+Extra, post requests:
+1. Spawn item
+{
+    "itemId": "17000",
+    "location": {
+        "map": "dreamscape",
+        "x": 35240,
+        "y": -68565,
+        "z": -20199
+    }
+}

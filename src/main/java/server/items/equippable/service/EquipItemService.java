@@ -3,8 +3,12 @@ package server.items.equippable.service;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.Stats;
+import server.attribute.stats.service.StatsService;
 import server.common.dto.Location2D;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.model.exceptions.EquipException;
@@ -22,6 +26,8 @@ public class EquipItemService {
     @Inject EquipRepository equipRepository;
 
     @Inject InventoryService inventoryService;
+
+    @Inject StatsService statsService;
 
     public Single<EquippedItems> equipItem(String itemInstanceId, String characterName) {
         // in order to equip item, first un-equip item from slot if one exists
@@ -45,7 +51,7 @@ public class EquipItemService {
                             if (equippedItem != null) {
                                 // TODO: Make this async
                                 items =
-                                        unequipItem(
+                                        unequipItemAndGetInventory(
                                                         equippedItem
                                                                 .getItemInstance()
                                                                 .getItemInstanceId(),
@@ -71,11 +77,18 @@ public class EquipItemService {
                                     .updateInventoryItems(characterName, items)
                                     .blockingGet();
 
-                            return equipRepository.insert(equippedItem);
+                            return equipRepository
+                                    .insert(equippedItem)
+                                    .map(
+                                            equippedItems -> {
+                                                updateCharacterItemStats(characterName);
+
+                                                return equippedItems;
+                                            });
                         });
     }
 
-    public Single<Inventory> unequipItem(String itemInstanceId, String characterName) {
+    public Single<String> unEquipItem(String itemInstanceId, String characterName) {
         return inventoryService
                 .unequipItem(itemInstanceId, characterName)
                 .doOnError(
@@ -83,12 +96,20 @@ public class EquipItemService {
                             log.warn("Failed to unequip item, {}", e.getMessage());
                             throw new EquipException("Failed to unequip item");
                         })
-                .flatMap(
+                .map(
                         itemList -> {
                             // TODO: Make async
                             equipRepository.deleteEquippedItem(itemInstanceId).blockingGet();
-                            return inventoryService.getInventory(characterName);
+                            updateCharacterItemStats(characterName);
+
+                            return itemInstanceId;
                         });
+    }
+
+    public Single<Inventory> unequipItemAndGetInventory(
+            String itemInstanceId, String characterName) {
+        return unEquipItem(itemInstanceId, characterName)
+                .flatMap(instanceId -> inventoryService.getInventory(characterName));
     }
 
     public Single<List<EquippedItems>> getEquippedItems(String characterName) {
@@ -106,5 +127,24 @@ public class EquipItemService {
                 .findFirst()
                 .orElseThrow(
                         () -> new InventoryException("The item trying to equip does not exist"));
+    }
+
+    public void updateCharacterItemStats(String playerName) {
+        getEquippedItems(playerName)
+                .doOnError(
+                        e -> log.error("Failed to update character item stats, {}", e.getMessage()))
+                .doOnSuccess(
+                        items -> {
+                            Map<String, Double> effects = new HashMap<>();
+                            items.forEach(
+                                    i ->
+                                            Stats.mergeLeft(
+                                                    effects,
+                                                    i.getItemInstance()
+                                                            .getItem()
+                                                            .getItemEffects()));
+                            statsService.updateItemStats(playerName, effects);
+                        })
+                .subscribe();
     }
 }

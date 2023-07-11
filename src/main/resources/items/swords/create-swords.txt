@@ -1,16 +1,16 @@
 {
-
     "items": [
         {
             "itemId": "15000",
             "itemName": "Sunsword of Vallen",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "300"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 2.3,
+               "WEAPON_DAMAGE": 60,
+               "MAX_HP": 100,
+               "ATTACK_SPEED": 30,
+               "PHY_AMP": 0.3
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -25,12 +25,10 @@
             "itemId": "15001",
             "itemName": "Iron butcher sword",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "35"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 2.3,
+               "WEAPON_DAMAGE": 60
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -45,12 +43,10 @@
             "itemId": "15002",
             "itemName": "Guards cleaver",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "125"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 2.3,
+               "WEAPON_DAMAGE": 60
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -65,12 +61,10 @@
             "itemId": "15003",
             "itemName": "Fallen champions sword",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "200"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 2.3,
+               "WEAPON_DAMAGE": 60
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -85,12 +79,10 @@
             "itemId": "15004",
             "itemName": "Giants cleaver",
             "category": "WEAPON",
-            "tags": [
-                {
-                    "name": "damage",
-                    "value": "250"
-                }
-            ],
+            "itemEffects": {
+               "BASE_ATTACK_SPEED": 2.3,
+               "WEAPON_DAMAGE": 60
+            },
             "value": 2000,
             "stacking": {
                 "canStack": false,
