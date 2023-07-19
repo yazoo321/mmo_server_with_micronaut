@@ -67,11 +67,12 @@ public class InventoryService {
                                                 itemService
                                                         .deleteDroppedItem(
                                                                 request.getItemInstanceId())
-                                                        .subscribe();
+                                                        .blockingGet();
+
                                                 inventoryRepository
                                                         .updateInventoryItems(
                                                                 request.getCharacterName(), items)
-                                                        .subscribe();
+                                                        .blockingGet();
 
                                                 return getInventory(request.getCharacterName());
                                             });

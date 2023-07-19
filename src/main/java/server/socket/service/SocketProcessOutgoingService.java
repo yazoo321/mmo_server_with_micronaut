@@ -34,6 +34,7 @@ public class SocketProcessOutgoingService {
                     MessageType.PICKUP_ITEM.getType(), this::handlePickupItem,
                     MessageType.DROP_ITEM.getType(), this::handleDropItem,
                     MessageType.FETCH_INVENTORY.getType(), this::handleFetchInventory,
+                    MessageType.FETCH_EQUIPPED.getType(), this::handleFetchEquipped,
                     MessageType.EQUIP_ITEM.getType(), this::handleEquipItem,
                     MessageType.UN_EQUIP_ITEM.getType(), this::handleUnEquipItem,
                     MessageType.FETCH_STATS.getType(), this::handleFetchStats);
@@ -100,6 +101,10 @@ public class SocketProcessOutgoingService {
 
     private void handleFetchInventory(SocketMessage message, WebSocketSession session) {
         itemSocketIntegration.handleFetchInventory(message.getInventoryRequest(), session);
+    }
+
+    private void handleFetchEquipped(SocketMessage message, WebSocketSession session) {
+        itemSocketIntegration.handleFetchEquipped(message.getInventoryRequest(), session);
     }
 
     private void handleEquipItem(SocketMessage message, WebSocketSession session) {

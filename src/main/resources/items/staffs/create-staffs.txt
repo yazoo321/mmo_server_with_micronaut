@@ -6,7 +6,7 @@
             "category": "WEAPON",
             "itemEffects": {
                 "BASE_ATTACK_SPEED": 1.8,
-                "WEAPON_DAMAGE": 10,
+                "WEAPON_DAMAGE": 10
             },
             "value": 2000,
             "stacking": {
@@ -24,7 +24,7 @@
             "category": "WEAPON",
             "itemEffects": {
                "BASE_ATTACK_SPEED": 2.0,
-               "WEAPON_DAMAGE": 30,
+               "WEAPON_DAMAGE": 30
             },
             "value": 2000,
             "stacking": {
@@ -42,7 +42,7 @@
             "category": "WEAPON",
             "itemEffects": {
                "BASE_ATTACK_SPEED": 2.3,
-               "WEAPON_DAMAGE": 60,
+               "WEAPON_DAMAGE": 60
             },
             "value": 2000,
             "stacking": {
