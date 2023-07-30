@@ -164,9 +164,9 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.26'
 
 	// Micronaut inject
-	annotationProcessor(platform('io.micronaut:micronaut-bom:3.8.7'))
+	annotationProcessor(platform('io.micronaut:micronaut-bom:3.9.2'))
 	annotationProcessor("io.micronaut:micronaut-inject-java")
-	implementation(platform('io.micronaut:micronaut-bom:3.7.4'))
+	implementation(platform('io.micronaut:micronaut-bom:3.9.2'))
 	implementation("io.micronaut:micronaut-inject")
 
 	// database configs

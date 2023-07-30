@@ -94,6 +94,25 @@ public class ItemSocketIntegration {
         sendInventoryToPlayer(session, request.getCharacterName());
     }
 
+    public void handleFetchEquipped(GenericInventoryData request, WebSocketSession session) {
+        equipItemService.getEquippedItems(request.getCharacterName())
+                .doOnSuccess(equippedItems -> {
+                    if (equippedItems.isEmpty()) {
+                        return;
+                    }
+                    GenericInventoryData inventoryData = new GenericInventoryData();
+                    inventoryData.setEquippedItems(equippedItems);
+                    SocketResponse response =
+                            SocketResponse.builder()
+                                    .messageType(
+                                            SocketResponseType.ADD_EQUIP_ITEM.getType())
+                                    .inventoryData(inventoryData)
+                                    .build();
+                    session.send(response).subscribe(socketResponseSubscriber);
+                })
+                .subscribe();
+    }
+
     public void handleEquipItem(GenericInventoryData request, WebSocketSession session) {
         equipItemService
                 .equipItem(request.getItemInstanceId(), request.getCharacterName())

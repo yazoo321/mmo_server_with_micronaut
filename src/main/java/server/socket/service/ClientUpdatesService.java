@@ -83,7 +83,7 @@ public class ClientUpdatesService {
     public void sendStatsUpdates(Stats stats) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
-                        .messageType(SocketResponseType.UPDATE_DERIVED_ATTRIBUTES.getType())
+                        .messageType(SocketResponseType.STATS_UPDATE.getType())
                         .stats(stats)
                         .build();
 

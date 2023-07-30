@@ -5,8 +5,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.StatsService;
+import server.socket.model.MessageType;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
+import server.socket.model.SocketResponseType;
 
 @Slf4j
 @Singleton
@@ -21,7 +23,9 @@ public class StatsSocketIntegration {
                 .getStatsFor(playerName)
                 .doOnSuccess(
                         stats -> {
-                            SocketResponse response = SocketResponse.builder().stats(stats).build();
+                            SocketResponse response = SocketResponse.builder()
+                                    .messageType(SocketResponseType.STATS_UPDATE.getType())
+                                    .stats(stats).build();
 
                             session.send(response).subscribe(socketResponseSubscriber);
                         })

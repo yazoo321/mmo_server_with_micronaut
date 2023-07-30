@@ -55,7 +55,7 @@ public class Stats {
     }
 
     public int getBaseStat(StatsTypes stat) {
-        return baseStats.getOrDefault(stat, 0);
+        return baseStats.getOrDefault(stat.getType(), 0);
     }
 
     public Double getDerived(StatsTypes type) {
