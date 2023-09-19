@@ -225,6 +225,26 @@ Here's a body with sample item creation body for `/v1/items/create-items`
             }
         },
         {
+            "itemId": "1505",
+            "itemName": "Footmans helmet",
+            "category": "HELM",
+            "itemEffects": {
+               "DEF": 28.5,
+               "MAG_DEF": 15.3,
+               "MAX_HP": 75.0,
+               "MAX_MP": 10
+            },
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
             "itemId": "1600",
             "itemName": "Leather pants",
             "category": "LEGS",

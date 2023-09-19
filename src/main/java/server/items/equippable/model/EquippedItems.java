@@ -23,6 +23,7 @@ import server.items.model.ItemInstance;
         property = "category")
 @JsonSubTypes({
     // Weapons
+    // Consider renaming weapon to MAINHAND and SHIELD to OFFHAND
     @JsonSubTypes.Type(value = WeaponSlot1.class, name = "WEAPON"),
     @JsonSubTypes.Type(value = ShieldSlot.class, name = "SHIELD"),
     // Accessories
