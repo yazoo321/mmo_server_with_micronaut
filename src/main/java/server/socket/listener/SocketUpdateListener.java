@@ -6,10 +6,15 @@ import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import server.items.equippable.model.EquippedItems;
+import server.items.inventory.model.ItemInstanceIds;
 import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
+import server.socket.model.SocketResponseType;
 import server.socket.service.ClientUpdatesService;
+
+import java.util.List;
 
 @Slf4j
 @KafkaListener(
@@ -39,5 +44,15 @@ public class SocketUpdateListener {
     @Topic("item-removed-from-map")
     void itemRemovedFromMap(String itemInstanceId) {
         clientUpdatesService.sendItemPickupUpdates(itemInstanceId);
+    }
+
+    @Topic("notify-equip-items")
+    void notifyItemEquip(List<EquippedItems> equippedItems) {
+        clientUpdatesService.sendItemEquipUpdates(equippedItems);
+    }
+
+    @Topic("notify-un-equip-items")
+    void notifyUnEquipItem(ItemInstanceIds itemInstanceIds) {
+        clientUpdatesService.sendItemUnEquipUpdates(itemInstanceIds.getPlayerName(), itemInstanceIds.getItemInstanceIds());
     }
 }

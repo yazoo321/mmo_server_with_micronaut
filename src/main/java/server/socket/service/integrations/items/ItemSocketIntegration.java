@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.items.equippable.service.EquipItemService;
+import server.items.inventory.model.ItemInstanceIds;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.inventory.service.InventoryService;
 import server.socket.model.SocketResponse;
@@ -101,6 +102,7 @@ public class ItemSocketIntegration {
                         return;
                     }
                     GenericInventoryData inventoryData = new GenericInventoryData();
+                    inventoryData.setCharacterName(equippedItems.get(0).getCharacterName());
                     inventoryData.setEquippedItems(equippedItems);
                     SocketResponse response =
                             SocketResponse.builder()
@@ -123,13 +125,15 @@ public class ItemSocketIntegration {
 
                             GenericInventoryData equipData = new GenericInventoryData();
                             equipData.setEquippedItems(List.of(equippedItems));
+                            equipData.setCharacterName(equippedItems.getCharacterName());
                             SocketResponse res =
                                     SocketResponse.builder()
                                             .inventoryData(equipData)
                                             .messageType(
                                                     SocketResponseType.ADD_EQUIP_ITEM.getType())
                                             .build();
-                            session.send(res).subscribe(socketResponseSubscriber);
+                            session.send(res).subscribe(socketResponseSubscriber); // notify this player
+                            updateProducer.notifyEquipItems(List.of(equippedItems));  // notify other players
                         })
                 .subscribe();
     }
@@ -142,14 +146,23 @@ public class ItemSocketIntegration {
                         unequippedItemInstanceId -> {
                             sendInventoryToPlayer(session, request.getCharacterName());
 
+                            GenericInventoryData equipData = new GenericInventoryData();
+                            equipData.setItemInstanceIds(List.of(unequippedItemInstanceId));
+                            equipData.setCharacterName(request.getCharacterName());
+
                             SocketResponse res =
                                     SocketResponse.builder()
-                                            .itemInstanceIds(Set.of(unequippedItemInstanceId))
+                                            .inventoryData(equipData)
                                             .messageType(
                                                     SocketResponseType.REMOVE_EQUIP_ITEM.getType())
                                             .build();
 
                             session.send(res).subscribe(socketResponseSubscriber);
+                            ItemInstanceIds itemInstanceIds = ItemInstanceIds.builder()
+                                    .itemInstanceIds(List.of(unequippedItemInstanceId))
+                                    .playerName(request.getCharacterName())
+                                    .build();
+                            updateProducer.notifyUnEquipItems(itemInstanceIds);  // notify other players
                         })
                 .subscribe();
     }
