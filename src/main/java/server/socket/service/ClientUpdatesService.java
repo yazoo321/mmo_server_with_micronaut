@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.common.dto.Location;
 import server.common.dto.Motion;
+import server.items.equippable.model.EquippedItems;
+import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
@@ -78,6 +80,43 @@ public class ClientUpdatesService {
 
         broadcaster
                 .broadcast(socketResponse, listensToItemPickup(itemInstanceId))
+                .subscribe(socketResponseSubscriber);
+    }
+
+    public void sendItemEquipUpdates(List<EquippedItems> equippedItems) {
+        if (equippedItems == null || equippedItems.isEmpty()) {
+            return;
+        }
+        String characterName = equippedItems.get(0).getCharacterName();
+        GenericInventoryData equipData = new GenericInventoryData();
+        equipData.setCharacterName(characterName);
+        equipData.setEquippedItems(equippedItems);
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .inventoryData(equipData)
+                        .messageType(SocketResponseType.ADD_EQUIP_ITEM.getType())
+                        .build();
+
+        broadcaster
+                .broadcast(socketResponse, listensToMotionUpdate(characterName))
+                .subscribe(socketResponseSubscriber);
+    }
+
+    public void sendItemUnEquipUpdates(String playerName, List<String> itemInstanceIds) {
+        if (itemInstanceIds == null || itemInstanceIds.isEmpty()) {
+            return;
+        }
+        GenericInventoryData equipData = new GenericInventoryData();
+        equipData.setCharacterName(playerName);
+        equipData.setItemInstanceIds(itemInstanceIds);
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .inventoryData(equipData)
+                        .messageType(SocketResponseType.REMOVE_EQUIP_ITEM.getType())
+                        .build();
+
+        broadcaster
+                .broadcast(socketResponse, listensToMotionUpdate(playerName))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -185,6 +224,7 @@ public class ClientUpdatesService {
                         || sessionListensToPlayerOrMob(s, playerOrMob));
     }
 
+    // TODO: Consider renaming
     private Predicate<WebSocketSession> notifyStatsFor(String playerOrMob, Stats stats) {
         return s -> {
             boolean isThePlayerOrMob = false;

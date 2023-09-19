@@ -24,4 +24,6 @@ public class GenericInventoryData {
 
     List<EquippedItems> equippedItems;
     List<DroppedItem> droppedItems;
+
+    List<String> itemInstanceIds;
 }
