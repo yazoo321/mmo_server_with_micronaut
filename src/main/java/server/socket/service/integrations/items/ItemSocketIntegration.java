@@ -101,6 +101,7 @@ public class ItemSocketIntegration {
                         return;
                     }
                     GenericInventoryData inventoryData = new GenericInventoryData();
+                    inventoryData.setCharacterName(request.getCharacterName());
                     inventoryData.setEquippedItems(equippedItems);
                     SocketResponse response =
                             SocketResponse.builder()

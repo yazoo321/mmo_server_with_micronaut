@@ -31,7 +31,10 @@ public enum StatsTypes {
     PHY_CRIT("PHY_CRIT"),
     MGC_CRIT("MGC_CRIT"),
 
-    WEAPON_DAMAGE("WEAPON_DAMAGE");
+    WEAPON_DAMAGE("WEAPON_DAMAGE"),
+
+    PHY_REDUCTION("PHY_REDUCTION"),
+    MGC_REDUCTION("MGC_REDUCTION");
 
     public final String type;
 }

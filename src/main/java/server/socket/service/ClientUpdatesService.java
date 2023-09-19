@@ -14,6 +14,7 @@ import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.SessionParams;
+import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
@@ -88,7 +89,7 @@ public class ClientUpdatesService {
                         .build();
 
         broadcaster
-                .broadcast(socketResponse, listensToUpdateFor(stats.getActorId()))
+                .broadcast(socketResponse, notifyStatsFor(stats.getActorId(), stats))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -182,6 +183,19 @@ public class ClientUpdatesService {
         return s ->
                 (sessionIsThePlayerOrMob(s, playerOrMob)
                         || sessionListensToPlayerOrMob(s, playerOrMob));
+    }
+
+    private Predicate<WebSocketSession> notifyStatsFor(String playerOrMob, Stats stats) {
+        return s -> {
+            boolean isThePlayerOrMob = false;
+            if (sessionIsThePlayerOrMob(s, playerOrMob)) {
+                isThePlayerOrMob = true;
+                // update session cache about stats
+                SessionParamHelper.setDerivedStats(s, stats.getDerivedStats());
+            }
+
+            return isThePlayerOrMob || sessionListensToPlayerOrMob(s, playerOrMob);
+        };
     }
 
     private Predicate<WebSocketSession> listensToMotionUpdate(String playerOrMob) {
