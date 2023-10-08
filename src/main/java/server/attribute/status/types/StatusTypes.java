@@ -8,6 +8,8 @@ import lombok.Getter;
 public enum StatusTypes {
 
     UNCONCIOUS("UNCONCIOUS"),
-    DEAD("DEAD");
+    DEAD("DEAD"),
+    STUNNED("STUNNED"),
+    SILENCED("SILENCED");
     public final String type;
 }

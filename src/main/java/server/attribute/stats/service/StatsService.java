@@ -10,6 +10,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
+import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.socket.producer.UpdateProducer;
 
@@ -82,6 +83,19 @@ public class StatsService {
                     handleDifference(updated, stats);
                 })
                 .subscribe();
+    }
+
+    public void takeDamage(Stats stats, Map<DamageTypes, Double> damageMap) {
+        Map<String, Double> derived = stats.getDerivedStats();
+        damageMap.forEach((k,v) -> {
+            Double currentHp = derived.get(StatsTypes.CURRENT_HP.getType());
+            currentHp -= v;
+            Map<String, Double> updated = Map.of(
+                    StatsTypes.CURRENT_HP.getType(),
+                    currentHp
+            );
+            handleDifference(updated, stats);
+        });
     }
 
     private void handleDifference(Map<String, Double> updated, Stats stats) {

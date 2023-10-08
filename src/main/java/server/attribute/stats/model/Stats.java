@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 
 @Data
