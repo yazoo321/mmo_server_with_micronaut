@@ -63,6 +63,10 @@ public class Stats {
         return derivedStats.getOrDefault(type.getType(), 0.0);
     }
 
+    public void setDerived(StatsTypes type, Double val) {
+        derivedStats.put(type.getType(), val);
+    }
+
     public Map<String, Double> recalculateDerivedStats() {
         Map<String, Double> updatedDerived = new HashMap<>();
         int strength = getBaseStat(StatsTypes.STR);
@@ -139,4 +143,9 @@ public class Stats {
 
         return left;
     }
+
+    private Double getMaxHp() {
+        return getDerived(StatsTypes.MAX_HP);
+    }
+
 }

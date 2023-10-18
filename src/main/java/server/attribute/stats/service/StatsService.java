@@ -12,6 +12,7 @@ import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
+import server.monster.server_integration.service.MobInstanceService;
 import server.socket.producer.UpdateProducer;
 
 @Slf4j
@@ -20,7 +21,38 @@ public class StatsService {
 
     @Inject ActorStatsRepository repository;
 
+    @Inject
+    MobInstanceService mobInstanceService;
+
     @Inject UpdateProducer updateProducer;
+
+    public void initializeMobStats(String actorId) {
+        Stats mobStats = new Stats();
+
+        mobStats.setActorId(actorId);
+
+        mobStats.setBaseStats(
+                new HashMap<>(
+                        Map.of(
+                                StatsTypes.STR.getType(), 200,
+                                StatsTypes.STA.getType(), 100,
+                                StatsTypes.DEX.getType(), 100,
+                                StatsTypes.INT.getType(), 100)));
+
+        mobStats
+                .getDerivedStats()
+                .putAll(
+                        new HashMap<>(
+                                Map.of(
+                                        StatsTypes.CURRENT_HP.getType(), 100.0,
+                                        StatsTypes.CURRENT_MP.getType(), 50.0)));
+
+        mobStats.recalculateDerivedStats();
+        mobStats.setDerived(StatsTypes.CURRENT_HP, mobStats.getDerived(StatsTypes.MAX_HP));
+        mobStats.setAttributePoints(0);
+
+        repository.updateStats(mobStats).subscribe();
+    }
 
     public void initializePlayerStats(String playerName) {
         Stats playerStats = new Stats();
@@ -90,12 +122,19 @@ public class StatsService {
         damageMap.forEach((k,v) -> {
             Double currentHp = derived.get(StatsTypes.CURRENT_HP.getType());
             currentHp -= v;
+            derived.put(StatsTypes.CURRENT_HP.getType(), currentHp);
             Map<String, Double> updated = Map.of(
                     StatsTypes.CURRENT_HP.getType(),
                     currentHp
             );
             handleDifference(updated, stats);
         });
+
+        if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
+            deleteStatsFor(stats.getActorId());
+            mobInstanceService.handleMobDeath(stats.getActorId());
+        }
+
     }
 
     private void handleDifference(Map<String, Double> updated, Stats stats) {

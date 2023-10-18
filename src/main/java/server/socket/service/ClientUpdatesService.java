@@ -231,7 +231,7 @@ public class ClientUpdatesService {
             if (sessionIsThePlayerOrMob(s, playerOrMob)) {
                 isThePlayerOrMob = true;
                 // update session cache about stats
-                SessionParamHelper.setDerivedStats(s, stats.getDerivedStats());
+                SessionParamHelper.updateDerivedStats(s, stats.getDerivedStats());
             }
 
             return isThePlayerOrMob || sessionListensToPlayerOrMob(s, playerOrMob);

@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.StatsService;
+import server.session.SessionParamHelper;
 import server.socket.model.MessageType;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
@@ -23,6 +24,12 @@ public class StatsSocketIntegration {
                 .getStatsFor(playerName)
                 .doOnSuccess(
                         stats -> {
+                            if (playerName.equalsIgnoreCase(SessionParamHelper.getPlayerName(session))) {
+                                // update session with params
+                                SessionParamHelper.updateDerivedStats(session, stats.getDerivedStats());
+
+                            }
+
                             SocketResponse response = SocketResponse.builder()
                                     .messageType(SocketResponseType.STATS_UPDATE.getType())
                                     .stats(stats).build();

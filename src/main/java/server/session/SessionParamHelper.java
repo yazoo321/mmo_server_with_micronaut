@@ -2,9 +2,11 @@ package server.session;
 
 import io.micronaut.websocket.WebSocketSession;
 import server.attribute.stats.model.Stats;
+import server.attribute.stats.types.StatsTypes;
 import server.combat.model.PlayerCombatData;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
+import server.items.types.ItemType;
 import server.motion.model.SessionParams;
 
 import java.time.Instant;
@@ -104,10 +106,15 @@ public class SessionParamHelper {
         return droppedItems;
     }
 
-    public static void setDerivedStats(WebSocketSession session, Map<String, Double> derivedStats) {
+    public static void updateDerivedStats(WebSocketSession session, Map<String, Double> derivedStats) {
         Map<String, Double> prev = getDerivedStats(session);
         Stats.mergeLeft(prev, derivedStats);
         session.put(SessionParams.DERIVED_STATS.getType(), prev);
+        updateCombatData(session);
+    }
+
+    public static void setDerivedStats(WebSocketSession session, Map<String, Double> derivedStats) {
+        session.put(SessionParams.DERIVED_STATS.getType(), derivedStats);
     }
 
     public static Map<String, Double> getDerivedStats(WebSocketSession session) {
@@ -150,19 +157,63 @@ public class SessionParamHelper {
     }
 
     public static void addToEquippedItems(WebSocketSession session, EquippedItems equippedItems) {
-        Map<String, EquippedItems> equippedItemsMap = (Map<String, EquippedItems>) session.asMap()
-                .get(SessionParams.EQUIPPED_ITEMS.getType());
-        if (equippedItemsMap == null) {
-            equippedItemsMap = setEquippedItems(session, new ArrayList<>());
-        }
+        Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
 
         equippedItemsMap.put(equippedItems.getCategory(), equippedItems);
+
+        updateCombatData(session, equippedItemsMap);
+    }
+
+    public static void removeFromEquippedItems(WebSocketSession session, String itemInstanceId) {
+        Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
+
+        equippedItemsMap.forEach((k,v) -> {
+            if (v.getItemInstance().getItemInstanceId().equals(itemInstanceId)) {
+                equippedItemsMap.remove(k);
+            }
+        });
+
+        updateCombatData(session, equippedItemsMap);
     }
 
     public static Map<String, EquippedItems> setEquippedItems(WebSocketSession session, List<EquippedItems> equippedItems) {
         Map<String, EquippedItems> data = equippedItems.stream().collect(Collectors.toMap(EquippedItems::getCategory, Function.identity()));
         session.put(SessionParams.EQUIPPED_ITEMS.getType(), data);
 
+        updateCombatData(session, data);
+
         return data;
     }
+
+    private static void updateCombatData(WebSocketSession session) {
+        Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
+        updateCombatData(session, equippedItemsMap);
+    }
+
+    private static void updateCombatData(WebSocketSession session, Map<String, EquippedItems> equippedItemsMap) {
+        PlayerCombatData combatData = getCombatData(session);
+        EquippedItems mainHand = equippedItemsMap.get(ItemType.WEAPON.getType());
+        EquippedItems offHand = equippedItemsMap.get(ItemType.SHIELD.getType());
+
+        combatData.setMainHandAttackSpeed(getBaseSpeed(mainHand));
+
+        if (offHand != null) {
+            combatData.setOffhandAttackSpeed(offHand.getBaseAttackSpeed());
+        } else {
+            combatData.setOffhandAttackSpeed(null);
+        }
+
+        Map<String, Double> stats = SessionParamHelper.getDerivedStats(session);
+
+        combatData.setCharacterAttackSpeed(stats.get(StatsTypes.ATTACK_SPEED.getType()));
+    }
+
+    private static Double getBaseSpeed(EquippedItems item) {
+        if (item != null) {
+            return item.getBaseAttackSpeed() != null ? item.getBaseAttackSpeed() : 1.0;
+        } else {
+            return 1.0;
+        }
+    }
+
 }

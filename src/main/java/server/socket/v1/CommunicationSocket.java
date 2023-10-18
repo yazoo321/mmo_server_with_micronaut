@@ -36,9 +36,13 @@ public class CommunicationSocket {
     @OnMessage
     public void onMessage(SocketMessage message, WebSocketSession session) {
         // TODO: get player/server name via injected headers
-        updateSessionParams(session, message);
-
-        socketProcessService.processMessage(message, session);
+        try {
+            updateSessionParams(session, message);
+            socketProcessService.processMessage(message, session);
+        } catch (Exception e) {
+            // avoid closing connection
+            log.error("Caught an unhandled exception! {}", e.getMessage());
+        }
     }
 
     @OnClose

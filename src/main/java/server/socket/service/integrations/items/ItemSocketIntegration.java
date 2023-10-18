@@ -10,6 +10,7 @@ import server.items.equippable.service.EquipItemService;
 import server.items.inventory.model.ItemInstanceIds;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.inventory.service.InventoryService;
+import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
@@ -98,6 +99,7 @@ public class ItemSocketIntegration {
     public void handleFetchEquipped(GenericInventoryData request, WebSocketSession session) {
         equipItemService.getEquippedItems(request.getCharacterName())
                 .doOnSuccess(equippedItems -> {
+                    SessionParamHelper.setEquippedItems(session, equippedItems);
                     if (equippedItems.isEmpty()) {
                         return;
                     }
@@ -121,6 +123,7 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         equippedItems -> {
+                            SessionParamHelper.addToEquippedItems(session, equippedItems);
                             sendInventoryToPlayer(session, request.getCharacterName());
 
                             GenericInventoryData equipData = new GenericInventoryData();
@@ -144,6 +147,7 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to un-equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         unequippedItemInstanceId -> {
+                            SessionParamHelper.removeFromEquippedItems(session, unequippedItemInstanceId);
                             sendInventoryToPlayer(session, request.getCharacterName());
 
                             GenericInventoryData equipData = new GenericInventoryData();

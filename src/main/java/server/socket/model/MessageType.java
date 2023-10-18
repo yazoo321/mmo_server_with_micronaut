@@ -17,7 +17,8 @@ public enum MessageType {
     DROP_ITEM("DROP_ITEM"),
     EQUIP_ITEM("EQUIP_ITEM"),
     UN_EQUIP_ITEM("UN_EQUIP_ITEM"),
-    FETCH_STATS("FETCH_STATS");
+    FETCH_STATS("FETCH_STATS"),
+    TRY_ATTACK("TRY_ATTACK");
 
     public final String type;
 }

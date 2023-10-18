@@ -4,9 +4,11 @@ import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.security.InvalidParameterException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
+import server.combat.service.PlayerCombatService;
 import server.motion.dto.PlayerMotion;
 import server.socket.model.MessageType;
 import server.socket.model.SocketMessage;
@@ -26,7 +28,13 @@ public class SocketProcessOutgoingService {
 
     @Inject StatsSocketIntegration attributeSocketIntegration;
 
-    Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap =
+    @Inject
+    PlayerCombatService combatService;
+
+    Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
+
+    public SocketProcessOutgoingService() {
+        this.functionMap = new HashMap<>(
             Map.of(
                     MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate,
                     MessageType.CREATE_MOB.getType(), this::handleCreateMob,
@@ -37,7 +45,13 @@ public class SocketProcessOutgoingService {
                     MessageType.FETCH_EQUIPPED.getType(), this::handleFetchEquipped,
                     MessageType.EQUIP_ITEM.getType(), this::handleEquipItem,
                     MessageType.UN_EQUIP_ITEM.getType(), this::handleUnEquipItem,
-                    MessageType.FETCH_STATS.getType(), this::handleFetchStats);
+                    MessageType.FETCH_STATS.getType(), this::handleFetchStats));
+        // map.of supports up to 10 items
+        this.functionMap.put(
+                MessageType.TRY_ATTACK.getType(), this::handleTryAttack);
+
+    }
+
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
         String updateType = socketMessage.getUpdateType();
@@ -117,6 +131,10 @@ public class SocketProcessOutgoingService {
 
     private void handleFetchStats(SocketMessage message, WebSocketSession session) {
         attributeSocketIntegration.handleFetchStats(message.getPlayerName(), session);
+    }
+
+    private void handleTryAttack(SocketMessage message, WebSocketSession session) {
+        combatService.requestAttack(session, message.getCombatRequest());
     }
 
     private boolean validate(String value, String name) {

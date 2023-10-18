@@ -5,40 +5,53 @@ import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.service.StatusService;
+import server.combat.model.CombatRequest;
 import server.combat.model.PlayerCombatData;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.service.EquipItemService;
 import server.items.types.weapons.Weapon;
 import server.session.SessionParamHelper;
+import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseSubscriber;
+import server.socket.model.SocketResponseType;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static server.attribute.stats.types.StatsTypes.PHY_AMP;
 import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 
+@Slf4j
 @Singleton
 public class PlayerCombatService {
 
-    ConcurrentSet<String> sessionsInCombat = new ConcurrentSet<>();
+    private final ConcurrentSet<String> sessionsInCombat = new ConcurrentSet<>();
 
     @Inject
-    StatsService statsService;
+    private StatsService statsService;
 
     @Inject
-    StatusService statusService;
+    private StatusService statusService;
 
-    public void requestAttack(WebSocketSession session, Set<String> targets) {
+    @Inject
+    SocketResponseSubscriber socketResponseSubscriber;
+
+    public void requestAttack(WebSocketSession session, CombatRequest combatRequest) {
+        if (combatRequest == null) {
+            log.error("Combat data is empty");
+            return;
+        }
         PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
-        combatData.setTargets(targets);
+        combatData.setTargets(combatRequest.getTargets());
 
         sessionsInCombat.add(SessionParamHelper.getPlayerName(session));
         attackLoop(session);
@@ -48,12 +61,16 @@ public class PlayerCombatService {
         sessionsInCombat.remove(SessionParamHelper.getPlayerName(session));
     }
 
-    private void tryAttackMainHand(WebSocketSession session, Stats target) {
+    private void tryAttack(WebSocketSession session, Stats target, boolean isMainHand) {
         PlayerCombatData data = SessionParamHelper.getCombatData(session);
 
         // Extract relevant combat data
-        Instant lastHit = data.getMainHandLastAttack();
-        Double baseSpeed = data.getMainHandAttackSpeed();
+        Instant lastHit = isMainHand ? data.getMainHandLastAttack() : data.getOffhandLastAttack();
+        if (lastHit == null) {
+            // TODO: this can be error prone
+            lastHit = Instant.now().minusSeconds(10);
+        }
+        Double baseSpeed = isMainHand ? data.getMainHandAttackSpeed() : data.getOffhandAttackSpeed();
         Double characterAttackSpeed = data.getCharacterAttackSpeed();
 
         // Calculate the actual delay in milliseconds
@@ -62,7 +79,8 @@ public class PlayerCombatService {
         // Calculate the next allowed attack time
         Instant nextAttackTime = lastHit.plusMillis(actualDelayInMS);
 
-        // Check if the next attack time is before the current time
+
+
         if (nextAttackTime.isBefore(Instant.now())) {
             // The player can attack
 
@@ -71,49 +89,48 @@ public class PlayerCombatService {
             Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
 
             // Get the equipped weapon
-            EquippedItems weapon = items.get("WEAPON");
+            EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
 
             if (weapon != null) {
                 // Create a damage map (currently only physical damage)
-                Map<DamageTypes, Double> damageMap = calculateDamageMapBasedOnWeapon(weapon, derivedStats);
+                Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
                 statsService.takeDamage(target, damageMap);
+                if (isMainHand) {
+                    data.setMainHandLastAttack(Instant.now());
+                } else {
+                    data.setOffhandLastAttack(Instant.now());
+                }
+
+                return;
             }
+
         }
-    }
-    private void tryAttackOffHand(WebSocketSession session, Stats target) {
-        PlayerCombatData data = SessionParamHelper.getCombatData(session);
-
-        // Extract relevant combat data
-        Instant lastHit = data.getOffhandLastAttack();
-        Double baseSpeed = data.getOffhandAttackSpeed();
-        Double characterAttackSpeed = data.getCharacterAttackSpeed();
-
-        // Calculate the actual delay in milliseconds
-        long actualDelayInMS = (long) (getAttackTimeDelay(baseSpeed, characterAttackSpeed) * 1000);
-
-        // Calculate the next allowed attack time
-        Instant nextAttackTime = lastHit.plusMillis(actualDelayInMS);
 
         // Check if the next attack time is before the current time
-        if (nextAttackTime.isBefore(Instant.now())) {
-            // The player can attack
+        if (nextAttackTime.isBefore(Instant.now().plusMillis(100))) {
+            // send a swing action as we're about to hit - we don't know if we will hit or miss yet
 
-            // Get derived stats and equipped items
-            Map<String, Double> derivedStats = SessionParamHelper.getDerivedStats(session);
             Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
 
             // Get the equipped weapon
-            EquippedItems weapon = items.get("SHIELD");
+            EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
+            String itemInstanceId = weapon.getItemInstance().getItemInstanceId();
 
-            if (weapon != null) {
-                // Create a damage map (currently only physical damage)
-                Map<DamageTypes, Double> damageMap = calculateDamageMapBasedOnWeapon(weapon, derivedStats);
-                statsService.takeDamage(target, damageMap);
-            }
+            requestSessionToSwingWeapon(session, itemInstanceId);
         }
     }
 
-    private Map<DamageTypes, Double> calculateDamageMapBasedOnWeapon(EquippedItems weapon, Map<String, Double> derivedStats) {
+    private void requestSessionToSwingWeapon(WebSocketSession session, String itemInstanceId) {
+        CombatRequest request = new CombatRequest();
+        request.setItemInstanceId(itemInstanceId);
+        session.send(SocketResponse.builder().messageType(SocketResponseType.INITIATE_ATTACK.getType())
+                        .combatRequest(request)
+                        .build())
+                .subscribe(socketResponseSubscriber);
+
+    }
+
+    private Map<DamageTypes, Double> calculateDamageMap(EquippedItems weapon, Map<String, Double> derivedStats) {
         // Calculate damage based on weapon and stats
         Map<String, Double> itemEffects = weapon.getItemInstance().getItem().getItemEffects();
         Double damage = itemEffects.get(WEAPON_DAMAGE.getType());
@@ -135,33 +152,31 @@ public class PlayerCombatService {
             return;
         }
 
-        // check target
         PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
         Set<String> targets = combatData.getTargets();
 
         List<Stats> targetStats = getTargetStats(targets);
-        // we add support for multiple, but we expect only one target
+
+        if (targetStats.isEmpty()) {
+            sessionsInCombat.remove(SessionParamHelper.getPlayerName(session));
+            return;
+        }
 
         targetStats.forEach(stat -> {
-            tryAttackMainHand(session, stat);
-            tryAttackOffHand(session, stat);
+            tryAttack(session, stat, true);
+//            tryAttack(session, stat, "OFF_HAND");
         });
-
 
         Single.fromCallable(() -> {
             attackLoop(session);
             return null;
         }).delaySubscription(100, TimeUnit.MILLISECONDS).subscribe();
-
     }
 
     private List<Stats> getTargetStats(Set<String> actors) {
-        List<Stats> targetStats = new ArrayList<>();
-
         return actors.stream()
                 .map(actor -> statsService.getStatsFor(actor).blockingGet())
                 .filter(s -> s.getDerivedStats().get(StatsTypes.CURRENT_HP.getType()) > 0)
                 .collect(Collectors.toList());
     }
-
 }
