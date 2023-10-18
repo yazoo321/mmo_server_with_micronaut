@@ -20,16 +20,16 @@ public class MonsterServerListener {
 
     @Inject MobInstanceService mobInstanceService;
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
     @Topic("create-mob")
     public void receiveCreateMob(Monster monster) {
         mobInstanceService
                 .createMob(monster)
-                .doOnSuccess(mob -> {
-                    statsService.initializeMobStats(monster.getMobInstanceId());
-                })
+                .doOnSuccess(
+                        mob -> {
+                            statsService.initializeMobStats(monster.getMobInstanceId());
+                        })
                 .doOnError(error -> log.error("Error on creating mob, {}", error.getMessage()))
                 .subscribe();
     }

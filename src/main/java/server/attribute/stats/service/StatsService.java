@@ -6,7 +6,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
@@ -21,8 +20,7 @@ public class StatsService {
 
     @Inject ActorStatsRepository repository;
 
-    @Inject
-    MobInstanceService mobInstanceService;
+    @Inject MobInstanceService mobInstanceService;
 
     @Inject UpdateProducer updateProducer;
 
@@ -39,8 +37,7 @@ public class StatsService {
                                 StatsTypes.DEX.getType(), 100,
                                 StatsTypes.INT.getType(), 100)));
 
-        mobStats
-                .getDerivedStats()
+        mobStats.getDerivedStats()
                 .putAll(
                         new HashMap<>(
                                 Map.of(
@@ -103,38 +100,35 @@ public class StatsService {
     }
 
     public void takeDamage(String actorId, Double damage) {
-        getStatsFor(actorId).
-                doOnSuccess(stats -> {
-                    Map<String, Double> derived = stats.getDerivedStats();
-                    Double newHp = derived.get(StatsTypes.CURRENT_HP.getType()) - damage;
-                    Map<String, Double> updated = Map.of(
-                            StatsTypes.CURRENT_HP.getType(),
-                            newHp
-                    );
-                    derived.put(StatsTypes.CURRENT_HP.getType(), newHp);
-                    handleDifference(updated, stats);
-                })
+        getStatsFor(actorId)
+                .doOnSuccess(
+                        stats -> {
+                            Map<String, Double> derived = stats.getDerivedStats();
+                            Double newHp = derived.get(StatsTypes.CURRENT_HP.getType()) - damage;
+                            Map<String, Double> updated =
+                                    Map.of(StatsTypes.CURRENT_HP.getType(), newHp);
+                            derived.put(StatsTypes.CURRENT_HP.getType(), newHp);
+                            handleDifference(updated, stats);
+                        })
                 .subscribe();
     }
 
     public void takeDamage(Stats stats, Map<DamageTypes, Double> damageMap) {
         Map<String, Double> derived = stats.getDerivedStats();
-        damageMap.forEach((k,v) -> {
-            Double currentHp = derived.get(StatsTypes.CURRENT_HP.getType());
-            currentHp -= v;
-            derived.put(StatsTypes.CURRENT_HP.getType(), currentHp);
-            Map<String, Double> updated = Map.of(
-                    StatsTypes.CURRENT_HP.getType(),
-                    currentHp
-            );
-            handleDifference(updated, stats);
-        });
+        damageMap.forEach(
+                (k, v) -> {
+                    Double currentHp = derived.get(StatsTypes.CURRENT_HP.getType());
+                    currentHp -= v;
+                    derived.put(StatsTypes.CURRENT_HP.getType(), currentHp);
+                    Map<String, Double> updated =
+                            Map.of(StatsTypes.CURRENT_HP.getType(), currentHp);
+                    handleDifference(updated, stats);
+                });
 
         if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
             deleteStatsFor(stats.getActorId());
             mobInstanceService.handleMobDeath(stats.getActorId());
         }
-
     }
 
     private void handleDifference(Map<String, Double> updated, Stats stats) {

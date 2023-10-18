@@ -1,10 +1,17 @@
 package server.combat.service;
 
+import static server.attribute.stats.types.StatsTypes.PHY_AMP;
+import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
+
 import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
@@ -14,21 +21,10 @@ import server.attribute.status.service.StatusService;
 import server.combat.model.CombatRequest;
 import server.combat.model.PlayerCombatData;
 import server.items.equippable.model.EquippedItems;
-import server.items.equippable.service.EquipItemService;
-import server.items.types.weapons.Weapon;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
-
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import static java.time.temporal.ChronoUnit.MILLIS;
-import static server.attribute.stats.types.StatsTypes.PHY_AMP;
-import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 
 @Slf4j
 @Singleton
@@ -36,14 +32,11 @@ public class PlayerCombatService {
 
     private final ConcurrentSet<String> sessionsInCombat = new ConcurrentSet<>();
 
-    @Inject
-    private StatsService statsService;
+    @Inject private StatsService statsService;
 
-    @Inject
-    private StatusService statusService;
+    @Inject private StatusService statusService;
 
-    @Inject
-    SocketResponseSubscriber socketResponseSubscriber;
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     public void requestAttack(WebSocketSession session, CombatRequest combatRequest) {
         if (combatRequest == null) {
@@ -70,7 +63,8 @@ public class PlayerCombatService {
             // TODO: this can be error prone
             lastHit = Instant.now().minusSeconds(10);
         }
-        Double baseSpeed = isMainHand ? data.getMainHandAttackSpeed() : data.getOffhandAttackSpeed();
+        Double baseSpeed =
+                isMainHand ? data.getMainHandAttackSpeed() : data.getOffhandAttackSpeed();
         Double characterAttackSpeed = data.getCharacterAttackSpeed();
 
         // Calculate the actual delay in milliseconds
@@ -78,8 +72,6 @@ public class PlayerCombatService {
 
         // Calculate the next allowed attack time
         Instant nextAttackTime = lastHit.plusMillis(actualDelayInMS);
-
-
 
         if (nextAttackTime.isBefore(Instant.now())) {
             // The player can attack
@@ -103,7 +95,6 @@ public class PlayerCombatService {
 
                 return;
             }
-
         }
 
         // Check if the next attack time is before the current time
@@ -123,14 +114,16 @@ public class PlayerCombatService {
     private void requestSessionToSwingWeapon(WebSocketSession session, String itemInstanceId) {
         CombatRequest request = new CombatRequest();
         request.setItemInstanceId(itemInstanceId);
-        session.send(SocketResponse.builder().messageType(SocketResponseType.INITIATE_ATTACK.getType())
-                        .combatRequest(request)
-                        .build())
+        session.send(
+                        SocketResponse.builder()
+                                .messageType(SocketResponseType.INITIATE_ATTACK.getType())
+                                .combatRequest(request)
+                                .build())
                 .subscribe(socketResponseSubscriber);
-
     }
 
-    private Map<DamageTypes, Double> calculateDamageMap(EquippedItems weapon, Map<String, Double> derivedStats) {
+    private Map<DamageTypes, Double> calculateDamageMap(
+            EquippedItems weapon, Map<String, Double> derivedStats) {
         // Calculate damage based on weapon and stats
         Map<String, Double> itemEffects = weapon.getItemInstance().getItem().getItemEffects();
         Double damage = itemEffects.get(WEAPON_DAMAGE.getType());
@@ -162,15 +155,19 @@ public class PlayerCombatService {
             return;
         }
 
-        targetStats.forEach(stat -> {
-            tryAttack(session, stat, true);
-//            tryAttack(session, stat, "OFF_HAND");
-        });
+        targetStats.forEach(
+                stat -> {
+                    tryAttack(session, stat, true);
+                    //            tryAttack(session, stat, "OFF_HAND");
+                });
 
-        Single.fromCallable(() -> {
-            attackLoop(session);
-            return null;
-        }).delaySubscription(100, TimeUnit.MILLISECONDS).subscribe();
+        Single.fromCallable(
+                        () -> {
+                            attackLoop(session);
+                            return null;
+                        })
+                .delaySubscription(100, TimeUnit.MILLISECONDS)
+                .subscribe();
     }
 
     private List<Stats> getTargetStats(Set<String> actors) {

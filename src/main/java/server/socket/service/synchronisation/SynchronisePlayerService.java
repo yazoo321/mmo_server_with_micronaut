@@ -3,7 +3,6 @@ package server.socket.service.synchronisation;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -139,29 +138,38 @@ public class SynchronisePlayerService {
     }
 
     private void resolveCharacterEquips(Set<String> newPlayers, WebSocketSession session) {
-        equipItemService.getEquippedItems(newPlayers)
-                .doOnSuccess(equippedItems -> {
-                    if (equippedItems == null || equippedItems.isEmpty()) {
-                        return;
-                    }
-                    Map<String, List<EquippedItems>> nameToItems = equippedItems.stream()
-                            .collect(Collectors.groupingBy(EquippedItems::getCharacterName,
-                                    Collectors.mapping(Function.identity(), Collectors.toList())));
+        equipItemService
+                .getEquippedItems(newPlayers)
+                .doOnSuccess(
+                        equippedItems -> {
+                            if (equippedItems == null || equippedItems.isEmpty()) {
+                                return;
+                            }
+                            Map<String, List<EquippedItems>> nameToItems =
+                                    equippedItems.stream()
+                                            .collect(
+                                                    Collectors.groupingBy(
+                                                            EquippedItems::getCharacterName,
+                                                            Collectors.mapping(
+                                                                    Function.identity(),
+                                                                    Collectors.toList())));
 
-                    nameToItems.forEach((charName, items) -> {
-                        GenericInventoryData equipData = new GenericInventoryData();
-                        equipData.setEquippedItems(items);
-                        equipData.setCharacterName(charName);
+                            nameToItems.forEach(
+                                    (charName, items) -> {
+                                        GenericInventoryData equipData = new GenericInventoryData();
+                                        equipData.setEquippedItems(items);
+                                        equipData.setCharacterName(charName);
 
-                        SocketResponse res =
-                                SocketResponse.builder()
-                                        .inventoryData(equipData)
-                                        .messageType(
-                                                SocketResponseType.ADD_EQUIP_ITEM.getType())
-                                        .build();
-                        session.send(res).subscribe(socketResponseSubscriber);
-                    });
-                })
+                                        SocketResponse res =
+                                                SocketResponse.builder()
+                                                        .inventoryData(equipData)
+                                                        .messageType(
+                                                                SocketResponseType.ADD_EQUIP_ITEM
+                                                                        .getType())
+                                                        .build();
+                                        session.send(res).subscribe(socketResponseSubscriber);
+                                    });
+                        })
                 .subscribe();
     }
 

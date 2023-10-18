@@ -11,7 +11,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 
 @Data
@@ -79,15 +78,13 @@ public class Stats {
 
         updatedDerived.put(
                 StatsTypes.CURRENT_HP.getType(),
-                getDerived(StatsTypes.CURRENT_HP)
-                                > updatedDerived.get(StatsTypes.MAX_HP.getType())
+                getDerived(StatsTypes.CURRENT_HP) > updatedDerived.get(StatsTypes.MAX_HP.getType())
                         ? updatedDerived.get(StatsTypes.MAX_HP.getType())
                         : getDerived(StatsTypes.CURRENT_HP));
 
         updatedDerived.put(
                 StatsTypes.CURRENT_MP.getType(),
-                getDerived(StatsTypes.CURRENT_MP)
-                                > updatedDerived.get(StatsTypes.MAX_MP.getType())
+                getDerived(StatsTypes.CURRENT_MP) > updatedDerived.get(StatsTypes.MAX_MP.getType())
                         ? updatedDerived.get(StatsTypes.MAX_MP.getType())
                         : getDerived(StatsTypes.CURRENT_MP));
 
@@ -147,5 +144,4 @@ public class Stats {
     private Double getMaxHp() {
         return getDerived(StatsTypes.MAX_HP);
     }
-
 }

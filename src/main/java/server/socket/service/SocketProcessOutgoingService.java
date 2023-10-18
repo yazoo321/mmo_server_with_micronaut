@@ -28,30 +28,27 @@ public class SocketProcessOutgoingService {
 
     @Inject StatsSocketIntegration attributeSocketIntegration;
 
-    @Inject
-    PlayerCombatService combatService;
+    @Inject PlayerCombatService combatService;
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
 
     public SocketProcessOutgoingService() {
-        this.functionMap = new HashMap<>(
-            Map.of(
-                    MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate,
-                    MessageType.CREATE_MOB.getType(), this::handleCreateMob,
-                    MessageType.MOB_MOTION.getType(), this::handleMobMotionUpdate,
-                    MessageType.PICKUP_ITEM.getType(), this::handlePickupItem,
-                    MessageType.DROP_ITEM.getType(), this::handleDropItem,
-                    MessageType.FETCH_INVENTORY.getType(), this::handleFetchInventory,
-                    MessageType.FETCH_EQUIPPED.getType(), this::handleFetchEquipped,
-                    MessageType.EQUIP_ITEM.getType(), this::handleEquipItem,
-                    MessageType.UN_EQUIP_ITEM.getType(), this::handleUnEquipItem,
-                    MessageType.FETCH_STATS.getType(), this::handleFetchStats));
+        this.functionMap =
+                new HashMap<>(
+                        Map.of(
+                                MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate,
+                                MessageType.CREATE_MOB.getType(), this::handleCreateMob,
+                                MessageType.MOB_MOTION.getType(), this::handleMobMotionUpdate,
+                                MessageType.PICKUP_ITEM.getType(), this::handlePickupItem,
+                                MessageType.DROP_ITEM.getType(), this::handleDropItem,
+                                MessageType.FETCH_INVENTORY.getType(), this::handleFetchInventory,
+                                MessageType.FETCH_EQUIPPED.getType(), this::handleFetchEquipped,
+                                MessageType.EQUIP_ITEM.getType(), this::handleEquipItem,
+                                MessageType.UN_EQUIP_ITEM.getType(), this::handleUnEquipItem,
+                                MessageType.FETCH_STATS.getType(), this::handleFetchStats));
         // map.of supports up to 10 items
-        this.functionMap.put(
-                MessageType.TRY_ATTACK.getType(), this::handleTryAttack);
-
+        this.functionMap.put(MessageType.TRY_ATTACK.getType(), this::handleTryAttack);
     }
-
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
         String updateType = socketMessage.getUpdateType();

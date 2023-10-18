@@ -1,10 +1,9 @@
 package server.combat.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.time.Instant;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Data
 @AllArgsConstructor
@@ -19,9 +18,5 @@ public class PlayerCombatData {
     private Instant mainHandLastAttack;
     private Instant offhandLastAttack;
 
-
     private Set<String> targets;
-
-
-
 }

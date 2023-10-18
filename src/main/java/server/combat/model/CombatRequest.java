@@ -1,11 +1,10 @@
 package server.combat.model;
 
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Location;
-
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -18,5 +17,4 @@ public class CombatRequest {
     private String skillId;
 
     private String itemInstanceId;
-
 }

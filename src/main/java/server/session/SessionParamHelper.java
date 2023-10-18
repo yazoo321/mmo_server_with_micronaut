@@ -1,6 +1,10 @@
 package server.session;
 
 import io.micronaut.websocket.WebSocketSession;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.PlayerCombatData;
@@ -8,11 +12,6 @@ import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.items.types.ItemType;
 import server.motion.model.SessionParams;
-
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class SessionParamHelper {
 
@@ -33,7 +32,8 @@ public class SessionParamHelper {
     }
 
     public static Set<String> getTrackingPlayers(WebSocketSession session) {
-        Set<String> trackingPlayers = (Set<String>) session.asMap().get(SessionParams.TRACKING_PLAYERS.getType());
+        Set<String> trackingPlayers =
+                (Set<String>) session.asMap().get(SessionParams.TRACKING_PLAYERS.getType());
         if (trackingPlayers == null) {
             trackingPlayers = new HashSet<>();
             setTrackingPlayers(session, trackingPlayers);
@@ -47,7 +47,8 @@ public class SessionParamHelper {
     }
 
     public static Set<String> getTrackingMobs(WebSocketSession session) {
-        Set<String> trackingMobs = (Set<String>) session.asMap().get(SessionParams.TRACKING_MOBS.getType());
+        Set<String> trackingMobs =
+                (Set<String>) session.asMap().get(SessionParams.TRACKING_MOBS.getType());
         if (trackingMobs == null) {
             trackingMobs = new HashSet<>();
             setTrackingMobs(session, trackingMobs);
@@ -62,7 +63,7 @@ public class SessionParamHelper {
 
     public static void setPlayerName(WebSocketSession session, String playerName) {
         session.put(SessionParams.PLAYER_NAME.getType(), playerName);
-        if (playerName!= null && !playerName.equalsIgnoreCase("false") && !playerName.isBlank()) {
+        if (playerName != null && !playerName.equalsIgnoreCase("false") && !playerName.isBlank()) {
             session.put(SessionParams.IS_PLAYER.getType(), true);
             session.put(SessionParams.IS_SERVER.getType(), false);
         }
@@ -70,7 +71,7 @@ public class SessionParamHelper {
 
     public static void setServerName(WebSocketSession session, String serverName) {
         session.put(SessionParams.SERVER_NAME.getType(), serverName);
-        if(serverName != null && !serverName.equalsIgnoreCase("false") && !serverName.isBlank()) {
+        if (serverName != null && !serverName.equalsIgnoreCase("false") && !serverName.isBlank()) {
             session.put(SessionParams.IS_SERVER.getType(), true);
             session.put(SessionParams.IS_PLAYER.getType(), false);
         }
@@ -97,7 +98,8 @@ public class SessionParamHelper {
     }
 
     public static Set<String> getDroppedItems(WebSocketSession session) {
-        Set<String> droppedItems = (Set<String>) session.asMap().get(SessionParams.DROPPED_ITEMS.getType());
+        Set<String> droppedItems =
+                (Set<String>) session.asMap().get(SessionParams.DROPPED_ITEMS.getType());
         if (droppedItems == null) {
             droppedItems = new HashSet<>();
             setDroppedItems(session, droppedItems);
@@ -106,7 +108,8 @@ public class SessionParamHelper {
         return droppedItems;
     }
 
-    public static void updateDerivedStats(WebSocketSession session, Map<String, Double> derivedStats) {
+    public static void updateDerivedStats(
+            WebSocketSession session, Map<String, Double> derivedStats) {
         Map<String, Double> prev = getDerivedStats(session);
         Stats.mergeLeft(prev, derivedStats);
         session.put(SessionParams.DERIVED_STATS.getType(), prev);
@@ -118,7 +121,8 @@ public class SessionParamHelper {
     }
 
     public static Map<String, Double> getDerivedStats(WebSocketSession session) {
-        Map<String, Double> derivedStats = (Map<String, Double>) session.asMap().get(SessionParams.DERIVED_STATS.getType());
+        Map<String, Double> derivedStats =
+                (Map<String, Double>) session.asMap().get(SessionParams.DERIVED_STATS.getType());
         if (derivedStats == null) {
             derivedStats = new HashMap<>();
             setDerivedStats(session, derivedStats);
@@ -132,13 +136,13 @@ public class SessionParamHelper {
     }
 
     public static PlayerCombatData getCombatData(WebSocketSession session) {
-        PlayerCombatData combatData = (PlayerCombatData) session.asMap().get(SessionParams.COMBAT_DATA.getType());
+        PlayerCombatData combatData =
+                (PlayerCombatData) session.asMap().get(SessionParams.COMBAT_DATA.getType());
         if (combatData == null) {
 
-            combatData = new PlayerCombatData(
-                    getPlayerName(session),
-                    null, null, null, null, null, new HashSet<>()
-            );
+            combatData =
+                    new PlayerCombatData(
+                            getPlayerName(session), null, null, null, null, null, new HashSet<>());
             setCombatData(session, combatData);
         }
 
@@ -146,8 +150,9 @@ public class SessionParamHelper {
     }
 
     public static Map<String, EquippedItems> getEquippedItems(WebSocketSession session) {
-        Map<String, EquippedItems> equippedItemsMap = (Map<String, EquippedItems>) session.asMap()
-                .get(SessionParams.EQUIPPED_ITEMS.getType());
+        Map<String, EquippedItems> equippedItemsMap =
+                (Map<String, EquippedItems>)
+                        session.asMap().get(SessionParams.EQUIPPED_ITEMS.getType());
 
         if (equippedItemsMap == null) {
             return setEquippedItems(session, new ArrayList<>());
@@ -167,17 +172,21 @@ public class SessionParamHelper {
     public static void removeFromEquippedItems(WebSocketSession session, String itemInstanceId) {
         Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
 
-        equippedItemsMap.forEach((k,v) -> {
-            if (v.getItemInstance().getItemInstanceId().equals(itemInstanceId)) {
-                equippedItemsMap.remove(k);
-            }
-        });
+        equippedItemsMap.forEach(
+                (k, v) -> {
+                    if (v.getItemInstance().getItemInstanceId().equals(itemInstanceId)) {
+                        equippedItemsMap.remove(k);
+                    }
+                });
 
         updateCombatData(session, equippedItemsMap);
     }
 
-    public static Map<String, EquippedItems> setEquippedItems(WebSocketSession session, List<EquippedItems> equippedItems) {
-        Map<String, EquippedItems> data = equippedItems.stream().collect(Collectors.toMap(EquippedItems::getCategory, Function.identity()));
+    public static Map<String, EquippedItems> setEquippedItems(
+            WebSocketSession session, List<EquippedItems> equippedItems) {
+        Map<String, EquippedItems> data =
+                equippedItems.stream()
+                        .collect(Collectors.toMap(EquippedItems::getCategory, Function.identity()));
         session.put(SessionParams.EQUIPPED_ITEMS.getType(), data);
 
         updateCombatData(session, data);
@@ -190,7 +199,8 @@ public class SessionParamHelper {
         updateCombatData(session, equippedItemsMap);
     }
 
-    private static void updateCombatData(WebSocketSession session, Map<String, EquippedItems> equippedItemsMap) {
+    private static void updateCombatData(
+            WebSocketSession session, Map<String, EquippedItems> equippedItemsMap) {
         PlayerCombatData combatData = getCombatData(session);
         EquippedItems mainHand = equippedItemsMap.get(ItemType.WEAPON.getType());
         EquippedItems offHand = equippedItemsMap.get(ItemType.SHIELD.getType());
@@ -215,5 +225,4 @@ public class SessionParamHelper {
             return 1.0;
         }
     }
-
 }
