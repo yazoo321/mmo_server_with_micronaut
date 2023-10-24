@@ -61,6 +61,11 @@ public class SessionParamHelper {
         session.put(SessionParams.TRACKING_MOBS.getType(), trackingMobs);
     }
 
+    public static void addTrackingMobs(WebSocketSession session, Set<String> trackingMobs) {
+        Set<String> mobs = getTrackingMobs(session);
+        mobs.addAll(trackingMobs);
+    }
+
     public static void setPlayerName(WebSocketSession session, String playerName) {
         session.put(SessionParams.PLAYER_NAME.getType(), playerName);
         if (playerName != null && !playerName.equalsIgnoreCase("false") && !playerName.isBlank()) {

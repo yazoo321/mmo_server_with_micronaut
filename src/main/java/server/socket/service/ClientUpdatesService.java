@@ -43,6 +43,15 @@ public class ClientUpdatesService {
                 .subscribe(socketResponseSubscriber);
     }
 
+    public void notifyServerOfRemovedMobs(Set<String> actorIds) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.REMOVE_MOBS.getType())
+                        .lostMobs(actorIds)
+                        .build();
+        broadcaster.broadcast(socketResponse)
+                .subscribe(socketResponseSubscriber);
+    }
     public void sendMotionUpdatesToSubscribedClients(Monster monster) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
@@ -241,5 +250,14 @@ public class ClientUpdatesService {
     private Predicate<WebSocketSession> listensToMotionUpdate(String playerOrMob) {
         // we will report to player every time they call update about other players nearby
         return s -> sessionListensToPlayerOrMob(s, playerOrMob);
+    }
+
+    private Predicate<WebSocketSession> serverListeningToActorUpdates(String actorId) {
+        // we will report to player every time they call update about other players nearby
+        return s -> sessionIsServerAndListensToMob(s, actorId);
+    }
+
+    private boolean sessionIsServerAndListensToMob(WebSocketSession s, String actorId) {
+        return SessionParamHelper.getIsServer(s) && SessionParamHelper.getTrackingMobs(s).contains(actorId);
     }
 }

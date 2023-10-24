@@ -20,8 +20,6 @@ public class StatsService {
 
     @Inject ActorStatsRepository repository;
 
-    @Inject MobInstanceService mobInstanceService;
-
     @Inject UpdateProducer updateProducer;
 
     public void initializeMobStats(String actorId) {
@@ -113,7 +111,7 @@ public class StatsService {
                 .subscribe();
     }
 
-    public void takeDamage(Stats stats, Map<DamageTypes, Double> damageMap) {
+    public Stats takeDamage(Stats stats, Map<DamageTypes, Double> damageMap) {
         Map<String, Double> derived = stats.getDerivedStats();
         damageMap.forEach(
                 (k, v) -> {
@@ -125,10 +123,7 @@ public class StatsService {
                     handleDifference(updated, stats);
                 });
 
-        if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-            deleteStatsFor(stats.getActorId());
-            mobInstanceService.handleMobDeath(stats.getActorId());
-        }
+        return stats;
     }
 
     private void handleDifference(Map<String, Double> updated, Stats stats) {

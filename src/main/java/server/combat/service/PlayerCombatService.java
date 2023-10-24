@@ -21,10 +21,12 @@ import server.attribute.status.service.StatusService;
 import server.combat.model.CombatRequest;
 import server.combat.model.PlayerCombatData;
 import server.items.equippable.model.EquippedItems;
+import server.monster.server_integration.service.MobInstanceService;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
+import server.socket.service.ClientUpdatesService;
 
 @Slf4j
 @Singleton
@@ -36,7 +38,14 @@ public class PlayerCombatService {
 
     @Inject private StatusService statusService;
 
+    @Inject private MobInstanceService mobInstanceService;
+
     @Inject SocketResponseSubscriber socketResponseSubscriber;
+
+    @Inject
+    ClientUpdatesService clientUpdatesService;
+
+    Random rand = new Random();
 
     public void requestAttack(WebSocketSession session, CombatRequest combatRequest) {
         if (combatRequest == null) {
@@ -86,11 +95,17 @@ public class PlayerCombatService {
             if (weapon != null) {
                 // Create a damage map (currently only physical damage)
                 Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
-                statsService.takeDamage(target, damageMap);
+                Stats stats = statsService.takeDamage(target, damageMap);
                 if (isMainHand) {
                     data.setMainHandLastAttack(Instant.now());
                 } else {
                     data.setOffhandLastAttack(Instant.now());
+                }
+
+                if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
+                    statsService.deleteStatsFor(stats.getActorId());
+                    mobInstanceService.handleMobDeath(stats.getActorId());
+                    clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
                 }
 
                 return;
@@ -129,7 +144,7 @@ public class PlayerCombatService {
         Double damage = itemEffects.get(WEAPON_DAMAGE.getType());
         double amp = derivedStats.get(PHY_AMP.getType());
 
-        double totalDamage = damage * amp;
+        double totalDamage = damage * amp * (1 + rand.nextDouble(0.15));
 
         // Create a damage map (currently only physical damage)
         return Map.of(DamageTypes.PHYSICAL, totalDamage);

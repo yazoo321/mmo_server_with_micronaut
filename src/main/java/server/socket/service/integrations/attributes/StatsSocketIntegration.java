@@ -18,12 +18,12 @@ public class StatsSocketIntegration {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-    public void handleFetchStats(String playerName, WebSocketSession session) {
+    public void handleFetchStats(String actorId, WebSocketSession session) {
         statsService
-                .getStatsFor(playerName)
+                .getStatsFor(actorId)
                 .doOnSuccess(
                         stats -> {
-                            if (playerName.equalsIgnoreCase(
+                            if (actorId.equalsIgnoreCase(
                                     SessionParamHelper.getPlayerName(session))) {
                                 // update session with params
                                 SessionParamHelper.updateDerivedStats(
@@ -42,7 +42,7 @@ public class StatsSocketIntegration {
                         e ->
                                 log.error(
                                         "Failed to fetch stats for {}, {}",
-                                        playerName,
+                                        actorId,
                                         e.getMessage()))
                 .subscribe();
     }

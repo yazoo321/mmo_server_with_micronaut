@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.motion.model.SessionParams;
 import server.motion.service.PlayerMotionService;
+import server.socket.model.MessageType;
 import server.socket.model.SocketMessage;
 import server.socket.service.SocketProcessOutgoingService;
 
@@ -57,21 +58,21 @@ public class CommunicationSocket {
     }
 
     private void updateSessionParams(WebSocketSession session, SocketMessage message) {
-        String playerName = message.getPlayerName();
-        String serverName = message.getServerName();
-
-        // this is temporary, until we get this via open session.
-        String sessionPlayerName =
-                (String) session.asMap().get(SessionParams.PLAYER_NAME.getType());
-        String sessionServerName =
-                (String) session.asMap().get(SessionParams.SERVER_NAME.getType());
-
-        if (playerName != null && !playerName.equals(sessionPlayerName)) {
-            session.put(SessionParams.PLAYER_NAME.getType(), playerName);
-        }
-        if (serverName != null && !serverName.equals(sessionServerName)) {
-            session.put(SessionParams.SERVER_NAME.getType(), serverName);
-        }
+//        String playerName = message.getPlayerName();
+//        String serverName = message.getServerName();
+//
+//        // this is temporary, until we get this via open session.
+//        String sessionPlayerName =
+//                (String) session.asMap().get(SessionParams.PLAYER_NAME.getType());
+//        String sessionServerName =
+//                (String) session.asMap().get(SessionParams.SERVER_NAME.getType());
+//
+//        if (playerName != null && !playerName.equals(sessionPlayerName)) {
+//            session.put(SessionParams.PLAYER_NAME.getType(), playerName);
+//        }
+//        if (serverName != null && !serverName.equals(sessionServerName)) {
+//            session.put(SessionParams.SERVER_NAME.getType(), serverName);
+//        }
 
         if (message.getPlayerMotion() != null
                 && motionValid(message.getPlayerMotion().getMotion())) {
