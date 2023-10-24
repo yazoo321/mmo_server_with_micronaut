@@ -1,7 +1,6 @@
 package server.items.equippable.repository;
 
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.reactivestreams.client.MongoClient;
@@ -11,6 +10,7 @@ import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.configuration.MongoConfiguration;
 import server.items.equippable.model.EquippedItems;
@@ -39,6 +39,12 @@ public class EquipRepository {
     public Single<List<EquippedItems>> getEquippedItemsForCharacter(String characterName) {
         return Flowable.fromPublisher(
                         equippedItemsCollection.find(eq("characterName", characterName)))
+                .toList();
+    }
+
+    public Single<List<EquippedItems>> getEquippedItemsForCharacters(Set<String> characterNames) {
+        return Flowable.fromPublisher(
+                        equippedItemsCollection.find(in("characterName", characterNames)))
                 .toList();
     }
 

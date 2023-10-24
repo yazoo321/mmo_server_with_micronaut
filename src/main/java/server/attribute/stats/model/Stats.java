@@ -62,6 +62,10 @@ public class Stats {
         return derivedStats.getOrDefault(type.getType(), 0.0);
     }
 
+    public void setDerived(StatsTypes type, Double val) {
+        derivedStats.put(type.getType(), val);
+    }
+
     public Map<String, Double> recalculateDerivedStats() {
         Map<String, Double> updatedDerived = new HashMap<>();
         int strength = getBaseStat(StatsTypes.STR);
@@ -74,15 +78,13 @@ public class Stats {
 
         updatedDerived.put(
                 StatsTypes.CURRENT_HP.getType(),
-                getDerived(StatsTypes.CURRENT_HP)
-                                > updatedDerived.get(StatsTypes.MAX_HP.getType())
+                getDerived(StatsTypes.CURRENT_HP) > updatedDerived.get(StatsTypes.MAX_HP.getType())
                         ? updatedDerived.get(StatsTypes.MAX_HP.getType())
                         : getDerived(StatsTypes.CURRENT_HP));
 
         updatedDerived.put(
                 StatsTypes.CURRENT_MP.getType(),
-                getDerived(StatsTypes.CURRENT_MP)
-                                > updatedDerived.get(StatsTypes.MAX_MP.getType())
+                getDerived(StatsTypes.CURRENT_MP) > updatedDerived.get(StatsTypes.MAX_MP.getType())
                         ? updatedDerived.get(StatsTypes.MAX_MP.getType())
                         : getDerived(StatsTypes.CURRENT_MP));
 
@@ -137,5 +139,9 @@ public class Stats {
                 });
 
         return left;
+    }
+
+    private Double getMaxHp() {
+        return getDerived(StatsTypes.MAX_HP);
     }
 }

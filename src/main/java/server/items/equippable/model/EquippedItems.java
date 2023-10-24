@@ -5,13 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
+import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import server.attribute.stats.types.StatsTypes;
 import server.items.equippable.model.types.*;
 import server.items.model.ItemInstance;
+import server.items.types.ItemType;
 
 @Data
 @Introspected
@@ -56,4 +59,14 @@ public abstract class EquippedItems {
     String characterName;
     ItemInstance itemInstance;
     String category;
+
+    public Double getBaseAttackSpeed() {
+        if (this.category.equalsIgnoreCase(ItemType.WEAPON.getType())
+                || this.category.equalsIgnoreCase(ItemType.SHIELD.getType())) {
+            Map<String, Double> effects = this.itemInstance.getItem().getItemEffects();
+
+            return effects.get(StatsTypes.BASE_ATTACK_SPEED.getType());
+        }
+        return null;
+    }
 }

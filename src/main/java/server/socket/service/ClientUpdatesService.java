@@ -16,6 +16,7 @@ import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.SessionParams;
+import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
@@ -42,6 +43,15 @@ public class ClientUpdatesService {
                 .subscribe(socketResponseSubscriber);
     }
 
+    public void notifyServerOfRemovedMobs(Set<String> actorIds) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.REMOVE_MOBS.getType())
+                        .lostMobs(actorIds)
+                        .build();
+        broadcaster.broadcast(socketResponse)
+                .subscribe(socketResponseSubscriber);
+    }
     public void sendMotionUpdatesToSubscribedClients(Monster monster) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
@@ -127,7 +137,7 @@ public class ClientUpdatesService {
                         .build();
 
         broadcaster
-                .broadcast(socketResponse, listensToUpdateFor(stats.getActorId()))
+                .broadcast(socketResponse, notifyStatsFor(stats.getActorId(), stats))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -224,8 +234,30 @@ public class ClientUpdatesService {
     }
 
     // TODO: Consider renaming
+    private Predicate<WebSocketSession> notifyStatsFor(String playerOrMob, Stats stats) {
+        return s -> {
+            boolean isThePlayerOrMob = false;
+            if (sessionIsThePlayerOrMob(s, playerOrMob)) {
+                isThePlayerOrMob = true;
+                // update session cache about stats
+                SessionParamHelper.updateDerivedStats(s, stats.getDerivedStats());
+            }
+
+            return isThePlayerOrMob || sessionListensToPlayerOrMob(s, playerOrMob);
+        };
+    }
+
     private Predicate<WebSocketSession> listensToMotionUpdate(String playerOrMob) {
         // we will report to player every time they call update about other players nearby
         return s -> sessionListensToPlayerOrMob(s, playerOrMob);
+    }
+
+    private Predicate<WebSocketSession> serverListeningToActorUpdates(String actorId) {
+        // we will report to player every time they call update about other players nearby
+        return s -> sessionIsServerAndListensToMob(s, actorId);
+    }
+
+    private boolean sessionIsServerAndListensToMob(WebSocketSession s, String actorId) {
+        return SessionParamHelper.getIsServer(s) && SessionParamHelper.getTrackingMobs(s).contains(actorId);
     }
 }

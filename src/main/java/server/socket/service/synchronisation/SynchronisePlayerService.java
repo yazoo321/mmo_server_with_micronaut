@@ -3,12 +3,16 @@ package server.socket.service.synchronisation;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
+import server.items.equippable.model.EquippedItems;
+import server.items.equippable.service.EquipItemService;
+import server.items.inventory.model.response.GenericInventoryData;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.SessionParams;
 import server.motion.service.PlayerMotionService;
@@ -27,6 +31,8 @@ public class SynchronisePlayerService {
     @Inject PlayerCharacterService playerCharacterService;
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
+
+    @Inject EquipItemService equipItemService;
 
     private static final Integer DEFAULT_DISTANCE_THRESHOLD = 1000;
 
@@ -84,6 +90,7 @@ public class SynchronisePlayerService {
 
         resolveCharacterMotion(newPlayers, session);
         resolveCharacterAppearance(newPlayers, session);
+        resolveCharacterEquips(newPlayers, session);
     }
 
     private void handleLostPlayers(WebSocketSession session, Set<String> lostPlayers) {
@@ -126,6 +133,42 @@ public class SynchronisePlayerService {
                                             .build();
 
                             session.send(response).subscribe(socketResponseSubscriber);
+                        })
+                .subscribe();
+    }
+
+    private void resolveCharacterEquips(Set<String> newPlayers, WebSocketSession session) {
+        equipItemService
+                .getEquippedItems(newPlayers)
+                .doOnSuccess(
+                        equippedItems -> {
+                            if (equippedItems == null || equippedItems.isEmpty()) {
+                                return;
+                            }
+                            Map<String, List<EquippedItems>> nameToItems =
+                                    equippedItems.stream()
+                                            .collect(
+                                                    Collectors.groupingBy(
+                                                            EquippedItems::getCharacterName,
+                                                            Collectors.mapping(
+                                                                    Function.identity(),
+                                                                    Collectors.toList())));
+
+                            nameToItems.forEach(
+                                    (charName, items) -> {
+                                        GenericInventoryData equipData = new GenericInventoryData();
+                                        equipData.setEquippedItems(items);
+                                        equipData.setCharacterName(charName);
+
+                                        SocketResponse res =
+                                                SocketResponse.builder()
+                                                        .inventoryData(equipData)
+                                                        .messageType(
+                                                                SocketResponseType.ADD_EQUIP_ITEM
+                                                                        .getType())
+                                                        .build();
+                                        session.send(res).subscribe(socketResponseSubscriber);
+                                    });
                         })
                 .subscribe();
     }

@@ -10,6 +10,7 @@ import server.items.equippable.service.EquipItemService;
 import server.items.inventory.model.ItemInstanceIds;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.inventory.service.InventoryService;
+import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
@@ -96,22 +97,25 @@ public class ItemSocketIntegration {
     }
 
     public void handleFetchEquipped(GenericInventoryData request, WebSocketSession session) {
-        equipItemService.getEquippedItems(request.getCharacterName())
-                .doOnSuccess(equippedItems -> {
-                    if (equippedItems.isEmpty()) {
-                        return;
-                    }
-                    GenericInventoryData inventoryData = new GenericInventoryData();
-                    inventoryData.setCharacterName(equippedItems.get(0).getCharacterName());
-                    inventoryData.setEquippedItems(equippedItems);
-                    SocketResponse response =
-                            SocketResponse.builder()
-                                    .messageType(
-                                            SocketResponseType.ADD_EQUIP_ITEM.getType())
-                                    .inventoryData(inventoryData)
-                                    .build();
-                    session.send(response).subscribe(socketResponseSubscriber);
-                })
+        equipItemService
+                .getEquippedItems(request.getCharacterName())
+                .doOnSuccess(
+                        equippedItems -> {
+                            SessionParamHelper.setEquippedItems(session, equippedItems);
+                            if (equippedItems.isEmpty()) {
+                                return;
+                            }
+                            GenericInventoryData inventoryData = new GenericInventoryData();
+                            inventoryData.setCharacterName(equippedItems.get(0).getCharacterName());
+                            inventoryData.setEquippedItems(equippedItems);
+                            SocketResponse response =
+                                    SocketResponse.builder()
+                                            .messageType(
+                                                    SocketResponseType.ADD_EQUIP_ITEM.getType())
+                                            .inventoryData(inventoryData)
+                                            .build();
+                            session.send(response).subscribe(socketResponseSubscriber);
+                        })
                 .subscribe();
     }
 
@@ -121,6 +125,7 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         equippedItems -> {
+                            SessionParamHelper.addToEquippedItems(session, equippedItems);
                             sendInventoryToPlayer(session, request.getCharacterName());
 
                             GenericInventoryData equipData = new GenericInventoryData();
@@ -132,8 +137,10 @@ public class ItemSocketIntegration {
                                             .messageType(
                                                     SocketResponseType.ADD_EQUIP_ITEM.getType())
                                             .build();
-                            session.send(res).subscribe(socketResponseSubscriber); // notify this player
-                            updateProducer.notifyEquipItems(List.of(equippedItems));  // notify other players
+                            session.send(res)
+                                    .subscribe(socketResponseSubscriber); // notify this player
+                            updateProducer.notifyEquipItems(
+                                    List.of(equippedItems)); // notify other players
                         })
                 .subscribe();
     }
@@ -144,6 +151,8 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to un-equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         unequippedItemInstanceId -> {
+                            SessionParamHelper.removeFromEquippedItems(
+                                    session, unequippedItemInstanceId);
                             sendInventoryToPlayer(session, request.getCharacterName());
 
                             GenericInventoryData equipData = new GenericInventoryData();
@@ -153,16 +162,19 @@ public class ItemSocketIntegration {
                             SocketResponse res =
                                     SocketResponse.builder()
                                             .inventoryData(equipData)
+                                            .itemInstanceIds(Set.of(unequippedItemInstanceId))
                                             .messageType(
                                                     SocketResponseType.REMOVE_EQUIP_ITEM.getType())
                                             .build();
 
                             session.send(res).subscribe(socketResponseSubscriber);
-                            ItemInstanceIds itemInstanceIds = ItemInstanceIds.builder()
-                                    .itemInstanceIds(List.of(unequippedItemInstanceId))
-                                    .playerName(request.getCharacterName())
-                                    .build();
-                            updateProducer.notifyUnEquipItems(itemInstanceIds);  // notify other players
+                            ItemInstanceIds itemInstanceIds =
+                                    ItemInstanceIds.builder()
+                                            .itemInstanceIds(List.of(unequippedItemInstanceId))
+                                            .playerName(request.getCharacterName())
+                                            .build();
+                            updateProducer.notifyUnEquipItems(
+                                    itemInstanceIds); // notify other players
                         })
                 .subscribe();
     }
