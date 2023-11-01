@@ -43,6 +43,22 @@ public class ClientUpdatesService {
                 .subscribe(socketResponseSubscriber);
     }
 
+    public void notifySessionCombatTooFar(WebSocketSession session) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.COMBAT_TOO_FAR.getType())
+                        .build();
+        session.send(socketResponse).subscribe(socketResponseSubscriber);
+    }
+
+    public void notifySessionCombatNotFacing(WebSocketSession session) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.COMBAT_NOT_FACING.getType())
+                        .build();
+        session.send(socketResponse).subscribe(socketResponseSubscriber);
+    }
+
     public void notifyServerOfRemovedMobs(Set<String> actorIds) {
         SocketResponse socketResponse =
                 SocketResponse.builder()

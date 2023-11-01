@@ -69,4 +69,14 @@ public abstract class EquippedItems {
         }
         return null;
     }
+
+    public Double getAttackDistance() {
+        if (this.category.equalsIgnoreCase(ItemType.WEAPON.getType())
+                || this.category.equalsIgnoreCase(ItemType.SHIELD.getType())) {
+            Map<String, Double> effects = this.itemInstance.getItem().getItemEffects();
+
+            return effects.get(StatsTypes.ATTACK_DISTANCE.getType());
+        }
+        return null;
+    }
 }

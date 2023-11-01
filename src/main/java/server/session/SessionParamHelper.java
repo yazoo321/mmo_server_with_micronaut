@@ -144,10 +144,7 @@ public class SessionParamHelper {
         PlayerCombatData combatData =
                 (PlayerCombatData) session.asMap().get(SessionParams.COMBAT_DATA.getType());
         if (combatData == null) {
-
-            combatData =
-                    new PlayerCombatData(
-                            getPlayerName(session), null, null, null, null, null, new HashSet<>());
+            combatData = new PlayerCombatData(getPlayerName(session));
             setCombatData(session, combatData);
         }
 
