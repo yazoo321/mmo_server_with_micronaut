@@ -3,13 +3,14 @@ package server.combat.service;
 import static server.attribute.stats.types.StatsTypes.PHY_AMP;
 import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
-import java.time.temporal.TemporalField;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -45,8 +46,9 @@ public class PlayerCombatService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-    @Inject
-    ClientUpdatesService clientUpdatesService;
+    @Inject ClientUpdatesService clientUpdatesService;
+
+    @Inject StatefulRedisConnection<String, String> redisConnection;
 
     Random rand = new Random();
 
@@ -77,13 +79,15 @@ public class PlayerCombatService {
             return;
         }
 
-        int distanceThreshold = weapon.getAttackDistance() == null ? 200 : (int)(double) weapon.getAttackDistance();
+        int distanceThreshold =
+                weapon.getAttackDistance() == null
+                        ? 200
+                        : (int) (double) weapon.getAttackDistance();
         boolean valid = validatePositionLocation(session, target.getActorId(), distanceThreshold);
 
         if (!valid) {
             return;
         }
-
 
         Instant lastHit = isMainHand ? data.getMainHandLastAttack() : data.getOffhandLastAttack();
         // TODO: this is for demo, needs changing
@@ -104,7 +108,6 @@ public class PlayerCombatService {
         if (nextAttackTime.isBefore(Instant.now())) {
             // The player can attack
             // Get derived stats and equipped items
-
 
             // Create a damage map (currently only physical damage)
             Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
@@ -209,10 +212,16 @@ public class PlayerCombatService {
                 .collect(Collectors.toList());
     }
 
-    private boolean validatePositionLocation(WebSocketSession session, String mob, int distanceThreshold) {
+    private boolean validatePositionLocation(
+            WebSocketSession session, String mob, int distanceThreshold) {
         // TODO: This will NEED to come from shared cache (e.g. Redis)
         // TODO: Refactor mob/player motion calls
         // TODO: Make async
+
+        RedisCommands<String, String> commands = redisConnection.sync();
+        commands.set("foo", "bar");
+        //        commands.get("foo") == "bar";
+
         List<Monster> res = mobInstanceService.getMobsByIds(Set.of(mob)).blockingGet();
         PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
 
@@ -232,7 +241,9 @@ public class PlayerCombatService {
 
         if (!inRange || !facingTarget) {
             if (combatData.getLastHelperNotification() == null
-                    || Instant.now().getEpochSecond() - combatData.getLastHelperNotification().getEpochSecond() > 3) {
+                    || Instant.now().getEpochSecond()
+                                    - combatData.getLastHelperNotification().getEpochSecond()
+                            > 3) {
                 combatData.setLastHelperNotification(Instant.now());
 
                 if (!inRange) {

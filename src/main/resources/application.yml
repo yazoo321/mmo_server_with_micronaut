@@ -106,3 +106,10 @@ mongo-database:
   mob-attributes: "mobAttributes"
   actorStats: "actorStats"
 
+redis:
+  uri: redis://localhost
+  io-thread-pool-size: 5
+  computation-thread-pool-size: 4
+#  ssl: true
+  timeout: 30s
+

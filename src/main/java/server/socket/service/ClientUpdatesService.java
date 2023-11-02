@@ -65,9 +65,9 @@ public class ClientUpdatesService {
                         .messageType(SocketResponseType.REMOVE_MOBS.getType())
                         .lostMobs(actorIds)
                         .build();
-        broadcaster.broadcast(socketResponse)
-                .subscribe(socketResponseSubscriber);
+        broadcaster.broadcast(socketResponse).subscribe(socketResponseSubscriber);
     }
+
     public void sendMotionUpdatesToSubscribedClients(Monster monster) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
@@ -274,6 +274,7 @@ public class ClientUpdatesService {
     }
 
     private boolean sessionIsServerAndListensToMob(WebSocketSession s, String actorId) {
-        return SessionParamHelper.getIsServer(s) && SessionParamHelper.getTrackingMobs(s).contains(actorId);
+        return SessionParamHelper.getIsServer(s)
+                && SessionParamHelper.getTrackingMobs(s).contains(actorId);
     }
 }

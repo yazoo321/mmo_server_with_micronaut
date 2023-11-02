@@ -3,18 +3,14 @@ package server.common.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.BoundType;
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
 import io.micronaut.core.annotation.Introspected;
+import java.time.temporal.ValueRange;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-
-import java.time.temporal.ValueRange;
 
 @Data
 @JsonInclude
