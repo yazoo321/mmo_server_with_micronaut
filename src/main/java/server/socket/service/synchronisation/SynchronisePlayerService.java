@@ -18,6 +18,7 @@ import server.motion.model.SessionParams;
 import server.motion.service.PlayerMotionService;
 import server.player.model.Character;
 import server.player.service.PlayerCharacterService;
+import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
@@ -39,7 +40,7 @@ public class SynchronisePlayerService {
     public void handleSynchronisePlayers(Motion motion, WebSocketSession session) {
         int distanceThreshold = DEFAULT_DISTANCE_THRESHOLD;
 
-        String playerName = (String) session.asMap().get(SessionParams.PLAYER_NAME.getType());
+        String playerName = SessionParamHelper.getPlayerName(session);
 
         playerMotionService
                 .getNearbyPlayersAsync(motion, playerName, distanceThreshold)

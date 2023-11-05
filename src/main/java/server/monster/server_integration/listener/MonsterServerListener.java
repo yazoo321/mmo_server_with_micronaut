@@ -27,15 +27,15 @@ public class MonsterServerListener {
         mobInstanceService
                 .createMob(monster)
                 .doOnSuccess(
-                        mob -> {
-                            statsService.initializeMobStats(monster.getMobInstanceId());
-                        })
+                        mob -> statsService.initializeMobStats(monster.getMobInstanceId()))
                 .doOnError(error -> log.error("Error on creating mob, {}", error.getMessage()))
                 .subscribe();
     }
 
     @Topic("mob-motion-update")
     public void receiveUpdateMob(Monster monster) {
+        // Add validation
+        // TODO: Move these writes over to cache sync to db service
         mobInstanceService
                 .updateMobMotion(monster.getMobInstanceId(), monster.getMotion())
                 .doOnError(

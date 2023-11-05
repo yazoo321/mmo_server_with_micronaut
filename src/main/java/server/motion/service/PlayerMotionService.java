@@ -12,6 +12,7 @@ import server.motion.dto.PlayerMotion;
 import server.motion.model.PlayerMotionList;
 import server.motion.producer.PlayerMotionUpdateProducer;
 import server.motion.repository.PlayerMotionRepository;
+import server.session.SessionParamHelper;
 
 @Slf4j
 @Singleton
@@ -20,6 +21,9 @@ public class PlayerMotionService {
     @Inject PlayerMotionRepository playerMotionRepository;
 
     @Inject PlayerMotionUpdateProducer playerMotionUpdateProducer;
+
+    @Inject
+    SessionParamHelper sessionParamHelper;
 
     private static int DEFAULT_DISTANCE_THRESHOLD = 1000;
 
@@ -45,6 +49,8 @@ public class PlayerMotionService {
         playerMotion.setPlayerName(playerName);
         playerMotion.setIsOnline(false);
         playerMotion.setUpdatedAt(Instant.now());
+
+        sessionParamHelper.setSharedActorMotion(playerName, playerMotion.getMotion());
 
         return playerMotionRepository.insertPlayerMotion(playerMotion);
     }

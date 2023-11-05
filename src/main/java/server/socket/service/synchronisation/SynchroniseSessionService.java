@@ -8,6 +8,7 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.motion.model.SessionParams;
+import server.session.SessionParamHelper;
 import server.socket.v1.CommunicationSocket;
 
 @Slf4j
@@ -31,8 +32,7 @@ public class SynchroniseSessionService {
         sessions.parallelStream()
                 .forEach(
                         session -> {
-                            Motion motion =
-                                    (Motion) session.asMap().get(SessionParams.MOTION.getType());
+                            Motion motion = SessionParamHelper.getMotion(session);
                             if (motion == null) {
                                 // possibly the motion is not fully initiated
                                 return;

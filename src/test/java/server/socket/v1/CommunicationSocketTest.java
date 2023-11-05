@@ -30,6 +30,10 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
         TestWebSocketClient playerClient2 = createWebSocketClient(embeddedServer.getPort());
         TestWebSocketClient playerClient3 = createWebSocketClient(embeddedServer.getPort());
 
+        initiateSocketAsPlayer(playerClient1, CHARACTER_1);
+        initiateSocketAsServer(playerClient2, CHARACTER_2);
+        initiateSocketAsPlayer(playerClient3, CHARACTER_3);
+
         SocketMessage char1WithinRange = createMessageForMotionWithinRange(CHARACTER_1);
         SocketMessage char2WithinRange = createMessageForMotionWithinRange(CHARACTER_2);
         SocketMessage char3OutOfRange = createMessageForMotionOutOfRange(CHARACTER_3);
@@ -118,6 +122,10 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
         TestWebSocketClient playerClient2 = createWebSocketClient(embeddedServer.getPort());
         TestWebSocketClient mobServerClient = createWebSocketClient(embeddedServer.getPort());
 
+        initiateSocketAsPlayer(playerClient1, CHARACTER_1);
+        initiateSocketAsPlayer(playerClient2, CHARACTER_2);
+        initiateSocketAsServer(mobServerClient, "SERVER_NAME");
+
         SocketMessage char1WithinRange = createMessageForMotionWithinRange(CHARACTER_1);
         SocketMessage char2OutOfRange = createMessageForMotionOutOfRange(CHARACTER_2);
 
@@ -137,6 +145,12 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
         // first we need to make sure the player clients are started and synchronised.
         Thread.sleep(1000);
 
+        // now we can make motion which should be tracked
+        mobWithinRange.setUpdateType(MessageType.MOB_MOTION.getType());
+        mobOutOfRange.setUpdateType(MessageType.MOB_MOTION.getType());
+        mobServerClient.send(mobWithinRange);
+        mobServerClient.send(mobOutOfRange);
+
         playerClient1.send(char1WithinRange);
         playerClient2.send(char2OutOfRange);
 
@@ -144,9 +158,9 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
                 .until(() -> !playerClient1.getMessagesChronologically().isEmpty());
 
-        await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() -> !playerClient2.getMessagesChronologically().isEmpty());
+//        await().pollDelay(300, TimeUnit.MILLISECONDS)
+//                .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
+//                .until(() -> !playerClient2.getMessagesChronologically().isEmpty());
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))

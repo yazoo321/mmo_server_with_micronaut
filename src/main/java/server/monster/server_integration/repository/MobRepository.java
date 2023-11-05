@@ -77,6 +77,7 @@ public class MobRepository {
 
     public Single<List<Monster>> getMobsNearby(Location location) {
         return MongoDbQueryHelper.nearbyMobMotionFinder(mobMotionMongoCollection, location, 2000);
+//    Flowable.fromPublisher(mobMotionMongoCollection.find(Filters.ne("mobInstanceId", "t"))).toList().blockingGet()
     }
 
     public Single<DeleteResult> deleteMobsNotUpdatedWithin(Instant time) {

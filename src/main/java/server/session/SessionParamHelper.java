@@ -1,10 +1,17 @@
 package server.session;
 
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.async.RedisAsyncCommands;
+import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.NonNull;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.PlayerCombatData;
@@ -12,8 +19,38 @@ import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.items.types.ItemType;
 import server.motion.model.SessionParams;
+import server.session.model.CacheData;
+import server.session.model.CacheDomains;
+import server.session.model.CacheKey;
 
+@Singleton
+@NonNull
 public class SessionParamHelper {
+
+//    @Inject
+    StatefulRedisConnection<String, Object> redisConnection;
+
+    RedisCommands<String, Object> synchCommands;
+    RedisAsyncCommands<String, Object> asynchCommands;
+
+
+    public SessionParamHelper(StatefulRedisConnection<String, Object> conn) {
+        this.redisConnection = conn;
+        if (redisConnection == null) {
+            return;
+        }
+        synchCommands = redisConnection.sync();
+        asynchCommands = redisConnection.async();
+    }
+
+    public Motion getSharedActorMotion(String actorId) {
+        return ((CacheData<Motion>)synchCommands.get(CacheKey.of(CacheDomains.MOTION, actorId))).getData();
+    }
+
+    public void setSharedActorMotion(String actorId, Motion motion) {
+        asynchCommands.set(CacheKey.of(CacheDomains.MOTION, actorId),
+                new CacheData<Motion>(motion, true, Instant.now()));
+    }
 
     public static Instant getLastUpdatedAt(WebSocketSession session) {
         return (Instant) session.asMap().get(SessionParams.LAST_UPDATED_AT.getType());
@@ -27,7 +64,8 @@ public class SessionParamHelper {
         return (Motion) session.asMap().getOrDefault(SessionParams.MOTION.getType(), null);
     }
 
-    public static void setMotion(WebSocketSession session, Motion motion) {
+    public void setMotion(WebSocketSession session, Motion motion, String actorId) {
+        setSharedActorMotion(actorId, motion);
         session.put(SessionParams.MOTION.getType(), motion);
     }
 

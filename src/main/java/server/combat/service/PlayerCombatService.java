@@ -48,7 +48,8 @@ public class PlayerCombatService {
 
     @Inject ClientUpdatesService clientUpdatesService;
 
-    @Inject StatefulRedisConnection<String, String> redisConnection;
+    @Inject
+    SessionParamHelper sessionParamHelper;
 
     Random rand = new Random();
 
@@ -214,13 +215,8 @@ public class PlayerCombatService {
 
     private boolean validatePositionLocation(
             WebSocketSession session, String mob, int distanceThreshold) {
-        // TODO: This will NEED to come from shared cache (e.g. Redis)
         // TODO: Refactor mob/player motion calls
         // TODO: Make async
-
-        RedisCommands<String, String> commands = redisConnection.sync();
-        commands.set("foo", "bar");
-        //        commands.get("foo") == "bar";
 
         List<Monster> res = mobInstanceService.getMobsByIds(Set.of(mob)).blockingGet();
         PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
@@ -234,7 +230,7 @@ public class PlayerCombatService {
         Monster monster = res.get(0);
 
         Motion targetMotion = monster.getMotion();
-        Motion attackerMotion = SessionParamHelper.getMotion(session);
+        Motion attackerMotion = sessionParamHelper.getSharedActorMotion(SessionParamHelper.getPlayerName(session));
 
         boolean inRange = attackerMotion.withinRange(targetMotion, distanceThreshold);
         boolean facingTarget = attackerMotion.facingMotion(targetMotion);

@@ -112,4 +112,7 @@ redis:
   computation-thread-pool-size: 4
 #  ssl: true
   timeout: 30s
-
+#  valueSerializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+#  caches:
+#    default:
+#      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
