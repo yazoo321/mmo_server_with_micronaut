@@ -60,7 +60,7 @@ public class CommunicationSocketTestBase {
 
     protected final String MOB_SERVER_NAME = "UE_SERVER_MAP_1";
 
-    protected final int TIMEOUT = 20;
+    protected final int TIMEOUT = 10;
 
     @BeforeEach
     void setup() {
@@ -90,6 +90,22 @@ public class CommunicationSocketTestBase {
         Publisher<server.util.websocket.TestWebSocketClient> client =
                 webSocketClient.connect(server.util.websocket.TestWebSocketClient.class, uri);
         return Flux.from(client).blockFirst();
+    }
+
+    protected void initiateSocketAsServer(TestWebSocketClient client, String serverName) {
+        SocketMessage msg = new SocketMessage();
+        msg.setUpdateType(MessageType.SET_SESSION_ID.getType());
+        msg.setServerName(serverName);
+
+        client.send(msg);
+    }
+
+    protected void initiateSocketAsPlayer(TestWebSocketClient client, String playerName) {
+        SocketMessage msg = new SocketMessage();
+        msg.setUpdateType(MessageType.SET_SESSION_ID.getType());
+        msg.setPlayerName(playerName);
+
+        client.send(msg);
     }
 
     protected Motion createBaseMotion() {

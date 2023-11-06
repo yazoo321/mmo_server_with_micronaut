@@ -4,9 +4,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
+import java.time.temporal.ValueRange;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
@@ -15,6 +19,8 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @Introspected
 @NoArgsConstructor
 @Builder
+@Slf4j
+@Serdeable
 public class Motion {
 
     @BsonCreator
@@ -66,4 +72,47 @@ public class Motion {
     Integer vz;
 
     Boolean isFalling;
+
+    public boolean withinRange(Motion motion, int threshold) {
+        boolean xValid = validDimension(this.getX(), motion.getX(), threshold);
+        boolean yValid = validDimension(this.getY(), motion.getY(), threshold);
+        boolean zValid = validDimension(this.getZ(), motion.getZ(), threshold);
+
+        return xValid && yValid && zValid;
+    }
+
+    private boolean validDimension(long v1, long v2, int threshold) {
+        return ValueRange.of(v1 - threshold, v1 + threshold).isValidValue(v2);
+    }
+
+    public boolean facingMotion(Motion motion2) {
+        double maxAngle = 90;
+
+        // Calculate direction vectors for the player and the monster
+        double x1 = this.getX();
+        double y1 = this.getY();
+
+        double x2 = motion2.getX();
+        double y2 = motion2.getY();
+
+        double vectorX = x2 - x1;
+        double vectorY = y2 - y1;
+
+        // Calculate direction vector based on yaw (horizontal angle)
+        double directionX = Math.cos(Math.toRadians(yaw));
+        double directionY = Math.sin(Math.toRadians(yaw));
+
+        double dotProduct = directionX * vectorX + directionY * vectorY;
+
+        double magnitudeDirection = Math.sqrt(directionX * directionX + directionY * directionY);
+        double magnitudeVector = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
+
+        double cosTheta = dotProduct / (magnitudeDirection * magnitudeVector);
+        double angleRad = Math.acos(cosTheta);
+
+        double degrees = Math.toDegrees(angleRad);
+
+        log.warn("Angle evaluated: {}", degrees);
+        return degrees < maxAngle;
+    }
 }

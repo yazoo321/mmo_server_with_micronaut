@@ -3,6 +3,8 @@ package server.combat.service;
 import static server.attribute.stats.types.StatsTypes.PHY_AMP;
 import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
@@ -20,7 +22,9 @@ import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatRequest;
 import server.combat.model.PlayerCombatData;
+import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
+import server.monster.server_integration.model.Monster;
 import server.monster.server_integration.service.MobInstanceService;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
@@ -42,14 +46,15 @@ public class PlayerCombatService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
+    @Inject ClientUpdatesService clientUpdatesService;
+
     @Inject
-    ClientUpdatesService clientUpdatesService;
+    SessionParamHelper sessionParamHelper;
 
     Random rand = new Random();
 
     public void requestAttack(WebSocketSession session, CombatRequest combatRequest) {
         if (combatRequest == null) {
-            log.error("Combat data is empty");
             return;
         }
         PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
@@ -64,13 +69,32 @@ public class PlayerCombatService {
     }
 
     private void tryAttack(WebSocketSession session, Stats target, boolean isMainHand) {
-        PlayerCombatData data = SessionParamHelper.getCombatData(session);
-
         // Extract relevant combat data
+        PlayerCombatData data = SessionParamHelper.getCombatData(session);
+        Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
+        Map<String, Double> derivedStats = SessionParamHelper.getDerivedStats(session);
+
+        // Get the equipped weapon
+        EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
+        if (weapon == null) {
+            return;
+        }
+
+        int distanceThreshold =
+                weapon.getAttackDistance() == null
+                        ? 200
+                        : (int) (double) weapon.getAttackDistance();
+        boolean valid = validatePositionLocation(session, target.getActorId(), distanceThreshold);
+
+        if (!valid) {
+            return;
+        }
+
         Instant lastHit = isMainHand ? data.getMainHandLastAttack() : data.getOffhandLastAttack();
-        if (lastHit == null) {
-            // TODO: this can be error prone
-            lastHit = Instant.now().minusSeconds(10);
+        // TODO: this is for demo, needs changing
+        if (lastHit == null || lastHit.isBefore(Instant.now().minusSeconds(4))) {
+            lastHit = Instant.now().minusSeconds(4);
+            requestAttackSwing(session, isMainHand);
         }
         Double baseSpeed =
                 isMainHand ? data.getMainHandAttackSpeed() : data.getOffhandAttackSpeed();
@@ -84,46 +108,41 @@ public class PlayerCombatService {
 
         if (nextAttackTime.isBefore(Instant.now())) {
             // The player can attack
-
             // Get derived stats and equipped items
-            Map<String, Double> derivedStats = SessionParamHelper.getDerivedStats(session);
-            Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
 
-            // Get the equipped weapon
-            EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
-
-            if (weapon != null) {
-                // Create a damage map (currently only physical damage)
-                Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
-                Stats stats = statsService.takeDamage(target, damageMap);
-                if (isMainHand) {
-                    data.setMainHandLastAttack(Instant.now());
-                } else {
-                    data.setOffhandLastAttack(Instant.now());
-                }
-
-                if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-                    statsService.deleteStatsFor(stats.getActorId());
-                    mobInstanceService.handleMobDeath(stats.getActorId());
-                    clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
-                }
-
-                return;
+            // Create a damage map (currently only physical damage)
+            Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
+            Stats stats = statsService.takeDamage(target, damageMap);
+            if (isMainHand) {
+                data.setMainHandLastAttack(Instant.now());
+            } else {
+                data.setOffhandLastAttack(Instant.now());
             }
+
+            if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
+                statsService.deleteStatsFor(stats.getActorId());
+                mobInstanceService.handleMobDeath(stats.getActorId());
+                clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
+            }
+
+            return;
         }
 
         // Check if the next attack time is before the current time
         if (nextAttackTime.isBefore(Instant.now().plusMillis(100))) {
             // send a swing action as we're about to hit - we don't know if we will hit or miss yet
-
-            Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
-
-            // Get the equipped weapon
-            EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
-            String itemInstanceId = weapon.getItemInstance().getItemInstanceId();
-
-            requestSessionToSwingWeapon(session, itemInstanceId);
+            requestAttackSwing(session, isMainHand);
         }
+    }
+
+    private void requestAttackSwing(WebSocketSession session, boolean isMainHand) {
+        Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
+
+        // Get the equipped weapon
+        EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
+        String itemInstanceId = weapon.getItemInstance().getItemInstanceId();
+
+        requestSessionToSwingWeapon(session, itemInstanceId);
     }
 
     private void requestSessionToSwingWeapon(WebSocketSession session, String itemInstanceId) {
@@ -179,16 +198,59 @@ public class PlayerCombatService {
         Single.fromCallable(
                         () -> {
                             attackLoop(session);
-                            return null;
+                            return true;
                         })
                 .delaySubscription(100, TimeUnit.MILLISECONDS)
+                .doOnError(er -> log.error("Error encountered, {}", er.getMessage()))
                 .subscribe();
     }
 
     private List<Stats> getTargetStats(Set<String> actors) {
+        // TODO: Make async
         return actors.stream()
                 .map(actor -> statsService.getStatsFor(actor).blockingGet())
                 .filter(s -> s.getDerivedStats().get(StatsTypes.CURRENT_HP.getType()) > 0)
                 .collect(Collectors.toList());
+    }
+
+    private boolean validatePositionLocation(
+            WebSocketSession session, String mob, int distanceThreshold) {
+        // TODO: Refactor mob/player motion calls
+        // TODO: Make async
+
+        List<Monster> res = mobInstanceService.getMobsByIds(Set.of(mob)).blockingGet();
+        PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
+
+        if (res.isEmpty()) {
+            combatData.getTargets().remove(mob);
+
+            return false;
+        }
+
+        Monster monster = res.get(0);
+
+        Motion targetMotion = monster.getMotion();
+        Motion attackerMotion = sessionParamHelper.getSharedActorMotion(SessionParamHelper.getPlayerName(session));
+
+        boolean inRange = attackerMotion.withinRange(targetMotion, distanceThreshold);
+        boolean facingTarget = attackerMotion.facingMotion(targetMotion);
+
+        if (!inRange || !facingTarget) {
+            if (combatData.getLastHelperNotification() == null
+                    || Instant.now().getEpochSecond()
+                                    - combatData.getLastHelperNotification().getEpochSecond()
+                            > 3) {
+                combatData.setLastHelperNotification(Instant.now());
+
+                if (!inRange) {
+                    clientUpdatesService.notifySessionCombatTooFar(session);
+                    return false;
+                }
+                clientUpdatesService.notifySessionCombatNotFacing(session);
+            }
+            return false;
+        }
+
+        return true;
     }
 }

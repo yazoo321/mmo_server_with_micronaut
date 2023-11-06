@@ -1,12 +1,16 @@
 package server.combat.model;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
+@Serdeable
 public class PlayerCombatData {
 
     private String playerName;
@@ -19,4 +23,17 @@ public class PlayerCombatData {
     private Instant offhandLastAttack;
 
     private Set<String> targets;
+
+    private Instant lastHelperNotification;
+
+    public PlayerCombatData(String playerName) {
+        this.setPlayerName(playerName);
+        this.mainHandAttackSpeed = 0.0;
+        this.offhandAttackSpeed = 0.0;
+        this.characterAttackSpeed = 0.0;
+        this.mainHandLastAttack = Instant.now().minusSeconds(20);
+        this.offhandLastAttack = Instant.now().minusSeconds(20);
+        this.targets = new HashSet<>();
+        this.lastHelperNotification = Instant.now().minusSeconds(20);
+    }
 }

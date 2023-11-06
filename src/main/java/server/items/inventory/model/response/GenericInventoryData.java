@@ -1,6 +1,8 @@
 package server.items.inventory.model.response;
 
 import java.util.List;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +15,7 @@ import server.items.model.Item;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Serdeable
 public class GenericInventoryData {
 
     List<Item> items;

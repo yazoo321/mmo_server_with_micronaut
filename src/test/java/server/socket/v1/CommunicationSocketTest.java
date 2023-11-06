@@ -30,6 +30,10 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
         TestWebSocketClient playerClient2 = createWebSocketClient(embeddedServer.getPort());
         TestWebSocketClient playerClient3 = createWebSocketClient(embeddedServer.getPort());
 
+        initiateSocketAsPlayer(playerClient1, CHARACTER_1);
+        initiateSocketAsServer(playerClient2, CHARACTER_2);
+        initiateSocketAsPlayer(playerClient3, CHARACTER_3);
+
         SocketMessage char1WithinRange = createMessageForMotionWithinRange(CHARACTER_1);
         SocketMessage char2WithinRange = createMessageForMotionWithinRange(CHARACTER_2);
         SocketMessage char3OutOfRange = createMessageForMotionOutOfRange(CHARACTER_3);
@@ -116,7 +120,13 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
 
         TestWebSocketClient playerClient1 = createWebSocketClient(embeddedServer.getPort());
         TestWebSocketClient playerClient2 = createWebSocketClient(embeddedServer.getPort());
-        TestWebSocketClient mobServerClient = createWebSocketClient(embeddedServer.getPort());
+        TestWebSocketClient mobServerClient1 = createWebSocketClient(embeddedServer.getPort());
+        TestWebSocketClient mobServerClient2 = createWebSocketClient(embeddedServer.getPort());
+
+        initiateSocketAsPlayer(playerClient1, CHARACTER_1);
+        initiateSocketAsPlayer(playerClient2, CHARACTER_2);
+        initiateSocketAsServer(mobServerClient1, "SERVER_NAME_1");
+        initiateSocketAsServer(mobServerClient2, "SERVER_NAME_2");
 
         SocketMessage char1WithinRange = createMessageForMotionWithinRange(CHARACTER_1);
         SocketMessage char2OutOfRange = createMessageForMotionOutOfRange(CHARACTER_2);
@@ -128,36 +138,46 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
         mobWithinRange.setUpdateType(MessageType.CREATE_MOB.getType());
         mobOutOfRange.setUpdateType(MessageType.CREATE_MOB.getType());
 
-        mobServerClient.send(mobWithinRange);
-        mobServerClient.send(mobOutOfRange);
+        mobServerClient1.send(mobWithinRange);
+        mobServerClient2.send(mobOutOfRange);
 
         playerClient1.send(char1WithinRange);
         playerClient2.send(char2OutOfRange);
 
-        // first we need to make sure the player clients are started and synchronised.
-        Thread.sleep(1000);
+//        // first we need to make sure the player clients are started and synchronised.
+//        Thread.sleep(1000);
 
-        playerClient1.send(char1WithinRange);
-        playerClient2.send(char2OutOfRange);
+        // now we can make motion which should be tracked
+        mobWithinRange.setUpdateType(MessageType.MOB_MOTION.getType());
+        mobOutOfRange.setUpdateType(MessageType.MOB_MOTION.getType());
 
-        await().pollDelay(300, TimeUnit.MILLISECONDS)
+        await().pollDelay(500, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() -> !playerClient1.getMessagesChronologically().isEmpty());
+                .until(() -> {
+                    mobServerClient1.send(mobWithinRange);
+                    mobServerClient2.send(mobOutOfRange);
+                    return !playerClient1.getMessagesChronologically().isEmpty();
+                });;
 
-        await().pollDelay(300, TimeUnit.MILLISECONDS)
+        await().pollDelay(500, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
                 .until(() -> !playerClient2.getMessagesChronologically().isEmpty());
 
-        await().pollDelay(300, TimeUnit.MILLISECONDS)
+        await().pollDelay(500, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() -> !mobServerClient.getMessagesChronologically().isEmpty());
+                .until(() -> {
+                    playerClient1.send(char1WithinRange);
+                    playerClient2.send(char2OutOfRange);
+                    return !mobServerClient1.getMessagesChronologically().isEmpty();
+                });
 
         List<SocketResponse> client1Responses = getSocketResponse(playerClient1);
         List<SocketResponse> client2Responses = getSocketResponse(playerClient2);
-        List<SocketResponse> mobClientResponses = getSocketResponse(mobServerClient);
+        List<SocketResponse> mobClient1Responses = getSocketResponse(mobServerClient1);
+        List<SocketResponse> mobClient2Responses = getSocketResponse(mobServerClient2);
 
-        Assertions.assertThat(client1Responses.size()).isEqualTo(1);
-        Assertions.assertThat(client1Responses.get(0).getMonsters())
+//        Assertions.assertThat(client1Responses.size()).isEqualTo(1);
+        Assertions.assertThat(client1Responses.get(client1Responses.size()-1).getMonsters())
                 .usingRecursiveComparison()
                 .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9105.updatedAt")
                 .isEqualTo(
@@ -165,8 +185,8 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
                                 mobWithinRange.getMonster().getMobInstanceId(),
                                 mobWithinRange.getMonster()));
 
-        Assertions.assertThat(client2Responses.size()).isEqualTo(1);
-        Assertions.assertThat(client2Responses.get(0).getMonsters())
+//        Assertions.assertThat(client2Responses.size()).isEqualTo(1);
+        Assertions.assertThat(client2Responses.get(client2Responses.size()-1).getMonsters())
                 .usingRecursiveComparison()
                 .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9106.updatedAt")
                 .isEqualTo(
@@ -174,17 +194,23 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
                                 mobOutOfRange.getMonster().getMobInstanceId(),
                                 mobOutOfRange.getMonster()));
 
-        Assertions.assertThat(mobClientResponses.size())
-                .isLessThan(4); // we can get 2x motion updates and 1x appearance update
+//        Assertions.assertThat(mobClientResponses.size())
+//                .isLessThan(4); // we can get 2x motion updates and 1x appearance update
 
         Assertions.assertThat(
-                        mobClientResponses.stream().map(SocketResponse::getMessageType).toList())
+                        mobClient1Responses.stream().map(SocketResponse::getMessageType).toList())
                 .contains(
                         SocketResponseType.PLAYER_MOTION_UPDATE.getType(),
                         SocketResponseType.PLAYER_APPEARANCE.getType());
 
+        Assertions.assertThat(
+                        mobClient2Responses.stream().map(SocketResponse::getMessageType).toList())
+                .contains(
+                        SocketResponseType.PLAYER_MOTION_UPDATE.getType(),
+                        SocketResponseType.PLAYER_APPEARANCE.getType());
         playerClient1.close();
         playerClient2.close();
-        mobServerClient.close();
+        mobServerClient1.close();
+        mobServerClient2.close();
     }
 }

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import java.time.Instant;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
@@ -15,6 +17,7 @@ import server.common.dto.Motion;
 @JsonInclude()
 @Introspected
 @NoArgsConstructor
+@Serdeable
 public class PlayerMotion {
 
     @BsonCreator

@@ -12,6 +12,7 @@ import server.common.dto.Motion;
 import server.items.model.DroppedItem;
 import server.items.service.ItemService;
 import server.motion.model.SessionParams;
+import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
@@ -27,7 +28,7 @@ public class SynchroniseDroppedItemsService {
     public void handleSynchroniseDroppedItems(Motion motion, WebSocketSession session) {
         String playerName =
                 (String) session.asMap().getOrDefault(SessionParams.PLAYER_NAME.getType(), "");
-        if (playerName.isBlank()) {
+        if (SessionParamHelper.getIsServer(session)) {
             // don't synchronise dropped items on server instances
             return;
         }

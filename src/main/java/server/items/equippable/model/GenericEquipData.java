@@ -1,6 +1,8 @@
 package server.items.equippable.model;
 
 import java.util.List;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +11,7 @@ import server.items.inventory.model.Inventory;
 
 @Deprecated // now part of Generic Inventory
 @Data
+@Serdeable
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

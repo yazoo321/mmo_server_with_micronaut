@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.motion.model.SessionParams;
 import server.motion.service.PlayerMotionService;
+import server.session.SessionParamHelper;
 import server.socket.model.MessageType;
 import server.socket.model.SocketMessage;
 import server.socket.service.SocketProcessOutgoingService;
@@ -25,6 +26,9 @@ public class CommunicationSocket {
 
     @Inject SocketProcessOutgoingService socketProcessService;
     @Inject PlayerMotionService playerMotionService;
+
+    @Inject
+    SessionParamHelper sessionParamHelper;
 
     ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
 
@@ -60,9 +64,10 @@ public class CommunicationSocket {
     private void updateSessionParams(WebSocketSession session, SocketMessage message) {
         if (message.getPlayerMotion() != null
                 && motionValid(message.getPlayerMotion().getMotion())) {
-            session.put(SessionParams.MOTION.getType(), message.getPlayerMotion().getMotion());
+            sessionParamHelper.setMotion(session, message.getPlayerMotion().getMotion(),
+                    message.getPlayerMotion().getPlayerName());
         } else if (message.getMonster() != null && motionValid(message.getMonster().getMotion())) {
-            session.put(SessionParams.MOTION.getType(), message.getMonster().getMotion());
+            sessionParamHelper.setMotion(session, message.getMonster().getMotion(), message.getMonster().getMobId());
         }
     }
 

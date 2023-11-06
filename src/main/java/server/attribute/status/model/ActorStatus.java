@@ -1,5 +1,6 @@
 package server.attribute.status.model;
 
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 
 import java.time.Instant;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
+@Serdeable
 public class ActorStatus {
 
 

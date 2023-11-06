@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import java.time.Instant;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +16,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @Introspected
 @NoArgsConstructor
 @Builder
+@Serdeable
 public class ActorAction {
 
     @BsonCreator

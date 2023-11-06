@@ -30,6 +30,9 @@ public class ClientUpdatesService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
+    @Inject
+    SessionParamHelper sessionParamHelper;
+
     public void sendMotionUpdatesToSubscribedClients(PlayerMotion playerMotion) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
@@ -43,15 +46,31 @@ public class ClientUpdatesService {
                 .subscribe(socketResponseSubscriber);
     }
 
+    public void notifySessionCombatTooFar(WebSocketSession session) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.COMBAT_TOO_FAR.getType())
+                        .build();
+        session.send(socketResponse).subscribe(socketResponseSubscriber);
+    }
+
+    public void notifySessionCombatNotFacing(WebSocketSession session) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.COMBAT_NOT_FACING.getType())
+                        .build();
+        session.send(socketResponse).subscribe(socketResponseSubscriber);
+    }
+
     public void notifyServerOfRemovedMobs(Set<String> actorIds) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
                         .messageType(SocketResponseType.REMOVE_MOBS.getType())
                         .lostMobs(actorIds)
                         .build();
-        broadcaster.broadcast(socketResponse)
-                .subscribe(socketResponseSubscriber);
+        broadcaster.broadcast(socketResponse).subscribe(socketResponseSubscriber);
     }
+
     public void sendMotionUpdatesToSubscribedClients(Monster monster) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
@@ -150,9 +169,7 @@ public class ClientUpdatesService {
                 // servers don't need item updates
             }
 
-            Set<String> trackedItems =
-                    (Set<String>)
-                            s.asMap().getOrDefault(SessionParams.DROPPED_ITEMS.getType(), Set.of());
+            Set<String> trackedItems = SessionParamHelper.getDroppedItems(s);
 
             if (trackedItems.contains(itemInstanceId)) {
                 trackedItems.remove(itemInstanceId);
@@ -166,14 +183,11 @@ public class ClientUpdatesService {
 
     private Predicate<WebSocketSession> listensToItemDrops(DroppedItem droppedItem) {
         return s -> {
-            String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
-
-            if (serverName != null && !serverName.isBlank()) {
-                return false;
+            if (SessionParamHelper.getIsServer(s)) {
                 // servers don't need item updates
+                return false;
             }
-
-            Motion motion = (Motion) s.asMap().getOrDefault(SessionParams.MOTION.getType(), null);
+            Motion motion = SessionParamHelper.getMotion(s);
 
             if (motion == null) {
                 return false;
@@ -183,12 +197,8 @@ public class ClientUpdatesService {
             Location location = new Location(motion);
             if (location.withinThreshold(droppedItem.getLocation(), defaultThresholdDistance)) {
                 // automatically make it listen to this items events
-                Set<String> trackedItems =
-                        (Set<String>)
-                                s.asMap()
-                                        .getOrDefault(
-                                                SessionParams.DROPPED_ITEMS.getType(),
-                                                new HashSet<>());
+
+                Set<String> trackedItems = SessionParamHelper.getDroppedItems(s);
 
                 trackedItems.add(droppedItem.getItemInstance().getItemInstanceId());
                 s.put(SessionParams.DROPPED_ITEMS.getType(), trackedItems);
@@ -201,28 +211,17 @@ public class ClientUpdatesService {
     }
 
     private boolean sessionListensToPlayerOrMob(WebSocketSession s, String playerOrMob) {
-        String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
-        boolean isServer = serverName != null && !serverName.isBlank();
+        boolean isServer = SessionParamHelper.getIsServer(s);
         // server does not track mobs
-        Set<String> mobs =
-                isServer
-                        ? Set.of()
-                        : (Set<String>)
-                                s.asMap()
-                                        .getOrDefault(
-                                                SessionParams.TRACKING_MOBS.getType(), Set.of());
-        Set<String> players =
-                (Set<String>)
-                        s.asMap().getOrDefault(SessionParams.TRACKING_PLAYERS.getType(), Set.of());
+        Set<String> mobs = isServer ? Set.of() : SessionParamHelper.getTrackingMobs(s);
+        Set<String> players = SessionParamHelper.getTrackingPlayers(s);
 
         return mobs.contains(playerOrMob) || players.contains(playerOrMob);
     }
 
     private boolean sessionIsThePlayerOrMob(WebSocketSession s, String playerOrMob) {
-        String playerName =
-                (String) s.asMap().getOrDefault(SessionParams.PLAYER_NAME.getType(), "");
-        String serverName =
-                (String) s.asMap().getOrDefault(SessionParams.SERVER_NAME.getType(), "");
+        String playerName = SessionParamHelper.getPlayerName(s);
+        String serverName = SessionParamHelper.getServerName(s);
 
         return playerName.equalsIgnoreCase(playerOrMob) || serverName.equalsIgnoreCase(playerOrMob);
     }
@@ -258,6 +257,7 @@ public class ClientUpdatesService {
     }
 
     private boolean sessionIsServerAndListensToMob(WebSocketSession s, String actorId) {
-        return SessionParamHelper.getIsServer(s) && SessionParamHelper.getTrackingMobs(s).contains(actorId);
+        return SessionParamHelper.getIsServer(s)
+                && SessionParamHelper.getTrackingMobs(s).contains(actorId);
     }
 }

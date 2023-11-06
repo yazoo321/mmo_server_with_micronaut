@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
 import java.util.Map;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
@@ -18,6 +20,7 @@ import server.items.types.ItemType;
 
 @Data
 @Introspected
+@Serdeable
 @NoArgsConstructor
 @BsonDiscriminator
 @JsonTypeInfo(
@@ -66,6 +69,16 @@ public abstract class EquippedItems {
             Map<String, Double> effects = this.itemInstance.getItem().getItemEffects();
 
             return effects.get(StatsTypes.BASE_ATTACK_SPEED.getType());
+        }
+        return null;
+    }
+
+    public Double getAttackDistance() {
+        if (this.category.equalsIgnoreCase(ItemType.WEAPON.getType())
+                || this.category.equalsIgnoreCase(ItemType.SHIELD.getType())) {
+            Map<String, Double> effects = this.itemInstance.getItem().getItemEffects();
+
+            return effects.get(StatsTypes.ATTACK_DISTANCE.getType());
         }
         return null;
     }

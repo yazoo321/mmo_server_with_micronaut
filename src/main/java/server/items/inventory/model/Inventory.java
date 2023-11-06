@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import java.util.List;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
@@ -13,8 +15,9 @@ import server.common.dto.Location2D;
 
 @Data
 @Introspected
-@JsonInclude()
+@JsonInclude(JsonInclude.Include.ALWAYS)
 @NoArgsConstructor
+@Serdeable
 public class Inventory {
 
     @BsonCreator

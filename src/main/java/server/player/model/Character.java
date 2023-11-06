@@ -6,6 +6,8 @@ import io.micronaut.core.annotation.Introspected;
 import java.time.Instant;
 import java.util.Map;
 import javax.validation.constraints.*;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
@@ -14,6 +16,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @Data
 @Introspected
 @NoArgsConstructor
+@Serdeable
 public class Character {
     // TODO: Break this DTO into multiple classes
 

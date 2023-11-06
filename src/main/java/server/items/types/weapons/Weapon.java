@@ -2,6 +2,8 @@ package server.items.types.weapons;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Map;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -14,6 +16,7 @@ import server.items.model.Stacking;
 import server.items.types.ItemType;
 
 @Data
+@Serdeable
 @NoArgsConstructor
 @JsonTypeName("WEAPON")
 @EqualsAndHashCode(callSuper = false)
