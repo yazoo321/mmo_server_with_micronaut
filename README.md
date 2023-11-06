@@ -36,10 +36,10 @@ Each of the posts contains a video overview.
 ## Base components, JWT no longer in use, in favor of using Cognito or alternatives
 - Configuring MongoDB & creation of characters for account: https://ylazarev.com/2021/05/08/7-java-micronaut-with-mongodb-character-controller/
 
-- Setting up Micronaut, jooq, flyway:
+- Setting up Micronaut, jooq, flyway (deprecated with v0.7):
 https://ylazarev.com/2021/04/18/4-java-micronaut-dockered-postgres/
 
-- Setting up JWT Authentication:
+- Setting up JWT Authentication (deprecated):
 https://ylazarev.com/2021/04/26/5-java-micronaut-jwt-authentication/
 
 - Encode password for user, integrate with JWT: https://ylazarev.com/2021/05/04/6-java-secure-encode-user-credential/

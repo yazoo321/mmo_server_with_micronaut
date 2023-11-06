@@ -1,91 +1,15 @@
-import org.flywaydb.gradle.task.FlywayMigrateTask
-
-buildscript {
-	ext {
-		FLWAY_VERSION = "9.8.1"
-		JOOQ_VERSION = "7.1.1"
-	}
-	configurations['classpath'].resolutionStrategy.eachDependency {
-		if (requested.group == 'org.jooq') {
-			useVersion '3.17.3'
-		}
-	}
-}
 
 plugins {
 	id "com.github.johnrengelman.shadow" version "8.1.1"
 	id "io.micronaut.application" version "4.1.2"
-	id 'nu.studer.jooq' version "$JOOQ_VERSION"
-	id "org.flywaydb.flyway" version "$FLWAY_VERSION"
 	id 'com.avast.gradle.docker-compose' version '0.17.5'
 	id "com.diffplug.spotless" version "6.22.0"
 	id("io.micronaut.openapi") version "4.1.2"
 }
 
-version = "0.4"
+version = "0.7"
 group = "mmo_server"
 
-
-def dbDriver = System.getenv('DATABASE_DRIVER') ?: 'org.postgresql.Driver'
-def dbUser = System.getenv('DATABASE_USER') ?: 'mmo_server'
-def dbPassword = System.getenv('DATABASE_PASSWORD') ?: 'password123'
-def dbHost = System.getenv('DATABASE_HOST') ?: '127.0.0.1'
-def dbPort = System.getenv('DATABASE_PORT') ?: 5432
-def dbName = System.getenv('DATABASE_NAME') ?: 'mmo_server'
-def dbUrl = System.getenv('DATABASE_URL') ?: "jdbc:postgresql://$dbHost:$dbPort/$dbName"
-
-jooq {
-	version = '3.17.6'
-	configurations {
-		main {
-			generationTool {
-				logging = org.jooq.meta.jaxb.Logging.WARN
-				jdbc {
-					driver = dbDriver
-					url = dbUrl
-					user = dbUser
-					password = dbPassword
-					properties {
-						// SSL disabled at the moment (only running locally)
-						property {
-							key = 'ssl'
-							value = 'false'
-						}
-					}
-				}
-				generator {
-					name = 'org.jooq.codegen.DefaultGenerator'
-					database {
-						name = 'org.jooq.meta.postgres.PostgresDatabase'
-						inputSchema = 'public'
-						forcedTypes {
-							forcedType {
-								name = 'varchar'
-								includeExpression = '.*'
-								includeTypes = 'JSONB?'
-							}
-							forcedType {
-								name = 'varchar'
-								includeExpression = '.*'
-								includeTypes = 'INET'
-							}
-						}
-					}
-					generate {
-						deprecated = false
-						records = true
-						immutablePojos = true
-						fluentSetters = true
-					}
-					target {
-						packageName = 'com.org.mmo_server.repository.model'
-					}
-					strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
-				}
-			}
-		}
-	}
-}
 
 spotless {
 	// optional: limit format enforcement to just the files changed by this feature branch
@@ -114,20 +38,6 @@ spotless {
 	}
 }
 
-task migratePrimaryDB(type: FlywayMigrateTask) {
-	locations = ['filesystem:src/main/resources/db/postgres/']
-	url = dbUrl
-	user = dbUser
-	password = dbPassword
-	baselineOnMigrate = true
-	validateOnMigrate = false
-}
-
-
-// make sure Jooq can only run after we've finished creating db and migrating it
-tasks.generateJooq.mustRunAfter(tasks.migratePrimaryDB)
-tasks.compileJava.dependsOn(tasks.migratePrimaryDB)
-tasks.migratePrimaryDB.dependsOn(tasks.composeUp)
 tasks.compileJava.mustRunAfter(spotlessCheck)
 
 repositories {
@@ -154,14 +64,11 @@ dependencies {
 	runtimeOnly("org.yaml:snakeyaml")
 
 //	// swagger
-//	annotationProcessor("io.micronaut.openapi:micronaut-openapi:5.2.0")
 	implementation("io.swagger.core.v3:swagger-annotations")
 
 	// Flowable
 	implementation("io.micronaut.rxjava3:micronaut-rxjava3:3.1.0")
 	implementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client:3.1.0")
-
-//	implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
 
 	// Lombok:
 	compileOnly 'org.projectlombok:lombok:1.18.30'
@@ -172,11 +79,6 @@ dependencies {
 	annotationProcessor("io.micronaut:micronaut-inject-java")
 	implementation(platform('io.micronaut:micronaut-bom:3.10.2'))
 	implementation("io.micronaut:micronaut-inject")
-
-	// database configs
-	implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-	jooqGenerator 'org.postgresql:postgresql:42.5.4'
-	implementation 'org.postgresql:postgresql:42.5.4'
 
 	// transactional annotation
 	implementation('io.micronaut.spring:micronaut-spring:4.5.1')
