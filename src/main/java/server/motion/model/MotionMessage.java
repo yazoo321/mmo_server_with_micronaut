@@ -1,5 +1,6 @@
 package server.motion.model;
 
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import server.common.dto.Motion;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Serdeable
 public class MotionMessage {
     // sample message:
     //        {

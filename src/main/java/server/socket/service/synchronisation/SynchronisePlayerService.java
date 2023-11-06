@@ -65,10 +65,7 @@ public class SynchronisePlayerService {
     }
 
     private void evaluateNewPlayers(Set<String> playerNames, WebSocketSession session) {
-        Set<String> previouslyTracked =
-                (Set<String>)
-                        session.asMap()
-                                .getOrDefault(SessionParams.TRACKING_PLAYERS.getType(), Set.of());
+        Set<String> previouslyTracked = SessionParamHelper.getTrackingPlayers(session);
 
         Set<String> newPlayers =
                 playerNames.stream()

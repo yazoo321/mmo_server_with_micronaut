@@ -1,5 +1,6 @@
 package server.socket.model;
 
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import server.motion.dto.PlayerMotion;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Serdeable
 public class SocketMessage {
 
     String updateType;

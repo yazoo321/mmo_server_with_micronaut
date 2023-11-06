@@ -12,7 +12,7 @@ import server.player.attributes.model.PlayerAttributes;
 
 import java.util.List;
 
-@KafkaClient(id = "motion-update-producer")
+@KafkaClient(id = "general-update-producer")
 public interface UpdateProducer {
 
     @Topic("mob-motion-update")

@@ -3,6 +3,8 @@ package server.motion.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ import server.motion.dto.PlayerMotion;
 @JsonInclude
 @AllArgsConstructor
 @NoArgsConstructor
+@Serdeable
 public class PlayerMotionList {
 
     List<PlayerMotion> playerMotionList;

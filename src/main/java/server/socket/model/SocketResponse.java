@@ -2,6 +2,8 @@ package server.socket.model;
 
 import java.util.Map;
 import java.util.Set;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +20,7 @@ import server.player.model.Character;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Serdeable
 public class SocketResponse {
 
     String messageType;

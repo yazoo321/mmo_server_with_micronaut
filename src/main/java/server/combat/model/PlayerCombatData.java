@@ -3,11 +3,14 @@ package server.combat.model;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
+@Serdeable
 public class PlayerCombatData {
 
     private String playerName;

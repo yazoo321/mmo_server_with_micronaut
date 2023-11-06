@@ -5,10 +5,13 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 
 @Data
 @Introspected
+@Serdeable
 public class CreateCharacterRequest {
     // there will be more as per requirements from UE
 

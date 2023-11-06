@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
 import java.util.Map;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
@@ -18,6 +20,7 @@ import server.items.types.ItemType;
 
 @Data
 @Introspected
+@Serdeable
 @NoArgsConstructor
 @BsonDiscriminator
 @JsonTypeInfo(

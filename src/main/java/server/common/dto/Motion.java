@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
 import java.time.temporal.ValueRange;
+
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +20,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @NoArgsConstructor
 @Builder
 @Slf4j
+@Serdeable
 public class Motion {
 
     @BsonCreator

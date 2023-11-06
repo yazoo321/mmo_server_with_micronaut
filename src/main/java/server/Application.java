@@ -1,9 +1,13 @@
 package server;
 
 import io.micronaut.runtime.Micronaut;
+import io.micronaut.serde.annotation.SerdeImport;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
+import server.motion.model.MotionMessage;
+import server.socket.model.SocketMessage;
+import server.socket.model.SocketResponse;
 
 @OpenAPIDefinition(
         info =
@@ -16,6 +20,9 @@ import io.swagger.v3.oas.annotations.info.Info;
                                         url = "https://unreal-mmo-dev.com/",
                                         name = "Yaroslav Lazarev",
                                         email = "y.lazarev@hotmail.com")))
+@SerdeImport(MotionMessage.class)
+@SerdeImport(SocketMessage.class)
+@SerdeImport(SocketResponse.class)
 public class Application {
 
     public static void main(String[] args) {

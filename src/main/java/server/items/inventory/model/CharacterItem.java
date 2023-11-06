@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonCreator;
@@ -12,6 +13,7 @@ import server.common.dto.Location2D;
 import server.items.model.ItemInstance;
 
 @Data
+@Serdeable
 @Introspected
 @JsonInclude()
 @NoArgsConstructor
