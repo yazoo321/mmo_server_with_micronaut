@@ -5,15 +5,6 @@ networks:
     driver: bridge
 services:
 #  In future, create a dockerized container for the server, then make the 2 db images as dependencies
-  postgres:
-    image: postgres:15.1
-    environment:
-      - POSTGRES_DB=mmo_server
-      - POSTGRES_USER=mmo_server
-      - POSTGRES_PASSWORD=password123
-      - PGDATA=/var/lib/pgsql_docker/data
-    ports:
-      - "5432:5432"
   mongo_db:
     image: mongo
     environment:

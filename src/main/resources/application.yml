@@ -19,10 +19,6 @@ micronaut:
 jackson:
   serialization:
     writeDatesAsTimestamps: false
-jooq:
-  datasources:
-    default:
-      sql-dialect: 'POSTGRES'
 jpa:
   default:
     entity-scan:
@@ -53,31 +49,6 @@ kafka:
       auto:
         offset:
           reset: earliest
-
-datasources:
-  default:
-    url: jdbc:postgresql://127.0.0.1/mmo_server
-    username: mmo_server
-    password: password123
-    driverClassName: org.postgresql.Driver
-    hikari:
-      pool-name: ca-pool
-      minimum-idle: 2
-      maximum-pool-size: 5
-      data-source-properties:
-        cachePrepStmts: true
-        prepStmtCacheSize: 250
-        prepStmtCacheSqlLimit: 2048
-        useServerPrepStmts: true
-        useLocalSessionState: true
-        rewriteBatchedStatements: true
-        cacheResultSetMetadata: true
-        cacheServerConfiguration: true
-        elideSetAutoCommits: true
-        maintainTimeStats: false
-      leak-detection-threshold: 60000
-      connection-test-query: "SELECT 1"
-      validation-timeout: 50000
 
 mongodb:
 #  Set username/password as env vars
