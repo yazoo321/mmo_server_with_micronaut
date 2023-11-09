@@ -126,7 +126,6 @@ public class ItemTestHelper {
                 inventoryRepository.updateInventoryItems(characterName, items).blockingGet();
 
         return res.wasAcknowledged() ? characterItem : null;
-        //        return characterItem;
     }
 
     public Inventory insertInventory(Inventory inventory) {
@@ -177,8 +176,8 @@ public class ItemTestHelper {
 
         switch (type) {
             case "WEAPON":
-                itemEffects.put(StatsTypes.WEAPON_DAMAGE.getType(), 10.0);
-                itemEffects.put(StatsTypes.BASE_ATTACK_SPEED.getType(), 1.2);
+                itemEffects.put(StatsTypes.WEAPON_DAMAGE.getType(), 100.0);
+                itemEffects.put(StatsTypes.BASE_ATTACK_SPEED.getType(), 0.3);
 
                 return new Weapon(
                         UUID.randomUUID().toString(),

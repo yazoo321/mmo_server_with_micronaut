@@ -92,20 +92,30 @@ public class CommunicationSocketTestBase {
         return Flux.from(client).blockFirst();
     }
 
-    protected void initiateSocketAsServer(TestWebSocketClient client, String serverName) {
+    protected TestWebSocketClient initiateSocketAsServer(String serverName) {
+        TestWebSocketClient client = createWebSocketClient(embeddedServer.getPort());
         SocketMessage msg = new SocketMessage();
         msg.setUpdateType(MessageType.SET_SESSION_ID.getType());
         msg.setServerName(serverName);
 
         client.send(msg);
+
+        return client;
     }
 
-    protected void initiateSocketAsPlayer(TestWebSocketClient client, String playerName) {
+    protected TestWebSocketClient initiateSocketAsPlayer(String playerName) {
+        playerMotionService.initializePlayerMotion(playerName).blockingGet();
+        itemTestHelper.prepareInventory(playerName);
+
+        TestWebSocketClient playerClient = createWebSocketClient(embeddedServer.getPort());
+
         SocketMessage msg = new SocketMessage();
         msg.setUpdateType(MessageType.SET_SESSION_ID.getType());
         msg.setPlayerName(playerName);
 
-        client.send(msg);
+        playerClient.send(msg);
+
+        return playerClient;
     }
 
     protected Motion createBaseMotion() {

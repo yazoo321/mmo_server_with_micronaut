@@ -1,7 +1,8 @@
 package server.session;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import java.time.Instant;
@@ -9,7 +10,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.NonNull;
 import server.attribute.stats.model.Stats;
@@ -19,7 +19,7 @@ import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.items.types.ItemType;
 import server.motion.model.SessionParams;
-import server.session.model.CacheData;
+import server.configuration.redis.JacksonRedisCodecMotion;
 import server.session.model.CacheDomains;
 import server.session.model.CacheKey;
 
@@ -27,29 +27,41 @@ import server.session.model.CacheKey;
 @NonNull
 public class SessionParamHelper {
 
-//    @Inject
-    StatefulRedisConnection<String, Object> redisConnection;
+//    RMap<String, Motion> motionCache;
+//    RMapReactive<String, Motion> motionReactiveCache;
 
-    RedisCommands<String, Object> synchCommands;
-    RedisAsyncCommands<String, Object> asynchCommands;
+    ObjectMapper objectMapper = new ObjectMapper();
 
+    StatefulRedisConnection<String, Motion> connection;
+    RedisCommands<String, Motion> redisCommands;
 
-    public SessionParamHelper(StatefulRedisConnection<String, Object> conn) {
-        this.redisConnection = conn;
-        if (redisConnection == null) {
-            return;
-        }
-        synchCommands = redisConnection.sync();
-        asynchCommands = redisConnection.async();
+    public SessionParamHelper(RedisClient redisClient) {
+        connection = redisClient.connect(new JacksonRedisCodecMotion(objectMapper));
+        redisCommands = connection.sync();
+    }
+
+    private void tryRedisson() {
+//        // 1. Create config object
+//        Config config = new Config();
+//        config.useClusterServers().addNodeAddress("redis://localhost:6379");
+//        // Sync and Async API
+//        RedissonClient redisson = Redisson.create(config);
+//        RedissonReactiveClient redissonReactive = redisson.reactive();
+//
+//        motionCache = redisson.getMap("motion");
+//        motionReactiveCache = redissonReactive.getMap("motion");
     }
 
     public Motion getSharedActorMotion(String actorId) {
-        return ((CacheData<Motion>)synchCommands.get(CacheKey.of(CacheDomains.MOTION, actorId))).getData();
+//        return motionCache.get(actorId);
+//        redisCommands.get()
+        return redisCommands.get(CacheKey.of(CacheDomains.MOTION, actorId));
     }
 
     public void setSharedActorMotion(String actorId, Motion motion) {
-        asynchCommands.set(CacheKey.of(CacheDomains.MOTION, actorId),
-                new CacheData<Motion>(motion, true, Instant.now()));
+//        motionReactiveCache.put(actorId, motion).subscribe();
+//        new CacheData<Motion>(motion).
+        redisCommands.set(CacheKey.of(CacheDomains.MOTION, actorId), motion);
     }
 
     public static Instant getLastUpdatedAt(WebSocketSession session) {

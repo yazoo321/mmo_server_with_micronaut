@@ -207,6 +207,9 @@ public class PlayerCombatService {
 
     private List<Stats> getTargetStats(Set<String> actors) {
         // TODO: Make async
+        if (actors.isEmpty()) {
+            return new ArrayList<>();
+        }
         return actors.stream()
                 .map(actor -> statsService.getStatsFor(actor).blockingGet())
                 .filter(s -> s.getDerivedStats().get(StatsTypes.CURRENT_HP.getType()) > 0)
