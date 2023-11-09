@@ -97,6 +97,9 @@ public class Stats {
         updatedDerived.put(StatsTypes.MAG_AMP.getType(), 1 + intelligence * 0.01);
         updatedDerived.put(StatsTypes.PHY_CRIT.getType(), 5 + dexterity * 0.1);
 
+        updatedDerived.put(StatsTypes.HP_REGEN.getType(), 0.5 + (stamina / 100));
+        updatedDerived.put(StatsTypes.MP_REGEN.getType(), 1.0 + (intelligence / 100));
+
         // add other effects, such as item and statuses (buffs etc)
         Map<String, Double> otherEffects = mergeStats(itemEffects, statusEffects);
         updatedDerived = mergeStats(updatedDerived, otherEffects);
@@ -146,5 +149,10 @@ public class Stats {
 
     private Double getMaxHp() {
         return getDerived(StatsTypes.MAX_HP);
+    }
+
+    public boolean canAct() {
+        // TODO: Refactor later to status effects, some cases may allow to act
+        return this.getDerived(StatsTypes.CURRENT_HP) > 0;
     }
 }

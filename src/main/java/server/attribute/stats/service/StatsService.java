@@ -97,33 +97,52 @@ public class StatsService {
                 .subscribe();
     }
 
-    public void takeDamage(String actorId, Double damage) {
-        getStatsFor(actorId)
-                .doOnSuccess(
-                        stats -> {
-                            Map<String, Double> derived = stats.getDerivedStats();
-                            Double newHp = derived.get(StatsTypes.CURRENT_HP.getType()) - damage;
-                            Map<String, Double> updated =
-                                    Map.of(StatsTypes.CURRENT_HP.getType(), newHp);
-                            derived.put(StatsTypes.CURRENT_HP.getType(), newHp);
-                            handleDifference(updated, stats);
-                        })
-                .subscribe();
-    }
-
     public Stats takeDamage(Stats stats, Map<DamageTypes, Double> damageMap) {
-        Map<String, Double> derived = stats.getDerivedStats();
+        // TODO: send stat update once, send map of damage
         damageMap.forEach(
                 (k, v) -> {
-                    Double currentHp = derived.get(StatsTypes.CURRENT_HP.getType());
+                    Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
                     currentHp -= v;
-                    derived.put(StatsTypes.CURRENT_HP.getType(), currentHp);
-                    Map<String, Double> updated =
-                            Map.of(StatsTypes.CURRENT_HP.getType(), currentHp);
-                    handleDifference(updated, stats);
+                    setAndHandleDifference(stats, currentHp);
+//                    derived.put(StatsTypes.CURRENT_HP.getType(), currentHp);
+//                    Map<String, Double> updated =
+//                            Map.of(StatsTypes.CURRENT_HP.getType(), currentHp);
+//                    handleDifference(updated, stats);
                 });
 
         return stats;
+    }
+
+    private void setAndHandleDifference(Stats stats, Double val) {
+        stats.getDerivedStats().put(StatsTypes.CURRENT_HP.getType(), val);
+        Map<String, Double> updated =
+                Map.of(StatsTypes.CURRENT_HP.getType(), val);
+        handleDifference(updated, stats);
+    }
+
+    public void applyRegen(String actorName) {
+        getStatsFor(actorName)
+                .doOnSuccess(this::applyRegen)
+                .doOnError(err -> log.error("Failed to apply regen, {}", err.getMessage()))
+                .subscribe();
+
+    }
+
+    public void applyRegen(Stats stats) {
+        applyRegen(stats, StatsTypes.HP_REGEN);
+        applyRegen(stats, StatsTypes.MP_REGEN);
+    }
+
+    private void applyRegen(Stats stats, StatsTypes type) {
+        if (!stats.canAct()) {
+            return;
+        }
+
+        Double regen = stats.getDerived(type);
+        Double currentVal = stats.getDerived(type);
+
+        Double res = currentVal + regen;
+        setAndHandleDifference(stats, res);
     }
 
     private void handleDifference(Map<String, Double> updated, Stats stats) {

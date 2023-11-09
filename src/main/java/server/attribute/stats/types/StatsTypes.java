@@ -20,6 +20,12 @@ public enum StatsTypes {
     PHY_AMP("PHY_AMP"),
     MAG_AMP("MAG_AMP"),
 
+    BASE_HP_REGEN("BASE_HP_REGEN"),
+    HP_REGEN("HP_REGEN"),
+
+    BASE_MP_REGEN("BASE_MP_REGEN"),
+    MP_REGEN("MP_REGEN"),
+
     DEF("DEF"),
     MAG_DEF("MAG_DEF"),
 
