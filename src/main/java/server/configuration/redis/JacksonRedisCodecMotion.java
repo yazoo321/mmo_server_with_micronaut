@@ -17,7 +17,7 @@ public class JacksonRedisCodecMotion implements RedisCodec<String, Motion> {
     }
 
     @Override
-    public String decodeKey(ByteBuffer bytes) {
+    public String decodeKey(final ByteBuffer bytes) {
         try {
             return objectMapper.readValue(bytes.array(), String.class);
         } catch (IOException e) {
@@ -26,9 +26,12 @@ public class JacksonRedisCodecMotion implements RedisCodec<String, Motion> {
     }
 
     @Override
-    public Motion decodeValue(ByteBuffer bytes) {
+    public Motion decodeValue(final ByteBuffer bytes) {
         try {
-            return objectMapper.readValue(bytes.array(), Motion.class);
+            byte[] dataBytes = new byte[bytes.remaining()];
+            bytes.get(dataBytes);
+
+            return objectMapper.readValue(dataBytes, Motion.class);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

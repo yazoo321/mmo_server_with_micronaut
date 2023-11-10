@@ -68,7 +68,7 @@ public class PlayerCharacterService {
             statsService.initializePlayerStats(newCharacter.getName());
             // call relevant services to initialise data
             inventoryService.createInventoryForNewCharacter(newCharacter.getName()).blockingGet();
-            attributeService.createBaseAttributes(newCharacter.getName());
+//            attributeService.createBaseAttributes(newCharacter.getName());
             levelAttributeService.initializeCharacterClass(
                     newCharacter.getName(), createCharacterRequest.getClassName());
             // blocking call to ensure we do our rollback if anything happens.

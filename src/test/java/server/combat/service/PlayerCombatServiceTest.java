@@ -8,8 +8,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatRequest;
 import server.combat.model.PlayerCombatData;
@@ -24,8 +25,8 @@ import server.monster.server_integration.service.MobInstanceService;
 import server.motion.dto.PlayerMotion;
 import server.motion.service.PlayerMotionService;
 import server.session.SessionParamHelper;
+import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
-import server.socket.service.ClientUpdatesService;
 import server.socket.session.FakeSession;
 
 import java.time.Duration;
@@ -44,7 +45,7 @@ class PlayerCombatServiceTest {
     @Inject
     private SessionParamHelper sessionParamHelper;
 
-    @Inject
+    @Spy
     private FakeSession session;
 
     @Inject
@@ -73,6 +74,8 @@ class PlayerCombatServiceTest {
     void setUp() {
         cleanup();
         MockitoAnnotations.openMocks(this);
+        Publisher mockSubscriber = Mockito.mock(Publisher.class);
+        Mockito.when(session.send(Mockito.any())).thenReturn(mockSubscriber);
     }
 
     @AfterEach
@@ -101,7 +104,7 @@ class PlayerCombatServiceTest {
 
         // prepare mob
         Motion mobMotion = playerMotion.getMotion();
-        mobMotion.setX(mobMotion.getX() - 10);
+        mobMotion.setX(mobMotion.getX() + 10); // this is checked to face target
         mobInstanceService.createMob(MOB_1, mobMotion).blockingGet();
         sessionParamHelper.setMotion(session, mobMotion, MOB_1);
 
