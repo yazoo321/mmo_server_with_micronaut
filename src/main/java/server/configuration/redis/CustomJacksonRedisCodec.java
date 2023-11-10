@@ -2,11 +2,10 @@ package server.configuration.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.codec.RedisCodec;
-import server.session.model.CacheData;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
+import server.session.model.CacheData;
 
 public class CustomJacksonRedisCodec implements RedisCodec<String, CacheData> {
 

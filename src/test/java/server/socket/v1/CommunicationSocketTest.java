@@ -35,21 +35,22 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
         playerClient2.send(char2WithinRange);
         playerClient3.send(char3OutOfRange);
 
+        await().pollDelay(300, TimeUnit.MILLISECONDS)
+                .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
+                .until(
+                        () -> {
+                            playerClient2.send(char2WithinRange);
+
+                            return playerClient1.getMessagesChronologically().size() > 1;
+                        });
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() -> {
-                    playerClient2.send(char2WithinRange);
-
-                    return playerClient1.getMessagesChronologically().size() > 1;
-                });
-
-        await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() -> {
-                    playerClient1.send(char1WithinRange);
-                    return playerClient2.getMessagesChronologically().size() > 1;
-                });
+                .until(
+                        () -> {
+                            playerClient1.send(char1WithinRange);
+                            return playerClient2.getMessagesChronologically().size() > 1;
+                        });
 
         SocketResponse expectedMotionResponseForClient1 =
                 SocketResponse.builder()
@@ -77,7 +78,11 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
                                                                 .getType()))
                         .toList();
 
-        Assertions.assertThat(newMotionPlayer1.get(newMotionPlayer1.size()-1).getPlayerMotion().get(CHARACTER_2))
+        Assertions.assertThat(
+                        newMotionPlayer1
+                                .get(newMotionPlayer1.size() - 1)
+                                .getPlayerMotion()
+                                .get(CHARACTER_2))
                 .usingRecursiveComparison()
                 .ignoringFields("isOnline", "updatedAt")
                 .isEqualTo(expectedMotionResponseForClient1.getPlayerMotion().get(CHARACTER_2));
@@ -92,7 +97,11 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
                                                                 .getType()))
                         .toList();
 
-        Assertions.assertThat(newMotionPlayer2.get(newMotionPlayer2.size()-1).getPlayerMotion().get(CHARACTER_1))
+        Assertions.assertThat(
+                        newMotionPlayer2
+                                .get(newMotionPlayer2.size() - 1)
+                                .getPlayerMotion()
+                                .get(CHARACTER_1))
                 .usingRecursiveComparison()
                 .ignoringFields("isOnline", "updatedAt")
                 .isEqualTo(expectedMotionResponseForClient2.getPlayerMotion().get(CHARACTER_1));
@@ -134,11 +143,13 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
 
         await().pollDelay(500, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() -> {
-                    mobServerClient1.send(mobWithinRange);
-                    mobServerClient2.send(mobOutOfRange);
-                    return !playerClient1.getMessagesChronologically().isEmpty();
-                });;
+                .until(
+                        () -> {
+                            mobServerClient1.send(mobWithinRange);
+                            mobServerClient2.send(mobOutOfRange);
+                            return !playerClient1.getMessagesChronologically().isEmpty();
+                        });
+        ;
 
         await().pollDelay(500, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
@@ -146,18 +157,19 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
 
         await().pollDelay(500, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
-                .until(() -> {
-                    playerClient1.send(char1WithinRange);
-                    playerClient2.send(char2OutOfRange);
-                    return !mobServerClient1.getMessagesChronologically().isEmpty();
-                });
+                .until(
+                        () -> {
+                            playerClient1.send(char1WithinRange);
+                            playerClient2.send(char2OutOfRange);
+                            return !mobServerClient1.getMessagesChronologically().isEmpty();
+                        });
 
         List<SocketResponse> client1Responses = getSocketResponse(playerClient1);
         List<SocketResponse> client2Responses = getSocketResponse(playerClient2);
         List<SocketResponse> mobClient1Responses = getSocketResponse(mobServerClient1);
         List<SocketResponse> mobClient2Responses = getSocketResponse(mobServerClient2);
 
-        Assertions.assertThat(client1Responses.get(client1Responses.size()-1).getMonsters())
+        Assertions.assertThat(client1Responses.get(client1Responses.size() - 1).getMonsters())
                 .usingRecursiveComparison()
                 .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9105.updatedAt")
                 .isEqualTo(
@@ -165,7 +177,7 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
                                 mobWithinRange.getMonster().getMobInstanceId(),
                                 mobWithinRange.getMonster()));
 
-        Assertions.assertThat(client2Responses.get(client2Responses.size()-1).getMonsters())
+        Assertions.assertThat(client2Responses.get(client2Responses.size() - 1).getMonsters())
                 .usingRecursiveComparison()
                 .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9106.updatedAt")
                 .isEqualTo(

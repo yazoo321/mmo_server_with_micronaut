@@ -39,6 +39,7 @@ spotless {
 }
 
 tasks.compileJava.mustRunAfter(spotlessCheck)
+dockerCompose.isRequiredBy(compileJava)
 
 repositories {
 	mavenCentral()
@@ -99,8 +100,8 @@ dependencies {
 
 	// redis
 	implementation "io.micronaut.redis:micronaut-redis-lettuce"
-	implementation 'org.redisson:redisson-micronaut:3.20.0'
-	implementation 'org.redisson:redisson:3.24.3'
+//	implementation 'org.redisson:redisson-micronaut:3.20.0'
+//	implementation 'org.redisson:redisson:3.24.3'
 
 
 	// test

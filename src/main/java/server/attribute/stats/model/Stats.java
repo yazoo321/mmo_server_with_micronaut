@@ -5,10 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonCreator;

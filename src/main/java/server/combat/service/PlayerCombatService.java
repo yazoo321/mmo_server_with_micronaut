@@ -3,8 +3,6 @@ package server.combat.service;
 import static server.attribute.stats.types.StatsTypes.PHY_AMP;
 import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
@@ -48,8 +46,7 @@ public class PlayerCombatService {
 
     @Inject ClientUpdatesService clientUpdatesService;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
     Random rand = new Random();
 
@@ -233,7 +230,8 @@ public class PlayerCombatService {
         Monster monster = res.get(0);
 
         Motion targetMotion = monster.getMotion();
-        Motion attackerMotion = sessionParamHelper.getSharedActorMotion(SessionParamHelper.getPlayerName(session));
+        Motion attackerMotion =
+                sessionParamHelper.getSharedActorMotion(SessionParamHelper.getPlayerName(session));
 
         boolean inRange = attackerMotion.withinRange(targetMotion, distanceThreshold);
         boolean facingTarget = attackerMotion.facingMotion(targetMotion);

@@ -2,11 +2,10 @@ package server.configuration.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.codec.RedisCodec;
-import server.common.dto.Motion;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
+import server.common.dto.Motion;
 
 public class JacksonRedisCodecMotion implements RedisCodec<String, Motion> {
 

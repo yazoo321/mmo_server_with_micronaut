@@ -11,7 +11,6 @@ import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
-import server.monster.server_integration.service.MobInstanceService;
 import server.socket.producer.UpdateProducer;
 
 @Slf4j
@@ -104,10 +103,6 @@ public class StatsService {
                     Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
                     currentHp -= v;
                     setAndHandleDifference(stats, currentHp);
-//                    derived.put(StatsTypes.CURRENT_HP.getType(), currentHp);
-//                    Map<String, Double> updated =
-//                            Map.of(StatsTypes.CURRENT_HP.getType(), currentHp);
-//                    handleDifference(updated, stats);
                 });
 
         return stats;
@@ -115,17 +110,20 @@ public class StatsService {
 
     private void setAndHandleDifference(Stats stats, Double val) {
         stats.getDerivedStats().put(StatsTypes.CURRENT_HP.getType(), val);
-        Map<String, Double> updated =
-                Map.of(StatsTypes.CURRENT_HP.getType(), val);
+        Map<String, Double> updated = Map.of(StatsTypes.CURRENT_HP.getType(), val);
         handleDifference(updated, stats);
     }
 
     public void applyRegen(String actorName) {
         getStatsFor(actorName)
-                .doOnSuccess(this::applyRegen)
+                .doOnSuccess(stats -> {
+                    if (stats == null) {
+                        return;
+                    }
+                    applyRegen(stats);
+                })
                 .doOnError(err -> log.error("Failed to apply regen, {}", err.getMessage()))
                 .subscribe();
-
     }
 
     public void applyRegen(Stats stats) {

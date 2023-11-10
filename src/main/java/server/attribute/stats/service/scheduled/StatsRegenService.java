@@ -12,24 +12,24 @@ import server.socket.v1.CommunicationSocket;
 @Singleton
 public class StatsRegenService {
 
-    @Inject
-    CommunicationSocket socket;
+    @Inject CommunicationSocket socket;
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
-
-    @Scheduled(fixedDelay = "200ms")
+    @Scheduled(fixedDelay = "200ms", initialDelay = "30s")
     public void evaluateNearbyPlayers() {
         ConcurrentSet<WebSocketSession> sessions = socket.getLiveSessions();
 
-        sessions.stream().parallel().forEach(s -> {
-            if (SessionParamHelper.getIsServer(s)) {
-                // TODO: later support ability to regen on mobs
-                return;
-            }
+        sessions.stream()
+                .parallel()
+                .forEach(
+                        s -> {
+                            if (SessionParamHelper.getIsServer(s)) {
+                                // TODO: later support ability to regen on mobs
+                                return;
+                            }
 
-            statsService.applyRegen(SessionParamHelper.getPlayerName(s));
-        });
+                            statsService.applyRegen(SessionParamHelper.getPlayerName(s));
+                        });
     }
 }
