@@ -71,10 +71,8 @@ mongo-database:
   dropped-items-collection: "dropped-items"
   inventory-collection: "inventory"
   equip-collection: "equip"
-  player-attributes: "playerAttributes"
   player-motion: "playerMotion"
   mob-instance: "mobInstance"
-  mob-attributes: "mobAttributes"
   actorStats: "actorStats"
 
 redisson:

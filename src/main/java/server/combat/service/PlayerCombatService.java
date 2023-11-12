@@ -117,9 +117,12 @@ public class PlayerCombatService {
             }
 
             if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-                statsService.deleteStatsFor(stats.getActorId());
+                statsService.deleteStatsFor(stats.getActorId())
+                        .doOnError(err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
+                        .subscribe();
                 mobInstanceService.handleMobDeath(stats.getActorId());
                 clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
+                SessionParamHelper.getCombatData(session).getTargets().remove(target.getActorId());
             }
 
             return;
@@ -173,6 +176,7 @@ public class PlayerCombatService {
 
     private void attackLoop(WebSocketSession session) {
         if (!sessionsInCombat.contains(SessionParamHelper.getPlayerName(session))) {
+            log.warn("left combat");
             return;
         }
 
@@ -182,6 +186,7 @@ public class PlayerCombatService {
         List<Stats> targetStats = getTargetStats(targets);
 
         if (targetStats.isEmpty()) {
+            log.warn("Target stats empty");
             sessionsInCombat.remove(SessionParamHelper.getPlayerName(session));
             return;
         }
@@ -198,7 +203,8 @@ public class PlayerCombatService {
                             return true;
                         })
                 .delaySubscription(100, TimeUnit.MILLISECONDS)
-                .doOnError(er -> log.error("Error encountered, {}", er.getMessage()))
+                .doOnError(er ->
+                        log.error("Error encountered, {}", er.getMessage()))
                 .subscribe();
     }
 

@@ -2,6 +2,7 @@ package server.attribute.stats.service;
 
 import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.Disposable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class StatsService {
         repository.updateStats(mobStats).subscribe();
     }
 
-    public void initializePlayerStats(String playerName) {
+    public Single<Stats> initializePlayerStats(String playerName) {
         Stats playerStats = new Stats();
 
         playerStats.setActorId(playerName);
@@ -73,7 +74,7 @@ public class StatsService {
 
         playerStats.setAttributePoints(0);
 
-        repository.updateStats(playerStats).subscribe();
+        return repository.updateStats(playerStats);
     }
 
     public Single<Stats> getStatsFor(String actorId) {
@@ -93,6 +94,7 @@ public class StatsService {
                             Map<String, Double> updated = stats.recalculateDerivedStats();
                             handleDifference(updated, stats);
                         })
+                .doOnError(err -> log.error("Failed to update item stats, {}", err.getMessage()))
                 .subscribe();
     }
 
@@ -143,9 +145,11 @@ public class StatsService {
         setAndHandleDifference(stats, res);
     }
 
-    private void handleDifference(Map<String, Double> updated, Stats stats) {
+    void handleDifference(Map<String, Double> updated, Stats stats) {
         if (!updated.isEmpty()) {
-            repository.updateStats(stats).subscribe();
+            repository.updateStats(stats)
+                    .doOnError(err-> log.error("Failed to update stats, {}", err.getMessage()))
+                    .subscribe();
             Stats notifyUpdates =
                     Stats.builder().actorId(stats.getActorId()).derivedStats(updated).build();
             updateProducer.updateStats(notifyUpdates);

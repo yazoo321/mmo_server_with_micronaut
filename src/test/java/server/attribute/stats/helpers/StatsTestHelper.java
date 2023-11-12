@@ -1,4 +1,4 @@
-package server.player.attributes.helpers;
+package server.attribute.stats.helpers;
 
 import static com.mongodb.client.model.Filters.ne;
 
@@ -6,31 +6,32 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import server.attribute.stats.model.Stats;
 import server.configuration.MongoConfiguration;
-import server.player.attributes.model.PlayerAttributes;
 
 @Singleton
-public class PlayerAttributeTestHelper {
+public class StatsTestHelper {
 
     MongoConfiguration configuration;
     MongoClient mongoClient;
-    MongoCollection<PlayerAttributes> attributesCollection;
+    MongoCollection<Stats> statsCollection;
 
-    public PlayerAttributeTestHelper(MongoConfiguration configuration, MongoClient mongoClient) {
+
+    public StatsTestHelper(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
         prepareCollections();
     }
 
     public void deleteAllAttributeData() {
-        Single.fromPublisher(attributesCollection.deleteMany(ne("playerName", "deleteAll")))
+        Single.fromPublisher(statsCollection.deleteMany(ne("playerName", "deleteAll")))
                 .blockingGet();
     }
 
     private void prepareCollections() {
-        this.attributesCollection =
+        this.statsCollection =
                 mongoClient
                         .getDatabase(configuration.getDatabaseName())
-                        .getCollection(configuration.getPlayerAttributes(), PlayerAttributes.class);
+                        .getCollection(configuration.getActorStats(), Stats.class);
     }
 }

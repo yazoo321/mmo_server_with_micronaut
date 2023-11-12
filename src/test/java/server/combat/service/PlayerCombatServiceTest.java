@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.reactivestreams.Publisher;
+import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatRequest;
 import server.combat.model.PlayerCombatData;
@@ -83,6 +84,8 @@ class PlayerCombatServiceTest {
     void testRequestAttackWithValidRequest() {
         // Given
         // prepare character
+        Stats stats = statsService.initializePlayerStats(CHARACTER_1).blockingGet();
+        SessionParamHelper.updateDerivedStats(session, stats.getDerivedStats());
         PlayerMotion playerMotion =
                 playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         SessionParamHelper.setPlayerName(session, CHARACTER_1);
@@ -111,10 +114,16 @@ class PlayerCombatServiceTest {
         Assertions.assertThat(targets.size()).isEqualTo(1);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(60, ChronoUnit.SECONDS))
+                .timeout(Duration.of(6, ChronoUnit.SECONDS))
                 .until(
                         () -> {
-                            return statsService.getStatsFor(MOB_1).blockingGet() == null;
+                            try {
+                                statsService.getStatsFor(MOB_1).blockingGet();
+                                return false;
+                            } catch (NoSuchElementException e) {
+                                // when publisher is empty, the mob was killed and deleted. later needs to be refactored to mob death state.
+                                return true;
+                            }
                         });
     }
 

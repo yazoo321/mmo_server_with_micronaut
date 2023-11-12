@@ -112,7 +112,6 @@ public class Motion {
 
         double degrees = Math.toDegrees(angleRad);
 
-        log.warn("Angle evaluated: {}", degrees);
         return degrees < maxAngle;
     }
 }

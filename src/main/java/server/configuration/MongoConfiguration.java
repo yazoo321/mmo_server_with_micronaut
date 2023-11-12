@@ -14,10 +14,7 @@ public class MongoConfiguration {
     private String droppedItemsCollection;
     private String inventoryCollection;
     private String equipCollection;
-    private String playerAttributes;
     private String playerMotion;
     private String mobInstance;
-    private String mobAttributes;
-
     private String actorStats;
 }

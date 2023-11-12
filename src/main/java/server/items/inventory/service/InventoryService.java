@@ -118,6 +118,7 @@ public class InventoryService {
                             foundItem.setLocation(loc);
                             inventoryRepository
                                     .updateInventoryItems(characterName, items)
+                                    .doOnError(err -> log.error("Failed to update inventory items, {}", err.getMessage()))
                                     .subscribe();
 
                             return items;

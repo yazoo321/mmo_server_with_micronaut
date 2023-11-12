@@ -8,7 +8,6 @@ import server.items.inventory.model.ItemInstanceIds;
 import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
-import server.player.attributes.model.PlayerAttributes;
 
 import java.util.List;
 
@@ -35,9 +34,6 @@ public interface UpdateProducer {
 
     @Topic("notify-un-equip-items")
     void notifyUnEquipItems(ItemInstanceIds itemInstanceIds);
-
-    @Topic("update-player-attributes")
-    void updatePlayerAttributes(PlayerAttributes attributes);
 
     @Topic("update-actor-stats")
     void updateStats(Stats stats);

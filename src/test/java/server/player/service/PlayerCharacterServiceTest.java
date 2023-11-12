@@ -6,7 +6,7 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.common.attributes.types.ClassesAttributeTypes;
+import server.attribute.stats.model.types.ClassTypes;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
 import server.player.repository.PlayerCharacterRepository;
@@ -56,7 +56,7 @@ public class PlayerCharacterServiceTest {
         createCharacterRequest.setName(TEST_CHARACTER_NAME);
         Map<String, String> appearanceInfo = Map.of("key", "value");
         createCharacterRequest.setAppearanceInfo(appearanceInfo);
-        createCharacterRequest.setClassName(ClassesAttributeTypes.FIGHTER.getType());
+        createCharacterRequest.setClassName(ClassTypes.FIGHTER.getType());
 
         return createCharacterRequest;
     }

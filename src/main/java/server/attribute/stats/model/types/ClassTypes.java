@@ -1,11 +1,11 @@
-package server.common.attributes.types;
+package server.attribute.stats.model.types;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ClassesAttributeTypes {
+public enum ClassTypes {
     MAGE("mage"),
     FIGHTER("fighter"),
     CLERIC("cleric");
