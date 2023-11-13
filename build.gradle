@@ -92,7 +92,6 @@ dependencies {
 
 	// Serializer
 	runtimeOnly 'io.micronaut:micronaut-jackson-databind:3.8.7'
-//	implementation("io.micronaut.serde:micronaut-serde-jackson")
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
 
 	// Map difference
@@ -100,9 +99,6 @@ dependencies {
 
 	// redis
 	implementation "io.micronaut.redis:micronaut-redis-lettuce"
-//	implementation 'org.redisson:redisson-micronaut:3.20.0'
-//	implementation 'org.redisson:redisson:3.24.3'
-
 
 	// test
 	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.2'

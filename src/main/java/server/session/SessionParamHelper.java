@@ -6,7 +6,6 @@ import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Singleton;
-import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,9 +24,6 @@ import server.session.model.CacheKey;
 @Singleton
 @NonNull public class SessionParamHelper {
 
-    //    RMap<String, Motion> motionCache;
-    //    RMapReactive<String, Motion> motionReactiveCache;
-
     ObjectMapper objectMapper = new ObjectMapper();
 
     StatefulRedisConnection<String, Motion> connection;
@@ -38,36 +34,12 @@ import server.session.model.CacheKey;
         redisCommands = connection.sync();
     }
 
-    private void tryRedisson() {
-        //        // 1. Create config object
-        //        Config config = new Config();
-        //        config.useClusterServers().addNodeAddress("redis://localhost:6379");
-        //        // Sync and Async API
-        //        RedissonClient redisson = Redisson.create(config);
-        //        RedissonReactiveClient redissonReactive = redisson.reactive();
-        //
-        //        motionCache = redisson.getMap("motion");
-        //        motionReactiveCache = redissonReactive.getMap("motion");
-    }
-
     public Motion getSharedActorMotion(String actorId) {
-        //        return motionCache.get(actorId);
-        //        redisCommands.get()
         return redisCommands.get(CacheKey.of(CacheDomains.MOTION, actorId));
     }
 
     public void setSharedActorMotion(String actorId, Motion motion) {
-        //        motionReactiveCache.put(actorId, motion).subscribe();
-        //        new CacheData<Motion>(motion).
         redisCommands.set(CacheKey.of(CacheDomains.MOTION, actorId), motion);
-    }
-
-    public static Instant getLastUpdatedAt(WebSocketSession session) {
-        return (Instant) session.asMap().get(SessionParams.LAST_UPDATED_AT.getType());
-    }
-
-    public static void setLastUpdatedAt(WebSocketSession session, Instant time) {
-        session.put(SessionParams.LAST_UPDATED_AT.getType(), time);
     }
 
     public static Motion getMotion(WebSocketSession session) {
