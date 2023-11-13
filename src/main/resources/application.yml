@@ -71,18 +71,22 @@ mongo-database:
   dropped-items-collection: "dropped-items"
   inventory-collection: "inventory"
   equip-collection: "equip"
-  player-attributes: "playerAttributes"
   player-motion: "playerMotion"
   mob-instance: "mobInstance"
-  mob-attributes: "mobAttributes"
   actorStats: "actorStats"
+
+redisson:
+  single-server-config:
+    address: "redis://127.0.0.1:6379"
+  threads: 3
+  netty-threads: 6
 
 redis:
   uri: redis://localhost
   io-thread-pool-size: 5
   computation-thread-pool-size: 4
 #  ssl: true
-  timeout: 30s
+  timeout: 2s
 #  valueSerializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
 #  caches:
 #    default:

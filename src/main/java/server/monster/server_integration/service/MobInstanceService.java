@@ -69,10 +69,17 @@ public class MobInstanceService {
         // we will set state to death and wait for animations etc
 
         Single.fromCallable(
-                        () -> {
-                            return mobRepository.deleteMobInstance(mobId).subscribe();
-                        })
+                        () ->
+                                mobRepository
+                                        .deleteMobInstance(mobId)
+                                        .doOnError(
+                                                err ->
+                                                        log.error(
+                                                                "Failed to delete mob instance, {}",
+                                                                err.getMessage()))
+                                        .subscribe())
                 .delaySubscription(1000, TimeUnit.MILLISECONDS)
+                .doOnError(err -> log.error("error on handling mob death, {}", err.getMessage()))
                 .subscribe();
     }
 }

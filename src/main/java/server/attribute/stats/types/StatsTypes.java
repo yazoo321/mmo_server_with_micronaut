@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum StatsTypes {
-    // BASE
     STR("STR"),
     DEX("DEX"),
     INT("INT"),
@@ -19,6 +18,12 @@ public enum StatsTypes {
 
     PHY_AMP("PHY_AMP"),
     MAG_AMP("MAG_AMP"),
+
+    BASE_HP_REGEN("BASE_HP_REGEN"),
+    HP_REGEN("HP_REGEN"),
+
+    BASE_MP_REGEN("BASE_MP_REGEN"),
+    MP_REGEN("MP_REGEN"),
 
     DEF("DEF"),
     MAG_DEF("MAG_DEF"),
@@ -35,7 +40,11 @@ public enum StatsTypes {
     WEAPON_DAMAGE("WEAPON_DAMAGE"),
 
     PHY_REDUCTION("PHY_REDUCTION"),
-    MGC_REDUCTION("MGC_REDUCTION");
+    MGC_REDUCTION("MGC_REDUCTION"),
+
+    // Level stats
+    XP("XP"),
+    LEVEL("LEVEL");
 
     public final String type;
 }

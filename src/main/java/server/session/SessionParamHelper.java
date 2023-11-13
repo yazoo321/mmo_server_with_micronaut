@@ -1,63 +1,45 @@
 package server.session;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
-import java.time.Instant;
+import jakarta.inject.Singleton;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import lombok.NonNull;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.PlayerCombatData;
 import server.common.dto.Motion;
+import server.configuration.redis.JacksonRedisCodecMotion;
 import server.items.equippable.model.EquippedItems;
 import server.items.types.ItemType;
 import server.motion.model.SessionParams;
-import server.session.model.CacheData;
 import server.session.model.CacheDomains;
 import server.session.model.CacheKey;
 
 @Singleton
-@NonNull
-public class SessionParamHelper {
+@NonNull public class SessionParamHelper {
 
-//    @Inject
-    StatefulRedisConnection<String, Object> redisConnection;
+    ObjectMapper objectMapper = new ObjectMapper();
 
-    RedisCommands<String, Object> synchCommands;
-    RedisAsyncCommands<String, Object> asynchCommands;
+    StatefulRedisConnection<String, Motion> connection;
+    RedisCommands<String, Motion> redisCommands;
 
-
-    public SessionParamHelper(StatefulRedisConnection<String, Object> conn) {
-        this.redisConnection = conn;
-        if (redisConnection == null) {
-            return;
-        }
-        synchCommands = redisConnection.sync();
-        asynchCommands = redisConnection.async();
+    public SessionParamHelper(RedisClient redisClient) {
+        connection = redisClient.connect(new JacksonRedisCodecMotion(objectMapper));
+        redisCommands = connection.sync();
     }
 
     public Motion getSharedActorMotion(String actorId) {
-        return ((CacheData<Motion>)synchCommands.get(CacheKey.of(CacheDomains.MOTION, actorId))).getData();
+        return redisCommands.get(CacheKey.of(CacheDomains.MOTION, actorId));
     }
 
     public void setSharedActorMotion(String actorId, Motion motion) {
-        asynchCommands.set(CacheKey.of(CacheDomains.MOTION, actorId),
-                new CacheData<Motion>(motion, true, Instant.now()));
-    }
-
-    public static Instant getLastUpdatedAt(WebSocketSession session) {
-        return (Instant) session.asMap().get(SessionParams.LAST_UPDATED_AT.getType());
-    }
-
-    public static void setLastUpdatedAt(WebSocketSession session, Instant time) {
-        session.put(SessionParams.LAST_UPDATED_AT.getType(), time);
+        redisCommands.set(CacheKey.of(CacheDomains.MOTION, actorId), motion);
     }
 
     public static Motion getMotion(WebSocketSession session) {

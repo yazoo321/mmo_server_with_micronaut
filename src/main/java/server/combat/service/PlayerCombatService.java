@@ -3,8 +3,6 @@ package server.combat.service;
 import static server.attribute.stats.types.StatsTypes.PHY_AMP;
 import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
@@ -48,8 +46,7 @@ public class PlayerCombatService {
 
     @Inject ClientUpdatesService clientUpdatesService;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
     Random rand = new Random();
 
@@ -120,9 +117,17 @@ public class PlayerCombatService {
             }
 
             if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-                statsService.deleteStatsFor(stats.getActorId());
+                statsService
+                        .deleteStatsFor(stats.getActorId())
+                        .doOnError(
+                                err ->
+                                        log.error(
+                                                "Failed to delete stats on death, {}",
+                                                err.getMessage()))
+                        .subscribe();
                 mobInstanceService.handleMobDeath(stats.getActorId());
                 clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
+                SessionParamHelper.getCombatData(session).getTargets().remove(target.getActorId());
             }
 
             return;
@@ -176,6 +181,7 @@ public class PlayerCombatService {
 
     private void attackLoop(WebSocketSession session) {
         if (!sessionsInCombat.contains(SessionParamHelper.getPlayerName(session))) {
+            log.warn("left combat");
             return;
         }
 
@@ -185,6 +191,7 @@ public class PlayerCombatService {
         List<Stats> targetStats = getTargetStats(targets);
 
         if (targetStats.isEmpty()) {
+            log.warn("Target stats empty");
             sessionsInCombat.remove(SessionParamHelper.getPlayerName(session));
             return;
         }
@@ -207,6 +214,9 @@ public class PlayerCombatService {
 
     private List<Stats> getTargetStats(Set<String> actors) {
         // TODO: Make async
+        if (actors.isEmpty()) {
+            return new ArrayList<>();
+        }
         return actors.stream()
                 .map(actor -> statsService.getStatsFor(actor).blockingGet())
                 .filter(s -> s.getDerivedStats().get(StatsTypes.CURRENT_HP.getType()) > 0)
@@ -230,7 +240,8 @@ public class PlayerCombatService {
         Monster monster = res.get(0);
 
         Motion targetMotion = monster.getMotion();
-        Motion attackerMotion = sessionParamHelper.getSharedActorMotion(SessionParamHelper.getPlayerName(session));
+        Motion attackerMotion =
+                sessionParamHelper.getSharedActorMotion(SessionParamHelper.getPlayerName(session));
 
         boolean inRange = attackerMotion.withinRange(targetMotion, distanceThreshold);
         boolean facingTarget = attackerMotion.facingMotion(targetMotion);

@@ -1,8 +1,10 @@
 package server.session.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class CacheKey {
 
     String domain;
