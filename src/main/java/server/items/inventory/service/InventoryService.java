@@ -47,8 +47,7 @@ public class InventoryService {
                                                         inventory.getCharacterItems();
                                                 Location2D position =
                                                         getNextAvailableSlot(
-                                                                inventory.getMaxSize(),
-                                                                items);
+                                                                inventory.getMaxSize(), items);
 
                                                 if (position == null) {
                                                     throw new InventoryException(
@@ -118,7 +117,11 @@ public class InventoryService {
                             foundItem.setLocation(loc);
                             inventoryRepository
                                     .updateInventoryItems(characterName, items)
-                                    .doOnError(err -> log.error("Failed to update inventory items, {}", err.getMessage()))
+                                    .doOnError(
+                                            err ->
+                                                    log.error(
+                                                            "Failed to update inventory items, {}",
+                                                            err.getMessage()))
                                     .subscribe();
 
                             return items;

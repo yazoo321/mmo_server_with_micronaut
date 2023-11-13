@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
-import java.time.temporal.ValueRange;
-
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.temporal.ValueRange;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

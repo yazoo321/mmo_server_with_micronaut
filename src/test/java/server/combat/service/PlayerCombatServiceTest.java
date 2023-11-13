@@ -121,7 +121,8 @@ class PlayerCombatServiceTest {
                                 statsService.getStatsFor(MOB_1).blockingGet();
                                 return false;
                             } catch (NoSuchElementException e) {
-                                // when publisher is empty, the mob was killed and deleted. later needs to be refactored to mob death state.
+                                // when publisher is empty, the mob was killed and deleted. later
+                                // needs to be refactored to mob death state.
                                 return true;
                             }
                         });

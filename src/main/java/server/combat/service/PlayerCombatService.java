@@ -117,8 +117,13 @@ public class PlayerCombatService {
             }
 
             if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-                statsService.deleteStatsFor(stats.getActorId())
-                        .doOnError(err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
+                statsService
+                        .deleteStatsFor(stats.getActorId())
+                        .doOnError(
+                                err ->
+                                        log.error(
+                                                "Failed to delete stats on death, {}",
+                                                err.getMessage()))
                         .subscribe();
                 mobInstanceService.handleMobDeath(stats.getActorId());
                 clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
@@ -203,8 +208,7 @@ public class PlayerCombatService {
                             return true;
                         })
                 .delaySubscription(100, TimeUnit.MILLISECONDS)
-                .doOnError(er ->
-                        log.error("Error encountered, {}", er.getMessage()))
+                .doOnError(er -> log.error("Error encountered, {}", er.getMessage()))
                 .subscribe();
     }
 

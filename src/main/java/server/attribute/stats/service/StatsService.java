@@ -2,7 +2,6 @@ package server.attribute.stats.service;
 
 import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.disposables.Disposable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
@@ -104,26 +103,27 @@ public class StatsService {
                 (k, v) -> {
                     Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
                     currentHp -= v;
-                    setAndHandleDifference(stats, currentHp);
+                    setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
                 });
 
         return stats;
     }
 
-    private void setAndHandleDifference(Stats stats, Double val) {
-        stats.getDerivedStats().put(StatsTypes.CURRENT_HP.getType(), val);
-        Map<String, Double> updated = Map.of(StatsTypes.CURRENT_HP.getType(), val);
+    private void setAndHandleDifference(Stats stats, Double val, StatsTypes evalType) {
+        stats.getDerivedStats().put(evalType.getType(), val);
+        Map<String, Double> updated = Map.of(evalType.getType(), val);
         handleDifference(updated, stats);
     }
 
     public void applyRegen(String actorName) {
         getStatsFor(actorName)
-                .doOnSuccess(stats -> {
-                    if (stats == null) {
-                        return;
-                    }
-                    applyRegen(stats);
-                })
+                .doOnSuccess(
+                        stats -> {
+                            if (stats == null) {
+                                return;
+                            }
+                            applyRegen(stats);
+                        })
                 .doOnError(err -> log.error("Failed to apply regen, {}", err.getMessage()))
                 .subscribe();
     }
@@ -139,16 +139,21 @@ public class StatsService {
         }
 
         Double regen = stats.getDerived(type);
-        Double currentVal = stats.getDerived(type);
+
+        StatsTypes evalType =
+                type == StatsTypes.MP_REGEN ? StatsTypes.CURRENT_MP : StatsTypes.CURRENT_HP;
+
+        Double currentVal = stats.getDerived(evalType);
 
         Double res = currentVal + regen;
-        setAndHandleDifference(stats, res);
+        setAndHandleDifference(stats, res, evalType);
     }
 
     void handleDifference(Map<String, Double> updated, Stats stats) {
         if (!updated.isEmpty()) {
-            repository.updateStats(stats)
-                    .doOnError(err-> log.error("Failed to update stats, {}", err.getMessage()))
+            repository
+                    .updateStats(stats)
+                    .doOnError(err -> log.error("Failed to update stats, {}", err.getMessage()))
                     .subscribe();
             Stats notifyUpdates =
                     Stats.builder().actorId(stats.getActorId()).derivedStats(updated).build();

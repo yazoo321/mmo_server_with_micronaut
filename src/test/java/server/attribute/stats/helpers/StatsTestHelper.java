@@ -16,7 +16,6 @@ public class StatsTestHelper {
     MongoClient mongoClient;
     MongoCollection<Stats> statsCollection;
 
-
     public StatsTestHelper(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;

@@ -3,16 +3,14 @@ package server.player.service;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
 import server.items.inventory.service.InventoryService;
 import server.motion.service.PlayerMotionService;
-import server.attribute.stats.service.PlayerLevelStatsService;
-import server.player.exceptions.CharacterException;
 import server.player.model.AccountCharactersResponse;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
@@ -26,8 +24,7 @@ public class PlayerCharacterService {
 
     @Inject InventoryService inventoryService;
 
-    @Inject
-    PlayerLevelStatsService levelAttributeService;
+    @Inject PlayerLevelStatsService levelAttributeService;
 
     @Inject PlayerMotionService playerMotionService;
 
@@ -69,8 +66,10 @@ public class PlayerCharacterService {
             // call relevant services to initialise data
             inventoryService.createInventoryForNewCharacter(newCharacter.getName()).blockingGet();
             //            attributeService.createBaseAttributes(newCharacter.getName());
-            levelAttributeService.initializeCharacterClass(
-                    newCharacter.getName(), createCharacterRequest.getClassName()).blockingGet();
+            levelAttributeService
+                    .initializeCharacterClass(
+                            newCharacter.getName(), createCharacterRequest.getClassName())
+                    .blockingGet();
             // blocking call to ensure we do our rollback if anything happens.
             playerMotionService.initializePlayerMotion(newCharacter.getName()).blockingGet();
         } catch (Exception e) {

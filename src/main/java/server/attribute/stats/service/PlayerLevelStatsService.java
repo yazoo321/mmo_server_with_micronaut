@@ -1,13 +1,11 @@
 package server.attribute.stats.service;
 
 import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.disposables.Disposable;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
@@ -19,11 +17,9 @@ import server.player.exceptions.CharacterException;
 @Slf4j
 public class PlayerLevelStatsService {
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
-    @Inject
-    ActorStatsRepository statsRepository;
+    @Inject ActorStatsRepository statsRepository;
 
     public static final List<String> AVAILABLE_CLASSES =
             List.of(
@@ -62,14 +58,17 @@ public class PlayerLevelStatsService {
             throw new RuntimeException("Failed to level-up, bad request");
         }
 
-        return statsService.getStatsFor(playerName)
-                .flatMap(stats -> {
-                    Map<String, Integer> baseAttr = stats.getBaseStats();
-                    baseAttr.put(classToLevel, baseAttr.get(classToLevel) + 1);
-                    stats.recalculateDerivedStats();
-                    return statsRepository.updateStats(stats);
-                })
-                .doOnError(err -> log.error("Failed to get stats on level up, {}", err.getMessage()));
+        return statsService
+                .getStatsFor(playerName)
+                .flatMap(
+                        stats -> {
+                            Map<String, Integer> baseAttr = stats.getBaseStats();
+                            baseAttr.put(classToLevel, baseAttr.get(classToLevel) + 1);
+                            stats.recalculateDerivedStats();
+                            return statsRepository.updateStats(stats);
+                        })
+                .doOnError(
+                        err -> log.error("Failed to get stats on level up, {}", err.getMessage()));
     }
 
     public Single<Stats> addPlayerXp(String playerName, Integer xpToAdd) {
@@ -77,13 +76,18 @@ public class PlayerLevelStatsService {
             throw new IllegalArgumentException("Bad request to add player XP");
         }
 
-        return statsService.getStatsFor(playerName)
-                .doOnSuccess(stats -> {
-                    Map<String, Double> attr = stats.getDerivedStats();
-                    attr.put(StatsTypes.XP.type, attr.getOrDefault(StatsTypes.XP.type, 0.0) + xpToAdd);
-                    Map<String, Double> dataToSend = Map.of(StatsTypes.XP.type, attr.get(StatsTypes.XP.type));
-                    statsService.handleDifference(dataToSend, stats);
-                })
+        return statsService
+                .getStatsFor(playerName)
+                .doOnSuccess(
+                        stats -> {
+                            Map<String, Double> attr = stats.getDerivedStats();
+                            attr.put(
+                                    StatsTypes.XP.type,
+                                    attr.getOrDefault(StatsTypes.XP.type, 0.0) + xpToAdd);
+                            Map<String, Double> dataToSend =
+                                    Map.of(StatsTypes.XP.type, attr.get(StatsTypes.XP.type));
+                            statsService.handleDifference(dataToSend, stats);
+                        })
                 .doOnError(err -> log.error("Failed to add XP, {}", err.getMessage()));
     }
 

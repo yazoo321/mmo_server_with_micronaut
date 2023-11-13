@@ -14,20 +14,18 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import server.attribute.stats.helpers.StatsTestHelper;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
-import server.attribute.stats.helpers.StatsTestHelper;
 import server.attribute.stats.types.StatsTypes;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PlayerLevelStatsServiceTest {
 
-    @Inject
-    PlayerLevelStatsService playerLevelStatsService;
+    @Inject PlayerLevelStatsService playerLevelStatsService;
 
-    @Inject
-    StatsTestHelper statsTestHelper;
+    @Inject StatsTestHelper statsTestHelper;
 
     @Inject StatsService statsService;
 
@@ -60,7 +58,9 @@ public class PlayerLevelStatsServiceTest {
                 buildBaseExpectedNumTagsForCharacterClass(characterClass, 1);
 
         // when
-        playerLevelStatsService.initializeCharacterClass(CHARACTER_NAME, characterClass).blockingSubscribe();
+        playerLevelStatsService
+                .initializeCharacterClass(CHARACTER_NAME, characterClass)
+                .blockingSubscribe();
 
         // then
         Stats stats = statsService.getStatsFor(CHARACTER_NAME).blockingGet();
@@ -74,7 +74,9 @@ public class PlayerLevelStatsServiceTest {
     void handleLevelUp(String characterClass) {
         // given
         statsService.initializePlayerStats(CHARACTER_NAME).blockingSubscribe();
-        playerLevelStatsService.initializeCharacterClass(CHARACTER_NAME, characterClass).blockingSubscribe();
+        playerLevelStatsService
+                .initializeCharacterClass(CHARACTER_NAME, characterClass)
+                .blockingSubscribe();
 
         // when
         playerLevelStatsService.handleLevelUp(CHARACTER_NAME, characterClass).blockingSubscribe();
@@ -92,8 +94,9 @@ public class PlayerLevelStatsServiceTest {
     void addXpToCharacter() {
         // given
         statsService.initializePlayerStats(CHARACTER_NAME).blockingSubscribe();
-        playerLevelStatsService.initializeCharacterClass(
-                CHARACTER_NAME, ClassTypes.FIGHTER.getType()).blockingSubscribe();
+        playerLevelStatsService
+                .initializeCharacterClass(CHARACTER_NAME, ClassTypes.FIGHTER.getType())
+                .blockingSubscribe();
 
         Double expectedXp = 700.0;
 
