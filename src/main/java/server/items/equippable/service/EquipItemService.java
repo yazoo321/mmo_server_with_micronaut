@@ -110,7 +110,9 @@ public class EquipItemService {
     public Single<Inventory> unequipItemAndGetInventory(
             String itemInstanceId, String characterName) {
         return unEquipItem(itemInstanceId, characterName)
-                .flatMap(instanceId -> inventoryService.getInventory(characterName));
+                .flatMap(instanceId ->
+                        inventoryService.getInventory(characterName)
+                );
     }
 
     public Single<List<EquippedItems>> getEquippedItems(String characterName) {

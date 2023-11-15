@@ -143,7 +143,15 @@ public class StatsService {
         StatsTypes evalType =
                 type == StatsTypes.MP_REGEN ? StatsTypes.CURRENT_MP : StatsTypes.CURRENT_HP;
 
+        StatsTypes maxType =
+                type == StatsTypes.MP_REGEN ? StatsTypes.MAX_MP : StatsTypes.MAX_HP;
+
         Double currentVal = stats.getDerived(evalType);
+        Double maxVal = stats.getDerived(maxType);
+
+        if (currentVal>= maxVal) {
+            return;
+        }
 
         Double res = currentVal + regen;
         setAndHandleDifference(stats, res, evalType);
