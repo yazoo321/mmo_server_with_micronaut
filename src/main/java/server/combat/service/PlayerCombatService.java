@@ -67,7 +67,7 @@ public class PlayerCombatService {
 
     private void tryAttack(WebSocketSession session, Stats target, boolean isMainHand) {
         // Extract relevant combat data
-        PlayerCombatData data = SessionParamHelper.getCombatData(session);
+        PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
         Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
         Map<String, Double> derivedStats = SessionParamHelper.getDerivedStats(session);
 
@@ -87,15 +87,15 @@ public class PlayerCombatService {
             return;
         }
 
-        Instant lastHit = isMainHand ? data.getMainHandLastAttack() : data.getOffhandLastAttack();
+        Instant lastHit = isMainHand ? combatData.getMainHandLastAttack() : combatData.getOffhandLastAttack();
         // TODO: this is for demo, needs changing
         if (lastHit == null || lastHit.isBefore(Instant.now().minusSeconds(4))) {
             lastHit = Instant.now().minusSeconds(4);
             requestAttackSwing(session, isMainHand);
         }
         Double baseSpeed =
-                isMainHand ? data.getMainHandAttackSpeed() : data.getOffhandAttackSpeed();
-        Double characterAttackSpeed = data.getCharacterAttackSpeed();
+                isMainHand ? combatData.getMainHandAttackSpeed() : combatData.getOffhandAttackSpeed();
+        Double characterAttackSpeed = combatData.getCharacterAttackSpeed();
 
         // Calculate the actual delay in milliseconds
         long actualDelayInMS = (long) (getAttackTimeDelay(baseSpeed, characterAttackSpeed) * 1000);
@@ -107,13 +107,19 @@ public class PlayerCombatService {
             // The player can attack
             // Get derived stats and equipped items
 
+            if (!combatData.getAttackSent().getOrDefault(isMainHand ? "MAIN" : "OFF", false)) {
+                requestAttackSwing(session, isMainHand);
+            }
+
+            combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", false);
+
             // Create a damage map (currently only physical damage)
             Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
             Stats stats = statsService.takeDamage(target, damageMap);
             if (isMainHand) {
-                data.setMainHandLastAttack(Instant.now());
+                combatData.setMainHandLastAttack(Instant.now());
             } else {
-                data.setOffhandLastAttack(Instant.now());
+                combatData.setOffhandLastAttack(Instant.now());
             }
 
             if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
@@ -127,7 +133,7 @@ public class PlayerCombatService {
                         .subscribe();
                 mobInstanceService.handleMobDeath(stats.getActorId());
                 clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
-                SessionParamHelper.getCombatData(session).getTargets().remove(target.getActorId());
+                combatData.getTargets().remove(target.getActorId());
             }
 
             return;
@@ -146,6 +152,8 @@ public class PlayerCombatService {
         // Get the equipped weapon
         EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
         String itemInstanceId = weapon.getItemInstance().getItemInstanceId();
+
+        SessionParamHelper.getCombatData(session).getAttackSent().put(isMainHand ? "MAIN" : "OFF", true);
 
         requestSessionToSwingWeapon(session, itemInstanceId);
     }

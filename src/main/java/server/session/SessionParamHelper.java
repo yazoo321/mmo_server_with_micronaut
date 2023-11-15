@@ -7,6 +7,7 @@ import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Singleton;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.NonNull;
@@ -136,7 +137,7 @@ import server.session.model.CacheKey;
     public static void updateDerivedStats(
             WebSocketSession session, Map<String, Double> derivedStats) {
         Map<String, Double> prev = getDerivedStats(session);
-        Stats.mergeLeft(prev, derivedStats);
+        prev.putAll(derivedStats);
         session.put(SessionParams.DERIVED_STATS.getType(), prev);
         updateCombatData(session);
     }
@@ -194,12 +195,11 @@ import server.session.model.CacheKey;
     public static void removeFromEquippedItems(WebSocketSession session, String itemInstanceId) {
         Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
 
-        equippedItemsMap.forEach(
-                (k, v) -> {
-                    if (v.getItemInstance().getItemInstanceId().equals(itemInstanceId)) {
-                        equippedItemsMap.remove(k);
-                    }
-                });
+        for (String key : equippedItemsMap.keySet()) {
+            if (equippedItemsMap.get(key).getItemInstance().getItemInstanceId().equals(itemInstanceId)) {
+                equippedItemsMap.remove(key);
+            }
+        }
 
         updateCombatData(session, equippedItemsMap);
     }

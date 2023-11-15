@@ -1,7 +1,9 @@
 package server.combat.model;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import io.micronaut.serde.annotation.Serdeable;
@@ -22,6 +24,8 @@ public class PlayerCombatData {
     private Instant mainHandLastAttack;
     private Instant offhandLastAttack;
 
+    Map<String, Boolean> attackSent;
+
     private Set<String> targets;
 
     private Instant lastHelperNotification;
@@ -35,5 +39,6 @@ public class PlayerCombatData {
         this.offhandLastAttack = Instant.now().minusSeconds(20);
         this.targets = new HashSet<>();
         this.lastHelperNotification = Instant.now().minusSeconds(20);
+        this.attackSent = new HashMap<>();
     }
 }

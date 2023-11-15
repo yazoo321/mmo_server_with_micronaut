@@ -115,6 +115,7 @@ public class InventoryService {
                             }
 
                             foundItem.setLocation(loc);
+                            // TODO: make async
                             inventoryRepository
                                     .updateInventoryItems(characterName, items)
                                     .doOnError(
@@ -122,7 +123,7 @@ public class InventoryService {
                                                     log.error(
                                                             "Failed to update inventory items, {}",
                                                             err.getMessage()))
-                                    .subscribe();
+                                    .blockingSubscribe();
 
                             return items;
                         });
@@ -156,6 +157,7 @@ public class InventoryService {
 
                             inventoryRepository
                                     .updateInventoryItems(characterName, itemsList)
+                                    .doOnError(err-> log.error("Failed to update inventory items, {}", err.getMessage()))
                                     .subscribe();
 
                             // TODO: if dropItem fails, we need to revert the removal of item from
