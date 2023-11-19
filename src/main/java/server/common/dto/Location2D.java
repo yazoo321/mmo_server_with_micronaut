@@ -1,27 +1,19 @@
 package server.common.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 
 @Data
-@Introspected
 @NoArgsConstructor
 @Serdeable
+@ReflectiveAccess
 public class Location2D {
 
-    @BsonCreator
-    @JsonCreator
     public Location2D(
-            @JsonProperty("x")
-            @BsonProperty("x") Integer x,
-            @JsonProperty("y")
-            @BsonProperty("y") Integer y
+            Integer x,
+            Integer y
     ) {
         this.x = x;
         this.y = y;

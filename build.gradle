@@ -5,6 +5,7 @@ plugins {
 	id 'com.avast.gradle.docker-compose' version '0.17.5'
 	id "com.diffplug.spotless" version "6.22.0"
 	id("io.micronaut.openapi") version "4.1.2"
+	id 'org.graalvm.buildtools.native' version '0.9.28'
 }
 
 version = "0.7"
@@ -28,7 +29,7 @@ spotless {
 		// don't need to set target, it is inferred from java
 
 		// apply a specific flavor of google-java-format
-		googleJavaFormat('1.15.0').aosp().reflowLongStrings()
+		googleJavaFormat('1.17.0').aosp().reflowLongStrings()
 		// fix formatting of type annotations
 		formatAnnotations()
 		// make sure every file has the following copyright header.
@@ -43,6 +44,7 @@ dockerCompose.isRequiredBy(compileJava)
 
 repositories {
 	mavenCentral()
+	gradlePluginPortal()
 }
 
 micronaut {
@@ -85,6 +87,7 @@ dependencies {
 	implementation('io.micronaut.spring:micronaut-spring:4.5.1')
 
 	// MongoDB
+//	implementation("io.micronaut.data:micronaut-data-mongodb")
 	implementation "io.micronaut.mongodb:micronaut-mongo-reactive:4.6.0"
 
 	// Kafka
@@ -110,7 +113,7 @@ dependencies {
 }
 
 application {
-	mainClass.set("mmo_server.Application")
+	mainClass.set("server.Application")
 }
 
 java {
