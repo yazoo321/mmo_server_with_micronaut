@@ -1,29 +1,21 @@
 package server.common.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
-
 
 @Data
-@Introspected
 @NoArgsConstructor
 @Serdeable
+@ReflectiveAccess
 public class Tag {
 
-    @BsonCreator
-    @JsonCreator
     public Tag(
-            @JsonProperty("name")
-            @BsonProperty("name") String name,
-            @JsonProperty("value")
-            @BsonProperty("value") String value) {
+            String name,
+            String value) {
         this.name = name;
         this.value = value;
     }

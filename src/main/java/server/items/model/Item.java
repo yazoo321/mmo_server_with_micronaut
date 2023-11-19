@@ -1,18 +1,15 @@
 package server.items.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
 import java.util.Map;
 
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.items.equippable.model.EquippedItems;
 import server.items.types.accessories.Belt;
 import server.items.types.accessories.Cape;
@@ -27,6 +24,7 @@ import server.items.types.weapons.Weapon;
 @Introspected
 @NoArgsConstructor
 @BsonDiscriminator
+@ReflectiveAccess
 @Serdeable
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -55,17 +53,14 @@ import server.items.types.weapons.Weapon;
 })
 public abstract class Item {
 
-    @BsonCreator
-    @JsonCreator
     public Item(
-            @JsonProperty("itemId") @BsonProperty("itemId") String itemId,
-            @JsonProperty("itemName") @BsonProperty("itemName") String itemName,
-            @JsonProperty("category") @BsonProperty("category") String category,
-            @JsonProperty("itemEffects") @BsonProperty("itemEffects")
-                    Map<String, Double> itemEffects,
-            @JsonProperty("stacking") @BsonProperty("stacking") Stacking stacking,
-            @JsonProperty("value") @BsonProperty("value") Integer value,
-            @JsonProperty("config") @BsonProperty("config") ItemConfig itemConfig) {
+            String itemId,
+            String itemName,
+            String category,
+            Map<String, Double> itemEffects,
+            Stacking stacking,
+            Integer value,
+            ItemConfig itemConfig) {
 
         this.itemId = itemId;
         this.itemName = itemName;

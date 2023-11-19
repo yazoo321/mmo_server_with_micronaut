@@ -1,23 +1,19 @@
 package server.attribute.stats.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.attribute.stats.types.StatsTypes;
 
 @Data
 @Builder
-@Introspected
 @Serdeable
+@ReflectiveAccess
 public class Stats {
     private String actorId; // player name or mob id
 
@@ -28,19 +24,13 @@ public class Stats {
 
     private Integer attributePoints;
 
-    @BsonCreator
-    @JsonCreator
     public Stats(
-            @JsonProperty("actorId") @BsonProperty("actorId") String actorId,
-            @JsonProperty("baseStats") @BsonProperty("baseStats") Map<String, Integer> baseStats,
-            @JsonProperty("derivedStats") @BsonProperty("derivedStats")
-                    Map<String, Double> derivedStats,
-            @JsonProperty("itemEffects") @BsonProperty("itemEffects")
-                    Map<String, Double> itemEffects,
-            @JsonProperty("statusEffects") @BsonProperty("statusEffects")
-                    Map<String, Double> statusEffects,
-            @JsonProperty("attributePoints") @BsonProperty("attributePoints")
-                    Integer attributePoints) {
+            String actorId,
+            Map<String, Integer> baseStats,
+            Map<String, Double> derivedStats,
+            Map<String, Double> itemEffects,
+            Map<String, Double> statusEffects,
+            Integer attributePoints) {
         this.actorId = actorId;
         this.baseStats = baseStats == null ? new HashMap<>() : baseStats;
         this.derivedStats = derivedStats == null ? new HashMap<>() : derivedStats;

@@ -1,18 +1,15 @@
 package server.items.equippable.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
 import java.util.Map;
 
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.attribute.stats.types.StatsTypes;
 import server.items.equippable.model.types.*;
 import server.items.model.ItemInstance;
@@ -23,6 +20,7 @@ import server.items.types.ItemType;
 @Serdeable
 @NoArgsConstructor
 @BsonDiscriminator
+@ReflectiveAccess
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
@@ -48,12 +46,10 @@ import server.items.types.ItemType;
 })
 public abstract class EquippedItems {
 
-    @BsonCreator
-    @JsonCreator
     public EquippedItems(
-            @JsonProperty("characterName") @BsonProperty("characterName") String characterName,
-            @JsonProperty("itemInstance") @BsonProperty("itemInstance") ItemInstance itemInstance,
-            @JsonProperty("category") @BsonProperty("category") String category) {
+            String characterName,
+            ItemInstance itemInstance,
+            String category) {
         this.characterName = characterName;
         this.itemInstance = itemInstance;
         this.category = category;

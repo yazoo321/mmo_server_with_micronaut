@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Serdeable
+@ReflectiveAccess
 public class PlayerCombatData {
 
     private String playerName;

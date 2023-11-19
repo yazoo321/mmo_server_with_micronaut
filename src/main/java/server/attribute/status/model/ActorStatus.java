@@ -1,15 +1,15 @@
 package server.attribute.status.model;
 
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 @Data
 @Serdeable
+@ReflectiveAccess
 public class ActorStatus {
 
 

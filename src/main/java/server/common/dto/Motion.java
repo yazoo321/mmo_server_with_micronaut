@@ -1,41 +1,35 @@
 package server.common.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.time.temporal.ValueRange;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 
 @Data
-@JsonInclude
-@Introspected
-@NoArgsConstructor
-@Builder
 @Slf4j
+@Builder
 @Serdeable
+@JsonInclude
+@ReflectiveAccess
+@NoArgsConstructor
 public class Motion {
 
-    @BsonCreator
-    @JsonCreator
     public Motion(
-            @JsonProperty("map") @BsonProperty("map") String map,
-            @JsonProperty("x") @BsonProperty("x") Integer x,
-            @JsonProperty("y") @BsonProperty("y") Integer y,
-            @JsonProperty("z") @BsonProperty("z") Integer z,
-            @JsonProperty("pitch") @BsonProperty("pitch") Integer pitch,
-            @JsonProperty("roll") @BsonProperty("roll") Integer roll,
-            @JsonProperty("yaw") @BsonProperty("yaw") Integer yaw,
-            @JsonProperty("vx") @BsonProperty("vx") Integer vx,
-            @JsonProperty("vy") @BsonProperty("vy") Integer vy,
-            @JsonProperty("vz") @BsonProperty("vz") Integer vz,
-            @JsonProperty("isFalling") @BsonProperty("isFalling") Boolean isFalling) {
+            String map,
+            Integer x,
+            Integer y,
+            Integer z,
+            Integer pitch,
+            Integer roll,
+            Integer yaw,
+            Integer vx,
+            Integer vy,
+            Integer vz,
+            Boolean isFalling) {
         this.map = map;
 
         this.x = x;
