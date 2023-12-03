@@ -5,6 +5,7 @@ import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
@@ -74,9 +75,8 @@ public class PlayerMotionRepository {
                 .map(success -> playerMotion);
     }
 
-    public void deletePlayerMotion(String playerName) {
-        Single.fromPublisher(playerMotionMongoCollection.deleteOne(eq("playerName", playerName)))
-                .blockingGet();
+    public Single<DeleteResult> deletePlayerMotion(String playerName) {
+        return Single.fromPublisher(playerMotionMongoCollection.deleteOne(eq("playerName", playerName)));
     }
 
     public Single<List<PlayerMotion>> getPlayersNearby(

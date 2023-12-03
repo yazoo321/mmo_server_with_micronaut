@@ -84,11 +84,17 @@ public class PlayerCharacterService {
         return newCharacter;
     }
 
+    public void deleteCharacter(String playerName) {
+        // TODO: Validate request
+
+        rollbackChanges(playerName);
+    }
+
     private void rollbackChanges(String playerName) {
         inventoryService.clearAllDataForCharacter(playerName);
         playerMotionService.deletePlayerMotion(playerName);
         playerCharacterRepository.deleteByCharacterName(playerName);
-        statsService.deleteStatsFor(playerName);
+        statsService.deleteStatsFor(playerName).subscribe();
     }
 
     // TODO: Support deletes

@@ -58,9 +58,9 @@ Extra, post requests:
 {
     "itemId": "17000",
     "location": {
-        "map": "dreamscape",
-        "x": 35240,
-        "y": -68565,
-        "z": -20199
+        "map": "tooksworth",
+        "x": 240,
+        "y": 360,
+        "z": 230
     }
 }

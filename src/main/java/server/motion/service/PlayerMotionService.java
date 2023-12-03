@@ -29,10 +29,10 @@ public class PlayerMotionService {
 
     public static final Motion STARTING_MOTION =
             Motion.builder()
-                    .map("dreamscape") // Set up default starting location to match your map
-                    .x(34723)
-                    .y(-69026)
-                    .z(-20121)
+                    .map("Tooksworth") // Set up default starting location to match your map
+                    .x(240)
+                    .y(350)
+                    .z(230)
                     .vx(0)
                     .vy(0)
                     .vz(0)
@@ -56,7 +56,7 @@ public class PlayerMotionService {
     }
 
     public void deletePlayerMotion(String playerName) {
-        playerMotionRepository.deletePlayerMotion(playerName);
+        playerMotionRepository.deletePlayerMotion(playerName).subscribe();
     }
 
     public PlayerMotion buildPlayerMotion(String playerName, String map, Motion motion) {
