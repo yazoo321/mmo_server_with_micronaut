@@ -219,7 +219,7 @@ public class InventoryService {
 
     public void clearAllDataForCharacter(String characterName) {
         // This is for test purposes!
-        inventoryRepository.deleteAllInventoryDataForCharacter(characterName);
+        inventoryRepository.deleteAllInventoryDataForCharacter(characterName).subscribe();
     }
 
     private CharacterItem getItemAtLocation(Location2D location, Inventory inventory) {

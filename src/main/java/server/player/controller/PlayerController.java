@@ -35,4 +35,10 @@ public class PlayerController {
 
         return playerCharacterService.getCharacters(names);
     }
+
+    @Delete(value = "/{characterName}")
+    public void deleteCharacter(@Header String accountName, String characterName) {
+        // TODO: validation that character belongs to account
+        playerCharacterService.deleteCharacter(characterName);
+    }
 }
