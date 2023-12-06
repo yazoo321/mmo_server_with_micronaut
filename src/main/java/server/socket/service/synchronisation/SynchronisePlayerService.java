@@ -40,23 +40,26 @@ public class SynchronisePlayerService {
     public void handleSynchronisePlayers(Motion motion, WebSocketSession session) {
         int distanceThreshold = DEFAULT_DISTANCE_THRESHOLD;
 
-        String playerName = SessionParamHelper.getPlayerName(session);
+        String actorId = SessionParamHelper.getActorId(session);
 
         playerMotionService
-                .getNearbyPlayersAsync(motion, playerName, distanceThreshold)
+                .getNearbyPlayersAsync(motion, actorId, distanceThreshold)
                 .doOnSuccess(
                         list -> {
+                            if (SessionParamHelper.getIsServer(session)) {
+                                boolean hi=true;
+                            }
                             if (list == null || list.isEmpty()) {
                                 return;
                             }
-                            Set<String> playerNames =
+                            Set<String> actorIds =
                                     list.stream()
-                                            .map(PlayerMotion::getPlayerName)
+                                            .map(PlayerMotion::getActorId)
                                             .collect(Collectors.toSet());
 
-                            evaluateNewPlayers(playerNames, session);
+                            evaluateNewPlayers(actorIds, session);
                             // update the names that we follow
-                            session.put(SessionParams.TRACKING_PLAYERS.getType(), playerNames);
+                            session.put(SessionParams.TRACKING_PLAYERS.getType(), actorIds);
                         })
                 .doOnError(
                         (error) ->
@@ -64,17 +67,17 @@ public class SynchronisePlayerService {
                 .subscribe();
     }
 
-    private void evaluateNewPlayers(Set<String> playerNames, WebSocketSession session) {
+    private void evaluateNewPlayers(Set<String> actorIds, WebSocketSession session) {
         Set<String> previouslyTracked = SessionParamHelper.getTrackingPlayers(session);
 
         Set<String> newPlayers =
-                playerNames.stream()
+                actorIds.stream()
                         .filter(i -> !previouslyTracked.contains(i))
                         .collect(Collectors.toSet());
 
         Set<String> lostPlayers =
                 previouslyTracked.stream()
-                        .filter(i -> !playerNames.contains(i))
+                        .filter(i -> !actorIds.contains(i))
                         .collect(Collectors.toSet());
 
         handleNewPlayers(session, newPlayers);
@@ -118,7 +121,7 @@ public class SynchronisePlayerService {
                                     motionList.stream()
                                             .collect(
                                                     Collectors.toMap(
-                                                            PlayerMotion::getPlayerName,
+                                                            PlayerMotion::getActorId,
                                                             Function.identity()));
 
                             SocketResponse response =
@@ -147,7 +150,7 @@ public class SynchronisePlayerService {
                                     equippedItems.stream()
                                             .collect(
                                                     Collectors.groupingBy(
-                                                            EquippedItems::getCharacterName,
+                                                            EquippedItems::getActorId,
                                                             Collectors.mapping(
                                                                     Function.identity(),
                                                                     Collectors.toList())));
@@ -156,7 +159,7 @@ public class SynchronisePlayerService {
                                     (charName, items) -> {
                                         GenericInventoryData equipData = new GenericInventoryData();
                                         equipData.setEquippedItems(items);
-                                        equipData.setCharacterName(charName);
+                                        equipData.setActorId(charName);
 
                                         SocketResponse res =
                                                 SocketResponse.builder()

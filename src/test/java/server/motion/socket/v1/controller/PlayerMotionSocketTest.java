@@ -84,7 +84,7 @@ public class PlayerMotionSocketTest {
         abstract void send(MotionMessage message);
     }
 
-    private TestWebSocketClient createWebSocketClient(int port, String map, String playerName) {
+    private TestWebSocketClient createWebSocketClient(int port, String map, String actorId) {
         WebSocketClient webSocketClient = beanContext.getBean(WebSocketClient.class);
         URI uri =
                 UriBuilder.of("ws://localhost")
@@ -92,8 +92,8 @@ public class PlayerMotionSocketTest {
                         .path("v1")
                         .path("player-motion")
                         .path("{map}")
-                        .path("{playerName}")
-                        .expand(CollectionUtils.mapOf("map", map, "playerName", playerName));
+                        .path("{actorId}")
+                        .expand(CollectionUtils.mapOf("map", map, "actorId", actorId));
         Publisher<TestWebSocketClient> client =
                 webSocketClient.connect(TestWebSocketClient.class, uri);
         // requires to install reactor
@@ -151,7 +151,7 @@ public class PlayerMotionSocketTest {
 
         // expected response in client 2 (client1 motion)
         PlayerMotion expectedPlayerMotion = new PlayerMotion();
-        expectedPlayerMotion.setPlayerName(CHARACTER_1);
+        expectedPlayerMotion.setActorId(CHARACTER_1);
         expectedPlayerMotion.setIsOnline(true);
         expectedPlayerMotion.setMotion(motion);
 
@@ -181,7 +181,7 @@ public class PlayerMotionSocketTest {
 
         // client 1 should receive update from client 2
         PlayerMotion expectedPlayerMotion2 = new PlayerMotion();
-        expectedPlayerMotion2.setPlayerName(CHARACTER_2);
+        expectedPlayerMotion2.setActorId(CHARACTER_2);
         expectedPlayerMotion2.setIsOnline(true);
         expectedPlayerMotion2.setMotion(motion);
         PlayerMotionList expectedPlayerMotionList2 =

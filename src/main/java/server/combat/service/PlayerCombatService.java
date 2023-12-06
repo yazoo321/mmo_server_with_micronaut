@@ -57,12 +57,12 @@ public class PlayerCombatService {
         PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
         combatData.setTargets(combatRequest.getTargets());
 
-        sessionsInCombat.add(SessionParamHelper.getPlayerName(session));
+        sessionsInCombat.add(SessionParamHelper.getActorId(session));
         attackLoop(session);
     }
 
     public void requestStopAttack(WebSocketSession session) {
-        sessionsInCombat.remove(SessionParamHelper.getPlayerName(session));
+        sessionsInCombat.remove(SessionParamHelper.getActorId(session));
     }
 
     private void tryAttack(WebSocketSession session, Stats target, boolean isMainHand) {
@@ -87,14 +87,17 @@ public class PlayerCombatService {
             return;
         }
 
-        Instant lastHit = isMainHand ? combatData.getMainHandLastAttack() : combatData.getOffhandLastAttack();
+        Instant lastHit =
+                isMainHand ? combatData.getMainHandLastAttack() : combatData.getOffhandLastAttack();
         // TODO: this is for demo, needs changing
         if (lastHit == null || lastHit.isBefore(Instant.now().minusSeconds(4))) {
             lastHit = Instant.now().minusSeconds(4);
             requestAttackSwing(session, isMainHand);
         }
         Double baseSpeed =
-                isMainHand ? combatData.getMainHandAttackSpeed() : combatData.getOffhandAttackSpeed();
+                isMainHand
+                        ? combatData.getMainHandAttackSpeed()
+                        : combatData.getOffhandAttackSpeed();
         Double characterAttackSpeed = combatData.getCharacterAttackSpeed();
 
         // Calculate the actual delay in milliseconds
@@ -153,7 +156,9 @@ public class PlayerCombatService {
         EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
         String itemInstanceId = weapon.getItemInstance().getItemInstanceId();
 
-        SessionParamHelper.getCombatData(session).getAttackSent().put(isMainHand ? "MAIN" : "OFF", true);
+        SessionParamHelper.getCombatData(session)
+                .getAttackSent()
+                .put(isMainHand ? "MAIN" : "OFF", true);
 
         requestSessionToSwingWeapon(session, itemInstanceId);
     }
@@ -188,7 +193,7 @@ public class PlayerCombatService {
     }
 
     private void attackLoop(WebSocketSession session) {
-        if (!sessionsInCombat.contains(SessionParamHelper.getPlayerName(session))) {
+        if (!sessionsInCombat.contains(SessionParamHelper.getActorId(session))) {
             log.warn("left combat");
             return;
         }
@@ -200,7 +205,7 @@ public class PlayerCombatService {
 
         if (targetStats.isEmpty()) {
             log.warn("Target stats empty");
-            sessionsInCombat.remove(SessionParamHelper.getPlayerName(session));
+            sessionsInCombat.remove(SessionParamHelper.getActorId(session));
             return;
         }
 
@@ -249,7 +254,7 @@ public class PlayerCombatService {
 
         Motion targetMotion = monster.getMotion();
         Motion attackerMotion =
-                sessionParamHelper.getSharedActorMotion(SessionParamHelper.getPlayerName(session));
+                sessionParamHelper.getSharedActorMotion(SessionParamHelper.getActorId(session));
 
         boolean inRange = attackerMotion.withinRange(targetMotion, distanceThreshold);
         boolean facingTarget = attackerMotion.facingMotion(targetMotion);

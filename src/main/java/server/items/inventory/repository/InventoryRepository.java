@@ -31,34 +31,32 @@ public class InventoryRepository {
         prepareCollections();
     }
 
-    public Single<Inventory> getCharacterInventory(String characterName) {
-        return Single.fromPublisher(inventoryCollection.find(eq("characterName", characterName)));
+    public Single<Inventory> getCharacterInventory(String actorId) {
+        return Single.fromPublisher(inventoryCollection.find(eq("actorId", actorId)));
     }
 
-    public Single<UpdateResult> updateInventoryItems(
-            String characterName, List<CharacterItem> items) {
+    public Single<UpdateResult> updateInventoryItems(String actorId, List<CharacterItem> items) {
         return Single.fromPublisher(
                 inventoryCollection.updateOne(
-                        eq("characterName", characterName), set("characterItems", items)));
+                        eq("actorId", actorId), set("characterItems", items)));
     }
 
     public Single<UpdateResult> updateInventoryMaxSize(Inventory inventory) {
         return Single.fromPublisher(
                 inventoryCollection.updateOne(
-                        eq("characterName", inventory.getCharacterName()),
+                        eq("actorId", inventory.getActorId()),
                         set("maxSize", inventory.getMaxSize())));
     }
 
     public Single<Inventory> upsert(Inventory inventory) {
-        Bson filter = Filters.eq("characterName", inventory.getCharacterName());
+        Bson filter = Filters.eq("actorId", inventory.getActorId());
         ReplaceOptions options = new ReplaceOptions().upsert(true);
         return Single.fromPublisher(inventoryCollection.replaceOne(filter, inventory, options))
                 .map(res -> inventory);
     }
 
-    public Single<DeleteResult> deleteAllInventoryDataForCharacter(String characterName) {
-        return Single.fromPublisher(
-                inventoryCollection.deleteOne(eq("characterName", characterName)));
+    public Single<DeleteResult> deleteAllInventoryDataForCharacter(String actorId) {
+        return Single.fromPublisher(inventoryCollection.deleteOne(eq("actorId", actorId)));
     }
 
     private void prepareCollections() {

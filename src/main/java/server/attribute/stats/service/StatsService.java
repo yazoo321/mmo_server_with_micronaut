@@ -48,10 +48,10 @@ public class StatsService {
         repository.updateStats(mobStats).subscribe();
     }
 
-    public Single<Stats> initializePlayerStats(String playerName) {
+    public Single<Stats> initializePlayerStats(String actorId) {
         Stats playerStats = new Stats();
 
-        playerStats.setActorId(playerName);
+        playerStats.setActorId(actorId);
 
         playerStats.setBaseStats(
                 new HashMap<>(
@@ -84,9 +84,9 @@ public class StatsService {
         return repository.deleteAttributes(actorId);
     }
 
-    public void updateItemStats(String playerName, Map<String, Double> itemStats) {
+    public void updateItemStats(String actorId, Map<String, Double> itemStats) {
         repository
-                .findActorStats(playerName)
+                .findActorStats(actorId)
                 .doOnSuccess(
                         stats -> {
                             stats.setItemEffects(itemStats);
@@ -143,13 +143,12 @@ public class StatsService {
         StatsTypes evalType =
                 type == StatsTypes.MP_REGEN ? StatsTypes.CURRENT_MP : StatsTypes.CURRENT_HP;
 
-        StatsTypes maxType =
-                type == StatsTypes.MP_REGEN ? StatsTypes.MAX_MP : StatsTypes.MAX_HP;
+        StatsTypes maxType = type == StatsTypes.MP_REGEN ? StatsTypes.MAX_MP : StatsTypes.MAX_HP;
 
         Double currentVal = stats.getDerived(evalType);
         Double maxVal = stats.getDerived(maxType);
 
-        if (currentVal>= maxVal) {
+        if (currentVal >= maxVal) {
             return;
         }
 

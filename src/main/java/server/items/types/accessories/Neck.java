@@ -30,7 +30,7 @@ public class Neck extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
-        return new NeckSlot(characterName, itemInstance);
+    public EquippedItems createEquippedItem(String actorId, ItemInstance itemInstance) {
+        return new NeckSlot(actorId, itemInstance);
     }
 }

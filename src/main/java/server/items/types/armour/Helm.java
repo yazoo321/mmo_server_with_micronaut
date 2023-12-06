@@ -30,7 +30,7 @@ public class Helm extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
-        return new HelmSlot(characterName, itemInstance);
+    public EquippedItems createEquippedItem(String actorId, ItemInstance itemInstance) {
+        return new HelmSlot(actorId, itemInstance);
     }
 }

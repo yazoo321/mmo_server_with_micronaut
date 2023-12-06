@@ -30,19 +30,18 @@ public class ClientUpdatesService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
     public void sendMotionUpdatesToSubscribedClients(PlayerMotion playerMotion) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
                         .messageType(SocketResponseType.PLAYER_MOTION_UPDATE.getType())
-                        .playerMotion(Map.of(playerMotion.getPlayerName(), playerMotion))
-                        .playerKeys(Set.of(playerMotion.getPlayerName()))
+                        .playerMotion(Map.of(playerMotion.getActorId(), playerMotion))
+                        .playerKeys(Set.of(playerMotion.getActorId()))
                         .build();
 
         broadcaster
-                .broadcast(socketResponse, listensToMotionUpdate(playerMotion.getPlayerName()))
+                .broadcast(socketResponse, listensToMotionUpdate(playerMotion.getActorId()))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -75,12 +74,12 @@ public class ClientUpdatesService {
         SocketResponse socketResponse =
                 SocketResponse.builder()
                         .messageType(SocketResponseType.MOB_MOTION_UPDATE.getType())
-                        .monsters(Map.of(monster.getMobInstanceId(), monster))
-                        .mobKeys(Set.of(monster.getMobInstanceId()))
+                        .monsters(Map.of(monster.getActorId(), monster))
+                        .mobKeys(Set.of(monster.getActorId()))
                         .build();
 
         broadcaster
-                .broadcast(socketResponse, listensToMotionUpdate(monster.getMobInstanceId()))
+                .broadcast(socketResponse, listensToMotionUpdate(monster.getActorId()))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -115,9 +114,9 @@ public class ClientUpdatesService {
         if (equippedItems == null || equippedItems.isEmpty()) {
             return;
         }
-        String characterName = equippedItems.get(0).getCharacterName();
+        String actorId = equippedItems.get(0).getActorId();
         GenericInventoryData equipData = new GenericInventoryData();
-        equipData.setCharacterName(characterName);
+        equipData.setActorId(actorId);
         equipData.setEquippedItems(equippedItems);
         SocketResponse socketResponse =
                 SocketResponse.builder()
@@ -126,16 +125,16 @@ public class ClientUpdatesService {
                         .build();
 
         broadcaster
-                .broadcast(socketResponse, listensToMotionUpdate(characterName))
+                .broadcast(socketResponse, listensToMotionUpdate(actorId))
                 .subscribe(socketResponseSubscriber);
     }
 
-    public void sendItemUnEquipUpdates(String playerName, List<String> itemInstanceIds) {
+    public void sendItemUnEquipUpdates(String actorId, List<String> itemInstanceIds) {
         if (itemInstanceIds == null || itemInstanceIds.isEmpty()) {
             return;
         }
         GenericInventoryData equipData = new GenericInventoryData();
-        equipData.setCharacterName(playerName);
+        equipData.setActorId(actorId);
         equipData.setItemInstanceIds(itemInstanceIds);
         SocketResponse socketResponse =
                 SocketResponse.builder()
@@ -144,7 +143,7 @@ public class ClientUpdatesService {
                         .build();
 
         broadcaster
-                .broadcast(socketResponse, listensToMotionUpdate(playerName))
+                .broadcast(socketResponse, listensToMotionUpdate(actorId))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -220,10 +219,10 @@ public class ClientUpdatesService {
     }
 
     private boolean sessionIsThePlayerOrMob(WebSocketSession s, String playerOrMob) {
-        String playerName = SessionParamHelper.getPlayerName(s);
+        String actorId = SessionParamHelper.getActorId(s);
         String serverName = SessionParamHelper.getServerName(s);
 
-        return playerName.equalsIgnoreCase(playerOrMob) || serverName.equalsIgnoreCase(playerOrMob);
+        return actorId.equalsIgnoreCase(playerOrMob) || serverName.equalsIgnoreCase(playerOrMob);
     }
 
     private Predicate<WebSocketSession> listensToUpdateFor(String playerOrMob) {

@@ -2,12 +2,11 @@ package server.items.inventory.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @Serdeable
@@ -17,6 +16,6 @@ import java.util.List;
 @Builder
 public class ItemInstanceIds {
 
-    String playerName;
+    String actorId;
     List<String> itemInstanceIds;
 }

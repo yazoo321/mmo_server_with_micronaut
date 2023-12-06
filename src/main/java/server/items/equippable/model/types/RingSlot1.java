@@ -14,7 +14,7 @@ import server.items.types.ItemType;
 @EqualsAndHashCode(callSuper = false)
 public class RingSlot1 extends EquippedItems {
 
-    public RingSlot1(String characterName, ItemInstance itemInstance) {
-        super(characterName, itemInstance, ItemType.RING.getType());
+    public RingSlot1(String actorId, ItemInstance itemInstance) {
+        super(actorId, itemInstance, ItemType.RING.getType());
     }
 }

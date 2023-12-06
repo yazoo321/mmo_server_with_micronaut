@@ -16,9 +16,9 @@ public class EquipItemsController {
 
     @Post("/equip")
     public Single<GenericEquipData> equip(
-            @Body GenericEquipData equipData, @Header String characterName) {
+            @Body GenericEquipData equipData, @Header String actorId) {
         return equipItemService
-                .equipItem(equipData.getItemInstanceId(), characterName)
+                .equipItem(equipData.getItemInstanceId(), actorId)
                 .doOnError(e -> log.error("Failed to equip item, {}", e.getMessage()))
                 .map(
                         equippedItems ->
@@ -27,18 +27,18 @@ public class EquipItemsController {
 
     @Post("/unequip")
     public Single<GenericEquipData> unequip(
-            @Body GenericEquipData equipData, @Header String characterName) {
+            @Body GenericEquipData equipData, @Header String actorId) {
 
         return equipItemService
-                .unequipItemAndGetInventory(equipData.getItemInstanceId(), characterName)
+                .unequipItemAndGetInventory(equipData.getItemInstanceId(), actorId)
                 .doOnError(e -> log.error("Failed to unequip item, {}", e.getMessage()))
                 .map(i -> GenericEquipData.builder().inventory(i).build());
     }
 
     @Get
-    public Single<GenericEquipData> getCharacterEquippedItems(@Header String characterName) {
+    public Single<GenericEquipData> getCharacterEquippedItems(@Header String actorId) {
         return equipItemService
-                .getEquippedItems(characterName)
+                .getEquippedItems(actorId)
                 .doOnError(e -> log.error("Failed to get equipped items, {}", e.getMessage()))
                 .map(items -> GenericEquipData.builder().equippedItemsList(items).build());
     }

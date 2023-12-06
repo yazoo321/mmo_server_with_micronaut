@@ -14,7 +14,7 @@ import server.items.types.ItemType;
 @EqualsAndHashCode(callSuper = false)
 public class CapeSlot extends EquippedItems {
 
-    public CapeSlot(String characterName, ItemInstance itemInstance) {
-        super(characterName, itemInstance, ItemType.CAPE.getType());
+    public CapeSlot(String actorId, ItemInstance itemInstance) {
+        super(actorId, itemInstance, ItemType.CAPE.getType());
     }
 }

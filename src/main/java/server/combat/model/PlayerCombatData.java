@@ -1,13 +1,12 @@
 package server.combat.model;
 
+import io.micronaut.core.annotation.ReflectiveAccess;
+import io.micronaut.serde.annotation.Serdeable;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import io.micronaut.core.annotation.ReflectiveAccess;
-import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -17,7 +16,7 @@ import lombok.Data;
 @ReflectiveAccess
 public class PlayerCombatData {
 
-    private String playerName;
+    private String actorId;
 
     private Double mainHandAttackSpeed;
     private Double offhandAttackSpeed;
@@ -32,8 +31,8 @@ public class PlayerCombatData {
 
     private Instant lastHelperNotification;
 
-    public PlayerCombatData(String playerName) {
-        this.setPlayerName(playerName);
+    public PlayerCombatData(String actorId) {
+        this.setActorId(actorId);
         this.mainHandAttackSpeed = 0.0;
         this.offhandAttackSpeed = 0.0;
         this.characterAttackSpeed = 0.0;

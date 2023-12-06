@@ -3,10 +3,9 @@ package server.items.equippable.model;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
-import java.util.Map;
-
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
@@ -46,16 +45,13 @@ import server.items.types.ItemType;
 })
 public abstract class EquippedItems {
 
-    public EquippedItems(
-            String characterName,
-            ItemInstance itemInstance,
-            String category) {
-        this.characterName = characterName;
+    public EquippedItems(String actorId, ItemInstance itemInstance, String category) {
+        this.actorId = actorId;
         this.itemInstance = itemInstance;
         this.category = category;
     }
 
-    String characterName;
+    String actorId;
     ItemInstance itemInstance;
     String category;
 

@@ -21,25 +21,25 @@ public class MobRepositoryTest {
 
     private static String TEST_MAP = "TEST_MAP";
 
-    private static final String mobInstanceId1 = "5068a37d-46bc-40f2-9179-e9689bbfa52b";
-    private static final String mobInstanceId2 = "5068a37d-46bc-40f2-9179-e9689bbfa52c";
-    private static final String mobInstanceId3 = "5068a37d-46bc-40f2-9179-e9689bbfa52d";
+    private static final String actorId1 = "5068a37d-46bc-40f2-9179-e9689bbfa52b";
+    private static final String actorId2 = "5068a37d-46bc-40f2-9179-e9689bbfa52c";
+    private static final String actorId3 = "5068a37d-46bc-40f2-9179-e9689bbfa52d";
 
     @BeforeEach
     void deleteTestData() {
-        mobRepository.deleteMobInstance(mobInstanceId1).blockingGet();
-        mobRepository.deleteMobInstance(mobInstanceId2).blockingGet();
-        mobRepository.deleteMobInstance(mobInstanceId3).blockingGet();
+        mobRepository.deleteMobInstance(actorId1).blockingGet();
+        mobRepository.deleteMobInstance(actorId2).blockingGet();
+        mobRepository.deleteMobInstance(actorId3).blockingGet();
     }
 
     @Test
     void testFindMobMotion() {
         // Create a MobMotion object and insert it into the repository
-        Monster mobMotion = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
+        Monster mobMotion = createMobInstance(actorId1, 1000, 1000, 1000);
         mobRepository.insertMobInstance(mobMotion).blockingGet();
 
         // Retrieve the MobMotion by its instance ID
-        Monster result = mobRepository.findMobInstance(mobMotion.getMobInstanceId()).blockingGet();
+        Monster result = mobRepository.findMobInstance(mobMotion.getActorId()).blockingGet();
 
         // Verify that the retrieved MobMotion matches the inserted one
         assertThat(result).usingRecursiveComparison().isEqualTo(mobMotion);
@@ -48,11 +48,11 @@ public class MobRepositoryTest {
     @Test
     void testInsertMobMotion() {
         // Create a MobMotion object and insert it into the repository
-        Monster mobMotion = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
+        Monster mobMotion = createMobInstance(actorId1, 1000, 1000, 1000);
         mobRepository.insertMobInstance(mobMotion).blockingGet();
 
         // Retrieve the MobMotion by its instance ID
-        Single<Monster> result = mobRepository.findMobInstance(mobMotion.getMobInstanceId());
+        Single<Monster> result = mobRepository.findMobInstance(mobMotion.getActorId());
 
         // Verify that the retrieved MobMotion matches the inserted one
         assertThat(result.blockingGet()).usingRecursiveComparison().isEqualTo(mobMotion);
@@ -61,16 +61,16 @@ public class MobRepositoryTest {
     @Test
     void testUpdateMotionOnly() {
         // Create a MobMotion object and insert it into the repository
-        Monster mob = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
+        Monster mob = createMobInstance(actorId1, 1000, 1000, 1000);
         mobRepository.insertMobInstance(mob).blockingGet();
 
         // Update the motion of the MobMotion object
         mob.getMotion().setX(42);
         mob.getMotion().setY(84);
-        mobRepository.updateMotionOnly(mob.getMobInstanceId(), mob.getMotion()).blockingGet();
+        mobRepository.updateMotionOnly(mob.getActorId(), mob.getMotion()).blockingGet();
 
         // Retrieve the updated MobMotion by its instance ID
-        Monster result = mobRepository.findMobInstance(mob.getMobInstanceId()).blockingGet();
+        Monster result = mobRepository.findMobInstance(mob.getActorId()).blockingGet();
 
         // Verify that the retrieved MobMotion matches the updated one
         assertThat(result).usingRecursiveComparison().ignoringFields("updatedAt").isEqualTo(mob);
@@ -81,27 +81,27 @@ public class MobRepositoryTest {
     @Test
     void testDeleteMobInstance() {
         // Create a MobMotion object and insert it into the repository
-        Monster mobMotion = createMobInstance(mobInstanceId1, 1000, 1000, 1000);
+        Monster mobMotion = createMobInstance(actorId1, 1000, 1000, 1000);
         mobRepository.insertMobInstance(mobMotion).blockingGet();
 
         // Delete the MobMotion object by its instance ID
-        mobRepository.deleteMobInstance(mobMotion.getMobInstanceId()).blockingGet();
+        mobRepository.deleteMobInstance(mobMotion.getActorId()).blockingGet();
 
         // Attempt to retrieve the deleted MobMotion by its instance ID
         // Verify that the retrieved result is null
         assertThatThrownBy(
                         () ->
                                 mobRepository
-                                        .findMobInstance(mobMotion.getMobInstanceId())
+                                        .findMobInstance(mobMotion.getActorId())
                                         .blockingGet())
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void testGetMobsNearby() {
-        Monster mob1 = createMobInstance(mobInstanceId1, 10, 10, 10);
-        Monster mob2 = createMobInstance(mobInstanceId2, 50, 50, 50);
-        Monster mob3 = createMobInstance(mobInstanceId3, 5000, 5000, 5000);
+        Monster mob1 = createMobInstance(actorId1, 10, 10, 10);
+        Monster mob2 = createMobInstance(actorId2, 50, 50, 50);
+        Monster mob3 = createMobInstance(actorId3, 5000, 5000, 5000);
 
         mobRepository.insertMobInstance(mob1).blockingGet();
         mobRepository.insertMobInstance(mob2).blockingGet();
@@ -113,7 +113,7 @@ public class MobRepositoryTest {
         assertThat(mobsNearby).hasSize(2).containsExactlyInAnyOrder(mob1, mob2);
     }
 
-    private Monster createMobInstance(String mobInstanceId, int x, int y, int z) {
+    private Monster createMobInstance(String actorId, int x, int y, int z) {
         Motion motion = new Motion();
         motion.setMap(TEST_MAP);
         motion.setX(x);
@@ -121,7 +121,7 @@ public class MobRepositoryTest {
         motion.setZ(z);
         Monster monster = new Monster();
         monster.setMotion(motion);
-        monster.setMobInstanceId(mobInstanceId);
+        monster.setActorId(actorId);
         monster.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MILLIS));
 
         return monster;

@@ -15,17 +15,14 @@ import server.items.model.ItemInstance;
 @NoArgsConstructor
 public class CharacterItem {
 
-    public CharacterItem(
-            String characterName,
-            Location2D location,
-            ItemInstance itemInstance) {
+    public CharacterItem(String actorId, Location2D location, ItemInstance itemInstance) {
 
-        this.characterName = characterName;
+        this.actorId = actorId;
         this.location = location;
         this.itemInstance = itemInstance;
     }
 
-    String characterName;
+    String actorId;
 
     // position can be anything you like, 1d, 2d ints, string..
     Location2D location;

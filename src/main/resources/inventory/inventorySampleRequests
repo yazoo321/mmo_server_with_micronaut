@@ -4,10 +4,10 @@ All requests will go to following URL:
 1.
 Pickup item:
 {
-    "playerName": "testChar1",
+    "actorId": "testChar1",
     "updateType": "PICKUP_ITEM",
     "inventoryRequest": {
-        "characterName": "testChar1",
+        "actorId": "testChar1",
         "itemInstanceId": "ed040881-7d6c-4ed6-90b4-ce28fbc5d3f0"
     }
 }
@@ -15,10 +15,10 @@ Pickup item:
 
 2. Drop item
 {
-    "playerName": "testChar1",
+    "actorId": "testChar1",
     "updateType": "DROP_ITEM",
     "inventoryRequest": {
-        "characterName": "testChar1",
+        "actorId": "testChar1",
         "itemInventoryLocation": {
             "x": 0,
             "y": 0
@@ -34,20 +34,20 @@ Pickup item:
 
 3. Equip item
 {
-    "playerName": "testChar1",
+    "actorId": "testChar1",
     "updateType": "EQUIP_ITEM",
     "inventoryRequest": {
-        "characterName": "testChar1",
+        "actorId": "testChar1",
         "itemInstanceId": "38d8e69e-b05e-418c-9ece-cb97095b099a"
     }
 }
 
 4. Un-equip item
 {
-    "playerName": "testChar1",
+    "actorId": "testChar1",
     "updateType": "UN_EQUIP_ITEM",
     "inventoryRequest": {
-        "characterName": "testChar1",
+        "actorId": "testChar1",
         "itemInstanceId": "38d8e69e-b05e-418c-9ece-cb97095b099a"
     }
 }

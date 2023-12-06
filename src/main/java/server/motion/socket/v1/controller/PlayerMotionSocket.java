@@ -16,7 +16,7 @@ import server.motion.socket.model.PlayerMotionListSubscriber;
 
 @Deprecated // use CommunicationSocket instead
 @Slf4j
-@ServerWebSocket("/v1/player-motion/{map}/{playerName}/")
+@ServerWebSocket("/v1/player-motion/{map}/{actorId}/")
 public class PlayerMotionSocket {
 
     private final WebSocketBroadcaster broadcaster;
@@ -30,20 +30,20 @@ public class PlayerMotionSocket {
     }
 
     @OnOpen
-    public Publisher<String> onOpen(String map, String playerName, WebSocketSession session) {
+    public Publisher<String> onOpen(String map, String actorId, WebSocketSession session) {
         return broadcaster.broadcast(
-                String.format("[%s] Joined %s!", playerName, map), isValid(playerName));
+                String.format("[%s] Joined %s!", actorId, map), isValid(actorId));
     }
 
     @OnMessage
     public void onMessage(
-            String playerName, String map, MotionMessage message, WebSocketSession session) {
+            String actorId, String map, MotionMessage message, WebSocketSession session) {
         if (message.getUpdate()) {
-            playerMotionService.updatePlayerMotion(playerName, message.getMotion()).subscribe();
+            playerMotionService.updatePlayerMotion(actorId, message.getMotion()).subscribe();
         }
 
         playerMotionService
-                .getPlayersNearMe(message.getMotion(), playerName)
+                .getPlayersNearMe(message.getMotion(), actorId)
                 .doOnSuccess(
                         motionList -> {
                             session.send(motionList).subscribe(subscriber);
@@ -52,15 +52,14 @@ public class PlayerMotionSocket {
     }
 
     @OnClose
-    public Publisher<String> onClose(String playerName, String map, WebSocketSession session) {
-        playerMotionService.disconnectPlayer(playerName);
-        return broadcaster.broadcast(String.format("[%s] Leaving %s!", playerName, map));
+    public Publisher<String> onClose(String actorId, String map, WebSocketSession session) {
+        playerMotionService.disconnectPlayer(actorId);
+        return broadcaster.broadcast(String.format("[%s] Leaving %s!", actorId, map));
     }
 
-    private Predicate<WebSocketSession> isValid(String playerName) {
+    private Predicate<WebSocketSession> isValid(String actorId) {
         // we will report to player every time they call update about other players nearby
         return s ->
-                playerName.equalsIgnoreCase(
-                        s.getUriVariables().get("playerName", String.class, null));
+                actorId.equalsIgnoreCase(s.getUriVariables().get("actorId", String.class, null));
     }
 }

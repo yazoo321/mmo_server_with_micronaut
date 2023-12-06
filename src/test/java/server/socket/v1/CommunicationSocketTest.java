@@ -174,7 +174,7 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
                 .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9105.updatedAt")
                 .isEqualTo(
                         Map.of(
-                                mobWithinRange.getMonster().getMobInstanceId(),
+                                mobWithinRange.getMonster().getActorId(),
                                 mobWithinRange.getMonster()));
 
         Assertions.assertThat(client2Responses.get(client2Responses.size() - 1).getMonsters())
@@ -182,7 +182,7 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
                 .ignoringFields("9b50e6c6-84d0-467f-b455-6b9c125f9106.updatedAt")
                 .isEqualTo(
                         Map.of(
-                                mobOutOfRange.getMonster().getMobInstanceId(),
+                                mobOutOfRange.getMonster().getActorId(),
                                 mobOutOfRange.getMonster()));
 
         Assertions.assertThat(

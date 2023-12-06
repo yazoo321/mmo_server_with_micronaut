@@ -12,7 +12,6 @@ import server.common.dto.Motion;
 import server.motion.model.SessionParams;
 import server.motion.service.PlayerMotionService;
 import server.session.SessionParamHelper;
-import server.socket.model.MessageType;
 import server.socket.model.SocketMessage;
 import server.socket.service.SocketProcessOutgoingService;
 
@@ -27,8 +26,7 @@ public class CommunicationSocket {
     @Inject SocketProcessOutgoingService socketProcessService;
     @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
     ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
 
@@ -53,21 +51,24 @@ public class CommunicationSocket {
     @OnClose
     public void onClose(WebSocketSession session) {
         socketSessions.remove(session);
-        String playerName = (String) session.asMap().get(SessionParams.PLAYER_NAME.getType());
-        if (playerName == null) {
+        String actorId = (String) session.asMap().get(SessionParams.ACTOR_ID.getType());
+        if (actorId == null) {
             log.error("player name should not be null on disconnect");
             return;
         }
-        playerMotionService.disconnectPlayer(playerName);
+        playerMotionService.disconnectPlayer(actorId);
     }
 
     private void updateSessionParams(WebSocketSession session, SocketMessage message) {
         if (message.getPlayerMotion() != null
                 && motionValid(message.getPlayerMotion().getMotion())) {
-            sessionParamHelper.setMotion(session, message.getPlayerMotion().getMotion(),
-                    message.getPlayerMotion().getPlayerName());
+            sessionParamHelper.setMotion(
+                    session,
+                    message.getPlayerMotion().getMotion(),
+                    message.getPlayerMotion().getActorId());
         } else if (message.getMonster() != null && motionValid(message.getMonster().getMotion())) {
-            sessionParamHelper.setMotion(session, message.getMonster().getMotion(), message.getMonster().getMobId());
+            sessionParamHelper.setMotion(
+                    session, message.getMonster().getMotion(), message.getMonster().getMobId());
         }
     }
 

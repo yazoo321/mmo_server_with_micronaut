@@ -30,7 +30,7 @@ public class Bracers extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
-        return new BracersSlot(characterName, itemInstance);
+    public EquippedItems createEquippedItem(String actorId, ItemInstance itemInstance) {
+        return new BracersSlot(actorId, itemInstance);
     }
 }

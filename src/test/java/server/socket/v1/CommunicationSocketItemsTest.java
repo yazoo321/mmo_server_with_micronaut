@@ -158,11 +158,11 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
     }
 
     private SocketMessage dropRequestForCharacter(
-            String characterName, String itemInstanceId, Location dropLocation) {
+            String actorId, String itemInstanceId, Location dropLocation) {
         SocketMessage message = new SocketMessage();
         message.setUpdateType(MessageType.DROP_ITEM.getType());
         GenericInventoryData genericInventoryData = new GenericInventoryData();
-        genericInventoryData.setCharacterName(characterName);
+        genericInventoryData.setActorId(actorId);
         genericInventoryData.setItemInstanceId(itemInstanceId);
         genericInventoryData.setLocation(dropLocation);
 
@@ -171,11 +171,11 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
         return message;
     }
 
-    private SocketMessage pickupRequestForCharacter(String characterName, String itemInstanceId) {
+    private SocketMessage pickupRequestForCharacter(String actorId, String itemInstanceId) {
         SocketMessage message = new SocketMessage();
         message.setUpdateType(MessageType.PICKUP_ITEM.getType());
         GenericInventoryData inventoryData = new GenericInventoryData();
-        inventoryData.setCharacterName(characterName);
+        inventoryData.setActorId(actorId);
         inventoryData.setItemInstanceId(itemInstanceId);
 
         message.setInventoryRequest(inventoryData);

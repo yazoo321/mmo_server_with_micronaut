@@ -88,7 +88,7 @@ class PlayerCombatServiceTest {
         SessionParamHelper.updateDerivedStats(session, stats.getDerivedStats());
         PlayerMotion playerMotion =
                 playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
-        SessionParamHelper.setPlayerName(session, CHARACTER_1);
+        SessionParamHelper.setActorId(session, CHARACTER_1);
         sessionParamHelper.setMotion(session, playerMotion.getMotion(), CHARACTER_1);
 
         // create weapon and equip it
@@ -128,8 +128,8 @@ class PlayerCombatServiceTest {
                         });
     }
 
-    private EquippedItems equipWeapon(String characterName, WebSocketSession session) {
-        itemTestHelper.prepareInventory(characterName);
+    private EquippedItems equipWeapon(String actorId, WebSocketSession session) {
+        itemTestHelper.prepareInventory(actorId);
 
         Item item = itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         ItemInstance itemInstance =
@@ -138,9 +138,7 @@ class PlayerCombatServiceTest {
         itemTestHelper.addItemToInventory(CHARACTER_1, itemInstance);
 
         EquippedItems equippedItem =
-                equipItemService
-                        .equipItem(itemInstance.getItemInstanceId(), characterName)
-                        .blockingGet();
+                equipItemService.equipItem(itemInstance.getItemInstanceId(), actorId).blockingGet();
         if (session != null) {
             SessionParamHelper.addToEquippedItems(session, equippedItem);
         }

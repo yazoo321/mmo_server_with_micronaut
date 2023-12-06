@@ -19,12 +19,12 @@ public class MotionMessage {
     //            "y":-65466,
     //            "z":-20639
     //        }
-    //        "mobInstanceId:"some_instance_id_1"
+    //        "actorId:"some_instance_id_1"
     //     }
 
     private Motion motion;
     private Boolean update;
-    private String mobInstanceId;
+    private String actorId;
 
     public Boolean getUpdate() {
         if (update == null) {

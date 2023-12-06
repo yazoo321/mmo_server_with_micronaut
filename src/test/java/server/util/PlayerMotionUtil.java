@@ -28,24 +28,23 @@ public class PlayerMotionUtil {
     }
 
     public void deleteAllPlayerMotionData() {
-        Single.fromPublisher(motionCollection.deleteMany(ne("playerName", "deleteAll")))
-                .blockingGet();
+        Single.fromPublisher(motionCollection.deleteMany(ne("actorId", "deleteAll"))).blockingGet();
     }
 
-    public void deleteMotionForPlayers(List<String> playerNames) {
-        Single.fromPublisher(motionCollection.deleteMany(Filters.all("playerName", playerNames)))
+    public void deleteMotionForPlayers(List<String> actorIds) {
+        Single.fromPublisher(motionCollection.deleteMany(Filters.all("actorId", actorIds)))
                 .blockingGet();
     }
 
     public void deleteAllMobInstanceData() {
-        Single.fromPublisher(monsterMongoCollection.deleteMany(ne("mobInstanceId", "deleteAll")))
+        Single.fromPublisher(monsterMongoCollection.deleteMany(ne("actorId", "deleteAll")))
                 .blockingGet();
     }
 
-    public void deleteMobInstancesWithIds(List<String> mobInstanceIds) {
+    public void deleteMobInstancesWithIds(List<String> actorIds) {
         Single.fromPublisher(
                         monsterMongoCollection.deleteMany(
-                                Filters.all("mobInstanceId", mobInstanceIds)))
+                                Filters.all("actorId", actorIds)))
                 .blockingGet();
     }
 
@@ -69,7 +68,7 @@ public class PlayerMotionUtil {
         // Compare all fields except updated at
         return pm1.getMotion().equals(pm2.getMotion())
                 && pm1.getIsOnline().equals(pm2.getIsOnline())
-                && pm1.getPlayerName().equals(pm2.getPlayerName());
+                && pm1.getActorId().equals(pm2.getActorId());
     }
 
     private void prepareCollections() {

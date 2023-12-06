@@ -29,12 +29,12 @@ public class EquipItemServiceTest {
 
     @Inject ItemTestHelper itemTestHelper;
 
-    private static final String CHARACTER_NAME = "test_character";
+    private static final String ACTOR_ID = "test_character";
 
     @BeforeEach
     void cleanDb() {
         itemTestHelper.deleteAllItemData();
-        itemTestHelper.prepareInventory(CHARACTER_NAME);
+        itemTestHelper.prepareInventory(ACTOR_ID);
     }
 
     private static Stream<Arguments> itemTypesAndSlots() {
@@ -44,7 +44,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.WEAPON.getType(),
                         new WeaponSlot1(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -52,7 +52,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.SHIELD.getType(),
                         new ShieldSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -62,7 +62,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.BELT.getType(),
                         new BeltSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -70,7 +70,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.CAPE.getType(),
                         new CapeSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -78,7 +78,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.NECK.getType(),
                         new NeckSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -86,7 +86,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.RING.getType(),
                         new RingSlot1(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -96,7 +96,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.BOOTS.getType(),
                         new BootsSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -104,7 +104,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.BRACERS.getType(),
                         new BracersSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -112,7 +112,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.CHEST.getType(),
                         new ChestSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -120,7 +120,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.GLOVES.getType(),
                         new GlovesSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -128,7 +128,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.HELM.getType(),
                         new HelmSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -136,7 +136,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.LEGS.getType(),
                         new LegsSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -144,7 +144,7 @@ public class EquipItemServiceTest {
                 Arguments.of(
                         ItemType.SHOULDER.getType(),
                         new ShoulderSlot(
-                                CHARACTER_NAME,
+                                ACTOR_ID,
                                 new ItemInstance(
                                         "not-matched",
                                         "override",
@@ -158,14 +158,14 @@ public class EquipItemServiceTest {
         // Given
         Item item = itemTestHelper.createAndInsertItem(itemType);
         ItemInstance instance = itemTestHelper.createItemInstanceFor(item, "override");
-        CharacterItem characterItem = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance);
+        CharacterItem characterItem = itemTestHelper.addItemToInventory(ACTOR_ID, instance);
 
         // When
-        equipItemService.equipItem("override", CHARACTER_NAME).blockingGet();
+        equipItemService.equipItem("override", ACTOR_ID).blockingGet();
 
         // Then
         List<EquippedItems> equipped =
-                equipItemService.getEquippedItems(CHARACTER_NAME).blockingGet();
+                equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
         Assertions.assertThat(equipped)
                 .usingRecursiveComparison()
                 .ignoringFields(
@@ -178,7 +178,7 @@ public class EquipItemServiceTest {
         // Then
         // Check that the inventory item has no location set
 
-        Inventory inventory = itemTestHelper.getInventory(CHARACTER_NAME);
+        Inventory inventory = itemTestHelper.getInventory(ACTOR_ID);
         List<CharacterItem> inventoryItems = inventory.getCharacterItems();
 
         CharacterItem ci1 =
@@ -214,23 +214,23 @@ public class EquipItemServiceTest {
         ItemInstance instance1 = itemTestHelper.createItemInstanceFor(item, "override2");
         ItemInstance instance2 = itemTestHelper.createItemInstanceFor(item, "override");
 
-        CharacterItem i1 = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance1);
-        CharacterItem i2 = itemTestHelper.addItemToInventory(CHARACTER_NAME, instance2);
+        CharacterItem i1 = itemTestHelper.addItemToInventory(ACTOR_ID, instance1);
+        CharacterItem i2 = itemTestHelper.addItemToInventory(ACTOR_ID, instance2);
 
         EquippedItems items =
                 equipItemService
-                        .equipItem(instance1.getItemInstanceId(), CHARACTER_NAME)
+                        .equipItem(instance1.getItemInstanceId(), ACTOR_ID)
                         .blockingGet();
 
         // When
         items =
                 equipItemService
-                        .equipItem(instance2.getItemInstanceId(), CHARACTER_NAME)
+                        .equipItem(instance2.getItemInstanceId(), ACTOR_ID)
                         .blockingGet();
 
         // Then
         List<EquippedItems> equipped =
-                equipItemService.getEquippedItems(CHARACTER_NAME).blockingGet();
+                equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
         Assertions.assertThat(equipped.size()).isEqualTo(1);
 
         Assertions.assertThat(equipped)
@@ -243,7 +243,7 @@ public class EquipItemServiceTest {
 
         // Then
         // also check the inventory is set as expected
-        Inventory inventory = itemTestHelper.getInventory(CHARACTER_NAME);
+        Inventory inventory = itemTestHelper.getInventory(ACTOR_ID);
         List<CharacterItem> inventoryItems = inventory.getCharacterItems();
 
         CharacterItem ci1 =

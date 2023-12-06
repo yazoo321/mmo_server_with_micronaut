@@ -34,7 +34,7 @@ public class MongoDbQueryHelper {
             MongoCollection<T> collection, PlayerMotion playerMotion, Integer threshold) {
         Motion motion = playerMotion.getMotion();
 
-        Bson excludingThisCharacter = Filters.ne("playerName", playerMotion.getPlayerName());
+        Bson excludingThisCharacter = Filters.ne("actorId", playerMotion.getActorId());
         Bson isOnline = Filters.eq("isOnline", true);
         Bson mapEq = Filters.eq("motion.map", motion.getMap());
         Bson xWithinRange =

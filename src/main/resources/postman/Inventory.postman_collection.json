@@ -34,7 +34,7 @@
 								"type": "text"
 							},
 							{
-								"key": "characterName",
+								"key": "actorId",
 								"value": "character1",
 								"type": "text"
 							}
@@ -87,7 +87,7 @@
 								"type": "text"
 							},
 							{
-								"key": "characterName",
+								"key": "actorId",
 								"value": "character1",
 								"type": "text"
 							}
@@ -143,7 +143,7 @@
 								"type": "text"
 							},
 							{
-								"key": "characterName",
+								"key": "actorId",
 								"value": "character1",
 								"type": "text"
 							}
@@ -201,7 +201,7 @@
 						"type": "text"
 					},
 					{
-						"key": "characterName",
+						"key": "actorId",
 						"value": "character1",
 						"type": "text",
 						"disabled": true
@@ -209,7 +209,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"characterName\": \"character1\"\r\n}",
+					"raw": "{\r\n    \"actorId\": \"character1\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -261,7 +261,7 @@
 						"type": "text"
 					},
 					{
-						"key": "characterName",
+						"key": "actorId",
 						"value": "character1",
 						"type": "text"
 					}
@@ -317,7 +317,7 @@
 						"type": "text"
 					},
 					{
-						"key": "characterName",
+						"key": "actorId",
 						"value": "character1",
 						"type": "text"
 					}
@@ -373,14 +373,14 @@
 						"type": "text"
 					},
 					{
-						"key": "characterName",
+						"key": "actorId",
 						"value": "character1",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"characterName\": \"character1\",\r\n    \"itemInventoryLocation\": {\r\n        \"x\": 0,\r\n        \"y\": 0\r\n    },\r\n    \"location\": {\r\n        \"map\": \"map1\",\r\n        \"x\": -240,\r\n        \"y\": -220,\r\n        \"z\": 123\r\n    } \r\n}",
+					"raw": "{\r\n    \"actorId\": \"character1\",\r\n    \"itemInventoryLocation\": {\r\n        \"x\": 0,\r\n        \"y\": 0\r\n    },\r\n    \"location\": {\r\n        \"map\": \"map1\",\r\n        \"x\": -240,\r\n        \"y\": -220,\r\n        \"z\": 123\r\n    } \r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -429,7 +429,7 @@
 						"type": "text"
 					},
 					{
-						"key": "characterName",
+						"key": "actorId",
 						"value": "character1",
 						"type": "text"
 					}

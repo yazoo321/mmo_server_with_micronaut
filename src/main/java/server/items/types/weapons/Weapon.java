@@ -1,9 +1,8 @@
 package server.items.types.weapons;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.Map;
-
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -33,7 +32,7 @@ public class Weapon extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
-        return new WeaponSlot1(characterName, itemInstance);
+    public EquippedItems createEquippedItem(String actorId, ItemInstance itemInstance) {
+        return new WeaponSlot1(actorId, itemInstance);
     }
 }

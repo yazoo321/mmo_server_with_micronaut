@@ -16,19 +16,19 @@ public class Monster {
 
     public Monster(
             String mobId,
-            String mobInstanceId,
+            String actorId,
             Motion motion,
             Instant updatedAt,
             String timestamp) {
         this.mobId = mobId;
-        this.mobInstanceId = mobInstanceId;
+        this.actorId = actorId;
         this.motion = motion;
         this.updatedAt = updatedAt;
         this.timestamp = timestamp;
     }
 
     String mobId;
-    String mobInstanceId;
+    String actorId;
     Motion motion;
     Instant updatedAt;
 

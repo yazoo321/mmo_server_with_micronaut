@@ -14,7 +14,7 @@ import server.items.types.ItemType;
 @EqualsAndHashCode(callSuper = false)
 public class BootsSlot extends EquippedItems {
 
-    public BootsSlot(String characterName, ItemInstance itemInstance) {
-        super(characterName, itemInstance, ItemType.BOOTS.getType());
+    public BootsSlot(String actorId, ItemInstance itemInstance) {
+        super(actorId, itemInstance, ItemType.BOOTS.getType());
     }
 }

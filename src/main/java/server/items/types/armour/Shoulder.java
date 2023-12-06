@@ -30,7 +30,7 @@ public class Shoulder extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
-        return new ShoulderSlot(characterName, itemInstance);
+    public EquippedItems createEquippedItem(String actorId, ItemInstance itemInstance) {
+        return new ShoulderSlot(actorId, itemInstance);
     }
 }

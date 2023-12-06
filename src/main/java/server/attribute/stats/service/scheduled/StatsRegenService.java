@@ -29,7 +29,7 @@ public class StatsRegenService {
                                 return;
                             }
 
-                            statsService.applyRegen(SessionParamHelper.getPlayerName(s));
+                            statsService.applyRegen(SessionParamHelper.getActorId(s));
                         });
     }
 }

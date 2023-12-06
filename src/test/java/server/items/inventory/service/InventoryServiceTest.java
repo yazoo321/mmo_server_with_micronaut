@@ -27,12 +27,12 @@ public class InventoryServiceTest {
 
     @Inject ItemTestHelper itemTestHelper;
 
-    private static final String CHARACTER_NAME = "test_character";
+    private static final String ACTOR_ID = "test_character";
 
     @BeforeEach
     void cleanDb() {
         itemTestHelper.deleteAllItemData();
-        itemTestHelper.prepareInventory(CHARACTER_NAME);
+        itemTestHelper.prepareInventory(ACTOR_ID);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class InventoryServiceTest {
         Weapon weapon = (Weapon) itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
         GenericInventoryData request = new GenericInventoryData();
-        request.setCharacterName(CHARACTER_NAME);
+        request.setActorId(ACTOR_ID);
         request.setItemInstanceId(droppedItem.getItemInstanceId());
 
         // When
@@ -50,7 +50,7 @@ public class InventoryServiceTest {
 
         // Then
         // TODO: Make test not rely on service call
-        Inventory inventory = inventoryService.getInventory(CHARACTER_NAME).blockingGet();
+        Inventory inventory = inventoryService.getInventory(ACTOR_ID).blockingGet();
         List<CharacterItem> items = inventory.getCharacterItems();
         Assertions.assertThat(items.size()).isEqualTo(1);
 
@@ -67,14 +67,14 @@ public class InventoryServiceTest {
         Location location = new Location("map", 1, 1, 1);
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
         GenericInventoryData request = new GenericInventoryData();
-        request.setCharacterName(CHARACTER_NAME);
+        request.setActorId(ACTOR_ID);
         request.setItemInstanceId(droppedItem.getItemInstanceId());
         // TODO: make test not rely on service call
         inventoryService.pickupItem(request).blockingGet();
 
         // When
         inventoryService
-                .dropItem(CHARACTER_NAME, droppedItem.getItemInstanceId(), location)
+                .dropItem(ACTOR_ID, droppedItem.getItemInstanceId(), location)
                 .blockingGet();
 
         // Then
@@ -88,7 +88,7 @@ public class InventoryServiceTest {
     @Test
     void getAvailableSlotWillReturnCorrectValuesForInventorySize() {
         // Given
-        Inventory inventory = inventoryService.getInventory(CHARACTER_NAME).blockingGet();
+        Inventory inventory = inventoryService.getInventory(ACTOR_ID).blockingGet();
         // max size of 2x2 would allow 4 slots. ensure we can add 4 items and anything else will
         // throw.
         inventory.setMaxSize(new Location2D(2, 2));
@@ -101,7 +101,7 @@ public class InventoryServiceTest {
             Location location = new Location("map", 1, 1, 1);
             DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
             GenericInventoryData request = new GenericInventoryData();
-            request.setCharacterName(CHARACTER_NAME);
+            request.setActorId(ACTOR_ID);
             request.setItemInstanceId(droppedItem.getItemInstanceId());
             inventoryService.pickupItem(request).blockingGet();
         }
@@ -111,7 +111,7 @@ public class InventoryServiceTest {
         DroppedItem droppedItem = itemTestHelper.createAndInsertDroppedItem(location, weapon);
         // next `pickup` will error out
         GenericInventoryData request = new GenericInventoryData();
-        request.setCharacterName(CHARACTER_NAME);
+        request.setActorId(ACTOR_ID);
         request.setItemInstanceId(droppedItem.getItemInstanceId());
         org.junit.jupiter.api.Assertions.assertThrows(
                 InventoryException.class, () -> inventoryService.pickupItem(request).blockingGet());

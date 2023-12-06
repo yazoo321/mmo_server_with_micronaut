@@ -63,11 +63,10 @@ public class ItemTestHelper {
         Single.fromPublisher(droppedItemCollection.deleteMany(ne("map", "deleteAll")))
                 .blockingGet();
 
-        Single.fromPublisher(inventoryMongoCollection.deleteMany(ne("characterName", "deleteAll")))
+        Single.fromPublisher(inventoryMongoCollection.deleteMany(ne("actorId", "deleteAll")))
                 .blockingGet();
 
-        Single.fromPublisher(
-                        equippedItemsMongoCollection.deleteMany(ne("characterName", "deleteAll")))
+        Single.fromPublisher(equippedItemsMongoCollection.deleteMany(ne("actorId", "deleteAll")))
                 .blockingGet();
 
         Single.fromPublisher(itemInstanceCollection.deleteMany(ne("itemInstanceId", "deleteAll")))
@@ -98,10 +97,10 @@ public class ItemTestHelper {
         return itemService.createNewDroppedItem(item.getItemId(), location).blockingGet();
     }
 
-    public Inventory prepareInventory(String characterName) {
+    public Inventory prepareInventory(String actorId) {
         Inventory inventory = new Inventory();
 
-        inventory.setCharacterName(characterName);
+        inventory.setActorId(actorId);
         inventory.setCharacterItems(new ArrayList<>());
         inventory.setGold(0);
         inventory.setMaxSize(new Location2D(3, 20));
@@ -109,21 +108,20 @@ public class ItemTestHelper {
         return insertInventory(inventory);
     }
 
-    public CharacterItem addItemToInventory(String characterName, ItemInstance itemInstance) {
-        Inventory inventory = getInventory(characterName);
+    public CharacterItem addItemToInventory(String actorId, ItemInstance itemInstance) {
+        Inventory inventory = getInventory(actorId);
 
         List<CharacterItem> items = inventory.getCharacterItems();
 
         CharacterItem characterItem = new CharacterItem();
         characterItem.setItemInstance(itemInstance);
-        characterItem.setCharacterName(characterName);
+        characterItem.setActorId(actorId);
         characterItem.setLocation(
                 inventoryService.getNextAvailableSlot(
                         inventory.getMaxSize(), inventory.getCharacterItems()));
         items.add(characterItem);
 
-        UpdateResult res =
-                inventoryRepository.updateInventoryItems(characterName, items).blockingGet();
+        UpdateResult res = inventoryRepository.updateInventoryItems(actorId, items).blockingGet();
 
         return res.wasAcknowledged() ? characterItem : null;
     }
@@ -134,9 +132,8 @@ public class ItemTestHelper {
                 .blockingGet();
     }
 
-    public Inventory getInventory(String characterName) {
-        return Single.fromPublisher(
-                        inventoryMongoCollection.find(eq("characterName", characterName)))
+    public Inventory getInventory(String actorId) {
+        return Single.fromPublisher(inventoryMongoCollection.find(eq("actorId", actorId)))
                 .blockingGet();
     }
 

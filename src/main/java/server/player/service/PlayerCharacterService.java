@@ -42,8 +42,8 @@ public class PlayerCharacterService {
         return new AccountCharactersResponse(characterList);
     }
 
-    public Single<List<Character>> getCharactersByNames(Set<String> playerNames) {
-        return playerCharacterRepository.findByNames(playerNames);
+    public Single<List<Character>> getCharactersByNames(Set<String> actorIds) {
+        return playerCharacterRepository.findByNames(actorIds);
     }
 
     public Character createCharacter(
@@ -84,17 +84,17 @@ public class PlayerCharacterService {
         return newCharacter;
     }
 
-    public void deleteCharacter(String playerName) {
+    public void deleteCharacter(String actorId) {
         // TODO: Validate request
 
-        rollbackChanges(playerName);
+        rollbackChanges(actorId);
     }
 
-    private void rollbackChanges(String playerName) {
-        inventoryService.clearAllDataForCharacter(playerName);
-        playerMotionService.deletePlayerMotion(playerName);
-        playerCharacterRepository.deleteByCharacterName(playerName);
-        statsService.deleteStatsFor(playerName).subscribe();
+    private void rollbackChanges(String actorId) {
+        inventoryService.clearAllDataForCharacter(actorId);
+        playerMotionService.deletePlayerMotion(actorId);
+        playerCharacterRepository.deleteByActorId(actorId);
+        statsService.deleteStatsFor(actorId).subscribe();
     }
 
     // TODO: Support deletes

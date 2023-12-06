@@ -39,9 +39,9 @@ public class MobRepository {
         prepareCollections();
     }
 
-    public Single<Monster> findMobInstance(String mobInstanceId) {
+    public Single<Monster> findMobInstance(String actorId) {
         return Single.fromPublisher(
-                mobMotionMongoCollection.find(eq("mobInstanceId", mobInstanceId)));
+                mobMotionMongoCollection.find(eq("actorId", actorId)));
     }
 
     public Single<Monster> findMobById(String mobId) {
@@ -53,10 +53,10 @@ public class MobRepository {
     }
 
 
-    public Single<Monster> updateMotionOnly(String mobInstanceId, Motion motion) {
+    public Single<Monster> updateMotionOnly(String actorId, Motion motion) {
         return Single.fromPublisher(
                 mobMotionMongoCollection.findOneAndUpdate(
-                        eq("mobInstanceId", mobInstanceId),
+                        eq("actorId", actorId),
                         Updates.combine(
                                 Updates.set("motion", motion),
                                 Updates.set(
@@ -64,14 +64,14 @@ public class MobRepository {
                                         Instant.now().truncatedTo(ChronoUnit.MICROS)))));
     }
 
-    public Single<DeleteResult> deleteMobInstance(String mobInstanceId) {
+    public Single<DeleteResult> deleteMobInstance(String actorId) {
         return Single.fromPublisher(
-                mobMotionMongoCollection.deleteOne(eq("mobInstanceId", mobInstanceId)));
+                mobMotionMongoCollection.deleteOne(eq("actorId", actorId)));
     }
 
-    public Single<List<Monster>> getMobsByInstanceIds(Set<String> mobInstanceIds) {
+    public Single<List<Monster>> getMobsByInstanceIds(Set<String> actorIds) {
         return Flowable.fromPublisher(
-                        mobMotionMongoCollection.find(in("mobInstanceId", mobInstanceIds)))
+                        mobMotionMongoCollection.find(in("actorId", actorIds)))
                 .toList();
     }
 

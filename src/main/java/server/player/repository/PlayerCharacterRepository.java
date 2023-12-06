@@ -76,11 +76,11 @@ public class PlayerCharacterRepository {
         }
     }
 
-    public UpdateResult updateMotion(Motion motion, String characterName) {
+    public UpdateResult updateMotion(Motion motion, String actorId) {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         return Flowable.fromPublisher(
                         characters.updateOne(
-                                eq("name", characterName),
+                                eq("name", actorId),
                                 combine(
                                         set("motion", motion),
                                         set("updatedAt", now),
@@ -115,8 +115,8 @@ public class PlayerCharacterRepository {
         return Flowable.fromPublisher(characters.find(in("name", names))).toList().blockingGet();
     }
 
-    public Single<List<Character>> findByNames(Set<String> playerNames) {
-        return Flowable.fromPublisher(characters.find(in("name", playerNames))).toList();
+    public Single<List<Character>> findByNames(Set<String> actorIds) {
+        return Flowable.fromPublisher(characters.find(in("name", actorIds))).toList();
     }
 
     public List<Character> findByAccount(String accountName) {
@@ -126,16 +126,16 @@ public class PlayerCharacterRepository {
                 .blockingGet();
     }
 
-    public DeleteResult deleteByCharacterName(String name) {
+    public DeleteResult deleteByActorId(String name) {
         return Single.fromPublisher(characters.deleteOne(eq("name", name))).blockingGet();
     }
 
-    public List<Character> getPlayersNear(String playerName) {
+    public List<Character> getPlayersNear(String actorId) {
         // gets players near <player name>
         // require to add additional filters such as filter by location/town/etc
 
         return Flowable.fromPublisher(
-                        characters.find(and(ne("name", playerName), eq("isOnline", true))))
+                        characters.find(and(ne("name", actorId), eq("isOnline", true))))
                 .toList()
                 .blockingGet();
     }

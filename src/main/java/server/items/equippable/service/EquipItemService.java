@@ -30,10 +30,10 @@ public class EquipItemService {
 
     @Inject StatsService statsService;
 
-    public Single<EquippedItems> equipItem(String itemInstanceId, String characterName) {
+    public Single<EquippedItems> equipItem(String itemInstanceId, String actorId) {
         // in order to equip item, first un-equip item from slot if one exists
         return inventoryService
-                .getInventory(characterName)
+                .getInventory(actorId)
                 .doOnError(e -> log.error("Failed to get character inventory, {}", e.getMessage()))
                 .flatMap(
                         inventory -> {
@@ -47,7 +47,7 @@ public class EquipItemService {
                             // TODO: Make this async
                             EquippedItems equippedItem =
                                     equipRepository
-                                            .getCharacterItemSlot(characterName, slotType)
+                                            .getCharacterItemSlot(actorId, slotType)
                                             .blockingGet();
                             if (equippedItem != null) {
                                 // TODO: Make this async
@@ -56,7 +56,7 @@ public class EquipItemService {
                                                         equippedItem
                                                                 .getItemInstance()
                                                                 .getItemInstanceId(),
-                                                        characterName)
+                                                        actorId)
                                                 .blockingGet()
                                                 .getCharacterItems();
                             }
@@ -69,29 +69,27 @@ public class EquipItemService {
                                     characterItem
                                             .getItemInstance()
                                             .getItem()
-                                            .createEquippedItem(characterName, instance);
+                                            .createEquippedItem(actorId, instance);
 
                             // setting location to 'invalid' value, to not show it in inventory
                             characterItem.setLocation(new Location2D(-1, -1));
                             // TODO: Make this async
-                            inventoryService
-                                    .updateInventoryItems(characterName, items)
-                                    .blockingGet();
+                            inventoryService.updateInventoryItems(actorId, items).blockingGet();
 
                             return equipRepository
                                     .insert(equippedItem)
                                     .map(
                                             equippedItems -> {
-                                                updateCharacterItemStats(characterName);
+                                                updateCharacterItemStats(actorId);
 
                                                 return equippedItems;
                                             });
                         });
     }
 
-    public Single<String> unEquipItem(String itemInstanceId, String characterName) {
+    public Single<String> unEquipItem(String itemInstanceId, String actorId) {
         return inventoryService
-                .unequipItem(itemInstanceId, characterName)
+                .unequipItem(itemInstanceId, actorId)
                 .doOnError(
                         e -> {
                             log.warn("Failed to unequip item, {}", e.getMessage());
@@ -101,26 +99,23 @@ public class EquipItemService {
                         itemList -> {
                             // TODO: Make async
                             equipRepository.deleteEquippedItem(itemInstanceId).blockingGet();
-                            updateCharacterItemStats(characterName);
+                            updateCharacterItemStats(actorId);
 
                             return itemInstanceId;
                         });
     }
 
-    public Single<Inventory> unequipItemAndGetInventory(
-            String itemInstanceId, String characterName) {
-        return unEquipItem(itemInstanceId, characterName)
-                .flatMap(instanceId ->
-                        inventoryService.getInventory(characterName)
-                );
+    public Single<Inventory> unequipItemAndGetInventory(String itemInstanceId, String actorId) {
+        return unEquipItem(itemInstanceId, actorId)
+                .flatMap(instanceId -> inventoryService.getInventory(actorId));
     }
 
-    public Single<List<EquippedItems>> getEquippedItems(String characterName) {
-        return equipRepository.getEquippedItemsForCharacter(characterName);
+    public Single<List<EquippedItems>> getEquippedItems(String actorId) {
+        return equipRepository.getEquippedItemsForCharacter(actorId);
     }
 
-    public Single<List<EquippedItems>> getEquippedItems(Set<String> characterNames) {
-        return equipRepository.getEquippedItemsForCharacters(characterNames);
+    public Single<List<EquippedItems>> getEquippedItems(Set<String> actorIds) {
+        return equipRepository.getEquippedItemsForCharacters(actorIds);
     }
 
     private CharacterItem getCharacterItemByInstance(
@@ -136,8 +131,8 @@ public class EquipItemService {
                         () -> new InventoryException("The item trying to equip does not exist"));
     }
 
-    public void updateCharacterItemStats(String playerName) {
-        getEquippedItems(playerName)
+    public void updateCharacterItemStats(String actorId) {
+        getEquippedItems(actorId)
                 .doOnError(
                         e -> log.error("Failed to update character item stats, {}", e.getMessage()))
                 .doOnSuccess(
@@ -150,7 +145,7 @@ public class EquipItemService {
                                                     i.getItemInstance()
                                                             .getItem()
                                                             .getItemEffects()));
-                            statsService.updateItemStats(playerName, effects);
+                            statsService.updateItemStats(actorId, effects);
                         })
                 .subscribe();
     }

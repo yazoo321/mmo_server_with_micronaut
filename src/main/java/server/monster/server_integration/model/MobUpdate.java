@@ -14,7 +14,7 @@ public class MobUpdate {
 
     String mobId;
 
-    String mobInstanceId;
+    String actorId;
 
     Motion motion;
 
