@@ -29,7 +29,7 @@ public class PlayerCharacterRepositoryTest {
     @BeforeEach
     void cleanup() {
         List<String> namesToDelete = List.of(CHAR_1, CHAR_2, CHAR_3);
-        namesToDelete.forEach(name -> playerCharacterRepository.deleteByCharacterName(name));
+        namesToDelete.forEach(name -> playerCharacterRepository.deleteByActorId(name));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class PlayerCharacterRepositoryTest {
         // ensure there's an entry
         Assertions.assertEquals(CHAR_1, playerCharacterRepository.findByName(CHAR_1).getName());
         // when
-        DeleteResult res = playerCharacterRepository.deleteByCharacterName(CHAR_1);
+        DeleteResult res = playerCharacterRepository.deleteByActorId(CHAR_1);
 
         // then
         Assertions.assertEquals(1, res.getDeletedCount());
@@ -146,9 +146,9 @@ public class PlayerCharacterRepositoryTest {
                 .isEqualTo(character1);
     }
 
-    private Character createCharacter(String characterName, String account) {
+    private Character createCharacter(String actorId, String account) {
         Character character = new Character();
-        character.setName(characterName);
+        character.setName(actorId);
         character.setAccountName(account);
         character.setAppearanceInfo(Map.of("key", "value"));
         return character;

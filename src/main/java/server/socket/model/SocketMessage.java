@@ -20,9 +20,8 @@ public class SocketMessage {
     PlayerMotion playerMotion;
 
     String mobId; // mob id used by server to identify mesh etc to use
-    String mobInstanceId; // mob instance ID is the unique mob identifier
+    String actorId; // referring to mob instance or player instance
 
-    String playerName;
     String serverName;
 
     GenericInventoryData inventoryRequest;

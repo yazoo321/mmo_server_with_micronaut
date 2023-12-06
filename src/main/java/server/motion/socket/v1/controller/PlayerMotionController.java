@@ -24,8 +24,8 @@ public class PlayerMotionController {
         this.playerMotionService = playerMotionService;
     }
 
-    @Get(value = "/{characterName}")
-    Single<PlayerMotion> getPlayerMotion(String characterName) {
-        return playerMotionService.getPlayerMotion(characterName);
+    @Get(value = "/{actorId}")
+    Single<PlayerMotion> getPlayerMotion(String actorId) {
+        return playerMotionService.getPlayerMotion(actorId);
     }
 }

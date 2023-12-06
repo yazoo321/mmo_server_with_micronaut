@@ -27,12 +27,12 @@ public class PlayerLevelStatsService {
                     ClassTypes.FIGHTER.getType(),
                     ClassTypes.CLERIC.getType());
 
-    public Single<Stats> initializeCharacterClass(String playerName, String playerClass) {
+    public Single<Stats> initializeCharacterClass(String actorId, String playerClass) {
         if (!isClassValid(playerClass)) {
             throw new CharacterException("Invalid class selected");
         }
 
-        Stats stats = statsService.getStatsFor(playerName).blockingGet();
+        Stats stats = statsService.getStatsFor(actorId).blockingGet();
         Map<String, Integer> baseAttr = stats.getBaseStats();
 
         Map<String, Integer> toAdd =
@@ -52,14 +52,14 @@ public class PlayerLevelStatsService {
         return statsRepository.updateStats(stats);
     }
 
-    public Single<Stats> handleLevelUp(String playerName, String classToLevel) {
+    public Single<Stats> handleLevelUp(String actorId, String classToLevel) {
         // TODO: additional validation, check XP
         if (!AVAILABLE_CLASSES.contains(classToLevel)) {
             throw new RuntimeException("Failed to level-up, bad request");
         }
 
         return statsService
-                .getStatsFor(playerName)
+                .getStatsFor(actorId)
                 .flatMap(
                         stats -> {
                             Map<String, Integer> baseAttr = stats.getBaseStats();
@@ -71,13 +71,13 @@ public class PlayerLevelStatsService {
                         err -> log.error("Failed to get stats on level up, {}", err.getMessage()));
     }
 
-    public Single<Stats> addPlayerXp(String playerName, Integer xpToAdd) {
+    public Single<Stats> addPlayerXp(String actorId, Integer xpToAdd) {
         if (xpToAdd < 1) {
             throw new IllegalArgumentException("Bad request to add player XP");
         }
 
         return statsService
-                .getStatsFor(playerName)
+                .getStatsFor(actorId)
                 .doOnSuccess(
                         stats -> {
                             Map<String, Double> attr = stats.getDerivedStats();

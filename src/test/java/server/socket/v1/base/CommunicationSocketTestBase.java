@@ -103,15 +103,15 @@ public class CommunicationSocketTestBase {
         return client;
     }
 
-    protected TestWebSocketClient initiateSocketAsPlayer(String playerName) {
-        playerMotionService.initializePlayerMotion(playerName).blockingGet();
-        itemTestHelper.prepareInventory(playerName);
+    protected TestWebSocketClient initiateSocketAsPlayer(String actorId) {
+        playerMotionService.initializePlayerMotion(actorId).blockingGet();
+        itemTestHelper.prepareInventory(actorId);
 
         TestWebSocketClient playerClient = createWebSocketClient(embeddedServer.getPort());
 
         SocketMessage msg = new SocketMessage();
         msg.setUpdateType(MessageType.SET_SESSION_ID.getType());
-        msg.setPlayerName(playerName);
+        msg.setActorId(actorId);
 
         playerClient.send(msg);
 
@@ -133,8 +133,8 @@ public class CommunicationSocketTestBase {
                 .build();
     }
 
-    protected SocketMessage createMessageForMotionOutOfRange(String characterName) {
-        SocketMessage socketMsg = createMessageForMotionWithinRange(characterName);
+    protected SocketMessage createMessageForMotionOutOfRange(String actorId) {
+        SocketMessage socketMsg = createMessageForMotionWithinRange(actorId);
         Motion motion = socketMsg.getPlayerMotion().getMotion();
 
         motion.setX(10_000);
@@ -143,39 +143,39 @@ public class CommunicationSocketTestBase {
         return socketMsg;
     }
 
-    protected SocketMessage createMessageForMotionWithinRange(String characterName) {
+    protected SocketMessage createMessageForMotionWithinRange(String actorId) {
         Motion motionWithinRange = createBaseMotion();
         PlayerMotion playerMotion = new PlayerMotion();
         playerMotion.setMotion(motionWithinRange);
-        playerMotion.setPlayerName(characterName);
+        playerMotion.setActorId(actorId);
 
         SocketMessage playerMessageWithinRange = new SocketMessage();
         playerMessageWithinRange.setPlayerMotion(playerMotion);
-        playerMessageWithinRange.setPlayerName(characterName);
+        playerMessageWithinRange.setActorId(actorId);
         playerMessageWithinRange.setUpdateType(MessageType.PLAYER_MOTION.getType());
 
         return playerMessageWithinRange;
     }
 
-    protected SocketMessage createMobMessageForMotionWithinRange(String mobInstanceId) {
+    protected SocketMessage createMobMessageForMotionWithinRange(String actorId) {
         Motion motionWithinRange = createBaseMotion();
 
         Monster mob = new Monster();
-        mob.setMobInstanceId(mobInstanceId);
-        mob.setMobId(mobInstanceId);
+        mob.setActorId(actorId);
+        mob.setMobId(actorId);
         mob.setMotion(motionWithinRange);
 
         SocketMessage msg = new SocketMessage();
-        msg.setMobId(mobInstanceId);
-        msg.setMobInstanceId(mobInstanceId);
+        msg.setMobId(actorId);
+        msg.setActorId(actorId);
         msg.setMonster(mob);
         msg.setServerName(MOB_SERVER_NAME);
 
         return msg;
     }
 
-    protected SocketMessage createMobMessageForMotionOutOfRange(String mobInstanceId) {
-        SocketMessage msg = createMobMessageForMotionWithinRange(mobInstanceId);
+    protected SocketMessage createMobMessageForMotionOutOfRange(String actorId) {
+        SocketMessage msg = createMobMessageForMotionWithinRange(actorId);
 
         msg.getMonster().getMotion().setX(10_000);
         msg.getMonster().getMotion().setY(10_000);

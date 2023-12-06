@@ -40,9 +40,9 @@ public class SynchroniseMobService {
                             if (mobList == null || mobList.isEmpty()) {
                                 return;
                             }
-                            Set<String> mobInstanceIds = evaluateNewMobs(mobList, session);
+                            Set<String> actorIds = evaluateNewMobs(mobList, session);
 
-                            session.put(SessionParams.TRACKING_MOBS.getType(), mobInstanceIds);
+                            session.put(SessionParams.TRACKING_MOBS.getType(), actorIds);
                         })
                 .doOnError(
                         (error) -> log.error("error getting nearby mobs, {}", error.getMessage()))
@@ -50,8 +50,8 @@ public class SynchroniseMobService {
     }
 
     private Set<String> evaluateNewMobs(List<Monster> mobList, WebSocketSession session) {
-        Set<String> mobInstanceIds =
-                mobList.stream().map(Monster::getMobInstanceId).collect(Collectors.toSet());
+        Set<String> actorIds =
+                mobList.stream().map(Monster::getActorId).collect(Collectors.toSet());
 
         Set<String> previouslyTracked =
                 (Set<String>)
@@ -60,19 +60,19 @@ public class SynchroniseMobService {
 
         Set<Monster> newMobs =
                 mobList.stream()
-                        .filter(i -> !previouslyTracked.contains(i.getMobInstanceId()))
+                        .filter(i -> !previouslyTracked.contains(i.getActorId()))
                         .collect(Collectors.toSet());
 
         handleNewMobs(session, newMobs);
 
         Set<String> lostMobs =
                 previouslyTracked.stream()
-                        .filter(i -> !mobInstanceIds.contains(i))
+                        .filter(i -> !actorIds.contains(i))
                         .collect(Collectors.toSet());
 
         handleLostMobs(session, lostMobs);
 
-        return mobInstanceIds;
+        return actorIds;
     }
 
     private void handleNewMobs(WebSocketSession session, Set<Monster> mobs) {
@@ -83,7 +83,7 @@ public class SynchroniseMobService {
 
         Map<String, Monster> mobMap =
                 mobs.stream()
-                        .collect(Collectors.toMap(Monster::getMobInstanceId, Function.identity()));
+                        .collect(Collectors.toMap(Monster::getActorId, Function.identity()));
 
         SocketResponse response =
                 SocketResponse.builder()

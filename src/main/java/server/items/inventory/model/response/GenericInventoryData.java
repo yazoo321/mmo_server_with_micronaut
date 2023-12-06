@@ -1,8 +1,7 @@
 package server.items.inventory.model.response;
 
-import java.util.List;
-
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +20,7 @@ public class GenericInventoryData {
     List<Item> items;
     String itemInstanceId;
     String itemId;
-    String characterName;
+    String actorId;
     Location location;
     Inventory inventory;
 

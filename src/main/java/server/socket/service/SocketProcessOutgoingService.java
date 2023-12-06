@@ -74,7 +74,7 @@ public class SocketProcessOutgoingService {
         Map<String, String> validateFields =
                 Map.of(
                         "Player name",
-                        motion.getPlayerName(),
+                        motion.getActorId(),
                         "b",
                         "i",
                         "Map",
@@ -131,7 +131,7 @@ public class SocketProcessOutgoingService {
     }
 
     private void handleFetchStats(SocketMessage message, WebSocketSession session) {
-        String actorId = message.getPlayerName().isBlank() ? message.getMobInstanceId() : message.getPlayerName();
+        String actorId = message.getActorId();
         attributeSocketIntegration.handleFetchStats(actorId, session);
     }
 
@@ -140,11 +140,17 @@ public class SocketProcessOutgoingService {
     }
 
     private void setSessionId(SocketMessage message, WebSocketSession session) {
-        String serverName = message.getServerName() == null || message.getServerName().isBlank() ? null : message.getServerName();
-        String playerName = message.getPlayerName() == null || message.getPlayerName().isBlank() ? null : message.getPlayerName();
+        String serverName =
+                message.getServerName() == null || message.getServerName().isBlank()
+                        ? null
+                        : message.getServerName();
+        String actorId =
+                message.getActorId() == null || message.getActorId().isBlank()
+                        ? null
+                        : message.getActorId();
 
         SessionParamHelper.setServerName(session, serverName);
-        SessionParamHelper.setPlayerName(session, playerName);
+        SessionParamHelper.setActorId(session, actorId);
     }
 
     private boolean validate(String value, String name) {

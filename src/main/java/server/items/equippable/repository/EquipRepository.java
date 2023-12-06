@@ -36,22 +36,20 @@ public class EquipRepository {
                 .map(res -> equippedItems);
     }
 
-    public Single<List<EquippedItems>> getEquippedItemsForCharacter(String characterName) {
-        return Flowable.fromPublisher(
-                        equippedItemsCollection.find(eq("characterName", characterName)))
+    public Single<List<EquippedItems>> getEquippedItemsForCharacter(String actorId) {
+        return Flowable.fromPublisher(equippedItemsCollection.find(eq("actorId", actorId)))
                 .toList();
     }
 
-    public Single<List<EquippedItems>> getEquippedItemsForCharacters(Set<String> characterNames) {
-        return Flowable.fromPublisher(
-                        equippedItemsCollection.find(in("characterName", characterNames)))
+    public Single<List<EquippedItems>> getEquippedItemsForCharacters(Set<String> actorIds) {
+        return Flowable.fromPublisher(equippedItemsCollection.find(in("actorId", actorIds)))
                 .toList();
     }
 
-    public Maybe<EquippedItems> getCharacterItemSlot(String characterName, String slotType) {
+    public Maybe<EquippedItems> getCharacterItemSlot(String actorId, String slotType) {
         return Flowable.fromPublisher(
                         equippedItemsCollection.find(
-                                and(eq("characterName", characterName), eq("category", slotType))))
+                                and(eq("actorId", actorId), eq("category", slotType))))
                 .firstElement();
     }
 

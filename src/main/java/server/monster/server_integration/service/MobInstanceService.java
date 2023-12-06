@@ -29,14 +29,14 @@ public class MobInstanceService {
         return mobRepository.getMobsNearby(location);
     }
 
-    public Single<List<Monster>> getMobsByIds(Set<String> mobInstanceIds) {
-        return mobRepository.getMobsByInstanceIds(mobInstanceIds);
+    public Single<List<Monster>> getMobsByIds(Set<String> actorIds) {
+        return mobRepository.getMobsByInstanceIds(actorIds);
     }
 
     public Single<InsertOneResult> createMob(String mobId, Motion motion) {
         Monster mob = new Monster();
         // TODO: choose whether we need mob ID or not
-        mob.setMobInstanceId(mobId);
+        mob.setActorId(mobId);
         mob.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
         mob.setMotion(motion);
 
@@ -52,13 +52,13 @@ public class MobInstanceService {
         return mobRepository.insertMobInstance(mob);
     }
 
-    public Single<Monster> updateMobMotion(String mobInstanceId, Motion motion) {
-        return mobRepository.updateMotionOnly(mobInstanceId, motion);
+    public Single<Monster> updateMobMotion(String actorId, Motion motion) {
+        return mobRepository.updateMotionOnly(actorId, motion);
     }
 
-    public MotionResult buildMobMotionResult(String mobInstanceId, Motion motion) {
+    public MotionResult buildMobMotionResult(String actorId, Motion motion) {
         Monster monster = new Monster();
-        monster.setMobInstanceId(mobInstanceId);
+        monster.setActorId(actorId);
         monster.setMotion(motion);
         // we don't populate other info here
 

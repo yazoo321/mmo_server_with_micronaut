@@ -14,7 +14,7 @@ import server.items.types.ItemType;
 @EqualsAndHashCode(callSuper = false)
 public class BracersSlot extends EquippedItems {
 
-    public BracersSlot(String characterName, ItemInstance itemInstance) {
-        super(characterName, itemInstance, ItemType.BRACERS.getType());
+    public BracersSlot(String actorId, ItemInstance itemInstance) {
+        super(actorId, itemInstance, ItemType.BRACERS.getType());
     }
 }

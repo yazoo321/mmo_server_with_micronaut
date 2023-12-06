@@ -23,8 +23,7 @@ public class StatsSocketIntegration {
                 .getStatsFor(actorId)
                 .doOnSuccess(
                         stats -> {
-                            if (actorId.equalsIgnoreCase(
-                                    SessionParamHelper.getPlayerName(session))) {
+                            if (actorId.equalsIgnoreCase(SessionParamHelper.getActorId(session))) {
                                 // update session with params
                                 SessionParamHelper.updateDerivedStats(
                                         session, stats.getDerivedStats());
@@ -39,11 +38,7 @@ public class StatsSocketIntegration {
                             session.send(response).subscribe(socketResponseSubscriber);
                         })
                 .doOnError(
-                        e ->
-                                log.error(
-                                        "Failed to fetch stats for {}, {}",
-                                        actorId,
-                                        e.getMessage()))
+                        e -> log.error("Failed to fetch stats for {}, {}", actorId, e.getMessage()))
                 .subscribe();
     }
 }

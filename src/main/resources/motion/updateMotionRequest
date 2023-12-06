@@ -2,10 +2,10 @@ Example to update motion through socket
 URL: ws://localhost:8081/v1/communication-socket
 Payload:
 {
-    "playerName": "testChar2",
+    "actorId": "testChar2",
     "updateType": "PLAYER_MOTION",
     "playerMotion": {
-        "playerName": "testChar2",
+        "actorId": "testChar2",
         "motion": {
             "map": "test",
             "x": 100,

@@ -22,8 +22,7 @@ public class PlayerMotionService {
 
     @Inject PlayerMotionUpdateProducer playerMotionUpdateProducer;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
     private static int DEFAULT_DISTANCE_THRESHOLD = 1000;
 
@@ -42,26 +41,26 @@ public class PlayerMotionService {
                     .yaw(0)
                     .build();
 
-    public Single<PlayerMotion> initializePlayerMotion(String playerName) {
+    public Single<PlayerMotion> initializePlayerMotion(String actorId) {
         // can create custom start points for different classes/maps etc
         PlayerMotion playerMotion = new PlayerMotion();
         playerMotion.setMotion(STARTING_MOTION);
-        playerMotion.setPlayerName(playerName);
+        playerMotion.setActorId(actorId);
         playerMotion.setIsOnline(false);
         playerMotion.setUpdatedAt(Instant.now());
 
-        sessionParamHelper.setSharedActorMotion(playerName, playerMotion.getMotion());
+        sessionParamHelper.setSharedActorMotion(actorId, playerMotion.getMotion());
 
         return playerMotionRepository.insertPlayerMotion(playerMotion);
     }
 
-    public void deletePlayerMotion(String playerName) {
-        playerMotionRepository.deletePlayerMotion(playerName).subscribe();
+    public void deletePlayerMotion(String actorId) {
+        playerMotionRepository.deletePlayerMotion(actorId).subscribe();
     }
 
-    public PlayerMotion buildPlayerMotion(String playerName, String map, Motion motion) {
+    public PlayerMotion buildPlayerMotion(String actorId, String map, Motion motion) {
         motion.setMap(map);
-        return new PlayerMotion(playerName, motion, true, Instant.now());
+        return new PlayerMotion(actorId, motion, true, Instant.now());
     }
 
     public Single<PlayerMotion> updatePlayerMotion(PlayerMotion playerMotion) {
@@ -69,17 +68,17 @@ public class PlayerMotionService {
     }
 
     // used in v1
-    public Single<PlayerMotion> updatePlayerMotion(String playerName, Motion motion) {
-        PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
+    public Single<PlayerMotion> updatePlayerMotion(String actorId, Motion motion) {
+        PlayerMotion playerMotion = new PlayerMotion(actorId, motion, true, Instant.now());
         return playerMotionRepository.updateMotion(playerMotion);
     }
 
-    public void disconnectPlayer(String playerName) {
-        playerMotionRepository.setPlayerOnlineStatus(playerName, false).subscribe();
+    public void disconnectPlayer(String actorId) {
+        playerMotionRepository.setPlayerOnlineStatus(actorId, false).subscribe();
     }
 
-    public Single<PlayerMotionList> getPlayersNearMe(Motion motion, String playerName) {
-        PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
+    public Single<PlayerMotionList> getPlayersNearMe(Motion motion, String actorId) {
+        PlayerMotion playerMotion = new PlayerMotion(actorId, motion, true, Instant.now());
         return playerMotionRepository
                 .getPlayersNearby(playerMotion, DEFAULT_DISTANCE_THRESHOLD)
                 .doOnError(e -> log.error("Failed to get players motion, {}", e.getMessage()))
@@ -87,19 +86,19 @@ public class PlayerMotionService {
     }
 
     public Single<List<PlayerMotion>> getNearbyPlayersAsync(
-            Motion motion, String playerName, Integer threshold) {
-        PlayerMotion playerMotion = new PlayerMotion(playerName, motion, true, Instant.now());
+            Motion motion, String actorId, Integer threshold) {
+        PlayerMotion playerMotion = new PlayerMotion(actorId, motion, true, Instant.now());
         threshold = threshold == null ? DEFAULT_DISTANCE_THRESHOLD : threshold;
 
         return playerMotionRepository.getPlayersNearby(playerMotion, threshold);
     }
 
-    public Single<PlayerMotion> getPlayerMotion(String playerName) {
-        return playerMotionRepository.findPlayerMotion(playerName);
+    public Single<PlayerMotion> getPlayerMotion(String actorId) {
+        return playerMotionRepository.findPlayerMotion(actorId);
     }
 
-    public Single<List<PlayerMotion>> getPlayersMotion(Set<String> playerNames) {
-        return playerMotionRepository.findPlayersMotion(playerNames);
+    public Single<List<PlayerMotion>> getPlayersMotion(Set<String> actorIds) {
+        return playerMotionRepository.findPlayersMotion(actorIds);
     }
 
     public void relayPlayerMotion(PlayerMotion playerMotion) {

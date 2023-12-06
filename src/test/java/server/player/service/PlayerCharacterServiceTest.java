@@ -22,11 +22,11 @@ public class PlayerCharacterServiceTest {
     @Inject PlayerCharacterRepository playerCharacterRepository;
 
     private static final String TEST_USERNAME = "USER";
-    private static final String TEST_CHARACTER_NAME = "CHARACTER";
+    private static final String TEST_ACTOR_ID = "CHARACTER";
 
     @BeforeEach
     void cleanDb() {
-        playerCharacterRepository.deleteByCharacterName(TEST_CHARACTER_NAME);
+        playerCharacterRepository.deleteByActorId(TEST_ACTOR_ID);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class PlayerCharacterServiceTest {
 
         Character testCharacter =
                 TestCharacterUtil.getBasicTestCharacter(
-                        TEST_USERNAME, TEST_CHARACTER_NAME, Map.of("key", "value"));
+                        TEST_USERNAME, TEST_ACTOR_ID, Map.of("key", "value"));
 
         // When
         Character character =
@@ -53,7 +53,7 @@ public class PlayerCharacterServiceTest {
 
     public static CreateCharacterRequest createBasicCharacterRequest() {
         CreateCharacterRequest createCharacterRequest = new CreateCharacterRequest();
-        createCharacterRequest.setName(TEST_CHARACTER_NAME);
+        createCharacterRequest.setName(TEST_ACTOR_ID);
         Map<String, String> appearanceInfo = Map.of("key", "value");
         createCharacterRequest.setAppearanceInfo(appearanceInfo);
         createCharacterRequest.setClassName(ClassTypes.FIGHTER.getType());

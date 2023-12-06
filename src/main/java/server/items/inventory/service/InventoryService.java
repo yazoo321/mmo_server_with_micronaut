@@ -39,7 +39,7 @@ public class InventoryService {
                         droppedItem -> {
                             ItemInstance instance = droppedItem.getItemInstance();
                             return inventoryRepository
-                                    .getCharacterInventory(request.getCharacterName())
+                                    .getCharacterInventory(request.getActorId())
                                     .flatMap(
                                             inventory -> {
                                                 // check for example if inventory is full
@@ -56,7 +56,7 @@ public class InventoryService {
 
                                                 CharacterItem newCharacterItem =
                                                         new CharacterItem(
-                                                                request.getCharacterName(),
+                                                                request.getActorId(),
                                                                 position,
                                                                 instance);
 
@@ -70,17 +70,17 @@ public class InventoryService {
 
                                                 inventoryRepository
                                                         .updateInventoryItems(
-                                                                request.getCharacterName(), items)
+                                                                request.getActorId(), items)
                                                         .blockingGet();
 
-                                                return getInventory(request.getCharacterName());
+                                                return getInventory(request.getActorId());
                                             });
                         });
     }
 
-    public Single<List<CharacterItem>> unequipItem(String itemInstanceId, String characterName) {
+    public Single<List<CharacterItem>> unequipItem(String itemInstanceId, String actorId) {
         // this is basically finding the nearest slot and placing item there
-        return getInventory(characterName)
+        return getInventory(actorId)
                 .doOnError(e -> log.error("Failed to get characters inventory, {}", e.getMessage()))
                 .map(
                         inventory -> {
@@ -109,7 +109,7 @@ public class InventoryService {
                                 log.error(
                                         "Un-equip item unexpectedly failed for character {} and"
                                                 + " itemInstanceId {}",
-                                        characterName,
+                                        actorId,
                                         itemInstanceId);
                                 throw new EquipException("Un-equip has unexpectedly failed");
                             }
@@ -117,7 +117,7 @@ public class InventoryService {
                             foundItem.setLocation(loc);
                             // TODO: make async
                             inventoryRepository
-                                    .updateInventoryItems(characterName, items)
+                                    .updateInventoryItems(actorId, items)
                                     .doOnError(
                                             err ->
                                                     log.error(
@@ -129,11 +129,10 @@ public class InventoryService {
                         });
     }
 
-    public Single<DroppedItem> dropItem(
-            String characterName, String itemInstanceId, Location location)
+    public Single<DroppedItem> dropItem(String actorId, String itemInstanceId, Location location)
             throws InventoryException {
         return inventoryRepository
-                .getCharacterInventory(characterName)
+                .getCharacterInventory(actorId)
                 .doOnError(e -> log.error("Failed to get character inventory, {}", e.getMessage()))
                 .flatMap(
                         inventory -> {
@@ -156,8 +155,12 @@ public class InventoryService {
                             itemsList.remove(item);
 
                             inventoryRepository
-                                    .updateInventoryItems(characterName, itemsList)
-                                    .doOnError(err-> log.error("Failed to update inventory items, {}", err.getMessage()))
+                                    .updateInventoryItems(actorId, itemsList)
+                                    .doOnError(
+                                            err ->
+                                                    log.error(
+                                                            "Failed to update inventory items, {}",
+                                                            err.getMessage()))
                                     .subscribe();
 
                             // TODO: if dropItem fails, we need to revert the removal of item from
@@ -167,19 +170,19 @@ public class InventoryService {
                         });
     }
 
-    public Single<Inventory> getInventory(String characterName) {
-        return inventoryRepository.getCharacterInventory(characterName);
+    public Single<Inventory> getInventory(String actorId) {
+        return inventoryRepository.getCharacterInventory(actorId);
     }
 
     public Single<UpdateResult> updateInventoryItems(
-            String characterName, List<CharacterItem> characterItems) {
-        return inventoryRepository.updateInventoryItems(characterName, characterItems);
+            String actorId, List<CharacterItem> characterItems) {
+        return inventoryRepository.updateInventoryItems(actorId, characterItems);
     }
 
-    public Single<Inventory> createInventoryForNewCharacter(String characterName) {
+    public Single<Inventory> createInventoryForNewCharacter(String actorId) {
         Inventory inventory = new Inventory();
 
-        inventory.setCharacterName(characterName);
+        inventory.setActorId(actorId);
         inventory.setCharacterItems(new ArrayList<>());
         inventory.setGold(0);
         inventory.setMaxSize(new Location2D(4, 10));
@@ -217,9 +220,9 @@ public class InventoryService {
         return null;
     }
 
-    public void clearAllDataForCharacter(String characterName) {
+    public void clearAllDataForCharacter(String actorId) {
         // This is for test purposes!
-        inventoryRepository.deleteAllInventoryDataForCharacter(characterName).subscribe();
+        inventoryRepository.deleteAllInventoryDataForCharacter(actorId).subscribe();
     }
 
     private CharacterItem getItemAtLocation(Location2D location, Inventory inventory) {

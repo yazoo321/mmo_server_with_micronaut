@@ -78,7 +78,7 @@ public class MotionSocketV2Test {
         playerMotionUtil.deleteAllMobInstanceData();
     }
 
-    private TestWebSocketClient createWebSocketClient(int port, String map, String playerName) {
+    private TestWebSocketClient createWebSocketClient(int port, String map, String actorId) {
         WebSocketClient webSocketClient = beanContext.getBean(WebSocketClient.class);
         URI uri =
                 UriBuilder.of("ws://localhost")
@@ -86,8 +86,8 @@ public class MotionSocketV2Test {
                         .path("v2")
                         .path("actor-updates")
                         .path("{map}")
-                        .path("{playerName}")
-                        .expand(CollectionUtils.mapOf("map", map, "playerName", playerName));
+                        .path("{actorId}")
+                        .expand(CollectionUtils.mapOf("map", map, "actorId", actorId));
         Publisher<TestWebSocketClient> client =
                 webSocketClient.connect(TestWebSocketClient.class, uri);
         // requires to install reactor
@@ -140,7 +140,7 @@ public class MotionSocketV2Test {
         Thread.sleep(1000);
 
         PlayerMotion expectedPlayerMotion = new PlayerMotion();
-        expectedPlayerMotion.setPlayerName(CHARACTER_1);
+        expectedPlayerMotion.setActorId(CHARACTER_1);
         expectedPlayerMotion.setIsOnline(true);
         expectedPlayerMotion.setMotion(motionWithinRange);
 
@@ -155,7 +155,7 @@ public class MotionSocketV2Test {
                                         getMotionResult(playerClient2), expectedPlayerMotion));
 
         // now player 2 will move and player 1 will see this
-        expectedPlayerMotion.setPlayerName(CHARACTER_2);
+        expectedPlayerMotion.setActorId(CHARACTER_2);
         playerClient2.send(playerMotionWithinRange);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
@@ -171,7 +171,7 @@ public class MotionSocketV2Test {
         Thread.sleep(200);
 
         PlayerMotion player3Motion = new PlayerMotion();
-        expectedPlayerMotion.setPlayerName(CHARACTER_3);
+        expectedPlayerMotion.setActorId(CHARACTER_3);
         expectedPlayerMotion.setIsOnline(true);
         expectedPlayerMotion.setMotion(motionOutOfRange);
 
@@ -233,7 +233,7 @@ public class MotionSocketV2Test {
         mobServerClient.send(mobMotionWithinRange1);
 
         Monster expectedMobUpdate = new Monster();
-        expectedMobUpdate.setMobInstanceId(MOB_INSTANCE_ID_1);
+        expectedMobUpdate.setActorId(MOB_INSTANCE_ID_1);
         expectedMobUpdate.setMotion(motionWithinRange);
 
         Thread.sleep(200);
@@ -244,7 +244,7 @@ public class MotionSocketV2Test {
 
         // mob 2 will make a motion and player 1 should get this info
         mobServerClient.send(mobMotionWithinRange2);
-        expectedMobUpdate.setMobInstanceId(MOB_INSTANCE_ID_2);
+        expectedMobUpdate.setActorId(MOB_INSTANCE_ID_2);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
@@ -253,7 +253,7 @@ public class MotionSocketV2Test {
         // mob 3 will make a motion but player 1 will not see it.
 
         mobServerClient.send(mobMotionOutOfRange);
-        expectedMobUpdate.setMobInstanceId(MOB_INSTANCE_ID_3);
+        expectedMobUpdate.setActorId(MOB_INSTANCE_ID_3);
         expectedMobUpdate.getMotion().setX(10_000);
         expectedMobUpdate.getMotion().setY(10_000);
 
@@ -290,7 +290,7 @@ public class MotionSocketV2Test {
 
         // match all except updated_at
         return motion.getMotion().equals(expectedPlayerMotion.getMotion())
-                && motion.getPlayerName().equals(expectedPlayerMotion.getPlayerName())
+                && motion.getActorId().equals(expectedPlayerMotion.getActorId())
                 && motion.getIsOnline().equals(expectedPlayerMotion.getIsOnline());
     }
 
@@ -301,7 +301,7 @@ public class MotionSocketV2Test {
 
         Monster mob = motionResult.getMonster();
 
-        return mob.getMobInstanceId().equals(expectedMob.getMobInstanceId())
+        return mob.getActorId().equals(expectedMob.getActorId())
                 && mob.getMotion().equals(expectedMob.getMotion());
     }
 }

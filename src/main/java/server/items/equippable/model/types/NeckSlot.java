@@ -14,7 +14,7 @@ import server.items.types.ItemType;
 @EqualsAndHashCode(callSuper = false)
 public class NeckSlot extends EquippedItems {
 
-    public NeckSlot(String characterName, ItemInstance itemInstance) {
-        super(characterName, itemInstance, ItemType.NECK.getType());
+    public NeckSlot(String actorId, ItemInstance itemInstance) {
+        super(actorId, itemInstance, ItemType.NECK.getType());
     }
 }

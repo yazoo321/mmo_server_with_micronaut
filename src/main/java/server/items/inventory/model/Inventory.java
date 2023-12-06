@@ -1,10 +1,9 @@
 package server.items.inventory.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.List;
-
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Location2D;
@@ -17,17 +16,14 @@ import server.common.dto.Location2D;
 public class Inventory {
 
     public Inventory(
-            String characterName,
-            List<CharacterItem> characterItems,
-            Integer gold,
-            Location2D maxSize) {
-        this.characterName = characterName;
+            String actorId, List<CharacterItem> characterItems, Integer gold, Location2D maxSize) {
+        this.actorId = actorId;
         this.characterItems = characterItems;
         this.gold = gold;
         this.maxSize = maxSize;
     }
 
-    String characterName;
+    String actorId;
     List<CharacterItem> characterItems;
     Integer gold;
     Location2D maxSize;

@@ -54,10 +54,9 @@ public class MobIntegrationSocket {
         return broadcaster.broadcast(String.format("[%s] Leaving %s!", serverInstance, map));
     }
 
-    private Predicate<WebSocketSession> isValid(String playerName) {
+    private Predicate<WebSocketSession> isValid(String actorId) {
         // we will report to player every time they call update about other players nearby
         return s ->
-                playerName.equalsIgnoreCase(
-                        s.getUriVariables().get("playerName", String.class, null));
+                actorId.equalsIgnoreCase(s.getUriVariables().get("actorId", String.class, null));
     }
 }

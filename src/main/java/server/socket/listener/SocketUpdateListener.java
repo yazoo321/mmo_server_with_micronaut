@@ -5,16 +5,14 @@ import io.micronaut.configuration.kafka.annotation.OffsetReset;
 import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.ItemInstanceIds;
 import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
-import server.socket.model.SocketResponseType;
 import server.socket.service.ClientUpdatesService;
-
-import java.util.List;
 
 @Slf4j
 @KafkaListener(
@@ -53,6 +51,7 @@ public class SocketUpdateListener {
 
     @Topic("notify-un-equip-items")
     void notifyUnEquipItem(ItemInstanceIds itemInstanceIds) {
-        clientUpdatesService.sendItemUnEquipUpdates(itemInstanceIds.getPlayerName(), itemInstanceIds.getItemInstanceIds());
+        clientUpdatesService.sendItemUnEquipUpdates(
+                itemInstanceIds.getActorId(), itemInstanceIds.getItemInstanceIds());
     }
 }

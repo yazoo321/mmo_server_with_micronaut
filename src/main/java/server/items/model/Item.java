@@ -3,10 +3,9 @@ package server.items.model;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
-import java.util.Map;
-
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
@@ -79,6 +78,5 @@ public abstract class Item {
     Integer value;
     ItemConfig itemConfig;
 
-    public abstract EquippedItems createEquippedItem(
-            String characterName, ItemInstance itemInstance);
+    public abstract EquippedItems createEquippedItem(String actorId, ItemInstance itemInstance);
 }

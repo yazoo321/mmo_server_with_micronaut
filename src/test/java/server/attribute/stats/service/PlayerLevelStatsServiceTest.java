@@ -29,7 +29,7 @@ public class PlayerLevelStatsServiceTest {
 
     @Inject StatsService statsService;
 
-    private static final String CHARACTER_NAME = "TEST_PLAYER";
+    private static final String ACTOR_ID = "TEST_PLAYER";
 
     private static Stream<Arguments> availableClasses() {
         return Stream.of(
@@ -53,17 +53,17 @@ public class PlayerLevelStatsServiceTest {
     void whenCreatingNewCharacterOfClassTheDataIsSetupAsExpected(String characterClass) {
         // given
         // user has to pre-initialize
-        statsService.initializePlayerStats(CHARACTER_NAME).blockingSubscribe();
+        statsService.initializePlayerStats(ACTOR_ID).blockingSubscribe();
         Map<String, Integer> expectedTags =
                 buildBaseExpectedNumTagsForCharacterClass(characterClass, 1);
 
         // when
         playerLevelStatsService
-                .initializeCharacterClass(CHARACTER_NAME, characterClass)
+                .initializeCharacterClass(ACTOR_ID, characterClass)
                 .blockingSubscribe();
 
         // then
-        Stats stats = statsService.getStatsFor(CHARACTER_NAME).blockingGet();
+        Stats stats = statsService.getStatsFor(ACTOR_ID).blockingGet();
         Map<String, Integer> actualBaseAttr = stats.getBaseStats();
 
         Assertions.assertThat(actualBaseAttr).containsAllEntriesOf(expectedTags);
@@ -73,18 +73,18 @@ public class PlayerLevelStatsServiceTest {
     @MethodSource("availableClasses")
     void handleLevelUp(String characterClass) {
         // given
-        statsService.initializePlayerStats(CHARACTER_NAME).blockingSubscribe();
+        statsService.initializePlayerStats(ACTOR_ID).blockingSubscribe();
         playerLevelStatsService
-                .initializeCharacterClass(CHARACTER_NAME, characterClass)
+                .initializeCharacterClass(ACTOR_ID, characterClass)
                 .blockingSubscribe();
 
         // when
-        playerLevelStatsService.handleLevelUp(CHARACTER_NAME, characterClass).blockingSubscribe();
+        playerLevelStatsService.handleLevelUp(ACTOR_ID, characterClass).blockingSubscribe();
         Map<String, Integer> expectedTags =
                 buildBaseExpectedNumTagsForCharacterClass(characterClass, 2);
 
         // then
-        Stats stats = statsService.getStatsFor(CHARACTER_NAME).blockingGet();
+        Stats stats = statsService.getStatsFor(ACTOR_ID).blockingGet();
         Map<String, Integer> actualBaseAttr = stats.getBaseStats();
 
         Assertions.assertThat(actualBaseAttr).containsAllEntriesOf(expectedTags);
@@ -93,19 +93,19 @@ public class PlayerLevelStatsServiceTest {
     @Test
     void addXpToCharacter() {
         // given
-        statsService.initializePlayerStats(CHARACTER_NAME).blockingSubscribe();
+        statsService.initializePlayerStats(ACTOR_ID).blockingSubscribe();
         playerLevelStatsService
-                .initializeCharacterClass(CHARACTER_NAME, ClassTypes.FIGHTER.getType())
+                .initializeCharacterClass(ACTOR_ID, ClassTypes.FIGHTER.getType())
                 .blockingSubscribe();
 
         Double expectedXp = 700.0;
 
         // when
-        playerLevelStatsService.addPlayerXp(CHARACTER_NAME, 500).blockingSubscribe();
-        playerLevelStatsService.addPlayerXp(CHARACTER_NAME, 200).blockingSubscribe();
+        playerLevelStatsService.addPlayerXp(ACTOR_ID, 500).blockingSubscribe();
+        playerLevelStatsService.addPlayerXp(ACTOR_ID, 200).blockingSubscribe();
 
         // then
-        Stats stats = statsService.getStatsFor(CHARACTER_NAME).blockingGet();
+        Stats stats = statsService.getStatsFor(ACTOR_ID).blockingGet();
 
         Double actualXp = stats.getDerived(StatsTypes.XP);
 

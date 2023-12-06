@@ -7,11 +7,9 @@ import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Singleton;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.NonNull;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.PlayerCombatData;
 import server.common.dto.Motion;
@@ -87,12 +85,18 @@ import server.session.model.CacheKey;
         mobs.addAll(trackingMobs);
     }
 
-    public static void setPlayerName(WebSocketSession session, String playerName) {
-        session.put(SessionParams.PLAYER_NAME.getType(), playerName);
-        if (playerName != null && !playerName.equalsIgnoreCase("false") && !playerName.isBlank()) {
-            session.put(SessionParams.IS_PLAYER.getType(), true);
-            session.put(SessionParams.IS_SERVER.getType(), false);
+    public static void setActorId(WebSocketSession session, String actorId) {
+        session.put(SessionParams.ACTOR_ID.getType(), actorId);
+        boolean isServer = false;
+        try{
+            // can change this to REGEX
+            UUID.fromString(actorId);
+            isServer = true;
+        } catch (IllegalArgumentException exception){
+            // then it is a player
         }
+        session.put(SessionParams.IS_PLAYER.getType(), !isServer);
+        session.put(SessionParams.IS_SERVER.getType(), isServer);
     }
 
     public static void setServerName(WebSocketSession session, String serverName) {
@@ -103,8 +107,8 @@ import server.session.model.CacheKey;
         }
     }
 
-    public static String getPlayerName(WebSocketSession session) {
-        return (String) session.asMap().getOrDefault(SessionParams.PLAYER_NAME.getType(), "");
+    public static String getActorId(WebSocketSession session) {
+        return (String) session.asMap().getOrDefault(SessionParams.ACTOR_ID.getType(), "");
     }
 
     public static String getServerName(WebSocketSession session) {
@@ -165,7 +169,7 @@ import server.session.model.CacheKey;
         PlayerCombatData combatData =
                 (PlayerCombatData) session.asMap().get(SessionParams.COMBAT_DATA.getType());
         if (combatData == null) {
-            combatData = new PlayerCombatData(getPlayerName(session));
+            combatData = new PlayerCombatData(getActorId(session));
             setCombatData(session, combatData);
         }
 
@@ -196,7 +200,11 @@ import server.session.model.CacheKey;
         Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
 
         for (String key : equippedItemsMap.keySet()) {
-            if (equippedItemsMap.get(key).getItemInstance().getItemInstanceId().equals(itemInstanceId)) {
+            if (equippedItemsMap
+                    .get(key)
+                    .getItemInstance()
+                    .getItemInstanceId()
+                    .equals(itemInstanceId)) {
                 equippedItemsMap.remove(key);
             }
         }

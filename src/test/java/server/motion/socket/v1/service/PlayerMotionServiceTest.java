@@ -23,7 +23,7 @@ public class PlayerMotionServiceTest {
     @Inject PlayerMotionUtil playerMotionUtil;
 
     private static final String TEST_USERNAME = "USER";
-    private static final String TEST_CHARACTER_NAME = "CHARACTER";
+    private static final String TEST_ACTOR_ID = "CHARACTER";
 
     @BeforeEach
     void cleanDb() {
@@ -37,12 +37,12 @@ public class PlayerMotionServiceTest {
         PlayerMotion playerMotion = new PlayerMotion();
         playerMotion.setMotion(base);
         playerMotion.setIsOnline(false);
-        playerMotion.setPlayerName(TEST_CHARACTER_NAME);
+        playerMotion.setActorId(TEST_ACTOR_ID);
 
         // When
-        playerMotionService.initializePlayerMotion(TEST_CHARACTER_NAME).blockingGet();
+        playerMotionService.initializePlayerMotion(TEST_ACTOR_ID).blockingGet();
         PlayerMotion actual =
-                playerMotionRepository.findPlayerMotion(TEST_CHARACTER_NAME).blockingGet();
+                playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
 
         // Then
         Assertions.assertThat(actual)
@@ -55,7 +55,7 @@ public class PlayerMotionServiceTest {
     void whenUpdatingMotionForPlayerItsUpdatedAsExpected() {
         // Given
         PlayerMotion playerMotion =
-                playerMotionService.initializePlayerMotion(TEST_CHARACTER_NAME).blockingGet();
+                playerMotionService.initializePlayerMotion(TEST_ACTOR_ID).blockingGet();
         Motion motion = playerMotion.getMotion();
         motion.setX(100);
         motion.setY(100);
@@ -71,9 +71,9 @@ public class PlayerMotionServiceTest {
         playerMotion.setIsOnline(true);
 
         // When
-        playerMotionService.updatePlayerMotion(TEST_CHARACTER_NAME, motion).blockingGet();
+        playerMotionService.updatePlayerMotion(TEST_ACTOR_ID, motion).blockingGet();
         PlayerMotion actual =
-                playerMotionRepository.findPlayerMotion(TEST_CHARACTER_NAME).blockingGet();
+                playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
 
         // Then
         Assertions.assertThat(actual)
@@ -87,7 +87,7 @@ public class PlayerMotionServiceTest {
     void whenUserIsOnlineAndNearbyTheMotionIsReturned() {
         // Given
         PlayerMotion playerMotion =
-                playerMotionService.initializePlayerMotion(TEST_CHARACTER_NAME).blockingGet();
+                playerMotionService.initializePlayerMotion(TEST_ACTOR_ID).blockingGet();
         Motion motion = playerMotion.getMotion();
         motion.setX(100);
         motion.setY(100);
@@ -95,7 +95,7 @@ public class PlayerMotionServiceTest {
         playerMotion.setIsOnline(true);
 
         // update motion and set them online
-        playerMotionService.updatePlayerMotion(TEST_CHARACTER_NAME, motion).blockingGet();
+        playerMotionService.updatePlayerMotion(TEST_ACTOR_ID, motion).blockingGet();
 
         // When
         PlayerMotionList actual =
@@ -114,7 +114,7 @@ public class PlayerMotionServiceTest {
     void whenUserIsOnlineAndFarTheMotionIsNotReturned() {
         // Given
         PlayerMotion playerMotion =
-                playerMotionService.initializePlayerMotion(TEST_CHARACTER_NAME).blockingGet();
+                playerMotionService.initializePlayerMotion(TEST_ACTOR_ID).blockingGet();
         Motion motion = playerMotion.getMotion();
         motion.setX(100);
         motion.setY(100);
@@ -122,7 +122,7 @@ public class PlayerMotionServiceTest {
         playerMotion.setIsOnline(true);
 
         // update motion and set them online
-        playerMotionService.updatePlayerMotion(TEST_CHARACTER_NAME, motion).blockingGet();
+        playerMotionService.updatePlayerMotion(TEST_ACTOR_ID, motion).blockingGet();
 
         // When
         motion.setX(10000);

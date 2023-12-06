@@ -23,8 +23,7 @@ public class StatsTestHelper {
     }
 
     public void deleteAllAttributeData() {
-        Single.fromPublisher(statsCollection.deleteMany(ne("playerName", "deleteAll")))
-                .blockingGet();
+        Single.fromPublisher(statsCollection.deleteMany(ne("actorId", "deleteAll"))).blockingGet();
     }
 
     private void prepareCollections() {

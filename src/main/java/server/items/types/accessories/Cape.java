@@ -30,7 +30,7 @@ public class Cape extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
-        return new CapeSlot(characterName, itemInstance);
+    public EquippedItems createEquippedItem(String actorId, ItemInstance itemInstance) {
+        return new CapeSlot(actorId, itemInstance);
     }
 }

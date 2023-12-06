@@ -36,18 +36,17 @@ public class PlayerMotionRepository {
         prepareCollections();
     }
 
-    public Single<PlayerMotion> findPlayerMotion(String playerName) {
-        return Single.fromPublisher(playerMotionMongoCollection.find(eq("playerName", playerName)))
+    public Single<PlayerMotion> findPlayerMotion(String actorId) {
+        return Single.fromPublisher(playerMotionMongoCollection.find(eq("actorId", actorId)))
                 .doOnError(
                         (exception) -> {
-                            log.error("Player motion not found for {}", playerName);
+                            log.error("Player motion not found for {}", actorId);
                             throw new PlayerMotionException("Failed to find player motion");
                         });
     }
 
-    public Single<List<PlayerMotion>> findPlayersMotion(Set<String> playerName) {
-        return Flowable.fromPublisher(
-                        playerMotionMongoCollection.find(in("playerName", playerName)))
+    public Single<List<PlayerMotion>> findPlayersMotion(Set<String> actorId) {
+        return Flowable.fromPublisher(playerMotionMongoCollection.find(in("actorId", actorId)))
                 .toList();
     }
 
@@ -56,16 +55,16 @@ public class PlayerMotionRepository {
                 .map(success -> playerMotion);
     }
 
-    public Single<PlayerMotion> setPlayerOnlineStatus(String playerName, boolean isOnline) {
+    public Single<PlayerMotion> setPlayerOnlineStatus(String actorId, boolean isOnline) {
         return Single.fromPublisher(
                 playerMotionMongoCollection.findOneAndUpdate(
-                        eq("playerName", playerName), set("isOnline", isOnline)));
+                        eq("actorId", actorId), set("isOnline", isOnline)));
     }
 
     public Single<PlayerMotion> updateMotion(PlayerMotion playerMotion) {
         return Single.fromPublisher(
                         playerMotionMongoCollection.findOneAndUpdate(
-                                eq("playerName", playerMotion.getPlayerName()),
+                                eq("actorId", playerMotion.getActorId()),
                                 Updates.combine(
                                         Updates.set("motion", playerMotion.getMotion()),
                                         Updates.set("isOnline", true),
@@ -75,8 +74,8 @@ public class PlayerMotionRepository {
                 .map(success -> playerMotion);
     }
 
-    public Single<DeleteResult> deletePlayerMotion(String playerName) {
-        return Single.fromPublisher(playerMotionMongoCollection.deleteOne(eq("playerName", playerName)));
+    public Single<DeleteResult> deletePlayerMotion(String actorId) {
+        return Single.fromPublisher(playerMotionMongoCollection.deleteOne(eq("actorId", actorId)));
     }
 
     public Single<List<PlayerMotion>> getPlayersNearby(

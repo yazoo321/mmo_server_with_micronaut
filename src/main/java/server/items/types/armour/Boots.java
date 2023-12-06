@@ -30,7 +30,7 @@ public class Boots extends Item {
     }
 
     @Override
-    public EquippedItems createEquippedItem(String characterName, ItemInstance itemInstance) {
-        return new BootsSlot(characterName, itemInstance);
+    public EquippedItems createEquippedItem(String actorId, ItemInstance itemInstance) {
+        return new BootsSlot(actorId, itemInstance);
     }
 }

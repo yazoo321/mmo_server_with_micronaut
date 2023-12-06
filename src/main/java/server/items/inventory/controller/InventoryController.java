@@ -16,34 +16,34 @@ public class InventoryController {
 
     @Post("/pickup")
     public Single<Inventory> pickupItem(
-            @Body GenericInventoryData pickupRequest, @Header String characterName) {
-        pickupRequest.setCharacterName(characterName);
+            @Body GenericInventoryData pickupRequest, @Header String actorId) {
+        pickupRequest.setActorId(actorId);
         return inventoryService.pickupItem(pickupRequest);
     }
 
     @Post("/drop")
     public Single<DroppedItem> dropItem(
-            @Body GenericInventoryData dropRequest, @Header String characterName) {
+            @Body GenericInventoryData dropRequest, @Header String actorId) {
         return inventoryService.dropItem(
-                characterName, dropRequest.getItemInstanceId(), dropRequest.getLocation());
+                actorId, dropRequest.getItemInstanceId(), dropRequest.getLocation());
     }
 
     @Get
-    public Single<Inventory> getInventory(@Header String characterName) {
-        return inventoryService.getInventory(characterName);
+    public Single<Inventory> getInventory(@Header String actorId) {
+        return inventoryService.getInventory(actorId);
     }
 
     @Post("/generate-inventory")
     public Single<Inventory> createInventoryForCharacter(@Body GenericInventoryData data) {
         // This is test endpoint, this will be connected to the character creation process.
 
-        return inventoryService.createInventoryForNewCharacter(data.getCharacterName());
+        return inventoryService.createInventoryForNewCharacter(data.getActorId());
     }
 
     @Post("/clear-data")
-    public void clearAllData(@Header String characterName) {
+    public void clearAllData(@Header String actorId) {
         // this is a test endpoint
 
-        inventoryService.clearAllDataForCharacter(characterName);
+        inventoryService.clearAllDataForCharacter(actorId);
     }
 }
