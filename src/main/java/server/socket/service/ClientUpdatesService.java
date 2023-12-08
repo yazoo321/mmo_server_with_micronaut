@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
+import server.combat.model.CombatRequest;
 import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
@@ -156,6 +157,17 @@ public class ClientUpdatesService {
 
         broadcaster
                 .broadcast(socketResponse, notifyStatsFor(stats.getActorId(), stats))
+                .subscribe(socketResponseSubscriber);
+    }
+
+    public void sendAttackAnimUpdates(CombatRequest combatRequest) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .combatRequest(combatRequest)
+                        .build();
+
+        broadcaster
+                .broadcast(socketResponse, listensToUpdateFor(combatRequest.getActorId()))
                 .subscribe(socketResponseSubscriber);
     }
 

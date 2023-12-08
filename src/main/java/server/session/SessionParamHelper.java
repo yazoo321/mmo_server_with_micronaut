@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import server.attribute.stats.types.StatsTypes;
-import server.combat.model.PlayerCombatData;
+import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.configuration.redis.JacksonRedisCodecMotion;
 import server.items.equippable.model.EquippedItems;
@@ -143,7 +143,7 @@ import server.session.model.CacheKey;
         Map<String, Double> prev = getDerivedStats(session);
         prev.putAll(derivedStats);
         session.put(SessionParams.DERIVED_STATS.getType(), prev);
-        updateCombatData(session);
+        updatePlayerCombatData(session);
     }
 
     public static void setDerivedStats(WebSocketSession session, Map<String, Double> derivedStats) {
@@ -161,20 +161,65 @@ import server.session.model.CacheKey;
         return derivedStats;
     }
 
-    public static void setCombatData(WebSocketSession session, PlayerCombatData combatData) {
+
+    private static void setCombatData(WebSocketSession session, Map<String, CombatData> combatData) {
         session.put(SessionParams.COMBAT_DATA.getType(), combatData);
     }
 
-    public static PlayerCombatData getCombatData(WebSocketSession session) {
-        PlayerCombatData combatData =
-                (PlayerCombatData) session.asMap().get(SessionParams.COMBAT_DATA.getType());
+    private static Map<String, CombatData> getCombatData(WebSocketSession session) {
+        Map<String, CombatData> combatData =
+                (Map<String, CombatData>) session.asMap().get(SessionParams.COMBAT_DATA.getType());
         if (combatData == null) {
-            combatData = new PlayerCombatData(getActorId(session));
+            combatData = new HashMap<>();
             setCombatData(session, combatData);
         }
 
         return combatData;
     }
+
+    public static CombatData getActorCombatData(WebSocketSession session, String actorId) {
+        Map<String, CombatData> combatDataMap = getCombatData(session);
+        CombatData combatData;
+        if (combatDataMap.containsKey(actorId)) {
+            combatData = combatDataMap.get(actorId);
+        } else {
+            combatData = new CombatData(actorId);
+            combatDataMap.put(actorId, combatData);
+        }
+
+        return combatData;
+    }
+
+    public static void setActorCombatData(WebSocketSession session, String actorId, CombatData combatData) {
+        Map<String, CombatData> combatDataMap = getCombatData(session);
+        combatDataMap.put(actorId, combatData);
+    }
+//
+//    public static CombatData getCombatData(WebSocketSession session) {
+//        CombatData combatData =
+//                (CombatData) session.asMap().get(SessionParams.COMBAT_DATA.getType());
+//        if (combatData == null) {
+//            combatData = new CombatData(getActorId(session));
+//            setCombatData(session, combatData);
+//        }
+//
+//        return combatData;
+//    }
+
+//    public static CombatData getMobCombatData(WebSocketSession session, String actorId) {
+//        Map<String, CombatData> combatData =
+//                (Map<String, CombatData>) session.asMap().get(SessionParams.COMBAT_DATA.getType());
+//        if (combatData == null) {
+//            combatData = new HashMap<>(Map.of(actorId, new CombatData(actorId)));
+//            setMobCombatData(session, combatData);
+//        }
+//
+//        return combatData.get(actorId);
+//    }
+//
+//    public static void setMobCombatData(WebSocketSession session, Map<String, CombatData> combatData) {
+//        session.put(SessionParams.COMBAT_DATA.getType(), combatData);
+//    }
 
     public static Map<String, EquippedItems> getEquippedItems(WebSocketSession session) {
         Map<String, EquippedItems> equippedItemsMap =
@@ -193,7 +238,7 @@ import server.session.model.CacheKey;
 
         equippedItemsMap.put(equippedItems.getCategory(), equippedItems);
 
-        updateCombatData(session, equippedItemsMap);
+        updatePlayerCombatData(session, equippedItemsMap);
     }
 
     public static void removeFromEquippedItems(WebSocketSession session, String itemInstanceId) {
@@ -209,7 +254,7 @@ import server.session.model.CacheKey;
             }
         }
 
-        updateCombatData(session, equippedItemsMap);
+        updatePlayerCombatData(session, equippedItemsMap);
     }
 
     public static Map<String, EquippedItems> setEquippedItems(
@@ -219,19 +264,19 @@ import server.session.model.CacheKey;
                         .collect(Collectors.toMap(EquippedItems::getCategory, Function.identity()));
         session.put(SessionParams.EQUIPPED_ITEMS.getType(), data);
 
-        updateCombatData(session, data);
+        updatePlayerCombatData(session, data);
 
         return data;
     }
 
-    private static void updateCombatData(WebSocketSession session) {
+    private static void updatePlayerCombatData(WebSocketSession session) {
         Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
-        updateCombatData(session, equippedItemsMap);
+        updatePlayerCombatData(session, equippedItemsMap);
     }
 
-    private static void updateCombatData(
+    private static void updatePlayerCombatData(
             WebSocketSession session, Map<String, EquippedItems> equippedItemsMap) {
-        PlayerCombatData combatData = getCombatData(session);
+        CombatData combatData = getActorCombatData(session, getActorId(session));
         EquippedItems mainHand = equippedItemsMap.get(ItemType.WEAPON.getType());
         EquippedItems offHand = equippedItemsMap.get(ItemType.SHIELD.getType());
 
@@ -245,7 +290,7 @@ import server.session.model.CacheKey;
 
         Map<String, Double> stats = SessionParamHelper.getDerivedStats(session);
 
-        combatData.setCharacterAttackSpeed(stats.get(StatsTypes.ATTACK_SPEED.getType()));
+        combatData.setActorAttackSpeed(stats.get(StatsTypes.ATTACK_SPEED.getType()));
     }
 
     private static Double getBaseSpeed(EquippedItems item) {

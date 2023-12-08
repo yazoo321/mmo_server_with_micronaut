@@ -19,7 +19,7 @@ import org.reactivestreams.Publisher;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatRequest;
-import server.combat.model.PlayerCombatData;
+import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.service.EquipItemService;
@@ -109,7 +109,7 @@ class PlayerCombatServiceTest {
 
         // Then
         // check the attack loop has begun
-        PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
+        CombatData combatData = SessionParamHelper.getActorCombatData(session, SessionParamHelper.getActorId(session));
         Set<String> targets = combatData.getTargets();
         Assertions.assertThat(targets.size()).isEqualTo(1);
 

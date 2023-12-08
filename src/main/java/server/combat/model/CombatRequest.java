@@ -22,4 +22,6 @@ public class CombatRequest {
     private String skillId;
 
     private String itemInstanceId;
+
+    private String actorId;
 }

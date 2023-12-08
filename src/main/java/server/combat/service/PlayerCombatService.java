@@ -4,14 +4,13 @@ import static server.attribute.stats.types.StatsTypes.PHY_AMP;
 import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 
 import io.micronaut.websocket.WebSocketSession;
-import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
@@ -19,10 +18,9 @@ import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatRequest;
-import server.combat.model.PlayerCombatData;
+import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
-import server.monster.server_integration.model.Monster;
 import server.monster.server_integration.service.MobInstanceService;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
@@ -32,21 +30,21 @@ import server.socket.service.ClientUpdatesService;
 
 @Slf4j
 @Singleton
-public class PlayerCombatService {
+public class PlayerCombatService extends CombatService  {
 
-    private final ConcurrentSet<String> sessionsInCombat = new ConcurrentSet<>();
 
-    @Inject private StatsService statsService;
 
-    @Inject private StatusService statusService;
+//    @Inject private StatsService statsService;
 
-    @Inject private MobInstanceService mobInstanceService;
+//    @Inject private StatusService statusService;
 
-    @Inject SocketResponseSubscriber socketResponseSubscriber;
+//    @Inject private MobInstanceService mobInstanceService;
+
+//    @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     @Inject ClientUpdatesService clientUpdatesService;
 
-    @Inject SessionParamHelper sessionParamHelper;
+//    @Inject SessionParamHelper sessionParamHelper;
 
     Random rand = new Random();
 
@@ -54,20 +52,20 @@ public class PlayerCombatService {
         if (combatRequest == null) {
             return;
         }
-        PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
+        CombatData combatData = SessionParamHelper.getActorCombatData(session, SessionParamHelper.getActorId(session));
         combatData.setTargets(combatRequest.getTargets());
 
         sessionsInCombat.add(SessionParamHelper.getActorId(session));
-        attackLoop(session);
+        attackLoop(session, combatData.getActorId());
     }
 
-    public void requestStopAttack(WebSocketSession session) {
-        sessionsInCombat.remove(SessionParamHelper.getActorId(session));
+    public void requestStopAttack(String actorId) {
+        sessionsInCombat.remove(actorId);
     }
 
-    private void tryAttack(WebSocketSession session, Stats target, boolean isMainHand) {
+    public void tryAttack(WebSocketSession session, Stats target, boolean isMainHand) {
         // Extract relevant combat data
-        PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
+        CombatData combatData = SessionParamHelper.getActorCombatData(session, SessionParamHelper.getActorId(session));
         Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
         Map<String, Double> derivedStats = SessionParamHelper.getDerivedStats(session);
 
@@ -81,7 +79,11 @@ public class PlayerCombatService {
                 weapon.getAttackDistance() == null
                         ? 200
                         : (int) (double) weapon.getAttackDistance();
-        boolean valid = validatePositionLocation(session, target.getActorId(), distanceThreshold);
+
+        Motion attackerMotion = SessionParamHelper.getMotion(session);
+        boolean valid = validatePositionLocation(combatData, attackerMotion, target.getActorId(),
+                distanceThreshold, session);
+//        boolean valid = validatePositionLocation(session, target.getActorId(), distanceThreshold);
 
         if (!valid) {
             return;
@@ -98,7 +100,7 @@ public class PlayerCombatService {
                 isMainHand
                         ? combatData.getMainHandAttackSpeed()
                         : combatData.getOffhandAttackSpeed();
-        Double characterAttackSpeed = combatData.getCharacterAttackSpeed();
+        Double characterAttackSpeed = combatData.getActorAttackSpeed();
 
         // Calculate the actual delay in milliseconds
         long actualDelayInMS = (long) (getAttackTimeDelay(baseSpeed, characterAttackSpeed) * 1000);
@@ -149,6 +151,34 @@ public class PlayerCombatService {
         }
     }
 
+    void attackLoop(WebSocketSession session, String actorId) {
+        CombatData combatData = SessionParamHelper.getActorCombatData(session, actorId);
+        Set<String> targets = combatData.getTargets();
+
+        List<Stats> targetStats = getTargetStats(targets);
+
+        if (targetStats.isEmpty()) {
+            log.warn("Target stats empty");
+            sessionsInCombat.remove(SessionParamHelper.getActorId(session));
+            return;
+        }
+
+        targetStats.forEach(
+                stat -> {
+                    tryAttack(session, stat, true);
+                    //            tryAttack(session, stat, "OFF_HAND");
+                });
+
+        Single.fromCallable(
+                        () -> {
+                            attackLoop(session, SessionParamHelper.getActorId(session));
+                            return true;
+                        })
+                .delaySubscription(100, TimeUnit.MILLISECONDS)
+                .doOnError(er -> log.error("Error encountered, {}", er.getMessage()))
+                .subscribe();
+    }
+
     private void requestAttackSwing(WebSocketSession session, boolean isMainHand) {
         Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
 
@@ -156,23 +186,24 @@ public class PlayerCombatService {
         EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
         String itemInstanceId = weapon.getItemInstance().getItemInstanceId();
 
-        SessionParamHelper.getCombatData(session)
+        SessionParamHelper.getActorCombatData(session, SessionParamHelper.getActorId(session))
                 .getAttackSent()
                 .put(isMainHand ? "MAIN" : "OFF", true);
 
-        requestSessionToSwingWeapon(session, itemInstanceId);
+        requestSessionsToSwingWeapon(session, itemInstanceId, SessionParamHelper.getActorId(session));
     }
 
-    private void requestSessionToSwingWeapon(WebSocketSession session, String itemInstanceId) {
-        CombatRequest request = new CombatRequest();
-        request.setItemInstanceId(itemInstanceId);
-        session.send(
-                        SocketResponse.builder()
-                                .messageType(SocketResponseType.INITIATE_ATTACK.getType())
-                                .combatRequest(request)
-                                .build())
-                .subscribe(socketResponseSubscriber);
-    }
+//    private void requestSessionsToSwingWeapon(WebSocketSession session, String itemInstanceId) {
+//        CombatRequest request = new CombatRequest();
+//
+//        request.setItemInstanceId(itemInstanceId);
+//        session.send(
+//                        SocketResponse.builder()
+//                                .messageType(SocketResponseType.INITIATE_ATTACK.getType())
+//                                .combatRequest(request)
+//                                .build())
+//                .subscribe(socketResponseSubscriber);
+//    }
 
     private Map<DamageTypes, Double> calculateDamageMap(
             EquippedItems weapon, Map<String, Double> derivedStats) {
@@ -192,89 +223,89 @@ public class PlayerCombatService {
         return baseAttackSpeed / (1 + (characterAttackSpeed / 100));
     }
 
-    private void attackLoop(WebSocketSession session) {
-        if (!sessionsInCombat.contains(SessionParamHelper.getActorId(session))) {
-            log.warn("left combat");
-            return;
-        }
+//    private void attackLoop(WebSocketSession session) {
+//        if (!sessionsInCombat.contains(SessionParamHelper.getActorId(session))) {
+//            log.warn("left combat");
+//            return;
+//        }
+//
+//        CombatData combatData = SessionParamHelper.getCombatData(session);
+//        Set<String> targets = combatData.getTargets();
+//
+//        List<Stats> targetStats = getTargetStats(targets);
+//
+//        if (targetStats.isEmpty()) {
+//            log.warn("Target stats empty");
+//            sessionsInCombat.remove(SessionParamHelper.getActorId(session));
+//            return;
+//        }
+//
+//        targetStats.forEach(
+//                stat -> {
+//                    tryAttack(session, stat, true);
+//                    //            tryAttack(session, stat, "OFF_HAND");
+//                });
+//
+//        Single.fromCallable(
+//                        () -> {
+//                            attackLoop(session);
+//                            return true;
+//                        })
+//                .delaySubscription(100, TimeUnit.MILLISECONDS)
+//                .doOnError(er -> log.error("Error encountered, {}", er.getMessage()))
+//                .subscribe();
+//    }
 
-        PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
-        Set<String> targets = combatData.getTargets();
+//    private List<Stats> getTargetStats(Set<String> actors) {
+//        // TODO: Make async
+//        if (actors.isEmpty()) {
+//            return new ArrayList<>();
+//        }
+//        return actors.stream()
+//                .map(actor -> statsService.getStatsFor(actor).blockingGet())
+//                .filter(s -> s.getDerivedStats().get(StatsTypes.CURRENT_HP.getType()) > 0)
+//                .collect(Collectors.toList());
+//    }
 
-        List<Stats> targetStats = getTargetStats(targets);
-
-        if (targetStats.isEmpty()) {
-            log.warn("Target stats empty");
-            sessionsInCombat.remove(SessionParamHelper.getActorId(session));
-            return;
-        }
-
-        targetStats.forEach(
-                stat -> {
-                    tryAttack(session, stat, true);
-                    //            tryAttack(session, stat, "OFF_HAND");
-                });
-
-        Single.fromCallable(
-                        () -> {
-                            attackLoop(session);
-                            return true;
-                        })
-                .delaySubscription(100, TimeUnit.MILLISECONDS)
-                .doOnError(er -> log.error("Error encountered, {}", er.getMessage()))
-                .subscribe();
-    }
-
-    private List<Stats> getTargetStats(Set<String> actors) {
-        // TODO: Make async
-        if (actors.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return actors.stream()
-                .map(actor -> statsService.getStatsFor(actor).blockingGet())
-                .filter(s -> s.getDerivedStats().get(StatsTypes.CURRENT_HP.getType()) > 0)
-                .collect(Collectors.toList());
-    }
-
-    private boolean validatePositionLocation(
-            WebSocketSession session, String mob, int distanceThreshold) {
-        // TODO: Refactor mob/player motion calls
-        // TODO: Make async
-
-        List<Monster> res = mobInstanceService.getMobsByIds(Set.of(mob)).blockingGet();
-        PlayerCombatData combatData = SessionParamHelper.getCombatData(session);
-
-        if (res.isEmpty()) {
-            combatData.getTargets().remove(mob);
-
-            return false;
-        }
-
-        Monster monster = res.get(0);
-
-        Motion targetMotion = monster.getMotion();
-        Motion attackerMotion =
-                sessionParamHelper.getSharedActorMotion(SessionParamHelper.getActorId(session));
-
-        boolean inRange = attackerMotion.withinRange(targetMotion, distanceThreshold);
-        boolean facingTarget = attackerMotion.facingMotion(targetMotion);
-
-        if (!inRange || !facingTarget) {
-            if (combatData.getLastHelperNotification() == null
-                    || Instant.now().getEpochSecond()
-                                    - combatData.getLastHelperNotification().getEpochSecond()
-                            > 3) {
-                combatData.setLastHelperNotification(Instant.now());
-
-                if (!inRange) {
-                    clientUpdatesService.notifySessionCombatTooFar(session);
-                    return false;
-                }
-                clientUpdatesService.notifySessionCombatNotFacing(session);
-            }
-            return false;
-        }
-
-        return true;
-    }
+//    private boolean validatePositionLocation(
+//            WebSocketSession session, String mob, int distanceThreshold) {
+//        // TODO: Refactor mob/player motion calls
+//        // TODO: Make async
+//
+//        List<Monster> res = mobInstanceService.getMobsByIds(Set.of(mob)).blockingGet();
+//        CombatData combatData = SessionParamHelper.getCombatData(session);
+//
+//        if (res.isEmpty()) {
+//            combatData.getTargets().remove(mob);
+//
+//            return false;
+//        }
+//
+//        Monster monster = res.get(0);
+//
+//        Motion targetMotion = monster.getMotion();
+//        Motion attackerMotion =
+//                sessionParamHelper.getSharedActorMotion(SessionParamHelper.getActorId(session));
+//
+//        boolean inRange = attackerMotion.withinRange(targetMotion, distanceThreshold);
+//        boolean facingTarget = attackerMotion.facingMotion(targetMotion);
+//
+//        if (!inRange || !facingTarget) {
+//            if (combatData.getLastHelperNotification() == null
+//                    || Instant.now().getEpochSecond()
+//                                    - combatData.getLastHelperNotification().getEpochSecond()
+//                            > 3) {
+//                combatData.setLastHelperNotification(Instant.now());
+//
+//                if (!inRange) {
+//                    clientUpdatesService.notifySessionCombatTooFar(session);
+//                    return false;
+//                }
+//                clientUpdatesService.notifySessionCombatNotFacing(session);
+//            }
+//            return false;
+//        }
+//
+//        return true;
+//    }
 }

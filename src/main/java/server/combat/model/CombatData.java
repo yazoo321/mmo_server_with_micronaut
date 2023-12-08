@@ -3,10 +3,8 @@ package server.combat.model;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -14,13 +12,13 @@ import lombok.Data;
 @AllArgsConstructor
 @Serdeable
 @ReflectiveAccess
-public class PlayerCombatData {
+public class CombatData {
 
     private String actorId;
 
     private Double mainHandAttackSpeed;
     private Double offhandAttackSpeed;
-    private Double characterAttackSpeed;
+    private Double actorAttackSpeed;
 
     private Instant mainHandLastAttack;
     private Instant offhandLastAttack;
@@ -31,15 +29,23 @@ public class PlayerCombatData {
 
     private Instant lastHelperNotification;
 
-    public PlayerCombatData(String actorId) {
+    boolean isPlayer;
+
+    public CombatData(String actorId) {
         this.setActorId(actorId);
         this.mainHandAttackSpeed = 0.0;
         this.offhandAttackSpeed = 0.0;
-        this.characterAttackSpeed = 0.0;
+        this.actorAttackSpeed = 0.0;
         this.mainHandLastAttack = Instant.now().minusSeconds(20);
         this.offhandLastAttack = Instant.now().minusSeconds(20);
         this.targets = new HashSet<>();
         this.lastHelperNotification = Instant.now().minusSeconds(20);
         this.attackSent = new HashMap<>();
+        try {
+            UUID.fromString(actorId);
+            isPlayer = false;
+        } catch (IllegalArgumentException exception) {
+            isPlayer = true;
+        }
     }
 }
