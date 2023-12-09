@@ -25,7 +25,7 @@ public class StatsSocketIntegration {
                         stats -> {
                             if (actorId.equalsIgnoreCase(SessionParamHelper.getActorId(session))) {
                                 // update session with params
-                                SessionParamHelper.updateDerivedStats(
+                                SessionParamHelper.updateActorDerivedStats(
                                         session, stats.getDerivedStats());
                             }
 

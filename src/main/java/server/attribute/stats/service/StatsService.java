@@ -23,6 +23,10 @@ public class StatsService {
 
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();
+        // TODO: parameterize from server
+        int level = 10;
+        double baseAttackSpeed = 2.0;
+        double weaponDamage = 50;
 
         mobStats.setActorId(actorId);
 
@@ -40,6 +44,10 @@ public class StatsService {
                                 Map.of(
                                         StatsTypes.CURRENT_HP.getType(), 100.0,
                                         StatsTypes.CURRENT_MP.getType(), 50.0)));
+
+        mobStats.setBase(StatsTypes.LEVEL, level);
+        mobStats.setDerived(StatsTypes.BASE_ATTACK_SPEED, baseAttackSpeed);
+        mobStats.setDerived(StatsTypes.WEAPON_DAMAGE, weaponDamage);
 
         mobStats.recalculateDerivedStats();
         mobStats.setDerived(StatsTypes.CURRENT_HP, mobStats.getDerived(StatsTypes.MAX_HP));

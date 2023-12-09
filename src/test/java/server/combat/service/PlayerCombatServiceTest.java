@@ -85,7 +85,7 @@ class PlayerCombatServiceTest {
         // Given
         // prepare character
         Stats stats = statsService.initializePlayerStats(CHARACTER_1).blockingGet();
-        SessionParamHelper.updateDerivedStats(session, stats.getDerivedStats());
+        SessionParamHelper.updateActorDerivedStats(session, stats.getDerivedStats());
         PlayerMotion playerMotion =
                 playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         SessionParamHelper.setActorId(session, CHARACTER_1);

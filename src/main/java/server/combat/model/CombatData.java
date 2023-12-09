@@ -16,6 +16,8 @@ public class CombatData {
 
     private String actorId;
 
+    Map<String, Double> derivedStats;
+
     private Double mainHandAttackSpeed;
     private Double offhandAttackSpeed;
     private Double actorAttackSpeed;
@@ -41,6 +43,7 @@ public class CombatData {
         this.targets = new HashSet<>();
         this.lastHelperNotification = Instant.now().minusSeconds(20);
         this.attackSent = new HashMap<>();
+        this.derivedStats = new HashMap<>();
         try {
             UUID.fromString(actorId);
             isPlayer = false;

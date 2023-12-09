@@ -26,19 +26,23 @@ import server.session.model.CacheKey;
     ObjectMapper objectMapper = new ObjectMapper();
 
     StatefulRedisConnection<String, Motion> connection;
-    RedisCommands<String, Motion> redisCommands;
+    RedisCommands<String, Motion> redisMotionCache;
+
+    RedisCommands<String, CombatData> redisCombatDataCache;
+
 
     public SessionParamHelper(RedisClient redisClient) {
         connection = redisClient.connect(new JacksonRedisCodecMotion(objectMapper));
-        redisCommands = connection.sync();
+        redisMotionCache = connection.sync();
+        redisCombatDataCache = connection.sync();
     }
 
     public Motion getSharedActorMotion(String actorId) {
-        return redisCommands.get(CacheKey.of(CacheDomains.MOTION, actorId));
+        return redisMotionCache.get(CacheKey.of(CacheDomains.MOTION, actorId));
     }
 
     public void setSharedActorMotion(String actorId, Motion motion) {
-        redisCommands.set(CacheKey.of(CacheDomains.MOTION, actorId), motion);
+        redisMotionCache.set(CacheKey.of(CacheDomains.MOTION, actorId), motion);
     }
 
     public static Motion getMotion(WebSocketSession session) {
@@ -138,9 +142,9 @@ import server.session.model.CacheKey;
         return droppedItems;
     }
 
-    public static void updateDerivedStats(
+    public static void updateActorDerivedStats(
             WebSocketSession session, Map<String, Double> derivedStats) {
-        Map<String, Double> prev = getDerivedStats(session);
+        Map<String, Double> prev = getActorDerivedStats(session);
         prev.putAll(derivedStats);
         session.put(SessionParams.DERIVED_STATS.getType(), prev);
         updatePlayerCombatData(session);
@@ -150,7 +154,7 @@ import server.session.model.CacheKey;
         session.put(SessionParams.DERIVED_STATS.getType(), derivedStats);
     }
 
-    public static Map<String, Double> getDerivedStats(WebSocketSession session) {
+    public static Map<String, Double> getActorDerivedStats(WebSocketSession session) {
         Map<String, Double> derivedStats =
                 (Map<String, Double>) session.asMap().get(SessionParams.DERIVED_STATS.getType());
         if (derivedStats == null) {
@@ -194,32 +198,6 @@ import server.session.model.CacheKey;
         Map<String, CombatData> combatDataMap = getCombatData(session);
         combatDataMap.put(actorId, combatData);
     }
-//
-//    public static CombatData getCombatData(WebSocketSession session) {
-//        CombatData combatData =
-//                (CombatData) session.asMap().get(SessionParams.COMBAT_DATA.getType());
-//        if (combatData == null) {
-//            combatData = new CombatData(getActorId(session));
-//            setCombatData(session, combatData);
-//        }
-//
-//        return combatData;
-//    }
-
-//    public static CombatData getMobCombatData(WebSocketSession session, String actorId) {
-//        Map<String, CombatData> combatData =
-//                (Map<String, CombatData>) session.asMap().get(SessionParams.COMBAT_DATA.getType());
-//        if (combatData == null) {
-//            combatData = new HashMap<>(Map.of(actorId, new CombatData(actorId)));
-//            setMobCombatData(session, combatData);
-//        }
-//
-//        return combatData.get(actorId);
-//    }
-//
-//    public static void setMobCombatData(WebSocketSession session, Map<String, CombatData> combatData) {
-//        session.put(SessionParams.COMBAT_DATA.getType(), combatData);
-//    }
 
     public static Map<String, EquippedItems> getEquippedItems(WebSocketSession session) {
         Map<String, EquippedItems> equippedItemsMap =
@@ -288,7 +266,7 @@ import server.session.model.CacheKey;
             combatData.setOffhandAttackSpeed(null);
         }
 
-        Map<String, Double> stats = SessionParamHelper.getDerivedStats(session);
+        Map<String, Double> stats = SessionParamHelper.getActorDerivedStats(session);
 
         combatData.setActorAttackSpeed(stats.get(StatsTypes.ATTACK_SPEED.getType()));
     }

@@ -163,6 +163,7 @@ public class ClientUpdatesService {
     public void sendAttackAnimUpdates(CombatRequest combatRequest) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
+                        .messageType(SocketResponseType.INITIATE_ATTACK.getType())
                         .combatRequest(combatRequest)
                         .build();
 
@@ -237,10 +238,10 @@ public class ClientUpdatesService {
         return actorId.equalsIgnoreCase(playerOrMob) || serverName.equalsIgnoreCase(playerOrMob);
     }
 
-    private Predicate<WebSocketSession> listensToUpdateFor(String playerOrMob) {
+    private Predicate<WebSocketSession> listensToUpdateFor(String actorId) {
         return s ->
-                (sessionIsThePlayerOrMob(s, playerOrMob)
-                        || sessionListensToPlayerOrMob(s, playerOrMob));
+                (sessionIsThePlayerOrMob(s, actorId)
+                        || sessionListensToPlayerOrMob(s, actorId));
     }
 
     // TODO: Consider renaming
@@ -250,7 +251,7 @@ public class ClientUpdatesService {
             if (sessionIsThePlayerOrMob(s, playerOrMob)) {
                 isThePlayerOrMob = true;
                 // update session cache about stats
-                SessionParamHelper.updateDerivedStats(s, stats.getDerivedStats());
+                SessionParamHelper.updateActorDerivedStats(s, stats.getDerivedStats());
             }
 
             return isThePlayerOrMob || sessionListensToPlayerOrMob(s, playerOrMob);

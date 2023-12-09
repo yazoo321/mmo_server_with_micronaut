@@ -58,6 +58,10 @@ public class Stats {
         derivedStats.put(type.getType(), val);
     }
 
+    public void setBase(StatsTypes type, int value) {
+        baseStats.put(type.getType(), value);
+    }
+
     public Map<String, Double> recalculateDerivedStats() {
         Map<String, Double> updatedDerived = new HashMap<>();
         int strength = getBaseStat(StatsTypes.STR);

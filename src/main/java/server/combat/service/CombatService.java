@@ -49,21 +49,28 @@ public class CombatService {
         // TODO: Refactor mob/player motion calls
         // TODO: Make async
 
-        List<Monster> mobs = mobInstanceService.getMobsByIds(Set.of(target)).blockingGet();
-        List<PlayerMotion> players = playerMotionService.getPlayersMotion(Set.of(target)).blockingGet();
+        Motion targetMotion = sessionParamHelper.getSharedActorMotion(target);
 
-        if (mobs.isEmpty() && players.isEmpty()) {
+        if (targetMotion == null) {
             combatData.getTargets().remove(target);
 
             return false;
         }
-        Motion targetMotion;
+//        List<Monster> mobs = mobInstanceService.getMobsByIds(Set.of(target)).blockingGet();
+//        List<PlayerMotion> players = playerMotionService.getPlayersMotion(Set.of(target)).blockingGet();
 
-        if (!mobs.isEmpty()) {
-            targetMotion = mobs.get(0).getMotion();
-        } else {
-            targetMotion = players.get(0).getMotion();
-        }
+//        if (mobs.isEmpty() && players.isEmpty()) {
+//            combatData.getTargets().remove(target);
+//
+//            return false;
+//        }
+//        Motion targetMotion;
+//
+//        if (!mobs.isEmpty()) {
+//            targetMotion = mobs.get(0).getMotion();
+//        } else {
+//            targetMotion = players.get(0).getMotion();
+//        }
 
         boolean inRange = attackerMotion.withinRange(targetMotion, distanceThreshold);
         boolean facingTarget = attackerMotion.facingMotion(targetMotion);
@@ -101,7 +108,7 @@ public class CombatService {
                 .collect(Collectors.toList());
     }
 
-    void requestSessionsToSwingWeapon(WebSocketSession session, String itemInstanceId, String actorId) {
+    void requestSessionsToSwingWeapon(String itemInstanceId, String actorId) {
         CombatRequest request = new CombatRequest();
 
         request.setItemInstanceId(itemInstanceId);

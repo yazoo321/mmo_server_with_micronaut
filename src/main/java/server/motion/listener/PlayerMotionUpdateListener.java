@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import server.motion.dto.PlayerMotion;
 import server.motion.service.PlayerMotionService;
+import server.session.SessionParamHelper;
 
 @Slf4j
 @KafkaListener(
@@ -18,6 +19,9 @@ import server.motion.service.PlayerMotionService;
 public class PlayerMotionUpdateListener {
 
     @Inject PlayerMotionService playerMotionService;
+
+    @Inject
+    SessionParamHelper sessionParamHelper;
 
     @Topic("player-motion-update")
     public void receive(PlayerMotion playerMotion) {
@@ -31,5 +35,6 @@ public class PlayerMotionUpdateListener {
 
         // make others aware of this motion
         playerMotionService.relayPlayerMotion(playerMotion);
+        sessionParamHelper.setSharedActorMotion(playerMotion.getActorId(), playerMotion.getMotion());
     }
 }
