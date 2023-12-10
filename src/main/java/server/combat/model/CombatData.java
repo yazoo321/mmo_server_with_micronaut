@@ -7,20 +7,18 @@ import java.util.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @Serdeable
 @ReflectiveAccess
+@NoArgsConstructor
 public class CombatData {
 
     private String actorId;
 
     Map<String, Double> derivedStats;
-
-    private Double mainHandAttackSpeed;
-    private Double offhandAttackSpeed;
-    private Double actorAttackSpeed;
 
     private Instant mainHandLastAttack;
     private Instant offhandLastAttack;
@@ -35,9 +33,6 @@ public class CombatData {
 
     public CombatData(String actorId) {
         this.setActorId(actorId);
-        this.mainHandAttackSpeed = 0.0;
-        this.offhandAttackSpeed = 0.0;
-        this.actorAttackSpeed = 0.0;
         this.mainHandLastAttack = Instant.now().minusSeconds(20);
         this.offhandLastAttack = Instant.now().minusSeconds(20);
         this.targets = new HashSet<>();

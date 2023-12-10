@@ -34,10 +34,11 @@ public class PlayerCombatService extends CombatService  {
         if (combatRequest == null) {
             return;
         }
-        CombatData combatData = SessionParamHelper.getActorCombatData(session, SessionParamHelper.getActorId(session));
+        CombatData combatData = sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
         combatData.setTargets(combatRequest.getTargets());
 
         sessionsInCombat.add(SessionParamHelper.getActorId(session));
+        sessionParamHelper.setSharedActorCombatData(SessionParamHelper.getActorId(session), combatData);
         attackLoop(session, combatData.getActorId());
     }
 
@@ -47,9 +48,10 @@ public class PlayerCombatService extends CombatService  {
 
     public void tryAttack(WebSocketSession session, Stats target, boolean isMainHand) {
         // Extract relevant combat data
-        CombatData combatData = SessionParamHelper.getActorCombatData(session, SessionParamHelper.getActorId(session));
-        Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
-        Map<String, Double> derivedStats = SessionParamHelper.getActorDerivedStats(session);
+        String actorId = SessionParamHelper.getActorId(session);
+        CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
+        Map<String, EquippedItems> items = sessionParamHelper.getEquippedItems(session);
+        Map<String, Double> derivedStats = combatData.getDerivedStats();
 
         // Get the equipped weapon
         EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
@@ -75,13 +77,15 @@ public class PlayerCombatService extends CombatService  {
         // TODO: this is for demo, needs changing
         if (lastHit == null || lastHit.isBefore(Instant.now().minusSeconds(4))) {
             lastHit = Instant.now().minusSeconds(4);
-            requestAttackSwing(session, isMainHand);
+            requestAttackSwing(session, combatData, isMainHand);
         }
+
         Double baseSpeed =
                 isMainHand
-                        ? combatData.getMainHandAttackSpeed()
-                        : combatData.getOffhandAttackSpeed();
-        Double characterAttackSpeed = combatData.getActorAttackSpeed();
+                        ? derivedStats.get(StatsTypes.MAIN_HAND_ATTACK_SPEED.getType())
+                        : derivedStats.get(StatsTypes.OFF_HAND_ATTACK_SPEED.getType());
+
+        Double characterAttackSpeed = derivedStats.get(StatsTypes.ATTACK_SPEED.getType());
 
         // Calculate the actual delay in milliseconds
         long actualDelayInMS = (long) (getAttackTimeDelay(baseSpeed, characterAttackSpeed) * 1000);
@@ -94,7 +98,7 @@ public class PlayerCombatService extends CombatService  {
             // Get derived stats and equipped items
 
             if (!combatData.getAttackSent().getOrDefault(isMainHand ? "MAIN" : "OFF", false)) {
-                requestAttackSwing(session, isMainHand);
+                requestAttackSwing(session, combatData, isMainHand);
             }
 
             combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", false);
@@ -122,18 +126,20 @@ public class PlayerCombatService extends CombatService  {
                 combatData.getTargets().remove(target.getActorId());
             }
 
+            sessionParamHelper.setSharedActorCombatData(actorId, combatData);
             return;
         }
 
         // Check if the next attack time is before the current time
         if (nextAttackTime.isBefore(Instant.now().plusMillis(100))) {
             // send a swing action as we're about to hit - we don't know if we will hit or miss yet
-            requestAttackSwing(session, isMainHand);
+            requestAttackSwing(session, combatData, isMainHand);
+            sessionParamHelper.setSharedActorCombatData(actorId, combatData);
         }
     }
 
     void attackLoop(WebSocketSession session, String actorId) {
-        CombatData combatData = SessionParamHelper.getActorCombatData(session, actorId);
+        CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
         Set<String> targets = combatData.getTargets();
 
         List<Stats> targetStats = getTargetStats(targets);
@@ -160,16 +166,14 @@ public class PlayerCombatService extends CombatService  {
                 .subscribe();
     }
 
-    private void requestAttackSwing(WebSocketSession session, boolean isMainHand) {
-        Map<String, EquippedItems> items = SessionParamHelper.getEquippedItems(session);
+    private void requestAttackSwing(WebSocketSession session, CombatData combatData, boolean isMainHand) {
+        Map<String, EquippedItems> items = sessionParamHelper.getEquippedItems(session);
 
         // Get the equipped weapon
         EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
         String itemInstanceId = weapon.getItemInstance().getItemInstanceId();
 
-        SessionParamHelper.getActorCombatData(session, SessionParamHelper.getActorId(session))
-                .getAttackSent()
-                .put(isMainHand ? "MAIN" : "OFF", true);
+        combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", true);
 
         requestSessionsToSwingWeapon(itemInstanceId, SessionParamHelper.getActorId(session));
     }

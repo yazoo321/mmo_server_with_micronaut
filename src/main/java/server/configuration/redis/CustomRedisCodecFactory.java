@@ -7,6 +7,7 @@ import io.micronaut.context.annotation.Replaces;
 import io.micronaut.runtime.context.scope.ThreadLocal;
 import jakarta.inject.Singleton;
 import server.common.dto.Motion;
+import server.session.model.CacheData;
 
 @Factory
 public class CustomRedisCodecFactory {
@@ -15,6 +16,7 @@ public class CustomRedisCodecFactory {
     @ThreadLocal
     @Replaces(factory = RedisCodec.class)
     public RedisCodec<String, Motion> customRedisCodec(ObjectMapper objectMapper) {
-        return new JacksonRedisCodecMotion(objectMapper);
+        // Not in use
+        return new JacksonCodecMotion(objectMapper);
     }
 }

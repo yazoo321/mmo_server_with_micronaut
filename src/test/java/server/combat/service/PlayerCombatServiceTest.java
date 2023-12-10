@@ -85,7 +85,9 @@ class PlayerCombatServiceTest {
         // Given
         // prepare character
         Stats stats = statsService.initializePlayerStats(CHARACTER_1).blockingGet();
-        SessionParamHelper.updateActorDerivedStats(session, stats.getDerivedStats());
+        CombatData combatData = sessionParamHelper.getSharedActorCombatData(CHARACTER_1);
+        combatData.setDerivedStats(stats.getDerivedStats());
+        sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
         PlayerMotion playerMotion =
                 playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         SessionParamHelper.setActorId(session, CHARACTER_1);
@@ -95,10 +97,13 @@ class PlayerCombatServiceTest {
         equipWeapon(CHARACTER_1, session);
 
         // prepare mob
-        Motion mobMotion = playerMotion.getMotion();
-        mobMotion.setX(mobMotion.getX() + 10); // this is checked to face target
+        Motion mobMotion = new Motion();
+        mobMotion.setX(playerMotion.getMotion().getX() + 10);
+        mobMotion.setY(playerMotion.getMotion().getY());
+        mobMotion.setZ(playerMotion.getMotion().getZ());
+
         mobInstanceService.createMob(MOB_1, mobMotion).blockingGet();
-        sessionParamHelper.setMotion(session, mobMotion, MOB_1);
+        sessionParamHelper.setSharedActorMotion(MOB_1, mobMotion);
 
         // prepare combat request
         CombatRequest validCombatRequest = new CombatRequest();
@@ -109,7 +114,7 @@ class PlayerCombatServiceTest {
 
         // Then
         // check the attack loop has begun
-        CombatData combatData = SessionParamHelper.getActorCombatData(session, SessionParamHelper.getActorId(session));
+        combatData = sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
         Set<String> targets = combatData.getTargets();
         Assertions.assertThat(targets.size()).isEqualTo(1);
 
@@ -140,7 +145,7 @@ class PlayerCombatServiceTest {
         EquippedItems equippedItem =
                 equipItemService.equipItem(itemInstance.getItemInstanceId(), actorId).blockingGet();
         if (session != null) {
-            SessionParamHelper.addToEquippedItems(session, equippedItem);
+            sessionParamHelper.addToEquippedItems(session, equippedItem);
         }
 
         return equippedItem;

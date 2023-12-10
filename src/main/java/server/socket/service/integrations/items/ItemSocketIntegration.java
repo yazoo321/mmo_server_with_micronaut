@@ -32,6 +32,8 @@ public class ItemSocketIntegration {
 
     @Inject EquipItemService equipItemService;
 
+    @Inject SessionParamHelper sessionParamHelper;
+
     public void handleDropItem(GenericInventoryData request, WebSocketSession session) {
         inventoryService
                 .dropItem(request.getActorId(), request.getItemInstanceId(), request.getLocation())
@@ -98,7 +100,7 @@ public class ItemSocketIntegration {
                 .getEquippedItems(request.getActorId())
                 .doOnSuccess(
                         equippedItems -> {
-                            SessionParamHelper.setEquippedItems(session, equippedItems);
+                            sessionParamHelper.setEquippedItems(session, equippedItems);
                             if (equippedItems.isEmpty()) {
                                 return;
                             }
@@ -122,7 +124,7 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         equippedItems -> {
-                            SessionParamHelper.addToEquippedItems(session, equippedItems);
+                            sessionParamHelper.addToEquippedItems(session, equippedItems);
                             sendInventoryToPlayer(session, request.getActorId());
 
                             GenericInventoryData equipData = new GenericInventoryData();
@@ -148,7 +150,7 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to un-equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         unequippedItemInstanceId -> {
-                            SessionParamHelper.removeFromEquippedItems(
+                            sessionParamHelper.removeFromEquippedItems(
                                     session, unequippedItemInstanceId);
                             sendInventoryToPlayer(session, request.getActorId());
 

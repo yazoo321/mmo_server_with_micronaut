@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
+import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Location;
 import server.common.dto.Motion;
@@ -167,6 +168,7 @@ public class ClientUpdatesService {
                         .combatRequest(combatRequest)
                         .build();
 
+        // TODO: let server ignore all anim updates
         broadcaster
                 .broadcast(socketResponse, listensToUpdateFor(combatRequest.getActorId()))
                 .subscribe(socketResponseSubscriber);
@@ -251,7 +253,9 @@ public class ClientUpdatesService {
             if (sessionIsThePlayerOrMob(s, playerOrMob)) {
                 isThePlayerOrMob = true;
                 // update session cache about stats
-                SessionParamHelper.updateActorDerivedStats(s, stats.getDerivedStats());
+                CombatData combatData = sessionParamHelper.getSharedActorCombatData(stats.getActorId());
+                combatData.setDerivedStats(stats.getDerivedStats());
+                sessionParamHelper.setSharedActorCombatData(stats.getActorId(), combatData);
             }
 
             return isThePlayerOrMob || sessionListensToPlayerOrMob(s, playerOrMob);

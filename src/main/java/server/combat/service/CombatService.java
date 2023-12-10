@@ -56,21 +56,6 @@ public class CombatService {
 
             return false;
         }
-//        List<Monster> mobs = mobInstanceService.getMobsByIds(Set.of(target)).blockingGet();
-//        List<PlayerMotion> players = playerMotionService.getPlayersMotion(Set.of(target)).blockingGet();
-
-//        if (mobs.isEmpty() && players.isEmpty()) {
-//            combatData.getTargets().remove(target);
-//
-//            return false;
-//        }
-//        Motion targetMotion;
-//
-//        if (!mobs.isEmpty()) {
-//            targetMotion = mobs.get(0).getMotion();
-//        } else {
-//            targetMotion = players.get(0).getMotion();
-//        }
 
         boolean inRange = attackerMotion.withinRange(targetMotion, distanceThreshold);
         boolean facingTarget = attackerMotion.facingMotion(targetMotion);
@@ -84,6 +69,7 @@ public class CombatService {
                     - combatData.getLastHelperNotification().getEpochSecond()
                     > 3) {
                 combatData.setLastHelperNotification(Instant.now());
+                sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
 
                 if (!inRange) {
                     clientUpdatesService.notifySessionCombatTooFar(session);
