@@ -12,10 +12,8 @@ import java.util.Map;
 @ReflectiveAccess
 public class ActorStatus {
 
-
     String actorId;
     Map<String, Instant> actorStatuses;
-
 
     public void removeOldStatuses() {
         actorStatuses.values().removeIf(activeTil -> activeTil != null && activeTil.isBefore(Instant.now()));

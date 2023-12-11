@@ -103,4 +103,13 @@ public class CombatService {
         clientUpdatesService.sendAttackAnimUpdates(request);
     }
 
+    void handleActorDeath(Stats stats) {
+        if (stats.isPlayer()) {
+            // TODO: implement player death
+        } else {
+            mobInstanceService.handleMobDeath(stats.getActorId());
+        }
+        clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
+    }
+
 }

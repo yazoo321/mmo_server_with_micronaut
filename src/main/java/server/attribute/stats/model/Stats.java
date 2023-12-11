@@ -6,6 +6,8 @@ import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Data;
 import server.attribute.stats.types.StatsTypes;
@@ -147,5 +149,14 @@ public class Stats {
     public boolean canAct() {
         // TODO: Refactor later to status effects, some cases may allow to act
         return this.getDerived(StatsTypes.CURRENT_HP) > 0;
+    }
+
+    public boolean isPlayer() {
+        try {
+            UUID.fromString(actorId);
+            return false;
+        } catch (IllegalArgumentException e) {
+            return true;
+        }
     }
 }

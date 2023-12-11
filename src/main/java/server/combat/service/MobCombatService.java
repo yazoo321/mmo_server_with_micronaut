@@ -29,11 +29,9 @@ import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 @Singleton
 public class MobCombatService extends CombatService  {
 
-    @Inject ClientUpdatesService clientUpdatesService;
-
     Random rand = new Random();
 
-    public void requestAttack(WebSocketSession session, CombatRequest combatRequest) {
+    public void requestAttack(CombatRequest combatRequest) {
         if (combatRequest == null) {
             return;
         }
@@ -43,22 +41,22 @@ public class MobCombatService extends CombatService  {
 
         sessionsInCombat.add(combatData.getActorId());
         sessionParamHelper.setSharedActorCombatData(actorId, combatData);
-        attackLoop(session, combatData.getActorId());
+        attackLoop(combatData.getActorId());
     }
 
     public void requestStopAttack(String actorId) {
         sessionsInCombat.remove(actorId);
     }
 
-    public void tryAttack(WebSocketSession session, Stats target, boolean isMainHand) {
+    public void tryAttack(String actorId, Stats target, boolean isMainHand) {
         // Extract relevant combat data
-        CombatData combatData = sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
+        CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
         Map<String, Double> derivedStats = combatData.getDerivedStats();
         int distanceThreshold = 200;
-        Motion attackerMotion = SessionParamHelper.getMotion(session);
+        Motion attackerMotion = sessionParamHelper.getSharedActorMotion(actorId);
 
         boolean valid = validatePositionLocation(combatData, attackerMotion, target.getActorId(),
-                distanceThreshold, session);
+                distanceThreshold, null);
 
         if (!valid) {
             return;
@@ -69,7 +67,7 @@ public class MobCombatService extends CombatService  {
         // TODO: this is for demo, needs changing
         if (lastHit == null || lastHit.isBefore(Instant.now().minusSeconds(4))) {
             lastHit = Instant.now().minusSeconds(4);
-            requestAttackSwing(session, combatData, isMainHand);
+            requestAttackSwing(actorId, combatData, isMainHand);
         }
 
         Double baseSpeed =
@@ -89,7 +87,7 @@ public class MobCombatService extends CombatService  {
             // Get derived stats and equipped items
 
             if (!combatData.getAttackSent().getOrDefault(isMainHand ? "MAIN" : "OFF", false)) {
-                requestAttackSwing(session, combatData, isMainHand);
+                requestAttackSwing(actorId, combatData, isMainHand);
             }
 
             combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", false);
@@ -112,8 +110,7 @@ public class MobCombatService extends CombatService  {
                                                 "Failed to delete stats on death, {}",
                                                 err.getMessage()))
                         .subscribe();
-                mobInstanceService.handleMobDeath(stats.getActorId());
-                clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
+                handleActorDeath(stats);
                 combatData.getTargets().remove(target.getActorId());
             }
 
@@ -123,11 +120,11 @@ public class MobCombatService extends CombatService  {
         // Check if the next attack time is before the current time
         if (nextAttackTime.isBefore(Instant.now().plusMillis(100))) {
             // send a swing action as we're about to hit - we don't know if we will hit or miss yet
-            requestAttackSwing(session, combatData, isMainHand);
+            requestAttackSwing(actorId, combatData, isMainHand);
         }
     }
 
-    void attackLoop(WebSocketSession session, String actorId) {
+    void attackLoop(String actorId) {
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
         Set<String> targets = combatData.getTargets();
 
@@ -141,13 +138,13 @@ public class MobCombatService extends CombatService  {
 
         targetStats.forEach(
                 stat -> {
-                    tryAttack(session, stat, true);
+                    tryAttack(actorId, stat, true);
                     //            tryAttack(session, stat, "OFF_HAND");
                 });
 
         Single.fromCallable(
                         () -> {
-                            attackLoop(session, SessionParamHelper.getActorId(session));
+                            attackLoop(actorId);
                             return true;
                         })
                 .delaySubscription(100, TimeUnit.MILLISECONDS)
@@ -155,19 +152,15 @@ public class MobCombatService extends CombatService  {
                 .subscribe();
     }
 
-    private void requestAttackSwing(WebSocketSession session, CombatData combatData, boolean isMainHand) {
-
+    private void requestAttackSwing(String actorId, CombatData combatData, boolean isMainHand) {
         // Get the equipped weapon
-
         combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", true);
-
-        requestSessionsToSwingWeapon(null, SessionParamHelper.getActorId(session));
+        requestSessionsToSwingWeapon(null, actorId);
     }
 
     private Map<DamageTypes, Double> calculateDamageMap(Map<String, Double> derivedStats) {
         double damage = derivedStats.get(WEAPON_DAMAGE.getType());
         double amp = derivedStats.get(PHY_AMP.getType());
-
         double totalDamage = damage * amp * (1 + rand.nextDouble(0.15));
 
         // Create a damage map (currently only physical damage)

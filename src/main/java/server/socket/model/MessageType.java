@@ -19,6 +19,7 @@ public enum MessageType {
     UN_EQUIP_ITEM("UN_EQUIP_ITEM"),
     FETCH_STATS("FETCH_STATS"),
     TRY_ATTACK("TRY_ATTACK"),
+    STOP_ATTACK("STOP_ATTACK"),
     SET_SESSION_ID("SET_SESSION_ID");
 
     public final String type;
