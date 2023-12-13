@@ -26,6 +26,14 @@ public class Stats {
 
     private Integer attributePoints;
 
+    public Map<String, Double> getDerivedStats() {
+        if (this.derivedStats == null) {
+            this.derivedStats = new HashMap<>();
+        }
+
+        return this.derivedStats;
+    }
+
     public Stats(
             String actorId,
             Map<String, Integer> baseStats,
@@ -65,7 +73,7 @@ public class Stats {
     }
 
     public Map<String, Double> recalculateDerivedStats() {
-        Map<String, Double> updatedDerived = new HashMap<>();
+        Map<String, Double> updatedDerived = this.getDerivedStats();
         int strength = getBaseStat(StatsTypes.STR);
         int dexterity = getBaseStat(StatsTypes.DEX);
         int stamina = getBaseStat(StatsTypes.STA);

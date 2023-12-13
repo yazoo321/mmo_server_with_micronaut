@@ -84,7 +84,7 @@ public class CombatService {
     }
 
     List<Stats> getTargetStats(Set<String> actors) {
-        // TODO: Make async
+        // TODO: Make async, get from cache
         if (actors.isEmpty()) {
             return new ArrayList<>();
         }
@@ -106,7 +106,16 @@ public class CombatService {
     void handleActorDeath(Stats stats) {
         if (stats.isPlayer()) {
             // TODO: implement player death
+            statsService.addHealth(stats, 300.0);
         } else {
+            statsService
+                    .deleteStatsFor(stats.getActorId())
+                    .doOnError(
+                            err ->
+                                    log.error(
+                                            "Failed to delete stats on death, {}",
+                                            err.getMessage()))
+                    .subscribe();
             mobInstanceService.handleMobDeath(stats.getActorId());
         }
         clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));

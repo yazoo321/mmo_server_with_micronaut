@@ -11,6 +11,8 @@ import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
+import server.combat.model.CombatData;
+import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
 
 @Slf4j
@@ -21,19 +23,22 @@ public class StatsService {
 
     @Inject UpdateProducer updateProducer;
 
+    @Inject
+    SessionParamHelper sessionParamHelper;
+
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();
         // TODO: parameterize from server
         int level = 10;
-        double baseAttackSpeed = 2.0;
-        double weaponDamage = 50;
+        double baseAttackSpeed = 5.0;
+        double weaponDamage = 30;
 
         mobStats.setActorId(actorId);
 
         mobStats.setBaseStats(
                 new HashMap<>(
                         Map.of(
-                                StatsTypes.STR.getType(), 200,
+                                StatsTypes.STR.getType(), 100,
                                 StatsTypes.STA.getType(), 100,
                                 StatsTypes.DEX.getType(), 100,
                                 StatsTypes.INT.getType(), 100)));
@@ -46,7 +51,7 @@ public class StatsService {
                                         StatsTypes.CURRENT_MP.getType(), 50.0)));
 
         mobStats.setBase(StatsTypes.LEVEL, level);
-        mobStats.setDerived(StatsTypes.BASE_ATTACK_SPEED, baseAttackSpeed);
+        mobStats.setDerived(StatsTypes.MAIN_HAND_ATTACK_SPEED, baseAttackSpeed);
         mobStats.setDerived(StatsTypes.WEAPON_DAMAGE, weaponDamage);
 
         mobStats.recalculateDerivedStats();
@@ -54,6 +59,9 @@ public class StatsService {
         mobStats.setAttributePoints(0);
 
         repository.updateStats(mobStats).subscribe();
+        CombatData combatData = new CombatData(actorId);
+        combatData.setDerivedStats(mobStats.getDerivedStats());
+        sessionParamHelper.setSharedActorCombatData(actorId, combatData);
     }
 
     public Single<Stats> initializePlayerStats(String actorId) {
@@ -114,6 +122,13 @@ public class StatsService {
                     setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
                 });
 
+        return stats;
+    }
+
+    public Stats addHealth(Stats stats, Double amount) {
+        Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
+        currentHp += amount;
+        setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
         return stats;
     }
 

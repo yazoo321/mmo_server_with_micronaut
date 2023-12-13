@@ -68,7 +68,7 @@ public class CommunicationSocket {
                     message.getPlayerMotion().getActorId());
         } else if (message.getMonster() != null && motionValid(message.getMonster().getMotion())) {
             sessionParamHelper.setMotion(
-                    session, message.getMonster().getMotion(), message.getMonster().getMobId());
+                    session, message.getMonster().getMotion(), message.getMonster().getActorId());
         }
     }
 

@@ -32,16 +32,17 @@ public class MobCombatService extends CombatService  {
     Random rand = new Random();
 
     public void requestAttack(CombatRequest combatRequest) {
-        if (combatRequest == null) {
+        if (combatRequest == null || combatRequest.getTargets().isEmpty()) {
             return;
         }
+        String targetActorId = combatRequest.getTargets().stream().findFirst().get();
         String actorId = combatRequest.getActorId();
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
         combatData.setTargets(combatRequest.getTargets());
 
-        sessionsInCombat.add(combatData.getActorId());
+        sessionsInCombat.add(actorId);
         sessionParamHelper.setSharedActorCombatData(actorId, combatData);
-        attackLoop(combatData.getActorId());
+        attackLoop(actorId);
     }
 
     public void requestStopAttack(String actorId) {
@@ -102,18 +103,11 @@ public class MobCombatService extends CombatService  {
             }
 
             if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-                statsService
-                        .deleteStatsFor(stats.getActorId())
-                        .doOnError(
-                                err ->
-                                        log.error(
-                                                "Failed to delete stats on death, {}",
-                                                err.getMessage()))
-                        .subscribe();
                 handleActorDeath(stats);
                 combatData.getTargets().remove(target.getActorId());
             }
 
+            sessionParamHelper.setSharedActorCombatData(actorId, combatData);
             return;
         }
 
@@ -121,6 +115,7 @@ public class MobCombatService extends CombatService  {
         if (nextAttackTime.isBefore(Instant.now().plusMillis(100))) {
             // send a swing action as we're about to hit - we don't know if we will hit or miss yet
             requestAttackSwing(actorId, combatData, isMainHand);
+            sessionParamHelper.setSharedActorCombatData(actorId, combatData);
         }
     }
 
