@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
+import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Location;
@@ -161,6 +162,18 @@ public class ClientUpdatesService {
                 .subscribe(socketResponseSubscriber);
     }
 
+    public void sendStatusUpdates(ActorStatus actorStatus) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.STATS_UPDATE.getType())
+                        .actorStatus(actorStatus)
+                        .build();
+
+        broadcaster
+                .broadcast(socketResponse, notifyStatusFor(actorStatus.getActorId()))
+                .subscribe(socketResponseSubscriber);
+    }
+
     public void sendAttackAnimUpdates(CombatRequest combatRequest) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
@@ -259,6 +272,14 @@ public class ClientUpdatesService {
             }
 
             return isThePlayerOrMob || sessionListensToPlayerOrMob(s, playerOrMob);
+        };
+    }
+
+    private Predicate<WebSocketSession> notifyStatusFor(String actorId) {
+        return s -> {
+            boolean isThePlayerOrMob = sessionIsThePlayerOrMob(s, actorId);
+
+            return isThePlayerOrMob || sessionListensToPlayerOrMob(s, actorId);
         };
     }
 

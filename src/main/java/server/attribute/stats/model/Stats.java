@@ -124,28 +124,14 @@ public class Stats {
     public static Map<String, Double> mergeStats(
             Map<String, Double> left, Map<String, Double> right) {
         Map<String, Double> copy = new HashMap<>(left);
-        right.forEach(
-                (k, v) -> {
-                    if (copy.containsKey(k)) {
-                        copy.put(k, copy.get(k) + v);
-                    } else {
-                        copy.put(k, v);
-                    }
-                });
+        right.forEach((k, v) -> copy.merge(k, v, Double::sum));
 
         return copy;
     }
 
     public static Map<String, Double> mergeLeft(
             Map<String, Double> left, Map<String, Double> right) {
-        right.forEach(
-                (k, v) -> {
-                    if (left.containsKey(k)) {
-                        left.put(k, left.get(k) + v);
-                    } else {
-                        left.put(k, v);
-                    }
-                });
+        right.forEach((k, v) -> left.merge(k, v, Double::sum));
 
         return left;
     }

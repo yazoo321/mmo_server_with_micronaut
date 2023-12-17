@@ -17,4 +17,5 @@ public class MongoConfiguration {
     private String playerMotion;
     private String mobInstance;
     private String actorStats;
+    private String actorStatus;
 }

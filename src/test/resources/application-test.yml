@@ -48,3 +48,5 @@ mongo-database:
   player-motion: "playerMotion"
   mob-instance: "mobInstance"
   mob-attributes: "mobAttributes"
+  actor-stats: "actorStats"
+  actor-status: "actorStatus"
