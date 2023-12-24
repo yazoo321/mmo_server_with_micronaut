@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "5bbbe0bb-5238-4f0e-aa23-6fc2ab2e6de4",
+		"name": "CharacterController",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1620917"
+	},
+	"item": [
+		{
+			"name": "GetMyCharacters",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accountName",
+						"value": "testAcc1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/player/account-characters",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"player",
+						"account-characters"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteCharacter",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accountName",
+						"value": "testAcc1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/player/account-characters",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"player",
+						"account-characters"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateCharacter",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "accountName",
+						"value": "testAcc1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"apiTest2\",\n    \"appearanceInfo\": {\n        \"race\":\"human\",\n        \"gender\": \"m\",\n        \"hairStyle\": \"h_m_style_1\",\n        \"hairColor\": \"color1\",\n        \"skinColor\": \"h_m_style_1\",\n        \"facialFeature\": \"feature_1\"\n    },\n    \"className\": \"fighter\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/player/create-character",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"player",
+						"create-character"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCharactersByName",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accountName",
+						"value": "testAcc1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/player/characters?names=character1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"player",
+						"characters"
+					],
+					"query": [
+						{
+							"key": "names",
+							"value": "character1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

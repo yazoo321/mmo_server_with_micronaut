@@ -2,7 +2,8 @@
 	"info": {
 		"_postman_id": "e98ec88e-0621-4ac3-b3e0-e25ee96a0aee",
 		"name": "Inventory",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1620917"
 	},
 	"item": [
 		{
@@ -34,7 +35,7 @@
 								"type": "text"
 							},
 							{
-								"key": "actorId",
+								"key": "characterName",
 								"value": "character1",
 								"type": "text"
 							}
@@ -87,14 +88,14 @@
 								"type": "text"
 							},
 							{
-								"key": "actorId",
-								"value": "character1",
+								"key": "characterName",
+								"value": "character10",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"itemInstanceId\": \"0d605a98-ef78-4a12-ab56-11b77bcd6870\"\r\n}",
+							"raw": "{\r\n    \"itemInstanceId\": \"7cd9cd88-c1e4-45c1-a7e8-e1f055729408\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -143,14 +144,14 @@
 								"type": "text"
 							},
 							{
-								"key": "actorId",
+								"key": "characterName",
 								"value": "character1",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"itemInstanceId\": \"2193b0e0-acdc-499b-936a-f7f4bb61fbfd\"\r\n}",
+							"raw": "{\r\n    \"itemInstanceId\": \"0a93c011-8603-48c4-a7c8-e5c097426796\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -201,7 +202,7 @@
 						"type": "text"
 					},
 					{
-						"key": "actorId",
+						"key": "characterName",
 						"value": "character1",
 						"type": "text",
 						"disabled": true
@@ -209,7 +210,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"actorId\": \"character1\"\r\n}",
+					"raw": "{\r\n    \"characterName\": \"testChar10\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -261,8 +262,8 @@
 						"type": "text"
 					},
 					{
-						"key": "actorId",
-						"value": "character1",
+						"key": "characterName",
+						"value": "testChar11",
 						"type": "text"
 					}
 				],
@@ -317,14 +318,14 @@
 						"type": "text"
 					},
 					{
-						"key": "actorId",
-						"value": "character1",
+						"key": "characterName",
+						"value": "character10",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"itemInstanceId\": \"a541a5b0-b421-480e-ad04-e87a908b92c0\"\r\n}",
+					"raw": "{\r\n    \"droppedItemId\": \"7cd9cd88-c1e4-45c1-a7e8-e1f055729408\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -373,14 +374,14 @@
 						"type": "text"
 					},
 					{
-						"key": "actorId",
+						"key": "characterName",
 						"value": "character1",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"actorId\": \"character1\",\r\n    \"itemInventoryLocation\": {\r\n        \"x\": 0,\r\n        \"y\": 0\r\n    },\r\n    \"location\": {\r\n        \"map\": \"map1\",\r\n        \"x\": -240,\r\n        \"y\": -220,\r\n        \"z\": 123\r\n    } \r\n}",
+					"raw": "{\r\n    \"characterName\": \"character1\",\r\n    \"itemInventoryLocation\": {\r\n        \"x\": 0,\r\n        \"y\": 0\r\n    },\r\n    \"location\": {\r\n        \"map\": \"map1\",\r\n        \"x\": -240,\r\n        \"y\": -220,\r\n        \"z\": 123\r\n    } \r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -429,7 +430,7 @@
 						"type": "text"
 					},
 					{
-						"key": "actorId",
+						"key": "characterName",
 						"value": "character1",
 						"type": "text"
 					}

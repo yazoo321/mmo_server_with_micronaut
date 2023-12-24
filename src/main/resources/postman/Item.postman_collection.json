@@ -2,9 +2,186 @@
 	"info": {
 		"_postman_id": "7495c8fd-8bbc-4553-93c4-991b49f773f7",
 		"name": "Item",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1620917"
 	},
 	"item": [
+		{
+			"name": "Create batch item requests",
+			"item": [
+				{
+					"name": "Create axes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"items\": [\r\n        {\r\n            \"itemId\": \"16000\",\r\n            \"itemName\": \"Iron pickaxe\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"5\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"16001\",\r\n            \"itemName\": \"Iron double axe\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"35\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"16002\",\r\n            \"itemName\": \"Wood chopper\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"40\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"16003\",\r\n            \"itemName\": \"Axe with a thousand souls\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"200\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"16004\",\r\n            \"itemName\": \"Generals axe\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"200\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/v1/items/create-items",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"items",
+								"create-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create swords",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"items\": [\r\n        {\r\n            \"itemId\": \"15000\",\r\n            \"itemName\": \"Sunsword of Vallen\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60,\r\n               \"MAX_HP\": 100,\r\n               \"ATTACK_SPEED\": 30,\r\n               \"PHY_AMP\": 0.3\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"15001\",\r\n            \"itemName\": \"Iron butcher sword\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"15002\",\r\n            \"itemName\": \"Guards cleaver\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"15003\",\r\n            \"itemName\": \"Fallen champions sword\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"15004\",\r\n            \"itemName\": \"Giants cleaver\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/v1/items/create-items",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"items",
+								"create-items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create staffs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YXpvbyIsIm5iZiI6MTY1MjI2MTQwMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlzcyI6Im1tby1zZXJ2ZXIiLCJleHAiOjE2NTIyNjUwMDMsImlhdCI6MTY1MjI2MTQwM30.xE0zNpSayX88hh3XuwscXz5MStlPCHfccjWbWnRPhhY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"items\": [\r\n        {\r\n            \"itemId\": \"17000\",\r\n            \"itemName\": \"Staff of divinity\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"35\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"17001\",\r\n            \"itemName\": \"Staff of divinity\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"300\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"17002\",\r\n            \"itemName\": \"Lifestealer staff\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"250\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"17003\",\r\n            \"itemName\": \"Wooden stick\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"3\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"17004\",\r\n            \"itemName\": \"Apprentice's staff\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"35\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"17005\",\r\n            \"itemName\": \"Chipped arnana stick\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"50\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"17006\",\r\n            \"itemName\": \"Empowered stick\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"60\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/v1/items/create-items",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"items",
+								"create-items"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "Create items",
 			"request": {
@@ -39,7 +216,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n\r\n    \"items\": [\r\n        {\r\n            \"itemId\": \"500\",\r\n            \"itemName\": \"small axe\",\r\n            \"category\": \"WEAPON\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"damage\",\r\n                    \"value\": \"15\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"600\",\r\n            \"itemName\": \"wooden buckler\",\r\n            \"category\": \"SHIELD\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"10\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"700\",\r\n            \"itemName\": \"leather belt\",\r\n            \"category\": \"BELT\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"3\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"800\",\r\n            \"itemName\": \"Green cape\",\r\n            \"category\": \"CAPE\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"3\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"900\",\r\n            \"itemName\": \"Gold necklace\",\r\n            \"category\": \"NECK\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"2\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1000\",\r\n            \"itemName\": \"Gold ring\",\r\n            \"category\": \"RING\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"1\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1100\",\r\n            \"itemName\": \"Leather boots\",\r\n            \"category\": \"BOOTS\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"2\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1200\",\r\n            \"itemName\": \"Leather bracers\",\r\n            \"category\": \"BOOTS\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"2\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1300\",\r\n            \"itemName\": \"Leather armour\",\r\n            \"category\": \"CHEST\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"20\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1400\",\r\n            \"itemName\": \"Leather gloves\",\r\n            \"category\": \"GLOVES\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"5\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1500\",\r\n            \"itemName\": \"Leather helm\",\r\n            \"category\": \"HELM\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"10\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1600\",\r\n            \"itemName\": \"Leather pants\",\r\n            \"category\": \"LEGS\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"7\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1700\",\r\n            \"itemName\": \"Leather shoulder pads\",\r\n            \"category\": \"SHOULDER\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"6\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"1800\",\r\n            \"itemName\": \"Leather shoulder pads\",\r\n            \"category\": \"SHOULDER\",\r\n            \"tags\": [\r\n                {\r\n                    \"name\": \"armour\",\r\n                    \"value\": \"6\"\r\n                }\r\n            ],\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        }\r\n    ]\r\n}",
+					"raw": "{\r\n    \"items\": [\r\n        {\r\n            \"itemId\": \"15000\",\r\n            \"itemName\": \"Sunsword of Vallen\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60,\r\n               \"MAX_HP\": 100,\r\n               \"ATTACK_SPEED\": 30,\r\n               \"PHY_AMP\": 0.3\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"15001\",\r\n            \"itemName\": \"Iron butcher sword\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"15002\",\r\n            \"itemName\": \"Guards cleaver\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"15003\",\r\n            \"itemName\": \"Fallen champions sword\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n        {\r\n            \"itemId\": \"15004\",\r\n            \"itemName\": \"Giants cleaver\",\r\n            \"category\": \"WEAPON\",\r\n            \"itemEffects\": {\r\n               \"BASE_ATTACK_SPEED\": 2.3,\r\n               \"WEAPON_DAMAGE\": 60\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        },\r\n                {\r\n            \"itemId\": \"1505\",\r\n            \"itemName\": \"Footmans helmet\",\r\n            \"category\": \"HELM\",\r\n            \"itemEffects\": {\r\n               \"DEF\": 28.5,\r\n               \"MAG_DEF\": 15.3,\r\n               \"MAX_HP\": 75.0,\r\n               \"MAX_MP\": 10\r\n            },\r\n            \"value\": 2000,\r\n            \"stacking\": {\r\n                \"canStack\": false,\r\n                \"maxStacks\": 1\r\n            },\r\n            \"itemConfig\": {\r\n                \"icon\": \"TBD\",\r\n                \"mesh\": \"TBD\"\r\n            }\r\n        }\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -96,7 +273,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"itemId\": \"700\",\r\n    \"location\": {\r\n        \"map\": \"map1\",\r\n        \"x\": 2000,\r\n        \"y\": 2000,\r\n        \"z\": 100\r\n    }\r\n}\r\n",
+					"raw": "{\r\n    \"itemId\": \"15000\",\r\n    \"location\": {\r\n        \"map\": \"tooksworth\",\r\n        \"x\": 240,\r\n        \"y\": 350,\r\n        \"z\": 240\r\n    }\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -164,7 +341,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/v1/items/dropped?map=map1&x=2000&y=2000&z=265",
+					"raw": "http://localhost:8081/v1/items/dropped?map=dreamscape&x=35240&y=-68565&z=-20199",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -178,19 +355,19 @@
 					"query": [
 						{
 							"key": "map",
-							"value": "map1"
+							"value": "dreamscape"
 						},
 						{
 							"key": "x",
-							"value": "2000"
+							"value": "35240"
 						},
 						{
 							"key": "y",
-							"value": "2000"
+							"value": "-68565"
 						},
 						{
 							"key": "z",
-							"value": "265"
+							"value": "-20199"
 						}
 					]
 				}
