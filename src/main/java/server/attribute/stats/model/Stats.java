@@ -10,7 +10,9 @@ import java.util.UUID;
 
 import lombok.Builder;
 import lombok.Data;
+import org.bson.internal.UuidHelper;
 import server.attribute.stats.types.StatsTypes;
+import server.common.uuid.UUIDHelper;
 
 @Data
 @Builder
@@ -146,11 +148,6 @@ public class Stats {
     }
 
     public boolean isPlayer() {
-        try {
-            UUID.fromString(actorId);
-            return false;
-        } catch (IllegalArgumentException e) {
-            return true;
-        }
+        return !UUIDHelper.isValid(actorId);
     }
 }

@@ -13,12 +13,12 @@ import lombok.NonNull;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
-import server.configuration.redis.JacksonCodecCombatData;
-import server.configuration.redis.JacksonCodecMotion;
+import server.common.configuration.redis.JacksonCodecCombatData;
+import server.common.configuration.redis.JacksonCodecMotion;
+import server.common.uuid.UUIDHelper;
 import server.items.equippable.model.EquippedItems;
 import server.items.types.ItemType;
 import server.motion.model.SessionParams;
-import server.session.model.CacheData;
 import server.session.model.CacheDomains;
 import server.session.model.CacheKey;
 
@@ -117,15 +117,12 @@ import server.session.model.CacheKey;
     }
 
     public static void setActorId(WebSocketSession session, String actorId) {
-        session.put(SessionParams.ACTOR_ID.getType(), actorId);
-        boolean isServer = false;
-        try{
-            // can change this to REGEX
-            UUID.fromString(actorId);
-            isServer = true;
-        } catch (IllegalArgumentException exception){
-            // then it is a player
+        if (actorId == null || actorId.isBlank()) {
+            return;
         }
+        session.put(SessionParams.ACTOR_ID.getType(), actorId);
+        boolean isServer = UUIDHelper.isValid(actorId);
+
         session.put(SessionParams.IS_PLAYER.getType(), !isServer);
         session.put(SessionParams.IS_SERVER.getType(), isServer);
     }

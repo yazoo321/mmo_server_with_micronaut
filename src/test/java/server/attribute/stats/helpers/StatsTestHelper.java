@@ -7,7 +7,7 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import server.attribute.stats.model.Stats;
-import server.configuration.MongoConfiguration;
+import server.common.configuration.MongoConfiguration;
 
 @Singleton
 public class StatsTestHelper {

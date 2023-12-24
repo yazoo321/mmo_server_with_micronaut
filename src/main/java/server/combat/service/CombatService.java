@@ -117,8 +117,9 @@ public class CombatService {
                                             err.getMessage()))
                     .subscribe();
             mobInstanceService.handleMobDeath(stats.getActorId());
+            sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);
+            clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
         }
-        clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
     }
 
 }

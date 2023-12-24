@@ -28,9 +28,7 @@ public class StatsSocketIntegration {
                         stats -> {
                             if (actorId.equalsIgnoreCase(SessionParamHelper.getActorId(session))) {
                                 // update session with params
-                                CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
-                                combatData.getDerivedStats().putAll(stats.getDerivedStats());
-                                sessionParamHelper.setSharedActorCombatData(actorId, combatData);
+                                sessionParamHelper.setActorDerivedStats(actorId, stats.getDerivedStats());
                             }
 
                             SocketResponse response =

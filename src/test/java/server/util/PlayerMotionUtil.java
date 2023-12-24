@@ -8,7 +8,7 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.util.List;
-import server.configuration.MongoConfiguration;
+import server.common.configuration.MongoConfiguration;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.PlayerMotionList;

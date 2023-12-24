@@ -9,10 +9,8 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.conversions.Bson;
-import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
-import server.attribute.status.model.Status;
-import server.configuration.MongoConfiguration;
+import server.common.configuration.MongoConfiguration;
 
 import static com.mongodb.client.model.Filters.eq;
 

@@ -1,4 +1,4 @@
-package server.configuration.redis;
+package server.common.configuration.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.codec.RedisCodec;
@@ -7,7 +7,6 @@ import io.micronaut.context.annotation.Replaces;
 import io.micronaut.runtime.context.scope.ThreadLocal;
 import jakarta.inject.Singleton;
 import server.common.dto.Motion;
-import server.session.model.CacheData;
 
 @Factory
 public class CustomRedisCodecFactory {

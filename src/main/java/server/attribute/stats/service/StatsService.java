@@ -31,14 +31,14 @@ public class StatsService {
         // TODO: parameterize from server
         int level = 10;
         double baseAttackSpeed = 5.0;
-        double weaponDamage = 30;
+        double weaponDamage = 20;
 
         mobStats.setActorId(actorId);
 
         mobStats.setBaseStats(
                 new HashMap<>(
                         Map.of(
-                                StatsTypes.STR.getType(), 100,
+                                StatsTypes.STR.getType(), 50,
                                 StatsTypes.STA.getType(), 100,
                                 StatsTypes.DEX.getType(), 100,
                                 StatsTypes.INT.getType(), 100)));

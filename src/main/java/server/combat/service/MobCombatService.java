@@ -121,6 +121,11 @@ public class MobCombatService extends CombatService  {
 
     void attackLoop(String actorId) {
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
+        if (combatData == null) {
+            // mob likely died, later we can specify death state to be certain instead.
+            sessionsInCombat.remove(actorId);
+        }
+
         Set<String> targets = combatData.getTargets();
 
         List<Stats> targetStats = getTargetStats(targets);

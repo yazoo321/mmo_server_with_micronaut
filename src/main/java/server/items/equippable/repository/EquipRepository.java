@@ -12,7 +12,7 @@ import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import server.configuration.MongoConfiguration;
+import server.common.configuration.MongoConfiguration;
 import server.items.equippable.model.EquippedItems;
 
 @Slf4j

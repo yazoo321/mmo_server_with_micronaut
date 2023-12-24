@@ -1,4 +1,4 @@
-package server.configuration.redis;
+package server.common.configuration.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.codec.RedisCodec;

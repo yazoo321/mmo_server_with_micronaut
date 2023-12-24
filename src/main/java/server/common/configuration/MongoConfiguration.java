@@ -1,4 +1,4 @@
-package server.configuration;
+package server.common.configuration;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import lombok.Data;

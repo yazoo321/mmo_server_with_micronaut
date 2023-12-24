@@ -266,9 +266,9 @@ public class ClientUpdatesService {
             if (sessionIsThePlayerOrMob(s, playerOrMob)) {
                 isThePlayerOrMob = true;
                 // update session cache about stats
-                CombatData combatData = sessionParamHelper.getSharedActorCombatData(stats.getActorId());
-                combatData.setDerivedStats(stats.getDerivedStats());
-                sessionParamHelper.setSharedActorCombatData(stats.getActorId(), combatData);
+                if (!stats.getDerivedStats().isEmpty()) {
+                    sessionParamHelper.setActorDerivedStats(playerOrMob, stats.getDerivedStats());
+                }
             }
 
             return isThePlayerOrMob || sessionListensToPlayerOrMob(s, playerOrMob);

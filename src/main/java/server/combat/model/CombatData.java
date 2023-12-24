@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.attribute.status.model.ActorStatus;
+import server.common.uuid.UUIDHelper;
 
 @Data
 @AllArgsConstructor
@@ -47,12 +48,6 @@ public class CombatData {
         this.derivedStats = new HashMap<>();
         this.aggregatedStatusDerived = new HashMap<>();
         this.aggregatedStatusEffects = new HashSet<>();
-
-        try {
-            UUID.fromString(actorId);
-            isPlayer = false;
-        } catch (IllegalArgumentException exception) {
-            isPlayer = true;
-        }
+        this.isPlayer = !UUIDHelper.isValid(actorId);
     }
 }

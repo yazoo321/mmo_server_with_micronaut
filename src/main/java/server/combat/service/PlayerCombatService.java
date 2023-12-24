@@ -105,24 +105,15 @@ public class PlayerCombatService extends CombatService  {
 
             // Create a damage map (currently only physical damage)
             Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
-            Stats stats = statsService.takeDamage(target, damageMap);
+            target = statsService.takeDamage(target, damageMap);
             if (isMainHand) {
                 combatData.setMainHandLastAttack(Instant.now());
             } else {
                 combatData.setOffhandLastAttack(Instant.now());
             }
 
-            if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-                statsService
-                        .deleteStatsFor(stats.getActorId())
-                        .doOnError(
-                                err ->
-                                        log.error(
-                                                "Failed to delete stats on death, {}",
-                                                err.getMessage()))
-                        .subscribe();
-                mobInstanceService.handleMobDeath(stats.getActorId());
-                clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
+            if (target.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
+                handleActorDeath(target);
                 combatData.getTargets().remove(target.getActorId());
             }
 
@@ -151,8 +142,8 @@ public class PlayerCombatService extends CombatService  {
         }
 
         targetStats.forEach(
-                stat -> {
-                    tryAttack(session, stat, true);
+                target -> {
+                    tryAttack(session, target, true);
                     //            tryAttack(session, stat, "OFF_HAND");
                 });
 
