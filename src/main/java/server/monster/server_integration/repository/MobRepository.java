@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.common.mongo.query.MongoDbQueryHelper;
-import server.configuration.MongoConfiguration;
+import server.common.configuration.MongoConfiguration;
 import server.monster.server_integration.model.Monster;
 
 @Slf4j

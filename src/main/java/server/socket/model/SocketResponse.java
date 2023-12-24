@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.attribute.stats.model.Stats;
+import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatRequest;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.DroppedItem;
@@ -44,5 +45,6 @@ public class SocketResponse {
     CombatRequest combatRequest;
 
     Stats stats;
-    // other data to be added, e.g. inventory updates
+
+    ActorStatus actorStatus;
 }

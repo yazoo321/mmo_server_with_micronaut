@@ -1,4 +1,4 @@
-package server.configuration.redis;
+package server.common.configuration.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.codec.RedisCodec;
@@ -15,6 +15,7 @@ public class CustomRedisCodecFactory {
     @ThreadLocal
     @Replaces(factory = RedisCodec.class)
     public RedisCodec<String, Motion> customRedisCodec(ObjectMapper objectMapper) {
-        return new JacksonRedisCodecMotion(objectMapper);
+        // Not in use
+        return new JacksonCodecMotion(objectMapper);
     }
 }

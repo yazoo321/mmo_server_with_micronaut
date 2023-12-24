@@ -1,17 +1,19 @@
-package server.configuration.redis;
+package server.common.configuration.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.codec.RedisCodec;
+import server.combat.model.CombatData;
+import server.common.dto.Motion;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
-import server.common.dto.Motion;
 
-public class JacksonRedisCodecMotion implements RedisCodec<String, Motion> {
+public class JacksonCodecCombatData implements RedisCodec<String, CombatData> {
 
     private ObjectMapper objectMapper;
 
-    public JacksonRedisCodecMotion(ObjectMapper objectMapper) {
+    public JacksonCodecCombatData(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -25,12 +27,12 @@ public class JacksonRedisCodecMotion implements RedisCodec<String, Motion> {
     }
 
     @Override
-    public Motion decodeValue(final ByteBuffer bytes) {
+    public CombatData decodeValue(final ByteBuffer bytes) {
         try {
             byte[] dataBytes = new byte[bytes.remaining()];
             bytes.get(dataBytes);
 
-            return objectMapper.readValue(dataBytes, Motion.class);
+            return objectMapper.readValue(dataBytes, CombatData.class);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -47,7 +49,7 @@ public class JacksonRedisCodecMotion implements RedisCodec<String, Motion> {
     }
 
     @Override
-    public ByteBuffer encodeValue(Motion value) {
+    public ByteBuffer encodeValue(CombatData value) {
         try {
             byte[] bytes = objectMapper.writeValueAsBytes(value);
             return ByteBuffer.wrap(bytes);

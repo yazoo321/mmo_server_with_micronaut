@@ -7,6 +7,7 @@ import server.attribute.stats.service.StatsService;
 import server.monster.server_integration.model.Monster;
 import server.monster.server_integration.producer.MonsterServerProducer;
 import server.monster.server_integration.service.MobInstanceService;
+import server.session.SessionParamHelper;
 
 @Slf4j
 @KafkaListener(
@@ -21,6 +22,9 @@ public class MonsterServerListener {
     @Inject MobInstanceService mobInstanceService;
 
     @Inject StatsService statsService;
+
+    @Inject
+    SessionParamHelper sessionParamHelper;
 
     @Topic("create-mob")
     public void receiveCreateMob(Monster monster) {
@@ -45,5 +49,6 @@ public class MonsterServerListener {
                                         error.getMessage()))
                 .subscribe();
         monsterServerProducer.sendMobUpdateResult(monster);
+        sessionParamHelper.setSharedActorMotion(monster.getActorId(), monster.getMotion());
     }
 }

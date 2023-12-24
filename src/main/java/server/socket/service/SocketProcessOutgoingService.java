@@ -8,7 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+
+import jdk.jfr.Frequency;
 import lombok.extern.slf4j.Slf4j;
+import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
 import server.motion.dto.PlayerMotion;
 import server.session.SessionParamHelper;
@@ -30,7 +33,10 @@ public class SocketProcessOutgoingService {
 
     @Inject StatsSocketIntegration attributeSocketIntegration;
 
-    @Inject PlayerCombatService combatService;
+    @Inject PlayerCombatService playerCombatService;
+
+    @Inject
+    MobCombatService mobCombatService;
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
 
@@ -50,6 +56,7 @@ public class SocketProcessOutgoingService {
                                 MessageType.FETCH_STATS.getType(), this::handleFetchStats));
         // map.of supports up to 10 items
         this.functionMap.put(MessageType.TRY_ATTACK.getType(), this::handleTryAttack);
+        this.functionMap.put(MessageType.STOP_ATTACK.getType(), this::handleStopAttack);
         this.functionMap.put(MessageType.SET_SESSION_ID.getType(), this::setSessionId);
     }
 
@@ -136,7 +143,19 @@ public class SocketProcessOutgoingService {
     }
 
     private void handleTryAttack(SocketMessage message, WebSocketSession session) {
-        combatService.requestAttack(session, message.getCombatRequest());
+        if (SessionParamHelper.getIsPlayer(session)){
+            playerCombatService.requestAttack(session, message.getCombatRequest());
+        } else {
+            mobCombatService.requestAttack(message.getCombatRequest());
+        }
+    }
+
+    private void handleStopAttack(SocketMessage message, WebSocketSession session) {
+        if (SessionParamHelper.getIsPlayer(session)){
+            playerCombatService.requestStopAttack(SessionParamHelper.getActorId(session));
+        } else {
+            mobCombatService.requestStopAttack(message.getActorId());
+        }
     }
 
     private void setSessionId(SocketMessage message, WebSocketSession session) {

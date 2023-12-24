@@ -13,7 +13,7 @@ import java.util.*;
 import server.attribute.stats.types.StatsTypes;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
-import server.configuration.MongoConfiguration;
+import server.common.configuration.MongoConfiguration;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.CharacterItem;
 import server.items.inventory.model.Inventory;

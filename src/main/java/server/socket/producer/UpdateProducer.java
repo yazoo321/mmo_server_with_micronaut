@@ -4,6 +4,7 @@ import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import java.util.List;
 import server.attribute.stats.model.Stats;
+import server.attribute.status.model.ActorStatus;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.ItemInstanceIds;
 import server.items.model.DroppedItem;
@@ -36,4 +37,7 @@ public interface UpdateProducer {
 
     @Topic("update-actor-stats")
     void updateStats(Stats stats);
+
+    @Topic("update-actor-status")
+    void updateStatus(ActorStatus actorStatus);
 }

@@ -73,7 +73,8 @@ mongo-database:
   equip-collection: "equip"
   player-motion: "playerMotion"
   mob-instance: "mobInstance"
-  actorStats: "actorStats"
+  actor-stats: "actorStats"
+  actor-status: "actorStatus"
 
 redisson:
   single-server-config:

@@ -1,4 +1,4 @@
-package server.configuration;
+package server.common.configuration;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import lombok.Data;
@@ -17,4 +17,5 @@ public class MongoConfiguration {
     private String playerMotion;
     private String mobInstance;
     private String actorStats;
+    private String actorStatus;
 }

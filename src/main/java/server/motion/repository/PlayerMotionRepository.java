@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.common.mongo.query.MongoDbQueryHelper;
-import server.configuration.MongoConfiguration;
+import server.common.configuration.MongoConfiguration;
 import server.motion.dto.PlayerMotion;
 import server.motion.dto.exceptions.PlayerMotionException;
 

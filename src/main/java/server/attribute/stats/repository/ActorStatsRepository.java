@@ -12,7 +12,7 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.conversions.Bson;
 import server.attribute.stats.model.Stats;
-import server.configuration.MongoConfiguration;
+import server.common.configuration.MongoConfiguration;
 
 @Slf4j
 @Singleton

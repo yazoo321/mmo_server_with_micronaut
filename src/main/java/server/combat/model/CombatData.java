@@ -3,24 +3,29 @@ package server.combat.model;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import server.attribute.status.model.ActorStatus;
+import server.common.uuid.UUIDHelper;
 
 @Data
 @AllArgsConstructor
 @Serdeable
 @ReflectiveAccess
-public class PlayerCombatData {
+@NoArgsConstructor
+public class CombatData {
 
     private String actorId;
 
-    private Double mainHandAttackSpeed;
-    private Double offhandAttackSpeed;
-    private Double characterAttackSpeed;
+    Map<String, Double> derivedStats;
+
+    ActorStatus actorStatus;
+
+    Set<String> aggregatedStatusEffects;
+    Map<String, Double> aggregatedStatusDerived;
 
     private Instant mainHandLastAttack;
     private Instant offhandLastAttack;
@@ -31,15 +36,18 @@ public class PlayerCombatData {
 
     private Instant lastHelperNotification;
 
-    public PlayerCombatData(String actorId) {
+    boolean isPlayer;
+
+    public CombatData(String actorId) {
         this.setActorId(actorId);
-        this.mainHandAttackSpeed = 0.0;
-        this.offhandAttackSpeed = 0.0;
-        this.characterAttackSpeed = 0.0;
         this.mainHandLastAttack = Instant.now().minusSeconds(20);
         this.offhandLastAttack = Instant.now().minusSeconds(20);
         this.targets = new HashSet<>();
         this.lastHelperNotification = Instant.now().minusSeconds(20);
         this.attackSent = new HashMap<>();
+        this.derivedStats = new HashMap<>();
+        this.aggregatedStatusDerived = new HashMap<>();
+        this.aggregatedStatusEffects = new HashSet<>();
+        this.isPlayer = !UUIDHelper.isValid(actorId);
     }
 }

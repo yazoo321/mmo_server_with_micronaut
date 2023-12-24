@@ -6,9 +6,13 @@ import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Data;
+import org.bson.internal.UuidHelper;
 import server.attribute.stats.types.StatsTypes;
+import server.common.uuid.UUIDHelper;
 
 @Data
 @Builder
@@ -23,6 +27,14 @@ public class Stats {
     private Map<String, Double> statusEffects;
 
     private Integer attributePoints;
+
+    public Map<String, Double> getDerivedStats() {
+        if (this.derivedStats == null) {
+            this.derivedStats = new HashMap<>();
+        }
+
+        return this.derivedStats;
+    }
 
     public Stats(
             String actorId,
@@ -58,8 +70,12 @@ public class Stats {
         derivedStats.put(type.getType(), val);
     }
 
+    public void setBase(StatsTypes type, int value) {
+        baseStats.put(type.getType(), value);
+    }
+
     public Map<String, Double> recalculateDerivedStats() {
-        Map<String, Double> updatedDerived = new HashMap<>();
+        Map<String, Double> updatedDerived = this.getDerivedStats();
         int strength = getBaseStat(StatsTypes.STR);
         int dexterity = getBaseStat(StatsTypes.DEX);
         int stamina = getBaseStat(StatsTypes.STA);
@@ -110,28 +126,14 @@ public class Stats {
     public static Map<String, Double> mergeStats(
             Map<String, Double> left, Map<String, Double> right) {
         Map<String, Double> copy = new HashMap<>(left);
-        right.forEach(
-                (k, v) -> {
-                    if (copy.containsKey(k)) {
-                        copy.put(k, copy.get(k) + v);
-                    } else {
-                        copy.put(k, v);
-                    }
-                });
+        right.forEach((k, v) -> copy.merge(k, v, Double::sum));
 
         return copy;
     }
 
     public static Map<String, Double> mergeLeft(
             Map<String, Double> left, Map<String, Double> right) {
-        right.forEach(
-                (k, v) -> {
-                    if (left.containsKey(k)) {
-                        left.put(k, left.get(k) + v);
-                    } else {
-                        left.put(k, v);
-                    }
-                });
+        right.forEach((k, v) -> left.merge(k, v, Double::sum));
 
         return left;
     }
@@ -143,5 +145,9 @@ public class Stats {
     public boolean canAct() {
         // TODO: Refactor later to status effects, some cases may allow to act
         return this.getDerived(StatsTypes.CURRENT_HP) > 0;
+    }
+
+    public boolean isPlayer() {
+        return !UUIDHelper.isValid(actorId);
     }
 }

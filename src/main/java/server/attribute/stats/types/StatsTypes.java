@@ -44,7 +44,10 @@ public enum StatsTypes {
 
     // Level stats
     XP("XP"),
-    LEVEL("LEVEL");
+    LEVEL("LEVEL"),
+
+    MAIN_HAND_ATTACK_SPEED("MAIN_HAND_ATTACK_SPEED"),
+    OFF_HAND_ATTACK_SPEED("OFF_HAND_ATTACK_SPEED");
 
     public final String type;
 }
