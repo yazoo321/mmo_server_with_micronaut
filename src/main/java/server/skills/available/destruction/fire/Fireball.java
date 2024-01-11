@@ -21,7 +21,9 @@ public class Fireball extends ChannelledSkill {
                         StatsTypes.MAGIC_DAMAGE.getType(), 100.0
                 ),
                 0,
-                1500
+                1500,
+                1000,
+                Map.of()
         );
     }
 }

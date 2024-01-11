@@ -22,7 +22,9 @@ public class BasicHeal extends ChannelledSkill {
                         StatsTypes.MAGIC_DAMAGE.getType(), -100.0
                 ),
                 1000,
-                1000
+                1000,
+                500,
+                Map.of()
         );
     }
 }

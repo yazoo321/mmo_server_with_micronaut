@@ -16,6 +16,10 @@ public abstract class Skill {
     private String description;
     Map<String, Double> derived;
 
+    private Integer maxRange;
+
+    private Map<String, Integer> requirements;
+
 
 //    public abstract void applySkill();
 }
