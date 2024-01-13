@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.attribute.status.model.ActorStatus;
 import server.common.uuid.UUIDHelper;
+import server.skills.model.ActorSkills;
+import server.skills.model.Skill;
 
 @Data
 @AllArgsConstructor
@@ -38,6 +40,10 @@ public class CombatData {
 
     boolean isPlayer;
 
+    private Map<Skill, Instant> activatedSkills;
+
+    private String combatState;
+
     public CombatData(String actorId) {
         this.setActorId(actorId);
         this.mainHandLastAttack = Instant.now().minusSeconds(20);
@@ -49,5 +55,6 @@ public class CombatData {
         this.aggregatedStatusDerived = new HashMap<>();
         this.aggregatedStatusEffects = new HashSet<>();
         this.isPlayer = !UUIDHelper.isValid(actorId);
+        this.combatState = CombatState.IDLE.getType();
     }
 }

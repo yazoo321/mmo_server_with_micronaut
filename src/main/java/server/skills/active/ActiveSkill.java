@@ -1,12 +1,10 @@
 package server.skills.active;
 
-import server.common.dto.Location2D;
 import server.skills.model.Skill;
 
 import java.util.Map;
-import java.util.Set;
 
-public class ActiveSkill extends Skill {
+public abstract class ActiveSkill extends Skill {
 
     Integer cooldown;
 

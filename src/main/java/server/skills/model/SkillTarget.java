@@ -8,7 +8,9 @@ import server.common.dto.Location2D;
 @AllArgsConstructor
 public class SkillTarget {
 
-    private String actorId; // either actorID or location has to be set
+    private String casterId;
+
+    private String targetId;
     private Location2D location;
 
     private int radius; // radius can be 0 for single target

@@ -1,25 +1,44 @@
 package server.skills.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.AllArgsConstructor;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
+import server.attribute.stats.service.StatsService;
+import server.combat.model.CombatData;
+import server.session.SessionParamHelper;
 
 import java.util.Map;
+import java.util.Random;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "name")
 public abstract class Skill {
 
-    private String name;
-    private String description;
-    Map<String, Double> derived;
 
-    private Integer maxRange;
+    private final String name;
 
-    private Map<String, Integer> requirements;
+    private final String description;
 
+    private final Map<String, Double> derived;
 
-//    public abstract void applySkill();
+    private final Integer maxRange;
+
+    private final Map<String, Integer> requirements;
+
+    @Inject
+    protected SessionParamHelper sessionParamHelper;
+
+    @Inject
+    protected StatsService statsService;
+
+    protected Random rand = new Random();
+
+    public abstract void startSkill(CombatData combatData, SkillTarget skillTarget);
+
+    public abstract void endSkill(CombatData combatData, SkillTarget skillTarget);
+
+    public abstract boolean canApply(CombatData combatData, SkillTarget skillTarget);
 }

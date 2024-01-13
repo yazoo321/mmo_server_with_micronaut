@@ -13,7 +13,9 @@ public enum DamageTypes {
     MAGIC("MAGIC"),
     FIRE("FIRE"),
     COLD("COLD"),
-    LIGHTNING("LIGHTNING");
+    LIGHTNING("LIGHTNING"),
+
+    POSITIVE("POSITIVE");
 
     public final String type;
 }

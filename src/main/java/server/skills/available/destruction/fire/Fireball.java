@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import server.attribute.stats.types.StatsTypes;
+import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
+import server.skills.model.SkillTarget;
 
 import java.util.Map;
 
@@ -25,5 +27,15 @@ public class Fireball extends ChannelledSkill {
                 1000,
                 Map.of()
         );
+    }
+
+    @Override
+    public void startSkill(CombatData combatData, SkillTarget skillTarget) {
+
+    }
+
+    @Override
+    public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
+        return true;
     }
 }
