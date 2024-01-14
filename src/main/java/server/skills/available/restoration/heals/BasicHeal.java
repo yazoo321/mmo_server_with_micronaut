@@ -28,13 +28,14 @@ public class BasicHeal extends ChannelledSkill {
                 1000,
                 1000,
                 false,
+                true,
                 500,
                 Map.of()
         );
     }
 
     @Override
-    public void startSkill(CombatData combatData, SkillTarget skillTarget) {
+    public void endSkill(CombatData combatData, SkillTarget skillTarget) {
         Map<String, Double> derived = combatData.getDerivedStats();
 
         Double healAmp = derived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);

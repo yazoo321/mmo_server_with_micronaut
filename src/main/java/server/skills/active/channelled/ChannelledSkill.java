@@ -15,28 +15,39 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public abstract class ChannelledSkill extends ActiveSkill {
 
-    private int castTime;
-
-    private boolean allowsMovement;
-
+    private final int castTime;
+    private final boolean allowsMovement;
+    private final boolean canInterrupt;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public ChannelledSkill(String name, String description, Map<String, Double> derived, int cooldown, int castTime,
-                           boolean allowsMovement, int maxRange, Map<String, Integer> requirements) {
+                           boolean allowsMovement, boolean canInterrupt, int maxRange,
+                           Map<String, Integer> requirements) {
         super(name, description, derived, cooldown, maxRange, requirements);
         this.castTime = castTime;
         this.allowsMovement = allowsMovement;
+        this.canInterrupt = canInterrupt;
+    }
+
+    @Override
+    public void startSkill(CombatData combatData, SkillTarget skillTarget) {
+        startChanneling(combatData, skillTarget);
     }
 
     public void interruptChannel(CombatData combatData) {
-
+        // TBD
     }
 
     public void stopChannel(CombatData combatData) {
-
+        // TBD
     }
 
-    public void startChanneling(ChannelledSkill channelledSkill, CombatData combatData, SkillTarget skillTarget) {
+    public void startChanneling(CombatData combatData, SkillTarget skillTarget) {
+        // TODO: validate channelling
+        if (!this.canApply(combatData, skillTarget)) {
+            return;
+        }
+
         combatData.setCombatState(CombatState.CHANNELING.getType());
 
         // Schedule a task to periodically check the channeling status
@@ -50,11 +61,11 @@ public abstract class ChannelledSkill extends ActiveSkill {
         // Schedule a task to execute the skill after the channel time
         scheduler.schedule(() -> {
             if (channelingInProgress(combatData)) {
-                channelledSkill.startSkill(combatData, skillTarget);
+                this.endSkill(combatData, skillTarget);
             }
             combatData.setCombatState(CombatState.IDLE.getType()); // Reset combat state
             channelingTask.cancel(true); // Stop the periodic check
-        }, channelledSkill.getCastTime(), TimeUnit.MILLISECONDS);
+        }, this.getCastTime(), TimeUnit.MILLISECONDS);
     }
 
     private boolean channelingInProgress(CombatData combatData) {
