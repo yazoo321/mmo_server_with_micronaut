@@ -15,6 +15,7 @@ import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
 import server.motion.dto.PlayerMotion;
 import server.session.SessionParamHelper;
+import server.skills.service.CombatSkillsService;
 import server.socket.model.MessageType;
 import server.socket.model.SocketMessage;
 import server.socket.producer.UpdateProducer;
@@ -34,6 +35,9 @@ public class SocketProcessOutgoingService {
     @Inject StatsSocketIntegration attributeSocketIntegration;
 
     @Inject PlayerCombatService playerCombatService;
+
+    @Inject
+    CombatSkillsService combatSkillsService;
 
     @Inject
     MobCombatService mobCombatService;
@@ -148,6 +152,11 @@ public class SocketProcessOutgoingService {
         } else {
             mobCombatService.requestAttack(message.getCombatRequest());
         }
+    }
+
+    private void handleTryStartSkill(SocketMessage message, WebSocketSession session) {
+
+        combatSkillsService.tryApplySkill();
     }
 
     private void handleStopAttack(SocketMessage message, WebSocketSession session) {
