@@ -18,8 +18,8 @@ import server.skills.model.SkillTarget;
 public class CombatRequest {
 
     private Set<String> targets;
-//    private Location location;
 
+    private String skillId;
     private SkillTarget skillTarget;
 
     private String itemInstanceId;

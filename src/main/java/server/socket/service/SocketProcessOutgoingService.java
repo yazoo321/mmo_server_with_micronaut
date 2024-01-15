@@ -155,8 +155,7 @@ public class SocketProcessOutgoingService {
     }
 
     private void handleTryStartSkill(SocketMessage message, WebSocketSession session) {
-
-        combatSkillsService.tryApplySkill();
+        combatSkillsService.tryApplySkill(message.getCombatRequest());
     }
 
     private void handleStopAttack(SocketMessage message, WebSocketSession session) {
