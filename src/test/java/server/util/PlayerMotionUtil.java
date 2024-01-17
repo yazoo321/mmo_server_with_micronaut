@@ -1,17 +1,18 @@
 package server.util;
 
-import static com.mongodb.client.model.Filters.ne;
-
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
-import java.util.List;
 import server.common.configuration.MongoConfiguration;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.PlayerMotionList;
+
+import java.util.List;
+
+import static com.mongodb.client.model.Filters.ne;
 
 @Singleton
 public class PlayerMotionUtil {

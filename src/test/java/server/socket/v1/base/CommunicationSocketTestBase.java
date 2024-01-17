@@ -9,10 +9,6 @@ import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.websocket.WebSocketClient;
 import jakarta.inject.Inject;
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.reactivestreams.Publisher;
@@ -27,6 +23,11 @@ import server.socket.model.SocketMessage;
 import server.socket.model.SocketResponse;
 import server.util.PlayerMotionUtil;
 import server.util.websocket.TestWebSocketClient;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommunicationSocketTestBase {
 

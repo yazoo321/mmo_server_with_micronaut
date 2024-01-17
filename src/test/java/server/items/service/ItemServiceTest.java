@@ -2,10 +2,6 @@ package server.items.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.NoSuchElementException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +11,11 @@ import server.items.model.DroppedItem;
 import server.items.model.ItemInstance;
 import server.items.types.ItemType;
 import server.items.types.weapons.Weapon;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @MicronautTest
 public class ItemServiceTest {

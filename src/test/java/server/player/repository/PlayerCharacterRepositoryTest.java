@@ -1,18 +1,19 @@
 package server.player.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.mongodb.client.result.DeleteResult;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.player.exceptions.CharacterException;
 import server.player.model.Character;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @MicronautTest
 public class PlayerCharacterRepositoryTest {

@@ -1,18 +1,20 @@
 package server.monster.server_integration.repository;
 
-import static org.assertj.core.api.Assertions.*;
-
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.monster.server_integration.model.Monster;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.*;
 
 @MicronautTest
 public class MobRepositoryTest {

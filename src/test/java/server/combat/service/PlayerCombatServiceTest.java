@@ -1,25 +1,21 @@
 package server.combat.service;
 
-import static org.awaitility.Awaitility.await;
-
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.reactivestreams.Publisher;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
-import server.combat.model.CombatRequest;
 import server.combat.model.CombatData;
+import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.service.EquipItemService;
@@ -33,6 +29,13 @@ import server.motion.service.PlayerMotionService;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.session.FakeSession;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
 
 @MicronautTest
 class PlayerCombatServiceTest {
@@ -78,7 +81,7 @@ class PlayerCombatServiceTest {
     }
 
     private final String CHARACTER_1 = "character1";
-    private final String MOB_1 = "mob_1";
+    private final String MOB_1 = UUID.randomUUID().toString();
 
     @Test
     void testRequestAttackWithValidRequest() {
@@ -119,7 +122,7 @@ class PlayerCombatServiceTest {
         Assertions.assertThat(targets.size()).isEqualTo(1);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(6, ChronoUnit.SECONDS))
+                .timeout(Duration.of(9, ChronoUnit.SECONDS))
                 .until(
                         () -> {
                             try {

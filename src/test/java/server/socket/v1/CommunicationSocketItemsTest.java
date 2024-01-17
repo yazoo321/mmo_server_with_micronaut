@@ -1,13 +1,7 @@
 package server.socket.v1;
 
-import static org.awaitility.Awaitility.await;
-
 import io.micronaut.context.annotation.Property;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -22,6 +16,15 @@ import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.v1.base.CommunicationSocketTestBase;
 import server.util.websocket.TestWebSocketClient;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
 
 // This test is designed to test the items flow
 // dropping items, picking items up, etc.

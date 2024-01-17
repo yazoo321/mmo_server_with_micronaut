@@ -1,13 +1,13 @@
 package server.attribute.stats.helpers;
 
-import static com.mongodb.client.model.Filters.ne;
-
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import server.attribute.stats.model.Stats;
 import server.common.configuration.MongoConfiguration;
+
+import static com.mongodb.client.model.Filters.ne;
 
 @Singleton
 public class StatsTestHelper {

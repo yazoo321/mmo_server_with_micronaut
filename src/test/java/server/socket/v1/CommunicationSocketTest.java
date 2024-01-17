@@ -1,19 +1,23 @@
 package server.socket.v1;
 
-import static org.awaitility.Awaitility.await;
-
 import io.micronaut.context.annotation.Property;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import server.socket.model.MessageType;
+import server.socket.model.SocketMessage;
+import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseType;
+import server.util.websocket.TestWebSocketClient;
+
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import server.socket.model.*;
-import server.util.websocket.TestWebSocketClient;
+
+import static org.awaitility.Awaitility.await;
 
 @MicronautTest(environments = "kafka")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
