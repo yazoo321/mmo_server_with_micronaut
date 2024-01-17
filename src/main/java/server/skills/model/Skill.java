@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import lombok.NoArgsConstructor;
 import server.attribute.stats.service.StatsService;
@@ -90,7 +91,7 @@ public abstract class Skill {
 
     protected Random rand = new Random();
 
-    public abstract void startSkill(CombatData combatData, SkillTarget skillTarget);
+    public abstract void startSkill(CombatData combatData, SkillTarget skillTarget, WebSocketSession session);
 
     public abstract void endSkill(CombatData combatData, SkillTarget skillTarget);
 

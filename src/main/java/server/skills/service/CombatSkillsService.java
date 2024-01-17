@@ -2,6 +2,7 @@ package server.skills.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class CombatSkillsService {
     }
 
 
-    public void tryApplySkill(CombatRequest combatRequest) {
+    public void tryApplySkill(CombatRequest combatRequest, WebSocketSession session) {
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(combatRequest.getActorId());
         Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
         String skillName = combatRequest.getSkillId();
@@ -50,7 +51,11 @@ public class CombatSkillsService {
             return;
         }
 
-        skill.startSkill(combatData, combatRequest.getSkillTarget());
+        if (!skill.canApply(combatData, combatRequest.getSkillTarget())) {
+            return;
+        }
+
+        skill.startSkill(combatData, combatRequest.getSkillTarget(), session);
     }
 
 }

@@ -1,6 +1,7 @@
 package server.skills.active.channelled;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.websocket.WebSocketSession;
 import server.combat.model.CombatData;
 import server.combat.model.CombatState;
 import server.skills.active.ActiveSkill;
@@ -45,7 +46,7 @@ public abstract class ChannelledSkill extends ActiveSkill {
     }
 
     @Override
-    public void startSkill(CombatData combatData, SkillTarget skillTarget) {
+    public void startSkill(CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
         startChanneling(combatData, skillTarget);
     }
 
@@ -58,11 +59,6 @@ public abstract class ChannelledSkill extends ActiveSkill {
     }
 
     public void startChanneling(CombatData combatData, SkillTarget skillTarget) {
-        // TODO: validate channelling
-        if (!this.canApply(combatData, skillTarget)) {
-            return;
-        }
-
         combatData.setCombatState(CombatState.CHANNELING.getType());
 
         // Schedule a task to periodically check the channeling status

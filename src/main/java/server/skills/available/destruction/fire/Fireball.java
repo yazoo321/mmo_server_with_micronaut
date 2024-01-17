@@ -2,6 +2,7 @@ package server.skills.available.destruction.fire;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.websocket.WebSocketSession;
 import lombok.EqualsAndHashCode;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
@@ -34,7 +35,7 @@ public class Fireball extends ChannelledSkill {
     }
 
     @Override
-    public void startSkill(CombatData combatData, SkillTarget skillTarget) {
+    public void startSkill(CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
         travel(combatData, skillTarget, 1000);
     }
 
