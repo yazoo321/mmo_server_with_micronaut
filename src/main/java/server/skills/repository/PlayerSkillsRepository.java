@@ -6,17 +6,12 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import server.combat.model.CombatData;
 import server.common.configuration.MongoConfiguration;
-import server.motion.dto.PlayerMotion;
-import server.motion.dto.exceptions.PlayerMotionException;
 import server.session.SessionParamHelper;
 import server.skills.model.ActorSkills;
 import server.skills.model.Skill;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
@@ -49,13 +44,13 @@ public class PlayerSkillsRepository {
                 playerSkillsMongoCollection.findOneAndUpdate(
                         eq("actorId", actorId), set("skills", skills)));
     }
-
-    public Map<Skill, Instant>  getActorSkillsInUse(String actorId) {
-        CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
-        Map<Skill, Instant> activatedSkills = combatData.getActivatedSkills();
-
-        return activatedSkills;
-    }
+//
+//    public Map<String, Instant>  getActorSkillsInUse(String actorId) {
+//        CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
+//        Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
+//
+//        return activatedSkills;
+//    }
 
 
     private void prepareCollections() {

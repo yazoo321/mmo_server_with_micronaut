@@ -8,12 +8,13 @@ import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
-import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
 import server.common.dto.Location2D;
 import server.motion.model.MotionMessage;
 import server.motion.model.PlayerMotionList;
 import server.motion.service.PlayerMotionService;
+
+import java.util.function.Predicate;
 
 @Deprecated // use CommunicationSocket instead
 @ServerWebSocket("/v1/mob-integration/{map}/{serverInstance}/")

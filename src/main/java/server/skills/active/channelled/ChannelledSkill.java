@@ -1,6 +1,6 @@
 package server.skills.active.channelled;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import server.combat.model.CombatData;
 import server.combat.model.CombatState;
 import server.skills.active.ActiveSkill;
@@ -12,12 +12,27 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-@Getter
 public abstract class ChannelledSkill extends ActiveSkill {
 
+    @JsonProperty
     private final int castTime;
+    @JsonProperty
     private final boolean allowsMovement;
+    @JsonProperty
     private final boolean canInterrupt;
+
+    public int getCastTime() {
+        return castTime;
+    }
+
+    public boolean getAllowsMovement() {
+        return allowsMovement;
+    }
+
+    public boolean getCanInterrupt() {
+        return canInterrupt;
+    }
+
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public ChannelledSkill(String name, String description, Map<String, Double> derived, int cooldown, int castTime,

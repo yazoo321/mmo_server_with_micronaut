@@ -1,9 +1,5 @@
 package server.player.repository;
 
-import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Updates.combine;
-import static com.mongodb.client.model.Updates.set;
-
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -13,17 +9,22 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.subscribers.DefaultSubscriber;
 import jakarta.inject.Singleton;
+import server.common.configuration.MongoConfiguration;
+import server.common.dto.Motion;
+import server.player.exceptions.CharacterException;
+import server.player.model.Character;
+
+import javax.annotation.PostConstruct;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import javax.annotation.PostConstruct;
-import javax.validation.Valid;
-import server.common.dto.Motion;
-import server.common.configuration.MongoConfiguration;
-import server.player.exceptions.CharacterException;
-import server.player.model.Character;
+
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 
 @Singleton
 public class PlayerCharacterRepository {

@@ -8,10 +8,8 @@ import lombok.EqualsAndHashCode;
 import server.attribute.status.model.Status;
 import server.attribute.status.types.StatusTypes;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Data

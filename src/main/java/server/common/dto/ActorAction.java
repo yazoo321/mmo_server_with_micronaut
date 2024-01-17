@@ -1,12 +1,12 @@
 package server.common.dto;
 
-import java.time.Instant;
-
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor

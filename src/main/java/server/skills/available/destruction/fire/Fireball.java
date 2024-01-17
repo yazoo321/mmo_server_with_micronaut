@@ -1,8 +1,8 @@
 package server.skills.available.destruction.fire;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
@@ -12,7 +12,7 @@ import server.skills.model.SkillTarget;
 
 import java.util.Map;
 
-@Getter
+@Serdeable
 @JsonTypeName("Fireball")
 @EqualsAndHashCode(callSuper = false)
 public class Fireball extends ChannelledSkill {

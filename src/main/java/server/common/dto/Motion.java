@@ -3,11 +3,12 @@ package server.common.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
-import java.time.temporal.ValueRange;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.temporal.ValueRange;
 
 @Data
 @Slf4j

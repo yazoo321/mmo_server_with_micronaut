@@ -3,7 +3,8 @@ package server.common.configuration.redis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.codec.RedisCodec;
 import server.combat.model.CombatData;
-import server.common.dto.Motion;
+import server.skills.available.destruction.fire.Fireball;
+import server.skills.available.restoration.heals.BasicHeal;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -14,6 +15,8 @@ public class JacksonCodecCombatData implements RedisCodec<String, CombatData> {
     private ObjectMapper objectMapper;
 
     public JacksonCodecCombatData(ObjectMapper objectMapper) {
+        objectMapper.registerSubtypes(Fireball.class, BasicHeal.class);
+
         this.objectMapper = objectMapper;
     }
 

@@ -1,12 +1,12 @@
 package server.monster.server_integration.model;
 
-import java.time.Instant;
-
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Motion;
+
+import java.time.Instant;
 
 @Data
 @Serdeable

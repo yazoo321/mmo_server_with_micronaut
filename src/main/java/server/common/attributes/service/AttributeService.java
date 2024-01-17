@@ -1,9 +1,10 @@
 package server.common.attributes.service;
 
 import jakarta.inject.Singleton;
+import server.attribute.stats.types.StatsTypes;
+
 import java.util.List;
 import java.util.Map;
-import server.attribute.stats.types.StatsTypes;
 
 @Singleton
 public class AttributeService {

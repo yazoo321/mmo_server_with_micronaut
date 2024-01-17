@@ -5,14 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
-import server.items.types.accessories.Belt;
-import server.items.types.accessories.Cape;
-import server.items.types.accessories.Neck;
-import server.items.types.accessories.Ring;
-import server.items.types.armour.*;
 import server.items.types.consumable.Consumable;
-import server.items.types.weapons.Shield;
-import server.items.types.weapons.Weapon;
 
 import java.time.Instant;
 import java.util.Map;

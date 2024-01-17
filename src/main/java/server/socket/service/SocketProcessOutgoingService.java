@@ -3,13 +3,6 @@ package server.socket.service;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.security.InvalidParameterException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
-
-import jdk.jfr.Frequency;
 import lombok.extern.slf4j.Slf4j;
 import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
@@ -21,6 +14,12 @@ import server.socket.model.SocketMessage;
 import server.socket.producer.UpdateProducer;
 import server.socket.service.integrations.attributes.StatsSocketIntegration;
 import server.socket.service.integrations.items.ItemSocketIntegration;
+
+import java.security.InvalidParameterException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 @Slf4j
 @Singleton
@@ -154,7 +153,7 @@ public class SocketProcessOutgoingService {
         }
     }
 
-    private void handleTryStartSkill(SocketMessage message, WebSocketSession session) {
+    private void handleTryStartSkill(SocketMessage message) {
         combatSkillsService.tryApplySkill(message.getCombatRequest());
     }
 

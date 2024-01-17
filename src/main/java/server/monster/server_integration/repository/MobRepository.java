@@ -1,8 +1,5 @@
 package server.monster.server_integration.repository;
 
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.in;
-
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
@@ -12,17 +9,21 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+import server.common.configuration.MongoConfiguration;
+import server.common.dto.Location;
+import server.common.dto.Motion;
+import server.common.mongo.query.MongoDbQueryHelper;
+import server.monster.server_integration.model.Monster;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-import server.common.dto.Location;
-import server.common.dto.Motion;
-import server.common.mongo.query.MongoDbQueryHelper;
-import server.common.configuration.MongoConfiguration;
-import server.monster.server_integration.model.Monster;
+
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 
 @Slf4j
 @Singleton

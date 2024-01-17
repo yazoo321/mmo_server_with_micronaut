@@ -4,9 +4,6 @@ import com.mongodb.client.result.UpdateResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
@@ -19,6 +16,10 @@ import server.items.inventory.repository.InventoryRepository;
 import server.items.model.DroppedItem;
 import server.items.model.ItemInstance;
 import server.items.service.ItemService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Singleton

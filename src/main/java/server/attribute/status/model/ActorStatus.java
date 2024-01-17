@@ -4,7 +4,6 @@ import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import server.attribute.status.types.StatusTypes;
 
 import java.time.Instant;
 import java.util.*;

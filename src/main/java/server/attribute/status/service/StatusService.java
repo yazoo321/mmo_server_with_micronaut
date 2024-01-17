@@ -1,9 +1,7 @@
 package server.attribute.status.service;
 
-import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.repository.StatusRepository;

@@ -1,36 +1,86 @@
 package server.skills.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.micronaut.core.annotation.ReflectiveAccess;
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Inject;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatData;
 import server.session.SessionParamHelper;
+import server.skills.available.destruction.fire.Fireball;
+import server.skills.available.restoration.heals.BasicHeal;
 
 import java.util.Map;
 import java.util.Random;
 
-@RequiredArgsConstructor
+@Serdeable
+@ReflectiveAccess
+@NoArgsConstructor
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "name")
-@Getter
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Fireball.class, name = "Fireball"),
+        @JsonSubTypes.Type(value = BasicHeal.class, name = "Basic heal"),
+})
 public abstract class Skill {
 
+    @JsonProperty
+    private String name;
 
-    private final String name;
+    @JsonProperty
+    private String description;
 
-    private final String description;
+    @JsonProperty
+    private Map<String, Double> derived;
 
-    private final Map<String, Double> derived;
+    @JsonProperty
+    private Integer maxRange;
 
-    private final Integer maxRange;
+    @JsonProperty
+    private Map<String, Integer> requirements;
 
-    private final Map<String, Integer> requirements;
+    @JsonProperty
+    private Integer cooldown;
 
-    private final  Integer cooldown;
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Map<String, Double> getDerived() {
+        return derived;
+    }
+
+    public Integer getMaxRange() {
+        return maxRange;
+    }
+
+    public Map<String, Integer> getRequirements() {
+        return requirements;
+    }
+
+    public Integer getCooldown() {
+        return cooldown;
+    }
+
+    public Skill(String name, String description, Map<String, Double> derived, Integer maxRange,
+                 Map<String, Integer> requirements, Integer cooldown) {
+
+        this.name = name;
+        this.description = description;
+        this.derived = derived;
+        this.maxRange = maxRange;
+        this.requirements = requirements;
+        this.cooldown = cooldown;
+    }
 
     @Inject
     protected SessionParamHelper sessionParamHelper;
@@ -53,5 +103,14 @@ public abstract class Skill {
         }
 
         return ((Skill) o).getName().equals(this.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        int res = 17;
+        if (getName() != null) {
+            res = 31 * res + getName().hashCode();
+        }
+        return res;
     }
 }

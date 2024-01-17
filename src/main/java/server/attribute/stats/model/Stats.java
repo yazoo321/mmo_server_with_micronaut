@@ -4,15 +4,13 @@ import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import lombok.Builder;
 import lombok.Data;
-import org.bson.internal.UuidHelper;
 import server.attribute.stats.types.StatsTypes;
 import server.common.uuid.UUIDHelper;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder

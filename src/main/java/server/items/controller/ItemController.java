@@ -3,7 +3,6 @@ package server.items.controller;
 import io.micronaut.http.annotation.*;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.items.inventory.model.response.GenericInventoryData;
@@ -11,6 +10,8 @@ import server.items.model.DroppedItem;
 import server.items.model.DroppedItemResponse;
 import server.items.model.Item;
 import server.items.service.ItemService;
+
+import java.util.List;
 
 @Slf4j
 @Controller("/v1/items")

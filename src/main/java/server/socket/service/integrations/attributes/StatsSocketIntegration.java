@@ -5,7 +5,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.StatsService;
-import server.combat.model.CombatData;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;

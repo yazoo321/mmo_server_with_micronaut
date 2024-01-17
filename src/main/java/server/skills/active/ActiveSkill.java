@@ -25,11 +25,11 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
 
     @Override
     public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
-        Map<Skill, Instant> skillsOnCd = combatData.getActivatedSkills();
+        Map<String, Instant> skillsOnCd = combatData.getActivatedSkills();
 
-        if (skillsOnCd.containsKey(this)) {
-            if (skillsOnCd.get(this).plusMillis(this.getCooldown()).isBefore(Instant.now())) {
-                skillsOnCd.remove(this);
+        if (skillsOnCd.containsKey(this.getName())) {
+            if (skillsOnCd.get(this.getName()).plusMillis(this.getCooldown()).isBefore(Instant.now())) {
+                skillsOnCd.remove(this.getName());
 
                 return true;
             }

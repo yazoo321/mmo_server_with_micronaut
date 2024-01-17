@@ -1,16 +1,17 @@
 package server.common.mongo.query;
 
-import static com.mongodb.client.model.Filters.and;
-
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
-import java.util.List;
 import org.bson.conversions.Bson;
 import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
+
+import java.util.List;
+
+import static com.mongodb.client.model.Filters.and;
 
 public class MongoDbQueryHelper {
 

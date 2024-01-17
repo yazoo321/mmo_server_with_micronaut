@@ -7,7 +7,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
-import server.motion.model.SessionParams;
 import server.session.SessionParamHelper;
 import server.socket.v1.CommunicationSocket;
 

@@ -3,9 +3,10 @@ package server.scheduled.mob;
 import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import server.monster.server_integration.repository.MobRepository;
+
+import java.time.Instant;
 
 @Slf4j
 @Singleton

@@ -1,9 +1,5 @@
 package server.motion.repository;
 
-import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Updates.combine;
-import static com.mongodb.client.model.Updates.set;
-
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -12,15 +8,20 @@ import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+import server.common.configuration.MongoConfiguration;
+import server.common.mongo.query.MongoDbQueryHelper;
+import server.motion.dto.PlayerMotion;
+import server.motion.dto.exceptions.PlayerMotionException;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
-import server.common.mongo.query.MongoDbQueryHelper;
-import server.common.configuration.MongoConfiguration;
-import server.motion.dto.PlayerMotion;
-import server.motion.dto.exceptions.PlayerMotionException;
+
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 
 @Slf4j
 @Singleton

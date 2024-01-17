@@ -1,8 +1,5 @@
 package server.socket.model;
 
-import java.util.Map;
-import java.util.Set;
-
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +13,9 @@ import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.player.model.Character;
+
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @Builder
