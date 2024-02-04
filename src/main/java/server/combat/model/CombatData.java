@@ -3,8 +3,10 @@ package server.combat.model;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.time.Instant;
-import java.util.*;
-
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,6 +40,11 @@ public class CombatData {
 
     boolean isPlayer;
 
+    // key refers to skill name/id
+    private Map<String, Instant> activatedSkills;
+
+    private String combatState;
+
     public CombatData(String actorId) {
         this.setActorId(actorId);
         this.mainHandLastAttack = Instant.now().minusSeconds(20);
@@ -49,5 +56,11 @@ public class CombatData {
         this.aggregatedStatusDerived = new HashMap<>();
         this.aggregatedStatusEffects = new HashSet<>();
         this.isPlayer = !UUIDHelper.isValid(actorId);
+        this.combatState = CombatState.IDLE.getType();
+        this.activatedSkills = new HashMap<>();
+    }
+
+    public Map<String, Instant> getActivatedSkills() {
+        return activatedSkills == null ? new HashMap<>() : activatedSkills;
     }
 }

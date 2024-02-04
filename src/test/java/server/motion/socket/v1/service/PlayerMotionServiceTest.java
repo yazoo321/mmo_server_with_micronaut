@@ -41,8 +41,7 @@ public class PlayerMotionServiceTest {
 
         // When
         playerMotionService.initializePlayerMotion(TEST_ACTOR_ID).blockingGet();
-        PlayerMotion actual =
-                playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
+        PlayerMotion actual = playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
 
         // Then
         Assertions.assertThat(actual)
@@ -72,8 +71,7 @@ public class PlayerMotionServiceTest {
 
         // When
         playerMotionService.updatePlayerMotion(TEST_ACTOR_ID, motion).blockingGet();
-        PlayerMotion actual =
-                playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
+        PlayerMotion actual = playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
 
         // Then
         Assertions.assertThat(actual)

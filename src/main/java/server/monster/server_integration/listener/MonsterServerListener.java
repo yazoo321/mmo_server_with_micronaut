@@ -1,6 +1,9 @@
 package server.monster.server_integration.listener;
 
-import io.micronaut.configuration.kafka.annotation.*;
+import io.micronaut.configuration.kafka.annotation.KafkaListener;
+import io.micronaut.configuration.kafka.annotation.OffsetReset;
+import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
+import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.StatsService;
@@ -23,15 +26,13 @@ public class MonsterServerListener {
 
     @Inject StatsService statsService;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
     @Topic("create-mob")
     public void receiveCreateMob(Monster monster) {
         mobInstanceService
                 .createMob(monster)
-                .doOnSuccess(
-                        mob -> statsService.initializeMobStats(monster.getActorId()))
+                .doOnSuccess(mob -> statsService.initializeMobStats(monster.getActorId()))
                 .doOnError(error -> log.error("Error on creating mob, {}", error.getMessage()))
                 .subscribe();
     }

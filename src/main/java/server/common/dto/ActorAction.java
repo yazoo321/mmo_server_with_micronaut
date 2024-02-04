@@ -1,9 +1,8 @@
 package server.common.dto;
 
-import java.time.Instant;
-
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,11 +15,7 @@ import lombok.NoArgsConstructor;
 public class ActorAction {
 
     public ActorAction(
-            String actionId,
-            String state,
-            String target,
-            Location location,
-            Instant startedAt) {
+            String actionId, String state, String target, Location location, Instant startedAt) {
 
         this.actionId = actionId;
         this.state = state;

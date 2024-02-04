@@ -4,12 +4,13 @@ import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
-import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Location;
 import server.common.dto.Motion;
@@ -255,8 +256,7 @@ public class ClientUpdatesService {
 
     private Predicate<WebSocketSession> listensToUpdateFor(String actorId) {
         return s ->
-                (sessionIsThePlayerOrMob(s, actorId)
-                        || sessionListensToPlayerOrMob(s, actorId));
+                (sessionIsThePlayerOrMob(s, actorId) || sessionListensToPlayerOrMob(s, actorId));
     }
 
     // TODO: Consider renaming

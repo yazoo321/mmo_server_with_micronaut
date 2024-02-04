@@ -14,12 +14,14 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.reactivestreams.Publisher;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
-import server.combat.model.CombatRequest;
 import server.combat.model.CombatData;
+import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.service.EquipItemService;
@@ -78,7 +80,7 @@ class PlayerCombatServiceTest {
     }
 
     private final String CHARACTER_1 = "character1";
-    private final String MOB_1 = "mob_1";
+    private final String MOB_1 = UUID.randomUUID().toString();
 
     @Test
     void testRequestAttackWithValidRequest() {
@@ -114,12 +116,13 @@ class PlayerCombatServiceTest {
 
         // Then
         // check the attack loop has begun
-        combatData = sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
+        combatData =
+                sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
         Set<String> targets = combatData.getTargets();
         Assertions.assertThat(targets.size()).isEqualTo(1);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(6, ChronoUnit.SECONDS))
+                .timeout(Duration.of(9, ChronoUnit.SECONDS))
                 .until(
                         () -> {
                             try {

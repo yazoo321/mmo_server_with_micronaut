@@ -23,8 +23,7 @@ public class StatsService {
 
     @Inject UpdateProducer updateProducer;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();

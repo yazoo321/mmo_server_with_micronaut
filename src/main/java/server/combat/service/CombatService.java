@@ -2,29 +2,24 @@ package server.combat.service;
 
 import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
-import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
-import server.attribute.stats.service.StatsService;
-import server.attribute.stats.types.StatsTypes;
-import server.combat.combatInterface.CombatInterface;
-import server.combat.model.CombatData;
-import server.combat.model.CombatRequest;
-import server.common.dto.Motion;
-import server.monster.server_integration.model.Monster;
-import server.monster.server_integration.service.MobInstanceService;
-import server.motion.dto.PlayerMotion;
-import server.motion.service.PlayerMotionService;
-import server.session.SessionParamHelper;
-import server.socket.service.ClientUpdatesService;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.Stats;
+import server.attribute.stats.service.StatsService;
+import server.attribute.stats.types.StatsTypes;
+import server.combat.model.CombatData;
+import server.combat.model.CombatRequest;
+import server.common.dto.Motion;
+import server.monster.server_integration.service.MobInstanceService;
+import server.motion.service.PlayerMotionService;
+import server.session.SessionParamHelper;
+import server.socket.service.ClientUpdatesService;
 
 @Slf4j
 @Singleton
@@ -32,20 +27,22 @@ public class CombatService {
 
     final ConcurrentSet<String> sessionsInCombat = new ConcurrentSet<>();
 
-    @Inject
-    MobInstanceService mobInstanceService;
+    @Inject MobInstanceService mobInstanceService;
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
     @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    ClientUpdatesService clientUpdatesService;
+    @Inject ClientUpdatesService clientUpdatesService;
 
-    boolean validatePositionLocation(CombatData combatData, Motion attackerMotion, String target, int distanceThreshold, WebSocketSession session) {
+    boolean validatePositionLocation(
+            CombatData combatData,
+            Motion attackerMotion,
+            String target,
+            int distanceThreshold,
+            WebSocketSession session) {
         // TODO: Refactor mob/player motion calls
         // TODO: Make async
 
@@ -66,8 +63,8 @@ public class CombatService {
             }
             if (combatData.getLastHelperNotification() == null
                     || Instant.now().getEpochSecond()
-                    - combatData.getLastHelperNotification().getEpochSecond()
-                    > 3) {
+                                    - combatData.getLastHelperNotification().getEpochSecond()
+                            > 3) {
                 combatData.setLastHelperNotification(Instant.now());
                 sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
 
@@ -121,5 +118,4 @@ public class CombatService {
             clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
         }
     }
-
 }

@@ -164,8 +164,7 @@ public class EquipItemServiceTest {
         equipItemService.equipItem("override", ACTOR_ID).blockingGet();
 
         // Then
-        List<EquippedItems> equipped =
-                equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
+        List<EquippedItems> equipped = equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
         Assertions.assertThat(equipped)
                 .usingRecursiveComparison()
                 .ignoringFields(
@@ -218,19 +217,13 @@ public class EquipItemServiceTest {
         CharacterItem i2 = itemTestHelper.addItemToInventory(ACTOR_ID, instance2);
 
         EquippedItems items =
-                equipItemService
-                        .equipItem(instance1.getItemInstanceId(), ACTOR_ID)
-                        .blockingGet();
+                equipItemService.equipItem(instance1.getItemInstanceId(), ACTOR_ID).blockingGet();
 
         // When
-        items =
-                equipItemService
-                        .equipItem(instance2.getItemInstanceId(), ACTOR_ID)
-                        .blockingGet();
+        items = equipItemService.equipItem(instance2.getItemInstanceId(), ACTOR_ID).blockingGet();
 
         // Then
-        List<EquippedItems> equipped =
-                equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
+        List<EquippedItems> equipped = equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
         Assertions.assertThat(equipped.size()).isEqualTo(1);
 
         Assertions.assertThat(equipped)

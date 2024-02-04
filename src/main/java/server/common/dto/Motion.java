@@ -79,7 +79,6 @@ public class Motion {
     }
 
     public boolean facingMotion(Motion motion2) {
-        log.warn("current actor: {}, targetting: {}", this, motion2);
         double maxAngle = 90;
 
         // Calculate direction vectors for the player and the monster

@@ -7,7 +7,8 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
@@ -90,10 +91,7 @@ public class MobRepositoryTest {
         // Attempt to retrieve the deleted MobMotion by its instance ID
         // Verify that the retrieved result is null
         assertThatThrownBy(
-                        () ->
-                                mobRepository
-                                        .findMobInstance(mobMotion.getActorId())
-                                        .blockingGet())
+                        () -> mobRepository.findMobInstance(mobMotion.getActorId()).blockingGet())
                 .isInstanceOf(NoSuchElementException.class);
     }
 

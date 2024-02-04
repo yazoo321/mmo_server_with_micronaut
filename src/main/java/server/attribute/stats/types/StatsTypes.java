@@ -6,11 +6,14 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum StatsTypes {
+
+    // Base stats
     STR("STR"),
     DEX("DEX"),
     INT("INT"),
     STA("STA"),
 
+    // Derived stats
     MAX_HP("MAX_HP"),
     MAX_MP("MAX_MP"),
     CURRENT_HP("CURRENT_HP"),
@@ -38,6 +41,7 @@ public enum StatsTypes {
     MGC_CRIT("MGC_CRIT"),
 
     WEAPON_DAMAGE("WEAPON_DAMAGE"),
+    MAGIC_DAMAGE("MAGIC_DAMAGE"),
 
     PHY_REDUCTION("PHY_REDUCTION"),
     MGC_REDUCTION("MGC_REDUCTION"),
@@ -46,6 +50,7 @@ public enum StatsTypes {
     XP("XP"),
     LEVEL("LEVEL"),
 
+    // Mob specific stats
     MAIN_HAND_ATTACK_SPEED("MAIN_HAND_ATTACK_SPEED"),
     OFF_HAND_ATTACK_SPEED("OFF_HAND_ATTACK_SPEED");
 

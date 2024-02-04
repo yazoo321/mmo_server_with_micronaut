@@ -6,7 +6,6 @@ import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
 import server.socket.service.ClientUpdatesService;
 

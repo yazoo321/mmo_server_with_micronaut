@@ -42,9 +42,7 @@ public class PlayerMotionUtil {
     }
 
     public void deleteMobInstancesWithIds(List<String> actorIds) {
-        Single.fromPublisher(
-                        monsterMongoCollection.deleteMany(
-                                Filters.all("actorId", actorIds)))
+        Single.fromPublisher(monsterMongoCollection.deleteMany(Filters.all("actorId", actorIds)))
                 .blockingGet();
     }
 

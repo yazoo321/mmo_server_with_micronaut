@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
-import server.common.dto.Motion;
 import server.common.configuration.redis.JacksonCodecCombatData;
 import server.common.configuration.redis.JacksonCodecMotion;
+import server.common.dto.Motion;
 import server.common.uuid.UUIDHelper;
 import server.items.equippable.model.EquippedItems;
 import server.items.types.ItemType;
@@ -28,7 +28,7 @@ import server.session.model.CacheKey;
     private final ObjectMapper objectMapper =
             new ObjectMapper().registerModule(new JavaTimeModule());
 
-//    StatefulRedisConnection<String, Motion> connectionMotion;
+    //    StatefulRedisConnection<String, Motion> connectionMotion;
     RedisCommands<String, Motion> motionCache;
 
     RedisCommands<String, CombatData> combatDataCache;
@@ -234,7 +234,8 @@ import server.session.model.CacheKey;
         derivedStats.put(StatsTypes.MAIN_HAND_ATTACK_SPEED.getType(), getBaseSpeed(mainHand));
 
         if (offHand != null) {
-            derivedStats.put(StatsTypes.OFF_HAND_ATTACK_SPEED.getType(), offHand.getBaseAttackSpeed());
+            derivedStats.put(
+                    StatsTypes.OFF_HAND_ATTACK_SPEED.getType(), offHand.getBaseAttackSpeed());
         }
 
         setSharedActorCombatData(getActorId(session), combatData);

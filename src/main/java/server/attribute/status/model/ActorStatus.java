@@ -2,12 +2,10 @@ package server.attribute.status.model;
 
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import server.attribute.status.types.StatusTypes;
-
 import java.time.Instant;
 import java.util.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Data
 @Serdeable
@@ -21,12 +19,13 @@ public class ActorStatus {
 
     public List<Status> removeOldStatuses() {
         List<Status> removedStatuses = new ArrayList<>();
-        actorStatuses.removeIf(status -> {
-            if (status.getExpiration().isBefore(Instant.now())) {
-                removedStatuses.add(status);
-                return true;
-            } else return false;
-        });
+        actorStatuses.removeIf(
+                status -> {
+                    if (status.getExpiration().isBefore(Instant.now())) {
+                        removedStatuses.add(status);
+                        return true;
+                    } else return false;
+                });
 
         return removedStatuses;
     }
@@ -41,11 +40,14 @@ public class ActorStatus {
     public Map<String, Double> aggregateDerived() {
         Map<String, Double> derived = new HashMap<>();
 
-        actorStatuses.forEach(status -> status.getDerivedEffects().forEach((k,v) -> {
-            derived.merge(k, v, Double::sum);
-        }));
+        actorStatuses.forEach(
+                status ->
+                        status.getDerivedEffects()
+                                .forEach(
+                                        (k, v) -> {
+                                            derived.merge(k, v, Double::sum);
+                                        }));
 
         return derived;
     }
-
 }

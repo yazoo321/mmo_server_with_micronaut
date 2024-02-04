@@ -1,9 +1,8 @@
 package server.socket.model;
 
+import io.micronaut.serde.annotation.Serdeable;
 import java.util.Map;
 import java.util.Set;
-
-import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +15,7 @@ import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.player.model.Character;
+import server.skills.model.ActorSkills;
 
 @Data
 @Builder
@@ -47,4 +47,6 @@ public class SocketResponse {
     Stats stats;
 
     ActorStatus actorStatus;
+
+    ActorSkills actorSkills;
 }

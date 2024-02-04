@@ -47,7 +47,7 @@ public class SynchronisePlayerService {
                 .doOnSuccess(
                         list -> {
                             if (SessionParamHelper.getIsServer(session)) {
-                                boolean hi=true;
+                                boolean hi = true;
                             }
                             if (list == null || list.isEmpty()) {
                                 return;

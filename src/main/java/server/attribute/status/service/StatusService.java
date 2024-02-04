@@ -1,9 +1,8 @@
 package server.attribute.status.service;
 
-import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import server.attribute.stats.repository.ActorStatsRepository;
+import java.util.List;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.repository.StatusRepository;
@@ -11,19 +10,14 @@ import server.combat.model.CombatData;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
 
-import java.util.List;
-
 @Singleton
 public class StatusService {
 
-    @Inject
-    StatusRepository statusRepository;
+    @Inject StatusRepository statusRepository;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    UpdateProducer updateProducer;
+    @Inject UpdateProducer updateProducer;
 
     public ActorStatus getActorStatus(String actorId) {
         ActorStatus actorStatus = statusRepository.getActorStatuses(actorId).blockingGet();
@@ -57,12 +51,12 @@ public class StatusService {
     }
 
     private void updateActorStatusCache(ActorStatus actorStatus) {
-        CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorStatus.getActorId());
+        CombatData combatData =
+                sessionParamHelper.getSharedActorCombatData(actorStatus.getActorId());
         combatData.setActorStatus(actorStatus);
         combatData.setAggregatedStatusDerived(actorStatus.aggregateDerived());
         combatData.setAggregatedStatusEffects(actorStatus.aggregateStatusEffects());
 
         sessionParamHelper.setSharedActorCombatData(actorStatus.getActorId(), combatData);
     }
-
 }

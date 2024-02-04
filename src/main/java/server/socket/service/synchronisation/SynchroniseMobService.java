@@ -82,8 +82,7 @@ public class SynchroniseMobService {
         }
 
         Map<String, Monster> mobMap =
-                mobs.stream()
-                        .collect(Collectors.toMap(Monster::getActorId, Function.identity()));
+                mobs.stream().collect(Collectors.toMap(Monster::getActorId, Function.identity()));
 
         SocketResponse response =
                 SocketResponse.builder()

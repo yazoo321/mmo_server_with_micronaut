@@ -12,7 +12,10 @@ import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import server.socket.model.*;
+import server.socket.model.SocketMessage;
+import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseType;
+import server.socket.model.types.MessageType;
 import server.util.websocket.TestWebSocketClient;
 
 @MicronautTest(environments = "kafka")

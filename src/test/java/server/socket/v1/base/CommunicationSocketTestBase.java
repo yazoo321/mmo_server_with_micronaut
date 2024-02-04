@@ -22,9 +22,9 @@ import server.items.helper.ItemTestHelper;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.motion.service.PlayerMotionService;
-import server.socket.model.MessageType;
 import server.socket.model.SocketMessage;
 import server.socket.model.SocketResponse;
+import server.socket.model.types.MessageType;
 import server.util.PlayerMotionUtil;
 import server.util.websocket.TestWebSocketClient;
 

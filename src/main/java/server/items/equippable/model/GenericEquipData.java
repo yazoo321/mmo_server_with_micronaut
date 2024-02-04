@@ -1,9 +1,7 @@
 package server.items.equippable.model;
 
-import java.util.List;
-
-import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

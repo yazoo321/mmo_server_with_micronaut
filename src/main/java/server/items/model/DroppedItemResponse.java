@@ -1,8 +1,7 @@
 package server.items.model;
 
-import java.util.List;
-
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

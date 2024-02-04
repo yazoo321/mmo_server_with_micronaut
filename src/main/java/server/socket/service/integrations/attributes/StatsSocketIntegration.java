@@ -5,7 +5,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.StatsService;
-import server.combat.model.CombatData;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
@@ -28,7 +27,8 @@ public class StatsSocketIntegration {
                         stats -> {
                             if (actorId.equalsIgnoreCase(SessionParamHelper.getActorId(session))) {
                                 // update session with params
-                                sessionParamHelper.setActorDerivedStats(actorId, stats.getDerivedStats());
+                                sessionParamHelper.setActorDerivedStats(
+                                        actorId, stats.getDerivedStats());
                             }
 
                             SocketResponse response =

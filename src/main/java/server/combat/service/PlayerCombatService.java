@@ -8,15 +8,17 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
-import server.combat.model.CombatRequest;
 import server.combat.model.CombatData;
+import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.session.SessionParamHelper;
@@ -24,7 +26,7 @@ import server.socket.service.ClientUpdatesService;
 
 @Slf4j
 @Singleton
-public class PlayerCombatService extends CombatService  {
+public class PlayerCombatService extends CombatService {
 
     @Inject ClientUpdatesService clientUpdatesService;
 
@@ -34,11 +36,13 @@ public class PlayerCombatService extends CombatService  {
         if (combatRequest == null) {
             return;
         }
-        CombatData combatData = sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
+        CombatData combatData =
+                sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
         combatData.setTargets(combatRequest.getTargets());
 
         sessionsInCombat.add(SessionParamHelper.getActorId(session));
-        sessionParamHelper.setSharedActorCombatData(SessionParamHelper.getActorId(session), combatData);
+        sessionParamHelper.setSharedActorCombatData(
+                SessionParamHelper.getActorId(session), combatData);
         attackLoop(session, combatData.getActorId());
     }
 
@@ -65,8 +69,13 @@ public class PlayerCombatService extends CombatService  {
                         : (int) (double) weapon.getAttackDistance();
 
         Motion attackerMotion = SessionParamHelper.getMotion(session);
-        boolean valid = validatePositionLocation(combatData, attackerMotion, target.getActorId(),
-                distanceThreshold, session);
+        boolean valid =
+                validatePositionLocation(
+                        combatData,
+                        attackerMotion,
+                        target.getActorId(),
+                        distanceThreshold,
+                        session);
 
         if (!valid) {
             return;
@@ -157,7 +166,8 @@ public class PlayerCombatService extends CombatService  {
                 .subscribe();
     }
 
-    private void requestAttackSwing(WebSocketSession session, CombatData combatData, boolean isMainHand) {
+    private void requestAttackSwing(
+            WebSocketSession session, CombatData combatData, boolean isMainHand) {
         Map<String, EquippedItems> items = sessionParamHelper.getEquippedItems(session);
 
         // Get the equipped weapon
@@ -186,5 +196,4 @@ public class PlayerCombatService extends CombatService  {
         // 100 attack speed increases speed by 2x
         return baseAttackSpeed / (1 + (characterAttackSpeed / 100));
     }
-
 }

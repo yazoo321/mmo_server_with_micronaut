@@ -20,8 +20,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
-import server.common.dto.Motion;
 import server.common.configuration.MongoConfiguration;
+import server.common.dto.Motion;
 import server.player.exceptions.CharacterException;
 import server.player.model.Character;
 
