@@ -3,23 +3,24 @@ package server.socket.service;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-import server.combat.service.MobCombatService;
-import server.combat.service.PlayerCombatService;
-import server.motion.dto.PlayerMotion;
-import server.session.SessionParamHelper;
-import server.skills.service.CombatSkillsService;
-import server.socket.model.MessageType;
-import server.socket.model.SocketMessage;
-import server.socket.producer.UpdateProducer;
-import server.socket.service.integrations.attributes.StatsSocketIntegration;
-import server.socket.service.integrations.items.ItemSocketIntegration;
-
 import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import lombok.extern.slf4j.Slf4j;
+import server.combat.model.CombatRequest;
+import server.combat.service.MobCombatService;
+import server.combat.service.PlayerCombatService;
+import server.motion.dto.PlayerMotion;
+import server.session.SessionParamHelper;
+import server.skills.service.CombatSkillsService;
+import server.socket.model.SocketMessage;
+import server.socket.model.types.MessageType;
+import server.socket.model.types.SkillMessageType;
+import server.socket.producer.UpdateProducer;
+import server.socket.service.integrations.attributes.StatsSocketIntegration;
+import server.socket.service.integrations.items.ItemSocketIntegration;
 
 @Slf4j
 @Singleton
@@ -35,11 +36,9 @@ public class SocketProcessOutgoingService {
 
     @Inject PlayerCombatService playerCombatService;
 
-    @Inject
-    CombatSkillsService combatSkillsService;
+    @Inject CombatSkillsService combatSkillsService;
 
-    @Inject
-    MobCombatService mobCombatService;
+    @Inject MobCombatService mobCombatService;
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
 
@@ -61,6 +60,8 @@ public class SocketProcessOutgoingService {
         this.functionMap.put(MessageType.TRY_ATTACK.getType(), this::handleTryAttack);
         this.functionMap.put(MessageType.STOP_ATTACK.getType(), this::handleStopAttack);
         this.functionMap.put(MessageType.SET_SESSION_ID.getType(), this::setSessionId);
+        this.functionMap.put(SkillMessageType.INITIATE_SKILL.getType(), this::handleTryStartSkill);
+        this.functionMap.put(SkillMessageType.FETCH_SKILLS.getType(), this::handleFetchSkills);
     }
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
@@ -146,19 +147,25 @@ public class SocketProcessOutgoingService {
     }
 
     private void handleTryAttack(SocketMessage message, WebSocketSession session) {
-        if (SessionParamHelper.getIsPlayer(session)){
+        if (SessionParamHelper.getIsPlayer(session)) {
             playerCombatService.requestAttack(session, message.getCombatRequest());
         } else {
             mobCombatService.requestAttack(message.getCombatRequest());
         }
     }
 
-    private void handleTryStartSkill(SocketMessage message) {
-        combatSkillsService.tryApplySkill(message.getCombatRequest());
+    private void handleTryStartSkill(SocketMessage message, WebSocketSession session) {
+        combatSkillsService.tryApplySkill(message.getCombatRequest(), session);
+    }
+
+    private void handleFetchSkills(SocketMessage message, WebSocketSession session) {
+        String actorId = SessionParamHelper.getIsPlayer(session) ? SessionParamHelper.getActorId(session) :
+                message.getActorId();
+        combatSkillsService.getActorAvailableSkills(actorId, session);
     }
 
     private void handleStopAttack(SocketMessage message, WebSocketSession session) {
-        if (SessionParamHelper.getIsPlayer(session)){
+        if (SessionParamHelper.getIsPlayer(session)) {
             playerCombatService.requestStopAttack(SessionParamHelper.getActorId(session));
         } else {
             mobCombatService.requestStopAttack(message.getActorId());

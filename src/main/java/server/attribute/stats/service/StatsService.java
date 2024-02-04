@@ -4,6 +4,8 @@ import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
@@ -13,9 +15,6 @@ import server.combat.model.CombatData;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Slf4j
 @Singleton
 public class StatsService {
@@ -24,8 +23,7 @@ public class StatsService {
 
     @Inject UpdateProducer updateProducer;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();

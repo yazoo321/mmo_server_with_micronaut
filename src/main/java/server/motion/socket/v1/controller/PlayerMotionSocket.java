@@ -7,13 +7,12 @@ import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
 import jakarta.inject.Inject;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import server.motion.model.MotionMessage;
 import server.motion.service.PlayerMotionService;
 import server.motion.socket.model.PlayerMotionListSubscriber;
-
-import java.util.function.Predicate;
 
 @Deprecated // use CommunicationSocket instead
 @Slf4j

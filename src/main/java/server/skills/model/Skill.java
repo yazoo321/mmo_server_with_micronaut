@@ -7,15 +7,18 @@ import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
+import java.util.Map;
+import java.util.Random;
 import lombok.NoArgsConstructor;
 import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatData;
+import server.combat.model.CombatRequest;
 import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.restoration.heals.BasicHeal;
-
-import java.util.Map;
-import java.util.Random;
+import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseSubscriber;
+import server.socket.model.types.SkillMessageType;
 
 @Serdeable
 @ReflectiveAccess
@@ -25,28 +28,47 @@ import java.util.Random;
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "name")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = Fireball.class, name = "Fireball"),
-        @JsonSubTypes.Type(value = BasicHeal.class, name = "Basic heal"),
+    @JsonSubTypes.Type(value = Fireball.class, name = "Fireball"),
+    @JsonSubTypes.Type(value = BasicHeal.class, name = "Basic heal"),
 })
 public abstract class Skill {
 
-    @JsonProperty
-    private String name;
+    @JsonProperty private String name;
 
-    @JsonProperty
-    private String description;
+    @JsonProperty private String description;
 
-    @JsonProperty
-    private Map<String, Double> derived;
+    @JsonProperty protected Map<String, Double> derived;
 
-    @JsonProperty
-    private Integer maxRange;
+    @JsonProperty private Integer maxRange;
 
-    @JsonProperty
-    private Map<String, Integer> requirements;
+    @JsonProperty private Map<String, Integer> requirements;
 
-    @JsonProperty
-    private Integer cooldown;
+    @JsonProperty private Integer cooldown;
+
+
+    protected WebSocketSession session;
+
+    // populated via factory methods
+    protected SocketResponseSubscriber socketResponseSubscriber;
+    protected SessionParamHelper sessionParamHelper;
+    protected StatsService statsService;
+
+
+    public void setSocketResponseSubscriber(SocketResponseSubscriber socketResponseSubscriber) {
+        this.socketResponseSubscriber = socketResponseSubscriber;
+    }
+
+    public void setSessionParamHelper(SessionParamHelper sessionParamHelper) {
+        this.sessionParamHelper = sessionParamHelper;
+    }
+
+    public void setStatsService(StatsService statsService) {
+        this.statsService = statsService;
+    }
+
+    public void setSession(WebSocketSession session) {
+        this.session = session;
+    }
 
     public String getName() {
         return name;
@@ -72,8 +94,13 @@ public abstract class Skill {
         return cooldown;
     }
 
-    public Skill(String name, String description, Map<String, Double> derived, Integer maxRange,
-                 Map<String, Integer> requirements, Integer cooldown) {
+    public Skill(
+            String name,
+            String description,
+            Map<String, Double> derived,
+            Integer maxRange,
+            Map<String, Integer> requirements,
+            Integer cooldown) {
 
         this.name = name;
         this.description = description;
@@ -82,16 +109,10 @@ public abstract class Skill {
         this.requirements = requirements;
         this.cooldown = cooldown;
     }
-
-    @Inject
-    protected SessionParamHelper sessionParamHelper;
-
-    @Inject
-    protected StatsService statsService;
-
     protected Random rand = new Random();
 
-    public abstract void startSkill(CombatData combatData, SkillTarget skillTarget, WebSocketSession session);
+    public abstract void startSkill(
+            CombatData combatData, SkillTarget skillTarget, WebSocketSession session);
 
     public abstract void endSkill(CombatData combatData, SkillTarget skillTarget);
 
@@ -113,5 +134,16 @@ public abstract class Skill {
             res = 31 * res + getName().hashCode();
         }
         return res;
+    }
+
+    protected void updateSessionInitiateSkill(SkillTarget skillTarget) {
+        SocketResponse message = new SocketResponse();
+        message.setMessageType(SkillMessageType.INITIATE_SKILL.getType());
+
+        CombatRequest request = new CombatRequest();
+        request.setSkillId(this.getName());
+        request.setSkillTarget(skillTarget);
+
+        session.send(message).subscribe(socketResponseSubscriber);
     }
 }

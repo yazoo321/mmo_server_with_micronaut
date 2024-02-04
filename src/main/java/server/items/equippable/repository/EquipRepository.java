@@ -1,5 +1,7 @@
 package server.items.equippable.repository;
 
+import static com.mongodb.client.model.Filters.*;
+
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
@@ -7,14 +9,11 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.common.configuration.MongoConfiguration;
 import server.items.equippable.model.EquippedItems;
-
-import java.util.List;
-import java.util.Set;
-
-import static com.mongodb.client.model.Filters.*;
 
 @Slf4j
 @Singleton

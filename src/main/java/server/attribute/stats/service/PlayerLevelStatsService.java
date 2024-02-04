@@ -3,16 +3,15 @@ package server.attribute.stats.service;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.stats.types.StatsTypes;
 import server.player.exceptions.CharacterException;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Singleton
 @Slf4j

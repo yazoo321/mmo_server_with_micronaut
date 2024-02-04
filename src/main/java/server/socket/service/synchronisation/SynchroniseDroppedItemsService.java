@@ -3,6 +3,12 @@ package server.socket.service.synchronisation;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Motion;
@@ -13,13 +19,6 @@ import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton

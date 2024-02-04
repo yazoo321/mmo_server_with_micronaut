@@ -6,6 +6,9 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Singleton;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
@@ -19,17 +22,13 @@ import server.motion.model.SessionParams;
 import server.session.model.CacheDomains;
 import server.session.model.CacheKey;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 @Singleton
 @NonNull public class SessionParamHelper {
 
     private final ObjectMapper objectMapper =
             new ObjectMapper().registerModule(new JavaTimeModule());
 
-//    StatefulRedisConnection<String, Motion> connectionMotion;
+    //    StatefulRedisConnection<String, Motion> connectionMotion;
     RedisCommands<String, Motion> motionCache;
 
     RedisCommands<String, CombatData> combatDataCache;
@@ -235,7 +234,8 @@ import java.util.stream.Collectors;
         derivedStats.put(StatsTypes.MAIN_HAND_ATTACK_SPEED.getType(), getBaseSpeed(mainHand));
 
         if (offHand != null) {
-            derivedStats.put(StatsTypes.OFF_HAND_ATTACK_SPEED.getType(), offHand.getBaseAttackSpeed());
+            derivedStats.put(
+                    StatsTypes.OFF_HAND_ATTACK_SPEED.getType(), offHand.getBaseAttackSpeed());
         }
 
         setSharedActorCombatData(getActorId(session), combatData);

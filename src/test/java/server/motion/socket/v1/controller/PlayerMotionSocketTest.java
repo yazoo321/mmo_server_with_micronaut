@@ -1,5 +1,7 @@
 package server.motion.socket.v1.controller;
 
+import static org.awaitility.Awaitility.await;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -14,6 +16,15 @@ import io.micronaut.websocket.WebSocketClient;
 import io.micronaut.websocket.annotation.ClientWebSocket;
 import io.micronaut.websocket.annotation.OnMessage;
 import jakarta.inject.Inject;
+import java.net.URI;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
@@ -24,18 +35,6 @@ import server.motion.model.MotionMessage;
 import server.motion.model.PlayerMotionList;
 import server.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
-
-import java.net.URI;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
 
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
 @MicronautTest

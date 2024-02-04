@@ -2,6 +2,7 @@ package server.socket.producer;
 
 import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
+import java.util.List;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
 import server.items.equippable.model.EquippedItems;
@@ -9,8 +10,6 @@ import server.items.inventory.model.ItemInstanceIds;
 import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
-
-import java.util.List;
 
 @KafkaClient(id = "general-update-producer")
 public interface UpdateProducer {

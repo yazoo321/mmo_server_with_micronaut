@@ -1,13 +1,11 @@
 package server.skills.model;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class ActorSkills {
 
     private String actorId;
     private List<Skill> skills;
-
 }

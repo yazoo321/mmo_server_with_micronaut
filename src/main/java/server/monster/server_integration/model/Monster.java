@@ -2,11 +2,10 @@ package server.monster.server_integration.model;
 
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Motion;
-
-import java.time.Instant;
 
 @Data
 @Serdeable
@@ -15,11 +14,7 @@ import java.time.Instant;
 public class Monster {
 
     public Monster(
-            String mobId,
-            String actorId,
-            Motion motion,
-            Instant updatedAt,
-            String timestamp) {
+            String mobId, String actorId, Motion motion, Instant updatedAt, String timestamp) {
         this.mobId = mobId;
         this.actorId = actorId;
         this.motion = motion;

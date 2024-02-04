@@ -3,11 +3,10 @@ package server.items.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Location;
-
-import java.time.LocalDateTime;
 
 @Data
 @JsonInclude()

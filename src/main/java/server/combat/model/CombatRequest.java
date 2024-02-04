@@ -2,12 +2,11 @@ package server.combat.model;
 
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.skills.model.SkillTarget;
-
-import java.util.Set;
 
 @Data
 @AllArgsConstructor

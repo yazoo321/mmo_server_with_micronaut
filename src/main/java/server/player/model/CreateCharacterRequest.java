@@ -2,12 +2,11 @@ package server.player.model;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.Data;
-
+import java.util.Map;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.Map;
+import lombok.Data;
 
 @Data
 @Introspected

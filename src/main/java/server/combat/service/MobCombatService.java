@@ -1,7 +1,16 @@
 package server.combat.service;
 
+import static server.attribute.stats.types.StatsTypes.PHY_AMP;
+import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
+
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
@@ -10,19 +19,9 @@ import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import static server.attribute.stats.types.StatsTypes.PHY_AMP;
-import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
-
 @Slf4j
 @Singleton
-public class MobCombatService extends CombatService  {
+public class MobCombatService extends CombatService {
 
     Random rand = new Random();
 
@@ -51,8 +50,9 @@ public class MobCombatService extends CombatService  {
         int distanceThreshold = 200;
         Motion attackerMotion = sessionParamHelper.getSharedActorMotion(actorId);
 
-        boolean valid = validatePositionLocation(combatData, attackerMotion, target.getActorId(),
-                distanceThreshold, null);
+        boolean valid =
+                validatePositionLocation(
+                        combatData, attackerMotion, target.getActorId(), distanceThreshold, null);
 
         if (!valid) {
             return;
@@ -166,5 +166,4 @@ public class MobCombatService extends CombatService  {
         // 100 attack speed increases speed by 2x
         return baseAttackSpeed / (1 + (characterAttackSpeed / 100));
     }
-
 }

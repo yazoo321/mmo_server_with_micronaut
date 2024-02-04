@@ -3,11 +3,10 @@ package server.items.inventory.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Location2D;
-
-import java.util.List;
 
 @Data
 @JsonInclude()

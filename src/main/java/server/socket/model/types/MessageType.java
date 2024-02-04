@@ -1,4 +1,4 @@
-package server.socket.model;
+package server.socket.model.types;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +20,9 @@ public enum MessageType {
     FETCH_STATS("FETCH_STATS"),
     TRY_ATTACK("TRY_ATTACK"),
     STOP_ATTACK("STOP_ATTACK"),
-    SET_SESSION_ID("SET_SESSION_ID");
+    SET_SESSION_ID("SET_SESSION_ID"),
+
+    UPDATE_ACTOR_SKILLS("UPDATE_ACTOR_SKILLS");
 
     public final String type;
 }

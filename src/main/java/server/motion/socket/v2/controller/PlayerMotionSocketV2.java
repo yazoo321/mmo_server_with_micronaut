@@ -9,6 +9,10 @@ import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
 import io.netty.util.internal.ConcurrentSet;
 import jakarta.inject.Inject;
+import java.time.Instant;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import server.common.dto.Location;
@@ -20,11 +24,6 @@ import server.motion.dto.PlayerMotion;
 import server.motion.model.MotionMessage;
 import server.motion.model.SessionParams;
 import server.motion.service.PlayerMotionService;
-
-import java.time.Instant;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 // V2 socket will work quite different to V1.
 // We will periodically check the state of who's near the player

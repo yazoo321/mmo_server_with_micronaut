@@ -6,12 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum CombatState {
-
     IDLE("IDLE"),
     ATTACKING("ATTACKING"),
     CHANNELING("CHANNELING");
 
     public final String type;
-
-
 }

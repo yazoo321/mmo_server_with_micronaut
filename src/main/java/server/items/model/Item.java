@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
@@ -17,8 +18,6 @@ import server.items.types.armour.*;
 import server.items.types.consumable.Consumable;
 import server.items.types.weapons.Shield;
 import server.items.types.weapons.Weapon;
-
-import java.util.Map;
 
 @Data
 @Introspected

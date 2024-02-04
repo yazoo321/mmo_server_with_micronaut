@@ -26,15 +26,13 @@ public class MonsterServerListener {
 
     @Inject StatsService statsService;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
     @Topic("create-mob")
     public void receiveCreateMob(Monster monster) {
         mobInstanceService
                 .createMob(monster)
-                .doOnSuccess(
-                        mob -> statsService.initializeMobStats(monster.getActorId()))
+                .doOnSuccess(mob -> statsService.initializeMobStats(monster.getActorId()))
                 .doOnError(error -> log.error("Error on creating mob, {}", error.getMessage()))
                 .subscribe();
     }

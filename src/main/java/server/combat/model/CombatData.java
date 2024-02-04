@@ -2,17 +2,16 @@ package server.combat.model;
 
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import server.attribute.status.model.ActorStatus;
-import server.common.uuid.UUIDHelper;
-
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import server.attribute.status.model.ActorStatus;
+import server.common.uuid.UUIDHelper;
 
 @Data
 @AllArgsConstructor
@@ -59,5 +58,9 @@ public class CombatData {
         this.isPlayer = !UUIDHelper.isValid(actorId);
         this.combatState = CombatState.IDLE.getType();
         this.activatedSkills = new HashMap<>();
+    }
+
+    public Map<String, Instant> getActivatedSkills() {
+        return activatedSkills == null ? new HashMap<>() : activatedSkills;
     }
 }

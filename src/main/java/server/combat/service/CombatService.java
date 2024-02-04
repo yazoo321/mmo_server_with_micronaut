@@ -4,6 +4,11 @@ import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
@@ -16,32 +21,28 @@ import server.motion.service.PlayerMotionService;
 import server.session.SessionParamHelper;
 import server.socket.service.ClientUpdatesService;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Singleton
 public class CombatService {
 
     final ConcurrentSet<String> sessionsInCombat = new ConcurrentSet<>();
 
-    @Inject
-    MobInstanceService mobInstanceService;
+    @Inject MobInstanceService mobInstanceService;
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
     @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    ClientUpdatesService clientUpdatesService;
+    @Inject ClientUpdatesService clientUpdatesService;
 
-    boolean validatePositionLocation(CombatData combatData, Motion attackerMotion, String target, int distanceThreshold, WebSocketSession session) {
+    boolean validatePositionLocation(
+            CombatData combatData,
+            Motion attackerMotion,
+            String target,
+            int distanceThreshold,
+            WebSocketSession session) {
         // TODO: Refactor mob/player motion calls
         // TODO: Make async
 
@@ -62,8 +63,8 @@ public class CombatService {
             }
             if (combatData.getLastHelperNotification() == null
                     || Instant.now().getEpochSecond()
-                    - combatData.getLastHelperNotification().getEpochSecond()
-                    > 3) {
+                                    - combatData.getLastHelperNotification().getEpochSecond()
+                            > 3) {
                 combatData.setLastHelperNotification(Instant.now());
                 sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
 
@@ -117,5 +118,4 @@ public class CombatService {
             clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
         }
     }
-
 }

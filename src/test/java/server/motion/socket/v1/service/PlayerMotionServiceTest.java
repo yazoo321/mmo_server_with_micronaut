@@ -2,6 +2,7 @@ package server.motion.socket.v1.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,6 @@ import server.motion.model.PlayerMotionList;
 import server.motion.repository.PlayerMotionRepository;
 import server.motion.service.PlayerMotionService;
 import server.util.PlayerMotionUtil;
-
-import java.util.List;
 
 @MicronautTest
 public class PlayerMotionServiceTest {
@@ -42,8 +41,7 @@ public class PlayerMotionServiceTest {
 
         // When
         playerMotionService.initializePlayerMotion(TEST_ACTOR_ID).blockingGet();
-        PlayerMotion actual =
-                playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
+        PlayerMotion actual = playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
 
         // Then
         Assertions.assertThat(actual)
@@ -73,8 +71,7 @@ public class PlayerMotionServiceTest {
 
         // When
         playerMotionService.updatePlayerMotion(TEST_ACTOR_ID, motion).blockingGet();
-        PlayerMotion actual =
-                playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
+        PlayerMotion actual = playerMotionRepository.findPlayerMotion(TEST_ACTOR_ID).blockingGet();
 
         // Then
         Assertions.assertThat(actual)

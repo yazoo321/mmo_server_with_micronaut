@@ -3,6 +3,8 @@ package server.socket.service.integrations.items;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.items.equippable.service.EquipItemService;
 import server.items.inventory.model.ItemInstanceIds;
@@ -13,9 +15,6 @@ import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
 import server.socket.producer.UpdateProducer;
-
-import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Singleton

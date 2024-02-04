@@ -1,5 +1,8 @@
 package server.items.inventory.repository;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
+
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.DeleteResult;
@@ -8,15 +11,11 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import java.util.List;
 import org.bson.conversions.Bson;
 import server.common.configuration.MongoConfiguration;
 import server.items.inventory.model.CharacterItem;
 import server.items.inventory.model.Inventory;
-
-import java.util.List;
-
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
 
 @Singleton
 public class InventoryRepository {

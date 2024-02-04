@@ -7,11 +7,10 @@ import io.micronaut.core.convert.value.MutableConvertibleValues;
 import io.micronaut.http.MediaType;
 import io.micronaut.websocket.CloseReason;
 import io.micronaut.websocket.WebSocketSession;
-import org.reactivestreams.Publisher;
-
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import org.reactivestreams.Publisher;
 
 @Bean
 public class FakeSession implements WebSocketSession {

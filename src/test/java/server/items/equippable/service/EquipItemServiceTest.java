@@ -2,6 +2,9 @@ package server.items.equippable.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -17,10 +20,6 @@ import server.items.inventory.model.Inventory;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.types.ItemType;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -165,8 +164,7 @@ public class EquipItemServiceTest {
         equipItemService.equipItem("override", ACTOR_ID).blockingGet();
 
         // Then
-        List<EquippedItems> equipped =
-                equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
+        List<EquippedItems> equipped = equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
         Assertions.assertThat(equipped)
                 .usingRecursiveComparison()
                 .ignoringFields(
@@ -219,19 +217,13 @@ public class EquipItemServiceTest {
         CharacterItem i2 = itemTestHelper.addItemToInventory(ACTOR_ID, instance2);
 
         EquippedItems items =
-                equipItemService
-                        .equipItem(instance1.getItemInstanceId(), ACTOR_ID)
-                        .blockingGet();
+                equipItemService.equipItem(instance1.getItemInstanceId(), ACTOR_ID).blockingGet();
 
         // When
-        items =
-                equipItemService
-                        .equipItem(instance2.getItemInstanceId(), ACTOR_ID)
-                        .blockingGet();
+        items = equipItemService.equipItem(instance2.getItemInstanceId(), ACTOR_ID).blockingGet();
 
         // Then
-        List<EquippedItems> equipped =
-                equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
+        List<EquippedItems> equipped = equipItemService.getEquippedItems(ACTOR_ID).blockingGet();
         Assertions.assertThat(equipped.size()).isEqualTo(1);
 
         Assertions.assertThat(equipped)

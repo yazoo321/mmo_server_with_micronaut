@@ -3,6 +3,10 @@ package server.items.equippable.service;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
@@ -15,11 +19,6 @@ import server.items.inventory.model.Inventory;
 import server.items.inventory.model.exceptions.InventoryException;
 import server.items.inventory.service.InventoryService;
 import server.items.model.ItemInstance;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 @Singleton

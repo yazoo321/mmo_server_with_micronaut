@@ -1,20 +1,19 @@
 package server.monster.server_integration.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.monster.server_integration.model.Monster;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.assertj.core.api.Assertions.*;
 
 @MicronautTest
 public class MobRepositoryTest {
@@ -92,10 +91,7 @@ public class MobRepositoryTest {
         // Attempt to retrieve the deleted MobMotion by its instance ID
         // Verify that the retrieved result is null
         assertThatThrownBy(
-                        () ->
-                                mobRepository
-                                        .findMobInstance(mobMotion.getActorId())
-                                        .blockingGet())
+                        () -> mobRepository.findMobInstance(mobMotion.getActorId()).blockingGet())
                 .isInstanceOf(NoSuchElementException.class);
     }
 

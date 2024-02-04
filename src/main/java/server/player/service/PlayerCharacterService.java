@@ -3,6 +3,9 @@ package server.player.service;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
@@ -12,10 +15,6 @@ import server.player.model.AccountCharactersResponse;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
 import server.player.repository.PlayerCharacterRepository;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Singleton

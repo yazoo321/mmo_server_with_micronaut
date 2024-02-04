@@ -2,6 +2,10 @@ package server.attribute.stats.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,11 +18,6 @@ import server.attribute.stats.helpers.StatsTestHelper;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.StatsTypes;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

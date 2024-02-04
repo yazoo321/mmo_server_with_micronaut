@@ -2,13 +2,12 @@ package server.player.controller;
 
 import io.micronaut.http.annotation.*;
 import jakarta.inject.Inject;
+import java.util.List;
+import javax.validation.Valid;
 import server.player.model.AccountCharactersResponse;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
 import server.player.service.PlayerCharacterService;
-
-import javax.validation.Valid;
-import java.util.List;
 
 // @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/player")

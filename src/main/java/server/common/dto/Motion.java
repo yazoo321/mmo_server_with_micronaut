@@ -3,12 +3,11 @@ package server.common.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.temporal.ValueRange;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.time.temporal.ValueRange;
 
 @Data
 @Slf4j
@@ -80,7 +79,6 @@ public class Motion {
     }
 
     public boolean facingMotion(Motion motion2) {
-        log.warn("current actor: {}, targetting: {}", this, motion2);
         double maxAngle = 90;
 
         // Calculate direction vectors for the player and the monster

@@ -7,10 +7,9 @@ import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import jakarta.inject.Named;
+import java.util.concurrent.ExecutorService;
 import server.motion.dto.PlayerMotion;
 import server.motion.service.PlayerMotionService;
-
-import java.util.concurrent.ExecutorService;
 
 @Controller("/player-motion")
 public class PlayerMotionController {

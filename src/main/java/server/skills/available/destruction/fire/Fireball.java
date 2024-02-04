@@ -3,6 +3,7 @@ package server.skills.available.destruction.fire;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.websocket.WebSocketSession;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
@@ -10,8 +11,6 @@ import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
-
-import java.util.Map;
 
 @Serdeable
 @JsonTypeName("Fireball")
@@ -22,20 +21,18 @@ public class Fireball extends ChannelledSkill {
         super(
                 "Fireball",
                 "Hurl a fireball at a selected target",
-                Map.of(
-                        StatsTypes.MAGIC_DAMAGE.getType(), 100.0
-                ),
+                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 100.0),
                 0,
                 1500,
                 false,
                 true,
                 1000,
-                Map.of()
-        );
+                Map.of());
     }
 
     @Override
-    public void startSkill(CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
+    public void startSkill(
+            CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
         travel(combatData, skillTarget, 1000);
     }
 
@@ -59,5 +56,4 @@ public class Fireball extends ChannelledSkill {
     public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
         return true;
     }
-
 }

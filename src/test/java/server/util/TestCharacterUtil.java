@@ -1,8 +1,7 @@
 package server.util;
 
-import server.player.model.Character;
-
 import java.util.Map;
+import server.player.model.Character;
 
 public class TestCharacterUtil {
 
