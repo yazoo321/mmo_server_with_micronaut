@@ -14,6 +14,7 @@ import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
+import server.combat.service.CombatService;
 import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.factory.DefaultSkillFactory;
@@ -47,6 +48,9 @@ public class CombatSkillsService {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
+    @Inject
+    CombatService combatService;
+
     public CombatSkillsService() {
         objectMapper.registerSubtypes(Fireball.class, BasicHeal.class);
     }
@@ -60,18 +64,16 @@ public class CombatSkillsService {
         String skillName = combatRequest.getSkillId();
         Skill skill = skillFactory.createSkill(skillName.toLowerCase());
 
-//        if (activatedSkills.containsKey(skill.getName())) {
-//            // the skill is on CD
-//            return;
-//        }
-
         if (!skill.canApply(combatData, combatRequest.getSkillTarget())) {
             return;
         }
-
         activatedSkills.put(skillName, Instant.now());
         sessionParamHelper.setSharedActorCombatData(combatRequest.getActorId(), combatData);
-        skill.startSkill(combatData, combatRequest.getSkillTarget(), session);
+        try {
+            skill.startSkill(combatData, combatRequest.getSkillTarget(), session);
+        } catch (Exception e) {
+            log.error("Failed to start skill, {}", e.getMessage());
+        }
     }
 
     public void getActorAvailableSkills(String actorId, WebSocketSession session) {
