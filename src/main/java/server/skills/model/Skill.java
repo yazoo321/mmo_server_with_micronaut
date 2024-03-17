@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
+import server.combat.service.CombatService;
 import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.restoration.heals.BasicHeal;
@@ -45,6 +46,8 @@ public abstract class Skill {
 
     @JsonProperty private Integer cooldown;
 
+    @JsonProperty private Integer travelSpeed;
+
 
     protected WebSocketSession session;
 
@@ -52,7 +55,7 @@ public abstract class Skill {
     protected SocketResponseSubscriber socketResponseSubscriber;
     protected SessionParamHelper sessionParamHelper;
     protected StatsService statsService;
-
+    protected CombatService combatService;
 
     public void setSocketResponseSubscriber(SocketResponseSubscriber socketResponseSubscriber) {
         this.socketResponseSubscriber = socketResponseSubscriber;
@@ -65,6 +68,8 @@ public abstract class Skill {
     public void setStatsService(StatsService statsService) {
         this.statsService = statsService;
     }
+
+    public void setCombatService(CombatService combatService) {this.combatService = combatService; }
 
     public void setSession(WebSocketSession session) {
         this.session = session;
@@ -94,13 +99,18 @@ public abstract class Skill {
         return cooldown;
     }
 
+    public Integer getTravelSpeed() {
+        return travelSpeed;
+    }
+
     public Skill(
             String name,
             String description,
             Map<String, Double> derived,
             Integer maxRange,
             Map<String, Integer> requirements,
-            Integer cooldown) {
+            Integer cooldown,
+            Integer travelSpeed) {
 
         this.name = name;
         this.description = description;
@@ -108,6 +118,7 @@ public abstract class Skill {
         this.maxRange = maxRange;
         this.requirements = requirements;
         this.cooldown = cooldown;
+        this.travelSpeed = travelSpeed;
     }
     protected Random rand = new Random();
 
@@ -136,13 +147,16 @@ public abstract class Skill {
         return res;
     }
 
-    protected void updateSessionInitiateSkill(SkillTarget skillTarget) {
+    protected void updateSessionInitiateSkill(String castor, SkillTarget skillTarget) {
         SocketResponse message = new SocketResponse();
         message.setMessageType(SkillMessageType.INITIATE_SKILL.getType());
 
         CombatRequest request = new CombatRequest();
         request.setSkillId(this.getName());
         request.setSkillTarget(skillTarget);
+        request.setActorId(castor);
+
+        message.setCombatRequest(request);
 
         session.send(message).subscribe(socketResponseSubscriber);
     }

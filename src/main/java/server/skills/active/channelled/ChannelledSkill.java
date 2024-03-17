@@ -44,8 +44,9 @@ public abstract class ChannelledSkill extends ActiveSkill {
             boolean allowsMovement,
             boolean canInterrupt,
             int maxRange,
+            int travelSpeed,
             Map<String, Integer> requirements) {
-        super(name, description, derived, cooldown, maxRange, requirements);
+        super(name, description, derived, cooldown, maxRange, travelSpeed, requirements);
         this.castTime = castTime;
         this.allowsMovement = allowsMovement;
         this.canInterrupt = canInterrupt;
@@ -60,8 +61,6 @@ public abstract class ChannelledSkill extends ActiveSkill {
 
     @Override
     public void instantEffect(CombatData combatData, SkillTarget skillTarget) {
-        notifyStopChannel();
-        updateSessionInitiateSkill(skillTarget);
         this.endSkill(combatData, skillTarget);
     }
 
@@ -71,11 +70,11 @@ public abstract class ChannelledSkill extends ActiveSkill {
 
     public void stopChannel(CombatData combatData) {
         // TBD
-        notifyStopChannel();
+        notifyStopChannel(combatData.getActorId(), false);
     }
 
     public void startChanneling(CombatData combatData, SkillTarget skillTarget) {
-        notifyStartChannel();
+        notifyStartChannel(combatData.getActorId());
         combatData.setCombatState(CombatState.CHANNELING.getType());
 
         // Schedule a task to periodically check the channeling status
@@ -95,7 +94,9 @@ public abstract class ChannelledSkill extends ActiveSkill {
         scheduler.schedule(
                 () -> {
                     if (channelingInProgress(combatData)) {
-                        this.endSkill(combatData, skillTarget);
+                        notifyStopChannel(combatData.getActorId(), true);
+                        updateSessionInitiateSkill(combatData.getActorId(), skillTarget);
+                        this.travel(combatData, skillTarget);
                     }
                     combatData.setCombatState(CombatState.IDLE.getType()); // Reset combat state
                     channelingTask.cancel(true); // Stop the periodic check
@@ -108,19 +109,26 @@ public abstract class ChannelledSkill extends ActiveSkill {
         return combatData.getCombatState().equalsIgnoreCase(CombatState.CHANNELING.getType());
     }
 
-    private void notifyStartChannel() {
+    private void notifyStartChannel(String actorId) {
         SocketResponse message = new SocketResponse();
         message.setMessageType(SkillMessageType.START_CHANNELLING.getType());
 
         CombatRequest request = new CombatRequest();
         request.setSkillId(this.getName());
+        request.setActorId(actorId);
+        message.setCombatRequest(request);
 
         session.send(message).subscribe(socketResponseSubscriber);
     }
 
-    private void notifyStopChannel() {
+    private void notifyStopChannel(String actorId, boolean channelSuccess) {
         SocketResponse message = new SocketResponse();
         message.setMessageType(SkillMessageType.STOP_CHANNELLING.getType());
+        CombatRequest combat = new CombatRequest();
+        combat.setActorId(actorId);
+        combat.setSkillId(getName());
+        combat.setChannelSuccess(channelSuccess);
+        message.setCombatRequest(combat);
 
         session.send(message).subscribe(socketResponseSubscriber);
     }

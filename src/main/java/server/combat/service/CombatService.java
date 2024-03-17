@@ -100,7 +100,11 @@ public class CombatService {
         clientUpdatesService.sendAttackAnimUpdates(request);
     }
 
-    void handleActorDeath(Stats stats) {
+    public void handleActorDeath(Stats stats) {
+        if (stats.getDerived(StatsTypes.CURRENT_HP) > 0.0) {
+            return;
+        }
+
         if (stats.isPlayer()) {
             // TODO: implement player death
             statsService.addHealth(stats, 300.0);

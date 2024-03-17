@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import io.micronaut.websocket.WebSocketSession;
+import server.attribute.stats.model.Stats;
+import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.skills.behavior.InstantSkill;
@@ -22,8 +26,9 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
             Map<String, Double> derived,
             Integer cooldown,
             Integer maxRange,
+            Integer travelSpeed,
             Map<String, Integer> requirements) {
-        super(name, description, derived, maxRange, requirements, cooldown);
+        super(name, description, derived, maxRange, requirements, cooldown, travelSpeed);
     }
 
     @Override
@@ -48,13 +53,12 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
 
     @Override
     public void instantEffect(CombatData combatData, SkillTarget skillTarget) {
-        updateSessionInitiateSkill(skillTarget);
         this.endSkill(combatData, skillTarget);
     }
 
     @Override
-    public void travel(CombatData combatData, SkillTarget skillTarget, Integer travelSpeed) {
-        if (travelSpeed == null) {
+    public void travel(CombatData combatData, SkillTarget skillTarget) {
+        if (getTravelSpeed() == null) {
             instantEffect(combatData, skillTarget);
         }
 
@@ -68,7 +72,7 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
 
         Double distance = Math.sqrt(x * x + y * y + z * z);
 
-        double time = Math.floor(((distance / travelSpeed) - 100));
+        double time = Math.floor(((distance / getTravelSpeed()) - 100));
         time = Math.max(Math.floor(time), 100);
 
         scheduler.schedule(
@@ -77,5 +81,9 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                 },
                 (long) time,
                 TimeUnit.MILLISECONDS);
+    }
+
+    protected void checkDeath(Stats stats) {
+        combatService.handleActorDeath(stats);
     }
 }
