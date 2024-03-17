@@ -19,7 +19,6 @@ public class CombatRequest {
 
     private String skillId;
     private SkillTarget skillTarget;
-    private Boolean channelSuccess;
 
     private String itemInstanceId;
 

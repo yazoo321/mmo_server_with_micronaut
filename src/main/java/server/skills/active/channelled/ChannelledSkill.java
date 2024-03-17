@@ -127,7 +127,6 @@ public abstract class ChannelledSkill extends ActiveSkill {
         CombatRequest combat = new CombatRequest();
         combat.setActorId(actorId);
         combat.setSkillId(getName());
-        combat.setChannelSuccess(channelSuccess);
         message.setCombatRequest(combat);
 
         session.send(message).subscribe(socketResponseSubscriber);
