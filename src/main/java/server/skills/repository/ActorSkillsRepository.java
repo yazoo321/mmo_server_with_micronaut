@@ -17,28 +17,28 @@ import server.skills.model.Skill;
 
 @Slf4j
 @Singleton
-public class PlayerSkillsRepository {
+public class ActorSkillsRepository {
 
     MongoConfiguration configuration;
     MongoClient mongoClient;
-    MongoCollection<ActorSkills> playerSkillsMongoCollection;
+    MongoCollection<ActorSkills> actorSkillsMongoCollection;
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    public PlayerSkillsRepository(MongoConfiguration configuration, MongoClient mongoClient) {
+    public ActorSkillsRepository(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
         prepareCollections();
     }
 
     public Single<ActorSkills> getActorSkills(String actorId) {
-        return Single.fromPublisher(playerSkillsMongoCollection.find(eq("actorId", actorId)))
+        return Single.fromPublisher(actorSkillsMongoCollection.find(eq("actorId", actorId)))
                 .doOnError((exception) -> log.error("actor skills not found for {}", actorId));
     }
 
     public Single<ActorSkills> setActorSkills(String actorId, List<Skill> skills) {
         return Single.fromPublisher(
-                playerSkillsMongoCollection.findOneAndUpdate(
+                actorSkillsMongoCollection.findOneAndUpdate(
                         eq("actorId", actorId), set("skills", skills)));
     }
 
@@ -51,9 +51,9 @@ public class PlayerSkillsRepository {
     //    }
 
     private void prepareCollections() {
-        this.playerSkillsMongoCollection =
+        this.actorSkillsMongoCollection =
                 mongoClient
                         .getDatabase(configuration.getDatabaseName())
-                        .getCollection(configuration.getPlayerSkills(), ActorSkills.class);
+                        .getCollection(configuration.getActorSkills(), ActorSkills.class);
     }
 }

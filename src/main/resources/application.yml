@@ -75,7 +75,8 @@ mongo-database:
   mob-instance: "mobInstance"
   actor-stats: "actorStats"
   actor-status: "actorStatus"
-  player-skills: "playerSkills"
+  actor-skills: "actorSkills"
+  actionbar: "actionbar"
 
 redisson:
   single-server-config:

@@ -1,9 +1,7 @@
 package server.skills.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.websocket.WebSocketSession;
-import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
@@ -20,7 +18,7 @@ import server.skills.available.factory.DefaultSkillFactory;
 import server.skills.available.restoration.heals.BasicHeal;
 import server.skills.model.ActorSkills;
 import server.skills.model.Skill;
-import server.skills.repository.PlayerSkillsRepository;
+import server.skills.repository.ActorSkillsRepository;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.types.MessageType;
@@ -40,7 +38,7 @@ public class CombatSkillsService {
     StatsService statsService;
 
     @Inject
-    PlayerSkillsRepository playerSkillsRepository;
+    ActorSkillsRepository actorSkillsRepository;
 
     @Inject
     SocketResponseSubscriber socketResponseSubscriber;
@@ -89,7 +87,7 @@ public class CombatSkillsService {
 
         // TODO: Make skills either dynamically evaluated, or taken from repo
 
-//        playerSkillsRepository.getActorSkills(actorId)
+//        actorSkillsRepository.getActorSkills(actorId)
 //                .doOnSuccess(actorSkills -> {
 //                            SocketResponse socketResponse = new SocketResponse();
 //                            socketResponse.setActorSkills(actorSkills);
