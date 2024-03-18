@@ -26,6 +26,7 @@ public class BasicHeal extends ChannelledSkill {
                 false,
                 true,
                 500,
+                0,
                 Map.of());
     }
 
@@ -44,7 +45,9 @@ public class BasicHeal extends ChannelledSkill {
 
         Stats targetStats = statsService.getStatsFor(target).blockingGet();
 
-        statsService.takeDamage(targetStats, damageMap);
+        Stats stats = statsService.takeDamage(targetStats, damageMap);
+
+        checkDeath(stats);
     }
 
     @Override

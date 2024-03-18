@@ -3,6 +3,7 @@ package server.skills.available.factory;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import server.attribute.stats.service.StatsService;
+import server.combat.service.CombatService;
 import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.restoration.heals.BasicHeal;
@@ -27,6 +28,9 @@ public class DefaultSkillFactory implements SkillFactory {
     @Inject
     StatsService statsService;
 
+    @Inject
+    CombatService combatService;
+
     public DefaultSkillFactory() {
         skillTypes.put("fireball", Fireball.class);
         skillTypes.put("basic heal", BasicHeal.class);
@@ -41,6 +45,7 @@ public class DefaultSkillFactory implements SkillFactory {
             skill.setSocketResponseSubscriber(socketResponseSubscriber);
             skill.setStatsService(statsService);
             skill.setSessionParamHelper(sessionParamHelper);
+            skill.setCombatService(combatService);
 
             return skill;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
