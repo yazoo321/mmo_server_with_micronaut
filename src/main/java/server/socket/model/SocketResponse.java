@@ -1,12 +1,14 @@
 package server.socket.model;
 
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import server.actionbar.model.ActorActionbar;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatRequest;
@@ -49,4 +51,6 @@ public class SocketResponse {
     ActorStatus actorStatus;
 
     ActorSkills actorSkills;
+
+    List<ActorActionbar> actionbarList;
 }

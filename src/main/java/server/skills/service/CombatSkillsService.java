@@ -1,9 +1,7 @@
 package server.skills.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.websocket.WebSocketSession;
-import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
@@ -21,7 +19,7 @@ import server.skills.available.factory.DefaultSkillFactory;
 import server.skills.available.restoration.heals.BasicHeal;
 import server.skills.model.ActorSkills;
 import server.skills.model.Skill;
-import server.skills.repository.PlayerSkillsRepository;
+import server.skills.repository.ActorSkillsRepository;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.types.MessageType;
@@ -34,22 +32,17 @@ public class CombatSkillsService {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    DefaultSkillFactory skillFactory;
+    @Inject DefaultSkillFactory skillFactory;
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
-    @Inject
-    PlayerSkillsRepository playerSkillsRepository;
+    @Inject ActorSkillsRepository actorSkillsRepository;
 
-    @Inject
-    SocketResponseSubscriber socketResponseSubscriber;
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    @Inject
-    CombatService combatService;
+    @Inject CombatService combatService;
 
     public CombatSkillsService() {
         objectMapper.registerSubtypes(Fireball.class, BasicHeal.class);
@@ -79,10 +72,7 @@ public class CombatSkillsService {
     public void getActorAvailableSkills(String actorId, WebSocketSession session) {
         ActorSkills actorSkills = new ActorSkills();
         actorSkills.setActorId(actorId);
-        actorSkills.setSkills(List.of(
-                new Fireball(),
-                new BasicHeal()
-        ));
+        actorSkills.setSkills(List.of(new Fireball(), new BasicHeal()));
         SocketResponse socketResponse = new SocketResponse();
         socketResponse.setActorSkills(actorSkills);
         socketResponse.setMessageType(MessageType.UPDATE_ACTOR_SKILLS.getType());
@@ -91,16 +81,19 @@ public class CombatSkillsService {
 
         // TODO: Make skills either dynamically evaluated, or taken from repo
 
-//        playerSkillsRepository.getActorSkills(actorId)
-//                .doOnSuccess(actorSkills -> {
-//                            SocketResponse socketResponse = new SocketResponse();
-//                            socketResponse.setActorSkills(actorSkills);
-//                            socketResponse.setMessageType(MessageType.UPDATE_ACTOR_SKILLS.getType());
-//
-//                            session.send(socketResponse).subscribe(socketResponseSubscriber);
-//                })
-//                .doOnError(err -> log.error("Failed to send skills to actor, {}", err.getMessage()))
-//                .subscribe();
+        //        actorSkillsRepository.getActorSkills(actorId)
+        //                .doOnSuccess(actorSkills -> {
+        //                            SocketResponse socketResponse = new SocketResponse();
+        //                            socketResponse.setActorSkills(actorSkills);
+        //
+        // socketResponse.setMessageType(MessageType.UPDATE_ACTOR_SKILLS.getType());
+        //
+        //
+        // session.send(socketResponse).subscribe(socketResponseSubscriber);
+        //                })
+        //                .doOnError(err -> log.error("Failed to send skills to actor, {}",
+        // err.getMessage()))
+        //                .subscribe();
     }
 
     private void checkCombatDataStatsAvailable(CombatData combatData) {

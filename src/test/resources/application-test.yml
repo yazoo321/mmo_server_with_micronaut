@@ -50,4 +50,5 @@ mongo-database:
   mob-attributes: "mobAttributes"
   actor-stats: "actorStats"
   actor-status: "actorStatus"
-  player-skills: "playerSkills"
+  actor-skills: "actorSkills"
+  actionbar: "actionbar"
