@@ -11,5 +11,4 @@ public class ActionbarContent {
 
     String skillId;
     String itemId;
-
 }

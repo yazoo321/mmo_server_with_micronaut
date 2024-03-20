@@ -1,7 +1,6 @@
 package server.socket.model;
 
 import io.micronaut.serde.annotation.Serdeable;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

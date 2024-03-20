@@ -12,40 +12,43 @@ import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
 
-import java.util.List;
-
 @Slf4j
 @Singleton
 public class ActionbarService {
 
-    @Inject
-    ActionbarRepository actionbarRepository;
+    @Inject ActionbarRepository actionbarRepository;
 
-    @Inject
-    SocketResponseSubscriber socketResponseSubscriber;
-
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     public void getActorActionbar(WebSocketSession session) {
         // this is only for players
         String actorId = SessionParamHelper.getActorId(session);
-        actionbarRepository.getActorActionbar(actorId)
-                .doOnSuccess(actionbar -> {
-                    SocketResponse response = new SocketResponse();
-                    response.setMessageType(SocketResponseType.UPDATE_ACTIONBAR.getType());
-                    response.setActionbarList(actionbar);
+        actionbarRepository
+                .getActorActionbar(actorId)
+                .doOnSuccess(
+                        actionbar -> {
+                            SocketResponse response = new SocketResponse();
+                            response.setMessageType(SocketResponseType.UPDATE_ACTIONBAR.getType());
+                            response.setActionbarList(actionbar);
 
-                    session.send(response).subscribe(socketResponseSubscriber);
-                })
-                .doOnError(err -> log.error("Failed to get actionbar for {}, {}", actorId, err.getMessage()))
+                            session.send(response).subscribe(socketResponseSubscriber);
+                        })
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "Failed to get actionbar for {}, {}",
+                                        actorId,
+                                        err.getMessage()))
                 .subscribe();
     }
 
     public void updateActionbarItem(ActorActionbar actorActionbar) {
         ActionbarContent content = actorActionbar.getActionbarContent();
 
-        if ((content.getItemId() == null || content.getItemId().isBlank()) &&
-                (content.getSkillId() == null || content.getSkillId().isBlank())) {
-            actionbarRepository.deleteActorActionbar(actorActionbar.getActorId(), actorActionbar.getActionbarId());
+        if ((content.getItemId() == null || content.getItemId().isBlank())
+                && (content.getSkillId() == null || content.getSkillId().isBlank())) {
+            actionbarRepository.deleteActorActionbar(
+                    actorActionbar.getActorId(), actorActionbar.getActionbarId());
         } else {
             actionbarRepository.updateActorActionbar(actorActionbar);
         }

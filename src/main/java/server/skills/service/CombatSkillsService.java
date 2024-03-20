@@ -32,22 +32,17 @@ public class CombatSkillsService {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    DefaultSkillFactory skillFactory;
+    @Inject DefaultSkillFactory skillFactory;
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
-    @Inject
-    ActorSkillsRepository actorSkillsRepository;
+    @Inject ActorSkillsRepository actorSkillsRepository;
 
-    @Inject
-    SocketResponseSubscriber socketResponseSubscriber;
+    @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    @Inject
-    CombatService combatService;
+    @Inject CombatService combatService;
 
     public CombatSkillsService() {
         objectMapper.registerSubtypes(Fireball.class, BasicHeal.class);
@@ -77,10 +72,7 @@ public class CombatSkillsService {
     public void getActorAvailableSkills(String actorId, WebSocketSession session) {
         ActorSkills actorSkills = new ActorSkills();
         actorSkills.setActorId(actorId);
-        actorSkills.setSkills(List.of(
-                new Fireball(),
-                new BasicHeal()
-        ));
+        actorSkills.setSkills(List.of(new Fireball(), new BasicHeal()));
         SocketResponse socketResponse = new SocketResponse();
         socketResponse.setActorSkills(actorSkills);
         socketResponse.setMessageType(MessageType.UPDATE_ACTOR_SKILLS.getType());
@@ -89,16 +81,19 @@ public class CombatSkillsService {
 
         // TODO: Make skills either dynamically evaluated, or taken from repo
 
-//        actorSkillsRepository.getActorSkills(actorId)
-//                .doOnSuccess(actorSkills -> {
-//                            SocketResponse socketResponse = new SocketResponse();
-//                            socketResponse.setActorSkills(actorSkills);
-//                            socketResponse.setMessageType(MessageType.UPDATE_ACTOR_SKILLS.getType());
-//
-//                            session.send(socketResponse).subscribe(socketResponseSubscriber);
-//                })
-//                .doOnError(err -> log.error("Failed to send skills to actor, {}", err.getMessage()))
-//                .subscribe();
+        //        actorSkillsRepository.getActorSkills(actorId)
+        //                .doOnSuccess(actorSkills -> {
+        //                            SocketResponse socketResponse = new SocketResponse();
+        //                            socketResponse.setActorSkills(actorSkills);
+        //
+        // socketResponse.setMessageType(MessageType.UPDATE_ACTOR_SKILLS.getType());
+        //
+        //
+        // session.send(socketResponse).subscribe(socketResponseSubscriber);
+        //                })
+        //                .doOnError(err -> log.error("Failed to send skills to actor, {}",
+        // err.getMessage()))
+        //                .subscribe();
     }
 
     private void checkCombatDataStatsAvailable(CombatData combatData) {
