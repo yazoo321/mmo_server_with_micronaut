@@ -23,7 +23,8 @@ import server.session.model.CacheDomains;
 import server.session.model.CacheKey;
 
 @Singleton
-@NonNull public class SessionParamHelper {
+@NonNull
+public class SessionParamHelper {
 
     private final ObjectMapper objectMapper =
             new ObjectMapper().registerModule(new JavaTimeModule());

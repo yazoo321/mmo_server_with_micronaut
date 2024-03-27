@@ -14,11 +14,11 @@ import lombok.Data;
 public class ActorStatus {
 
     String actorId;
-    List<Status> actorStatuses;
+    Set<Status> actorStatuses;
     boolean add;
 
-    public List<Status> removeOldStatuses() {
-        List<Status> removedStatuses = new ArrayList<>();
+    public Set<Status> removeOldStatuses() {
+        Set<Status> removedStatuses = new HashSet<>();
         actorStatuses.removeIf(
                 status -> {
                     if (status.getExpiration().isBefore(Instant.now())) {
