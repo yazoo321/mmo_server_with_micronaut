@@ -4,6 +4,7 @@ import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import server.actionbar.model.ActorActionbar;
 import server.combat.model.CombatRequest;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.monster.server_integration.model.Monster;
@@ -27,4 +28,6 @@ public class SocketMessage {
     GenericInventoryData inventoryRequest;
 
     CombatRequest combatRequest;
+
+    ActorActionbar actorActionbar;
 }
