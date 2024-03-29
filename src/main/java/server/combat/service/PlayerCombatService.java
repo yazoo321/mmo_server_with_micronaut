@@ -19,6 +19,7 @@ import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
+import server.combat.model.CombatState;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.session.SessionParamHelper;
@@ -69,7 +70,10 @@ public class PlayerCombatService extends CombatService {
                         : (int) (double) weapon.getAttackDistance();
 
         Motion attackerMotion = SessionParamHelper.getMotion(session);
-        boolean valid =
+
+        boolean valid = actorCombatStateValid(combatData.getCombatState());
+
+        valid = valid &&
                 validatePositionLocation(
                         combatData,
                         attackerMotion,
@@ -177,6 +181,11 @@ public class PlayerCombatService extends CombatService {
         combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", true);
 
         requestSessionsToSwingWeapon(itemInstanceId, SessionParamHelper.getActorId(session));
+    }
+
+    List<String> validAttackStates = List.of(CombatState.IDLE.getType(), CombatState.ATTACKING.getType());
+    private boolean actorCombatStateValid(String state) {
+        return validAttackStates.contains(state);
     }
 
     private Map<DamageTypes, Double> calculateDamageMap(
