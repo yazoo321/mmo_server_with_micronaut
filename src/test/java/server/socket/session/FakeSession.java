@@ -15,7 +15,7 @@ import org.reactivestreams.Publisher;
 @Bean
 public class FakeSession implements WebSocketSession {
 
-    private Map<String, Object> dataMap = new HashMap<>();
+    private final Map<String, Object> dataMap = new HashMap<>();
 
     @Override
     public String getId() {

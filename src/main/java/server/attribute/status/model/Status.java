@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import lombok.Data;
 import server.attribute.status.model.derived.*;
-import server.items.types.consumable.Consumable;
 
 @Data
 @Serdeable

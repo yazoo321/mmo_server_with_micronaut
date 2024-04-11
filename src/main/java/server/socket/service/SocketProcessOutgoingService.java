@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import server.actionbar.service.ActionbarService;
-import server.combat.model.CombatRequest;
 import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
 import server.motion.dto.PlayerMotion;
@@ -65,8 +64,10 @@ public class SocketProcessOutgoingService {
         this.functionMap.put(MessageType.SET_SESSION_ID.getType(), this::setSessionId);
         this.functionMap.put(SkillMessageType.INITIATE_SKILL.getType(), this::handleTryStartSkill);
         this.functionMap.put(SkillMessageType.FETCH_SKILLS.getType(), this::handleFetchSkills);
-        this.functionMap.put(SkillMessageType.FETCH_ACTIONBAR.getType(), this::handleFetchActionBar);
-        this.functionMap.put(SkillMessageType.UPDATE_ACTIONBAR.getType(), this::handleUpdateActionBar);
+        this.functionMap.put(
+                SkillMessageType.FETCH_ACTIONBAR.getType(), this::handleFetchActionBar);
+        this.functionMap.put(
+                SkillMessageType.UPDATE_ACTIONBAR.getType(), this::handleUpdateActionBar);
     }
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
@@ -164,8 +165,10 @@ public class SocketProcessOutgoingService {
     }
 
     private void handleFetchSkills(SocketMessage message, WebSocketSession session) {
-        String actorId = SessionParamHelper.getIsPlayer(session) ? SessionParamHelper.getActorId(session) :
-                message.getActorId();
+        String actorId =
+                SessionParamHelper.getIsPlayer(session)
+                        ? SessionParamHelper.getActorId(session)
+                        : message.getActorId();
         combatSkillsService.getActorAvailableSkills(actorId, session);
     }
 

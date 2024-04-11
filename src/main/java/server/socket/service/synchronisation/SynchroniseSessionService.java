@@ -10,6 +10,9 @@ import server.common.dto.Motion;
 import server.session.SessionParamHelper;
 import server.socket.v1.CommunicationSocket;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Slf4j
 @Singleton
 public class SynchroniseSessionService {
@@ -23,6 +26,21 @@ public class SynchroniseSessionService {
     @Inject SynchroniseMobService synchroniseMobService;
 
     @Inject SynchroniseDroppedItemsService synchroniseDroppedItemsService;
+
+
+    @Scheduled(fixedDelay = "10s", initialDelay = "10s")
+    public void syncMotionCacheToDB() {
+        ConcurrentSet<WebSocketSession> sessions = socket.getLiveSessions();
+        Set<String> actorsMotion = new HashSet<>();
+
+        sessions.parallelStream()
+                .forEach(
+                        session -> {
+                            actorsMotion.add(SessionParamHelper.getActorId(session));
+                        });
+
+        // TODO: Find a way to get sync all these actors to repo in 1 call
+    }
 
     @Scheduled(fixedDelay = "500ms")
     public void evaluateNearbyPlayers() {

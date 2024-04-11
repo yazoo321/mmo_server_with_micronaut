@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
@@ -52,7 +51,7 @@ public class CombatSkillsService {
         validateActorId(session, combatRequest);
         CombatData combatData =
                 sessionParamHelper.getSharedActorCombatData(combatRequest.getActorId());
-        checkCombatDataStatsAvailable(combatData);
+        //        checkCombatDataStatsAvailable(combatData);
         Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
         String skillName = combatRequest.getSkillId();
         Skill skill = skillFactory.createSkill(skillName.toLowerCase());
@@ -96,13 +95,14 @@ public class CombatSkillsService {
         //                .subscribe();
     }
 
-    private void checkCombatDataStatsAvailable(CombatData combatData) {
-        // we will try fetch stats if they're not present before they're needed, error-prone
-        if (combatData.getDerivedStats().size() < 5) {
-            Stats stats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
-            Stats.mergeLeft(combatData.getDerivedStats(), stats.getDerivedStats());
-        }
-    }
+    //    private void checkCombatDataStatsAvailable(CombatData combatData) {
+    //        // we will try fetch stats if they're not present before they're needed, error-prone
+    //        Stats stats = statsService.getStatsFor(combatData.getActorId());
+    //        if (combatData.getDerivedStats().size() < 5) {
+    //            Stats stats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
+    //            Stats.mergeLeft(combatData.getDerivedStats(), stats.getDerivedStats());
+    //        }
+    //    }
 
     private void validateActorId(WebSocketSession session, CombatRequest combatRequest) {
         if (SessionParamHelper.getIsPlayer(session)) {

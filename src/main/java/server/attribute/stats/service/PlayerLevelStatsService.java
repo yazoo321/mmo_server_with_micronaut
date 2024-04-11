@@ -49,7 +49,7 @@ public class PlayerLevelStatsService {
                 });
 
         stats.recalculateDerivedStats();
-        return statsRepository.updateStats(stats);
+        return statsRepository.updateStats(stats.getActorId(), stats);
     }
 
     public Single<Stats> handleLevelUp(String actorId, String classToLevel) {
@@ -65,7 +65,7 @@ public class PlayerLevelStatsService {
                             Map<String, Integer> baseAttr = stats.getBaseStats();
                             baseAttr.put(classToLevel, baseAttr.get(classToLevel) + 1);
                             stats.recalculateDerivedStats();
-                            return statsRepository.updateStats(stats);
+                            return statsRepository.updateStats(stats.getActorId(), stats);
                         })
                 .doOnError(
                         err -> log.error("Failed to get stats on level up, {}", err.getMessage()));

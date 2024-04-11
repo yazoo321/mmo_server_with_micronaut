@@ -9,7 +9,7 @@ import server.common.dto.Motion;
 
 public class JacksonCodecMotion implements RedisCodec<String, Motion> {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public JacksonCodecMotion(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;

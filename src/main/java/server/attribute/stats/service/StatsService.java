@@ -57,9 +57,8 @@ public class StatsService {
         mobStats.setDerived(StatsTypes.CURRENT_HP, mobStats.getDerived(StatsTypes.MAX_HP));
         mobStats.setAttributePoints(0);
 
-        repository.updateStats(mobStats).subscribe();
+        repository.updateStats(mobStats.getActorId(), mobStats).subscribe();
         CombatData combatData = new CombatData(actorId);
-        combatData.setDerivedStats(mobStats.getDerivedStats());
         sessionParamHelper.setSharedActorCombatData(actorId, combatData);
     }
 
@@ -88,20 +87,20 @@ public class StatsService {
 
         playerStats.setAttributePoints(0);
 
-        return repository.updateStats(playerStats);
+        return repository.updateStats(playerStats.getActorId(), playerStats);
     }
 
     public Single<Stats> getStatsFor(String actorId) {
-        return repository.findActorStats(actorId);
+        return repository.fetchActorStats(actorId);
     }
 
     public Single<DeleteResult> deleteStatsFor(String actorId) {
-        return repository.deleteAttributes(actorId);
+        return repository.deleteStats(actorId);
     }
 
     public void updateItemStats(String actorId, Map<String, Double> itemStats) {
         repository
-                .findActorStats(actorId)
+                .fetchActorStats(actorId)
                 .doOnSuccess(
                         stats -> {
                             stats.setItemEffects(itemStats);
@@ -181,7 +180,7 @@ public class StatsService {
     void handleDifference(Map<String, Double> updated, Stats stats) {
         if (!updated.isEmpty()) {
             repository
-                    .updateStats(stats)
+                    .updateStats(stats.getActorId(), stats)
                     .doOnError(err -> log.error("Failed to update stats, {}", err.getMessage()))
                     .subscribe();
             Stats notifyUpdates =

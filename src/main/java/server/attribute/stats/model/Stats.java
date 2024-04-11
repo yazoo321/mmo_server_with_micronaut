@@ -1,5 +1,7 @@
 package server.attribute.stats.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import io.micronaut.core.annotation.ReflectiveAccess;
@@ -8,21 +10,29 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import server.attribute.stats.types.StatsTypes;
 import server.common.uuid.UUIDHelper;
 
 @Data
 @Builder
 @Serdeable
+@JsonInclude
 @ReflectiveAccess
 public class Stats {
+    @Serdeable.Serializable
     private String actorId; // player name or mob id
-
+    @Serdeable.Serializable
     private Map<String, Integer> baseStats;
+    @Serdeable.Serializable
     private Map<String, Double> derivedStats;
+    @Serdeable.Serializable
     private Map<String, Double> itemEffects;
+    @Serdeable.Serializable
     private Map<String, Double> statusEffects;
 
+    @Serdeable.Serializable
     private Integer attributePoints;
 
     public Map<String, Double> getDerivedStats() {
@@ -63,8 +73,14 @@ public class Stats {
         return derivedStats.getOrDefault(type.getType(), 0.0);
     }
 
-    public void setDerived(StatsTypes type, Double val) {
-        derivedStats.put(type.getType(), val);
+    public boolean setDerived(StatsTypes type, Double val) {
+        // returns whether the value has changed or not
+        if (derivedStats.containsKey(type.getType()) && derivedStats.get(type.getType()).equals(val)) {
+            return false;
+        } else {
+            derivedStats.put(type.getType(), val);
+            return true;
+        }
     }
 
     public void setBase(StatsTypes type, int value) {

@@ -5,18 +5,13 @@ import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @NoArgsConstructor
 @Serdeable
 @ReflectiveAccess
 public class Location {
 
-    public Location(
-            String map,
-            Integer x,
-            Integer y,
-            Integer z) {
+    public Location(String map, Integer x, Integer y, Integer z) {
         this.map = map;
         this.x = x;
         this.y = y;
@@ -57,11 +52,8 @@ public class Location {
             return false;
         }
 
-        if (this.getY() < (y - threshold) || this.getY() > (y + threshold)) {
-            return false;
-        }
+        return this.getY() >= (y - threshold) && this.getY() <= (y + threshold);
 
         // can add Z if we want to.
-        return true;
     }
 }

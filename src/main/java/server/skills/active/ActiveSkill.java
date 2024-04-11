@@ -5,10 +5,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import io.micronaut.websocket.WebSocketSession;
 import server.attribute.stats.model.Stats;
-import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.skills.behavior.InstantSkill;
@@ -18,7 +15,7 @@ import server.skills.model.SkillTarget;
 
 public abstract class ActiveSkill extends Skill implements InstantSkill, TravelSkill {
 
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public ActiveSkill(
             String name,

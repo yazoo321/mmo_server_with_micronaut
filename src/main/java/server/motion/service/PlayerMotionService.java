@@ -24,7 +24,7 @@ public class PlayerMotionService {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    private static int DEFAULT_DISTANCE_THRESHOLD = 1000;
+    private static final int DEFAULT_DISTANCE_THRESHOLD = 1000;
 
     public static final Motion STARTING_MOTION =
             Motion.builder()
@@ -94,11 +94,11 @@ public class PlayerMotionService {
     }
 
     public Single<PlayerMotion> getPlayerMotion(String actorId) {
-        return playerMotionRepository.findPlayerMotion(actorId);
+        return playerMotionRepository.fetchPlayerMotion(actorId);
     }
 
     public Single<List<PlayerMotion>> getPlayersMotion(Set<String> actorIds) {
-        return playerMotionRepository.findPlayersMotion(actorIds);
+        return playerMotionRepository.fetchPlayersMotion(actorIds);
     }
 
     public void relayPlayerMotion(PlayerMotion playerMotion) {

@@ -6,11 +6,13 @@ import java.time.Instant;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Serdeable
 @ReflectiveAccess
 @AllArgsConstructor
+@NoArgsConstructor
 public class ActorStatus {
 
     String actorId;

@@ -46,7 +46,8 @@ public class MobCombatService extends CombatService {
     public void tryAttack(String actorId, Stats target, boolean isMainHand) {
         // Extract relevant combat data
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
-        Map<String, Double> derivedStats = combatData.getDerivedStats();
+        Stats actorStats = statsService.getStatsFor(actorId).blockingGet();
+        Map<String, Double> derivedStats = actorStats.getDerivedStats();
         int distanceThreshold = 200;
         Motion attackerMotion = sessionParamHelper.getSharedActorMotion(actorId);
 

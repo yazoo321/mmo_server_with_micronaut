@@ -32,7 +32,8 @@ public class Fireball extends ChannelledSkill {
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Map<String, Double> actorDerived = combatData.getDerivedStats();
+        Stats actorStats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
+        Map<String, Double> actorDerived = actorStats.getDerivedStats();
         Double healAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
 
         Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());

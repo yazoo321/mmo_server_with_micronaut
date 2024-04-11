@@ -9,6 +9,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
+import server.attribute.status.service.StatusService;
 import server.items.inventory.service.InventoryService;
 import server.motion.service.PlayerMotionService;
 import server.player.model.AccountCharactersResponse;
@@ -29,6 +30,8 @@ public class PlayerCharacterService {
     @Inject PlayerMotionService playerMotionService;
 
     @Inject StatsService statsService;
+
+    @Inject StatusService statusService;
 
     public AccountCharactersResponse getAccountCharacters(String username) {
         List<Character> characterList = playerCharacterRepository.findByAccount(username);
@@ -62,16 +65,18 @@ public class PlayerCharacterService {
         newCharacter = playerCharacterRepository.createNew(newCharacter);
 
         try {
-            statsService.initializePlayerStats(newCharacter.getName()).blockingGet();
+            statsService.initializePlayerStats(newCharacter.getName()).blockingSubscribe();
+            statusService.initializeStatus(newCharacter.getName());
             // call relevant services to initialise data
-            inventoryService.createInventoryForNewCharacter(newCharacter.getName()).blockingGet();
+            inventoryService.createInventoryForNewCharacter(newCharacter.getName()).blockingSubscribe();
             //            attributeService.createBaseAttributes(newCharacter.getName());
             levelAttributeService
                     .initializeCharacterClass(
                             newCharacter.getName(), createCharacterRequest.getClassName())
-                    .blockingGet();
+                    .blockingSubscribe();
             // blocking call to ensure we do our rollback if anything happens.
-            playerMotionService.initializePlayerMotion(newCharacter.getName()).blockingGet();
+            playerMotionService.initializePlayerMotion(newCharacter.getName()).blockingSubscribe();
+
         } catch (Exception e) {
             log.warn("Create character failed, rolling back changes");
             // we need to rollback the changes

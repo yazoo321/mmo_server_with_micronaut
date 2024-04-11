@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.attribute.stats.service.StatsService;
-import server.attribute.status.model.Status;
 import server.attribute.status.model.derived.Dead;
 import server.attribute.status.service.StatusService;
 import server.common.dto.Location;
@@ -50,6 +49,7 @@ public class MobInstanceService {
         mob.setMotion(motion);
 
         statsService.initializeMobStats(mobId);
+        statusService.initializeStatus(mobId);
 
         return mobRepository.insertMobInstance(mob);
 
@@ -81,13 +81,9 @@ public class MobInstanceService {
         statsService
                 .deleteStatsFor(mobId)
                 .doOnError(
-                        err ->
-                                log.error(
-                                        "Failed to delete stats on death, {}",
-                                        err.getMessage()))
+                        err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
                 .delaySubscription(10_000, TimeUnit.MILLISECONDS)
                 .subscribe();
-
 
         Single.fromCallable(
                         () ->

@@ -25,11 +25,14 @@ public class StatsSocketIntegration {
                 .getStatsFor(actorId)
                 .doOnSuccess(
                         stats -> {
-                            if (actorId.equalsIgnoreCase(SessionParamHelper.getActorId(session))) {
-                                // update session with params
-                                sessionParamHelper.setActorDerivedStats(
-                                        actorId, stats.getDerivedStats());
-                            }
+                            //                            if
+                            // (actorId.equalsIgnoreCase(SessionParamHelper.getActorId(session))) {
+                            //                                // update session with params
+                            //
+                            // sessionParamHelper.setActorDerivedStats(
+                            //                                        actorId,
+                            // stats.getDerivedStats());
+                            //                            }
 
                             SocketResponse response =
                                     SocketResponse.builder()

@@ -11,7 +11,7 @@ import server.skills.available.restoration.heals.BasicHeal;
 
 public class JacksonCodecCombatData implements RedisCodec<String, CombatData> {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public JacksonCodecCombatData(ObjectMapper objectMapper) {
         objectMapper.registerSubtypes(Fireball.class, BasicHeal.class);

@@ -86,9 +86,9 @@ class PlayerCombatServiceTest {
     void testRequestAttackWithValidRequest() {
         // Given
         // prepare character
-        Stats stats = statsService.initializePlayerStats(CHARACTER_1).blockingGet();
+        Stats stats = statsService.initializePlayerStats(CHARACTER_1)
+                .doOnError(err -> err.printStackTrace()).blockingGet();
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(CHARACTER_1);
-        combatData.setDerivedStats(stats.getDerivedStats());
         sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
         PlayerMotion playerMotion =
                 playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
@@ -147,6 +147,7 @@ class PlayerCombatServiceTest {
 
         EquippedItems equippedItem =
                 equipItemService.equipItem(itemInstance.getItemInstanceId(), actorId).blockingGet();
+
         if (session != null) {
             sessionParamHelper.addToEquippedItems(session, equippedItem);
         }

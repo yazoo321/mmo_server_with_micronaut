@@ -1,5 +1,6 @@
 package server.socket.v1;
 
+import io.micronaut.scheduling.annotation.Scheduled;
 import io.micronaut.websocket.WebSocketSession;
 import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
@@ -15,6 +16,9 @@ import server.session.SessionParamHelper;
 import server.socket.model.SocketMessage;
 import server.socket.service.SocketProcessOutgoingService;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Slf4j
 @ServerWebSocket("/v1/communication-socket")
 public class CommunicationSocket {
@@ -28,7 +32,7 @@ public class CommunicationSocket {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
+    private final ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
 
     @OnOpen
     public void onOpen(WebSocketSession session) {

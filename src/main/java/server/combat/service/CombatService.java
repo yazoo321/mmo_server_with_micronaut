@@ -17,7 +17,6 @@ import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
 import server.monster.server_integration.service.MobInstanceService;
-import server.motion.service.PlayerMotionService;
 import server.session.SessionParamHelper;
 import server.socket.service.ClientUpdatesService;
 
@@ -32,8 +31,6 @@ public class CombatService {
     @Inject SessionParamHelper sessionParamHelper;
 
     @Inject StatsService statsService;
-
-    @Inject PlayerMotionService playerMotionService;
 
     @Inject ClientUpdatesService clientUpdatesService;
 
@@ -87,7 +84,8 @@ public class CombatService {
         }
         return actors.stream()
                 .map(actor -> statsService.getStatsFor(actor).blockingGet())
-//                .filter(s -> s.getDerivedStats().get(StatsTypes.CURRENT_HP.getType()) > 0)
+                //                .filter(s ->
+                // s.getDerivedStats().get(StatsTypes.CURRENT_HP.getType()) > 0)
                 .collect(Collectors.toList());
     }
 

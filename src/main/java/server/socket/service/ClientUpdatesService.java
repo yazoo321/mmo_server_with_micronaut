@@ -267,7 +267,9 @@ public class ClientUpdatesService {
                 isThePlayerOrMob = true;
                 // update session cache about stats
                 if (!stats.getDerivedStats().isEmpty()) {
-                    sessionParamHelper.setActorDerivedStats(playerOrMob, stats.getDerivedStats());
+                    sessionParamHelper.updateStats(stats);
+                    //                    sessionParamHelper.setActorDerivedStats(playerOrMob,
+                    // stats.getDerivedStats());
                 }
             }
 
