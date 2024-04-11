@@ -20,6 +20,7 @@ import org.mockito.Spy;
 import org.reactivestreams.Publisher;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
+import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
@@ -40,6 +41,8 @@ import server.socket.session.FakeSession;
 class PlayerCombatServiceTest {
 
     @Inject private StatsService statsService;
+
+    @Inject private StatusService statusService;
 
     @Inject private SessionParamHelper sessionParamHelper;
 
@@ -126,8 +129,9 @@ class PlayerCombatServiceTest {
                 .until(
                         () -> {
                             try {
-                                statsService.getStatsFor(MOB_1).blockingGet();
-                                return false;
+                                return statusService.getActorStatus(MOB_1).isDead();
+//                                statsService.getStatsFor(MOB_1).blockingGet();
+//                                return false;
                             } catch (NoSuchElementException e) {
                                 // when publisher is empty, the mob was killed and deleted. later
                                 // needs to be refactored to mob death state.

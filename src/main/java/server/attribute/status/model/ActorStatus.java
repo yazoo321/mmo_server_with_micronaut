@@ -7,6 +7,7 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import server.attribute.status.types.StatusTypes;
 
 @Data
 @Serdeable
@@ -51,5 +52,23 @@ public class ActorStatus {
                                         }));
 
         return derived;
+    }
+
+    public Set<Status> getActorStatuses() {
+        if (actorStatuses == null) {
+            actorStatuses = new HashSet<>();
+        }
+
+        return actorStatuses;
+    }
+
+    public boolean isDead() {
+        for (Status status : getActorStatuses()) {
+            if (status.getCategory().equals(StatusTypes.DEAD.getType())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

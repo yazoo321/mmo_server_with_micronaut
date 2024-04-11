@@ -78,6 +78,11 @@ public class MobInstanceService {
         // we will set state to death and wait for animations etc
 
         statusService.addStatusToActor(Set.of(new Dead()), mobId);
+        statusService.deleteActorStatus(mobId)
+                        .doOnError(err -> log.error(err.getMessage()))
+                                .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                                        .subscribe();
+
         statsService
                 .deleteStatsFor(mobId)
                 .doOnError(

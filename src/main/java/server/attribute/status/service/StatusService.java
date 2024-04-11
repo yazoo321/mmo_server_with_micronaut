@@ -1,5 +1,7 @@
 package server.attribute.status.service;
 
+import com.mongodb.client.result.DeleteResult;
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.Set;
@@ -10,6 +12,8 @@ import server.attribute.status.model.Status;
 import server.attribute.status.repository.StatusRepository;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
+
+import static com.mongodb.client.model.Filters.eq;
 
 @Singleton
 @Slf4j
@@ -32,7 +36,7 @@ public class StatusService {
         }
 
         actorStatus.getActorStatuses().removeAll(removed);
-        statusRepository.updateStatus(actorStatus);
+        statusRepository.updateStatus(actorStatus.getActorId(), actorStatus);
 
         //        updateActorStatusCache(actorStatus);
         ActorStatus update = new ActorStatus(actorStatus.getActorId(), removed, false);
@@ -45,16 +49,20 @@ public class StatusService {
                 .doOnError(err-> {log.error(err.getMessage());}).blockingGet();
         currentStatuses.getActorStatuses().addAll(statuses);
 
-        statusRepository.updateStatus(currentStatuses)
-                .doOnError(err-> log.error(err.getMessage()))
+        statusRepository.updateStatus(currentStatuses.getActorId(), currentStatuses)
+                .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
 
         ActorStatus update = new ActorStatus(actorId, statuses, true);
         updateProducer.updateStatus(update);
     }
 
+    public Single<DeleteResult> deleteActorStatus(String actorId) {
+        return statusRepository.deleteActorStatuses(actorId);
+    }
+
     public void initializeStatus(String actorId) {
-        statusRepository.updateStatus(new ActorStatus(actorId, Set.of(), false))
+        statusRepository.updateStatus(actorId, new ActorStatus(actorId, Set.of(), false))
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
     }
