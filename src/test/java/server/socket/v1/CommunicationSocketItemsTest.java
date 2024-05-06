@@ -34,15 +34,16 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 
     @Test
     void testWhenPlayerDropsItemItIsDropped() {
-        playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
-        playerMotionService.initializePlayerMotion(CHARACTER_2).blockingGet();
+        playerMotionService.initializePlayerMotion(CHARACTER_1).blockingSubscribe();
+        playerMotionService.initializePlayerMotion(CHARACTER_2).blockingSubscribe();
 
         TestWebSocketClient playerClient1 = createWebSocketClient(embeddedServer.getPort());
         TestWebSocketClient playerClient2 = createWebSocketClient(embeddedServer.getPort());
 
+        initializeCharacters(playerClient1, playerClient2);
+
         ItemInstance createdItem = prepareCharactersAndItems();
 
-        initializeCharacters(playerClient1, playerClient2);
 
         Location dropLocation = new Location(createBaseMotion());
         SocketMessage dropRequestChar1 =
@@ -157,6 +158,12 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 
         client1.send(char1WithinRange);
         client2.send(char2WithinRange);
+
+        SocketMessage init1 = createMessageForSessionParams(true, CHARACTER_1);
+        SocketMessage init2 = createMessageForSessionParams(true, CHARACTER_2);
+
+        client1.send(init1);
+        client2.send(init2);
     }
 
     private SocketMessage dropRequestForCharacter(

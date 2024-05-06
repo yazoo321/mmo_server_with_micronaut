@@ -6,19 +6,22 @@ import java.time.Instant;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import server.attribute.status.types.StatusTypes;
 
 @Data
 @Serdeable
 @ReflectiveAccess
 @AllArgsConstructor
+@NoArgsConstructor
 public class ActorStatus {
 
     String actorId;
-    List<Status> actorStatuses;
+    Set<Status> actorStatuses;
     boolean add;
 
-    public List<Status> removeOldStatuses() {
-        List<Status> removedStatuses = new ArrayList<>();
+    public Set<Status> removeOldStatuses() {
+        Set<Status> removedStatuses = new HashSet<>();
         actorStatuses.removeIf(
                 status -> {
                     if (status.getExpiration().isBefore(Instant.now())) {
@@ -49,5 +52,23 @@ public class ActorStatus {
                                         }));
 
         return derived;
+    }
+
+    public Set<Status> getActorStatuses() {
+        if (actorStatuses == null) {
+            actorStatuses = new HashSet<>();
+        }
+
+        return actorStatuses;
+    }
+
+    public boolean isDead() {
+        for (Status status : getActorStatuses()) {
+            if (status.getCategory().equals(StatusTypes.DEAD.getType())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

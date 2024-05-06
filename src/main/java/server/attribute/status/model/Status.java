@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import lombok.Data;
-import server.items.types.consumable.Consumable;
+import server.attribute.status.model.derived.*;
 
 @Data
 @Serdeable
@@ -18,7 +18,11 @@ import server.items.types.consumable.Consumable;
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "category")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Consumable.class, name = "CONSUMABLE"),
+    @JsonSubTypes.Type(value = Bleeding.class, name = "BLEEDING"),
+    @JsonSubTypes.Type(value = Dead.class, name = "DEAD"),
+    @JsonSubTypes.Type(value = Silenced.class, name = "SILENCED"),
+    @JsonSubTypes.Type(value = Stunned.class, name = "STUNNED"),
+    @JsonSubTypes.Type(value = Unconscious.class, name = "UNCONCIOUS"),
 })
 public class Status {
 

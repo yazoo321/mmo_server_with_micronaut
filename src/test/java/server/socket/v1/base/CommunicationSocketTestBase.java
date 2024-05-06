@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
+import server.common.uuid.UUIDHelper;
 import server.items.helper.ItemTestHelper;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
@@ -104,7 +105,7 @@ public class CommunicationSocketTestBase {
     }
 
     protected TestWebSocketClient initiateSocketAsPlayer(String actorId) {
-        playerMotionService.initializePlayerMotion(actorId).blockingGet();
+        playerMotionService.initializePlayerMotion(actorId).blockingSubscribe();
         itemTestHelper.prepareInventory(actorId);
 
         TestWebSocketClient playerClient = createWebSocketClient(embeddedServer.getPort());
@@ -155,6 +156,18 @@ public class CommunicationSocketTestBase {
         playerMessageWithinRange.setUpdateType(MessageType.PLAYER_MOTION.getType());
 
         return playerMessageWithinRange;
+    }
+
+    protected SocketMessage createMessageForSessionParams(boolean isPlayer, String actorId) {
+        SocketMessage socketMessage = new SocketMessage();
+        socketMessage.setUpdateType(MessageType.SET_SESSION_ID.getType());
+        if (isPlayer) {
+            socketMessage.setActorId(actorId);
+        } else {
+            socketMessage.setServerName(actorId);
+        }
+
+        return socketMessage;
     }
 
     protected SocketMessage createMobMessageForMotionWithinRange(String actorId) {

@@ -5,8 +5,11 @@ import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
+import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.socket.v1.CommunicationSocket;
 
@@ -24,6 +27,22 @@ public class SynchroniseSessionService {
 
     @Inject SynchroniseDroppedItemsService synchroniseDroppedItemsService;
 
+    @Inject ActorMotionRepository actorMotionRepository;
+
+    @Scheduled(fixedDelay = "10s", initialDelay = "10s")
+    public void syncMotionCacheToDB() {
+        ConcurrentSet<WebSocketSession> sessions = socket.getLiveSessions();
+        Set<String> actorsMotion = new HashSet<>();
+
+        sessions.parallelStream()
+                .forEach(
+                        session -> {
+                            actorsMotion.add(SessionParamHelper.getActorId(session));
+                        });
+
+        // TODO: Find a way to get sync all these actors to repo in 1 call
+    }
+
     @Scheduled(fixedDelay = "500ms")
     public void evaluateNearbyPlayers() {
         ConcurrentSet<WebSocketSession> sessions = socket.getLiveSessions();
@@ -31,9 +50,19 @@ public class SynchroniseSessionService {
         sessions.parallelStream()
                 .forEach(
                         session -> {
-                            Motion motion = SessionParamHelper.getMotion(session);
+
+                            Motion motion = SessionParamHelper.getIsServer(session) ?
+                                    SessionParamHelper.getMotion(session) :
+                                    actorMotionRepository
+                                            .fetchActorMotion(
+                                                    SessionParamHelper.getActorId(session))
+                                            .doOnError(err -> log.error(err.getMessage()))
+                                            .blockingGet();
+
                             if (motion == null) {
-                                // possibly the motion is not fully initiated
+                                log.error(
+                                        "Motion unexpectedly null for session with Actor ID: {}",
+                                        SessionParamHelper.getActorId(session));
                                 return;
                             }
 

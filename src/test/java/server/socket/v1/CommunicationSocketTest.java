@@ -152,7 +152,6 @@ public class CommunicationSocketTest extends CommunicationSocketItemsTest {
                             mobServerClient2.send(mobOutOfRange);
                             return !playerClient1.getMessagesChronologically().isEmpty();
                         });
-        ;
 
         await().pollDelay(500, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))

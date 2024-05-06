@@ -26,4 +26,8 @@ public class UUIDHelper {
 
         return true;
     }
+
+    public static boolean isPlayer(String actorId) {
+        return !UUIDHelper.isValid(actorId);
+    }
 }

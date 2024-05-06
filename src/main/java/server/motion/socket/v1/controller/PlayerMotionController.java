@@ -15,7 +15,7 @@ import server.motion.service.PlayerMotionService;
 public class PlayerMotionController {
 
     private final Scheduler scheduler;
-    private PlayerMotionService playerMotionService;
+    private final PlayerMotionService playerMotionService;
 
     public PlayerMotionController(
             @Named(TaskExecutors.IO) ExecutorService executorService,

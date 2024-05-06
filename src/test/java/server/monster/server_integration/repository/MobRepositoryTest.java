@@ -20,7 +20,7 @@ public class MobRepositoryTest {
 
     @Inject MobRepository mobRepository;
 
-    private static String TEST_MAP = "TEST_MAP";
+    private static final String TEST_MAP = "TEST_MAP";
 
     private static final String actorId1 = "5068a37d-46bc-40f2-9179-e9689bbfa52b";
     private static final String actorId2 = "5068a37d-46bc-40f2-9179-e9689bbfa52c";

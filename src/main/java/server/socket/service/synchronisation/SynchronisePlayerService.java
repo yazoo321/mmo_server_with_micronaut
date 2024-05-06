@@ -46,9 +46,6 @@ public class SynchronisePlayerService {
                 .getNearbyPlayersAsync(motion, actorId, distanceThreshold)
                 .doOnSuccess(
                         list -> {
-                            if (SessionParamHelper.getIsServer(session)) {
-                                boolean hi = true;
-                            }
                             if (list == null || list.isEmpty()) {
                                 return;
                             }

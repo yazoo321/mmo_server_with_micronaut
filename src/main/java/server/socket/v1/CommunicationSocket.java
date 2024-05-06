@@ -28,7 +28,7 @@ public class CommunicationSocket {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
+    private final ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
 
     @OnOpen
     public void onOpen(WebSocketSession session) {
@@ -60,15 +60,16 @@ public class CommunicationSocket {
     }
 
     private void updateSessionParams(WebSocketSession session, SocketMessage message) {
+        // This is currently required to get session actor ID - needs to be refactored to use
+        // set session parameters
+        // TODO: will require updates to tests to remove this dependency
         if (message.getPlayerMotion() != null
                 && motionValid(message.getPlayerMotion().getMotion())) {
-            sessionParamHelper.setMotion(
-                    session,
-                    message.getPlayerMotion().getMotion(),
-                    message.getPlayerMotion().getActorId());
+                        sessionParamHelper.setMotion(
+                                session,
+                                message.getPlayerMotion().getMotion());
         } else if (message.getMonster() != null && motionValid(message.getMonster().getMotion())) {
-            sessionParamHelper.setMotion(
-                    session, message.getMonster().getMotion(), message.getMonster().getActorId());
+            sessionParamHelper.setMotion(session, message.getMonster().getMotion());
         }
     }
 

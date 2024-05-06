@@ -5,11 +5,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.Stats;
+import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.common.configuration.redis.JacksonCodecCombatData;
@@ -23,27 +27,20 @@ import server.session.model.CacheDomains;
 import server.session.model.CacheKey;
 
 @Singleton
-@NonNull public class SessionParamHelper {
+@NonNull @Slf4j
+public class SessionParamHelper {
 
     private final ObjectMapper objectMapper =
             new ObjectMapper().registerModule(new JavaTimeModule());
 
-    //    StatefulRedisConnection<String, Motion> connectionMotion;
     RedisCommands<String, Motion> motionCache;
-
     RedisCommands<String, CombatData> combatDataCache;
+
+    @Inject ActorStatsRepository statsRepository;
 
     public SessionParamHelper(RedisClient redisClient) {
         motionCache = redisClient.connect(new JacksonCodecMotion(objectMapper)).sync();
         combatDataCache = redisClient.connect(new JacksonCodecCombatData(objectMapper)).sync();
-    }
-
-    public Motion getSharedActorMotion(String actorId) {
-        return motionCache.get(CacheKey.of(CacheDomains.MOTION, actorId));
-    }
-
-    public void setSharedActorMotion(String actorId, Motion motion) {
-        motionCache.set(CacheKey.of(CacheDomains.MOTION, actorId), motion);
     }
 
     public void setSharedActorCombatData(String actorId, CombatData combatData) {
@@ -60,24 +57,15 @@ import server.session.model.CacheKey;
         return combatData;
     }
 
-    public void setActorDerivedStats(String actorId, Map<String, Double> derivedStats) {
-        CombatData combatData = getSharedActorCombatData(actorId);
-        combatData.getDerivedStats().putAll(derivedStats);
-        setSharedActorCombatData(actorId, combatData);
-    }
-
-    public Map<String, Double> getActorDerivedStats(String actorId) {
-        CombatData combatData = getSharedActorCombatData(actorId);
-
-        return combatData.getDerivedStats();
+    public void updateStats(Stats stats) {
+        statsRepository.updateStats(stats.getActorId(), stats);
     }
 
     public static Motion getMotion(WebSocketSession session) {
         return (Motion) session.asMap().getOrDefault(SessionParams.MOTION.getType(), null);
     }
 
-    public void setMotion(WebSocketSession session, Motion motion, String actorId) {
-        setSharedActorMotion(actorId, motion);
+    public void setMotion(WebSocketSession session, Motion motion) {
         session.put(SessionParams.MOTION.getType(), motion);
     }
 
@@ -166,10 +154,6 @@ import server.session.model.CacheKey;
         return droppedItems;
     }
 
-    public static void setDerivedStats(WebSocketSession session, Map<String, Double> derivedStats) {
-        session.put(SessionParams.DERIVED_STATS.getType(), derivedStats);
-    }
-
     public Map<String, EquippedItems> getEquippedItems(WebSocketSession session) {
         Map<String, EquippedItems> equippedItemsMap =
                 (Map<String, EquippedItems>)
@@ -218,27 +202,33 @@ import server.session.model.CacheKey;
         return data;
     }
 
-    private void updatePlayerCombatData(WebSocketSession session) {
-        Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
-        updatePlayerCombatData(session, equippedItemsMap);
-    }
-
     private void updatePlayerCombatData(
             WebSocketSession session, Map<String, EquippedItems> equippedItemsMap) {
-        CombatData combatData = getSharedActorCombatData(getActorId(session));
-        Map<String, Double> derivedStats = combatData.getDerivedStats();
+
+        Stats stats =
+                statsRepository
+                        .fetchActorStats(getActorId(session))
+                        .doOnError(
+                                err ->
+                                        log.error(
+                                                "Error fetching actor stats: {}", err.getMessage()))
+                        .blockingGet();
 
         EquippedItems mainHand = equippedItemsMap.get(ItemType.WEAPON.getType());
         EquippedItems offHand = equippedItemsMap.get(ItemType.SHIELD.getType());
 
-        derivedStats.put(StatsTypes.MAIN_HAND_ATTACK_SPEED.getType(), getBaseSpeed(mainHand));
+        boolean changed =
+                stats.setDerived(StatsTypes.MAIN_HAND_ATTACK_SPEED, getBaseSpeed(mainHand));
 
         if (offHand != null) {
-            derivedStats.put(
-                    StatsTypes.OFF_HAND_ATTACK_SPEED.getType(), offHand.getBaseAttackSpeed());
+            changed =
+                    stats.setDerived(StatsTypes.OFF_HAND_ATTACK_SPEED, offHand.getBaseAttackSpeed())
+                            || changed;
         }
 
-        setSharedActorCombatData(getActorId(session), combatData);
+        if (changed) {
+            statsRepository.updateStats(stats.getActorId(), stats).blockingSubscribe();
+        }
     }
 
     private static Double getBaseSpeed(EquippedItems item) {

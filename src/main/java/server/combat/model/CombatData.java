@@ -10,7 +10,6 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import server.attribute.status.model.ActorStatus;
 import server.common.uuid.UUIDHelper;
 
 @Data
@@ -21,13 +20,6 @@ import server.common.uuid.UUIDHelper;
 public class CombatData {
 
     private String actorId;
-
-    Map<String, Double> derivedStats;
-
-    ActorStatus actorStatus;
-
-    Set<String> aggregatedStatusEffects;
-    Map<String, Double> aggregatedStatusDerived;
 
     private Instant mainHandLastAttack;
     private Instant offhandLastAttack;
@@ -52,9 +44,6 @@ public class CombatData {
         this.targets = new HashSet<>();
         this.lastHelperNotification = Instant.now().minusSeconds(20);
         this.attackSent = new HashMap<>();
-        this.derivedStats = new HashMap<>();
-        this.aggregatedStatusDerived = new HashMap<>();
-        this.aggregatedStatusEffects = new HashSet<>();
         this.isPlayer = !UUIDHelper.isValid(actorId);
         this.combatState = CombatState.IDLE.getType();
         this.activatedSkills = new HashMap<>();

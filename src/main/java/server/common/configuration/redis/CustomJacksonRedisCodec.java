@@ -9,7 +9,7 @@ import server.session.model.CacheData;
 
 public class CustomJacksonRedisCodec implements RedisCodec<String, CacheData> {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public CustomJacksonRedisCodec(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;

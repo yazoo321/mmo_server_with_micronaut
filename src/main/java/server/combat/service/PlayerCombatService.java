@@ -19,6 +19,7 @@ import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
+import server.combat.model.CombatState;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.session.SessionParamHelper;
@@ -55,7 +56,8 @@ public class PlayerCombatService extends CombatService {
         String actorId = SessionParamHelper.getActorId(session);
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
         Map<String, EquippedItems> items = sessionParamHelper.getEquippedItems(session);
-        Map<String, Double> derivedStats = combatData.getDerivedStats();
+        Stats actorStats = statsService.getStatsFor(actorId).blockingGet();
+        Map<String, Double> derivedStats = actorStats.getDerivedStats();
 
         // Get the equipped weapon
         EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");
@@ -68,14 +70,18 @@ public class PlayerCombatService extends CombatService {
                         ? 200
                         : (int) (double) weapon.getAttackDistance();
 
-        Motion attackerMotion = SessionParamHelper.getMotion(session);
-        boolean valid =
-                validatePositionLocation(
-                        combatData,
-                        attackerMotion,
-                        target.getActorId(),
-                        distanceThreshold,
-                        session);
+        Motion attackerMotion = actorMotionRepository.fetchActorMotion(actorId).blockingGet();
+
+        boolean valid = actorCombatStateValid(combatData.getCombatState());
+
+        valid =
+                valid
+                        && validatePositionLocation(
+                                combatData,
+                                attackerMotion,
+                                target.getActorId(),
+                                distanceThreshold,
+                                session);
 
         if (!valid) {
             return;
@@ -177,6 +183,13 @@ public class PlayerCombatService extends CombatService {
         combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", true);
 
         requestSessionsToSwingWeapon(itemInstanceId, SessionParamHelper.getActorId(session));
+    }
+
+    List<String> validAttackStates =
+            List.of(CombatState.IDLE.getType(), CombatState.ATTACKING.getType());
+
+    private boolean actorCombatStateValid(String state) {
+        return validAttackStates.contains(state);
     }
 
     private Map<DamageTypes, Double> calculateDamageMap(

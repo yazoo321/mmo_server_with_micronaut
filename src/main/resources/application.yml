@@ -91,6 +91,21 @@ redis:
 #  ssl: true
   timeout: 2s
 #  valueSerializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
-#  caches:
-#    default:
-#      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+  caches:
+    default:
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+    actor-stats-cache:
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+      maximumSize: 1000
+    actor-aggregated-statuses:
+      maximumSize: 1000
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+    actor-aggregated-derived:
+      maximumSize: 1000
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+    actor-motion-cache:
+      maximumSize: 1000
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+    actor-status-cache:
+      maximumSize: 1000
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer

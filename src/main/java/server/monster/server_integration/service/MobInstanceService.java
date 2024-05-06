@@ -7,10 +7,14 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.attribute.stats.service.StatsService;
+import server.attribute.status.model.derived.Dead;
+import server.attribute.status.service.StatusService;
 import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.monster.server_integration.model.Monster;
@@ -25,6 +29,10 @@ public class MobInstanceService {
 
     @Inject StatsService statsService;
 
+    @Inject StatusService statusService;
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
     public Single<List<Monster>> getMobsNearby(Location location) {
         return mobRepository.getMobsNearby(location);
     }
@@ -33,7 +41,7 @@ public class MobInstanceService {
         return mobRepository.getMobsByInstanceIds(actorIds);
     }
 
-    public Single<InsertOneResult> createMob(String mobId, Motion motion) {
+    public Single<Monster> createMob(String mobId, Motion motion) {
         Monster mob = new Monster();
         // TODO: choose whether we need mob ID or not
         mob.setActorId(mobId);
@@ -41,13 +49,14 @@ public class MobInstanceService {
         mob.setMotion(motion);
 
         statsService.initializeMobStats(mobId);
+        statusService.initializeStatus(mobId);
 
         return mobRepository.insertMobInstance(mob);
 
         // also need to create mob attributes
     }
 
-    public Single<InsertOneResult> createMob(Monster mob) {
+    public Single<Monster> createMob(Monster mob) {
         mob.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
         return mobRepository.insertMobInstance(mob);
     }
@@ -68,6 +77,20 @@ public class MobInstanceService {
     public void handleMobDeath(String mobId) {
         // we will set state to death and wait for animations etc
 
+        statusService.addStatusToActor(Set.of(new Dead()), mobId);
+        statusService
+                .deleteActorStatus(mobId)
+                .doOnError(err -> log.error(err.getMessage()))
+                .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                .subscribe();
+
+        statsService
+                .deleteStatsFor(mobId)
+                .doOnError(
+                        err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
+                .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                .subscribe();
+
         Single.fromCallable(
                         () ->
                                 mobRepository
@@ -78,7 +101,7 @@ public class MobInstanceService {
                                                                 "Failed to delete mob instance, {}",
                                                                 err.getMessage()))
                                         .subscribe())
-                .delaySubscription(1000, TimeUnit.MILLISECONDS)
+                .delaySubscription(10_000, TimeUnit.MILLISECONDS)
                 .doOnError(err -> log.error("error on handling mob death, {}", err.getMessage()))
                 .subscribe();
     }

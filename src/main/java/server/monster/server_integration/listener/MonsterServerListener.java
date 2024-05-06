@@ -10,6 +10,7 @@ import server.attribute.stats.service.StatsService;
 import server.monster.server_integration.model.Monster;
 import server.monster.server_integration.producer.MonsterServerProducer;
 import server.monster.server_integration.service.MobInstanceService;
+import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 
 @Slf4j
@@ -28,6 +29,8 @@ public class MonsterServerListener {
 
     @Inject SessionParamHelper sessionParamHelper;
 
+    @Inject ActorMotionRepository actorMotionRepository;
+
     @Topic("create-mob")
     public void receiveCreateMob(Monster monster) {
         mobInstanceService
@@ -40,16 +43,7 @@ public class MonsterServerListener {
     @Topic("mob-motion-update")
     public void receiveUpdateMob(Monster monster) {
         // Add validation
-        // TODO: Move these writes over to cache sync to db service
-        mobInstanceService
-                .updateMobMotion(monster.getActorId(), monster.getMotion())
-                .doOnError(
-                        error ->
-                                log.error(
-                                        "Error processing mob motion update, {}",
-                                        error.getMessage()))
-                .subscribe();
+        actorMotionRepository.updateActorMotion(monster.getActorId(), monster.getMotion());
         monsterServerProducer.sendMobUpdateResult(monster);
-        sessionParamHelper.setSharedActorMotion(monster.getActorId(), monster.getMotion());
     }
 }

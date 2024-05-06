@@ -16,8 +16,8 @@ public class StatsRegenService {
 
     @Inject StatsService statsService;
 
-    @Scheduled(fixedDelay = "200ms", initialDelay = "30s")
-    public void evaluateNearbyPlayers() {
+    @Scheduled(fixedDelay = "300ms", initialDelay = "30s")
+    public void applyRegen() {
         ConcurrentSet<WebSocketSession> sessions = socket.getLiveSessions();
 
         sessions.stream()
