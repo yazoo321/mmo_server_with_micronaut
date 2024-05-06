@@ -68,7 +68,9 @@ public class PlayerCharacterService {
             statsService.initializePlayerStats(newCharacter.getName()).blockingSubscribe();
             statusService.initializeStatus(newCharacter.getName());
             // call relevant services to initialise data
-            inventoryService.createInventoryForNewCharacter(newCharacter.getName()).blockingSubscribe();
+            inventoryService
+                    .createInventoryForNewCharacter(newCharacter.getName())
+                    .blockingSubscribe();
             //            attributeService.createBaseAttributes(newCharacter.getName());
             levelAttributeService
                     .initializeCharacterClass(

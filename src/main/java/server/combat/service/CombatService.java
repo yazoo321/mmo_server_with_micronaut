@@ -17,6 +17,7 @@ import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
 import server.monster.server_integration.service.MobInstanceService;
+import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.socket.service.ClientUpdatesService;
 
@@ -34,6 +35,8 @@ public class CombatService {
 
     @Inject ClientUpdatesService clientUpdatesService;
 
+    @Inject ActorMotionRepository actorMotionRepository;
+
     boolean validatePositionLocation(
             CombatData combatData,
             Motion attackerMotion,
@@ -43,7 +46,9 @@ public class CombatService {
         // TODO: Refactor mob/player motion calls
         // TODO: Make async
 
-        Motion targetMotion = sessionParamHelper.getSharedActorMotion(target);
+        Motion targetMotion = actorMotionRepository.fetchActorMotion(target)
+                .doOnError(err->log.error(err.getMessage()))
+                .blockingGet();
 
         if (targetMotion == null) {
             combatData.getTargets().remove(target);

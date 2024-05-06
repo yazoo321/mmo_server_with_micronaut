@@ -1,6 +1,5 @@
 package server.socket.v1;
 
-import io.micronaut.scheduling.annotation.Scheduled;
 import io.micronaut.websocket.WebSocketSession;
 import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
@@ -15,9 +14,6 @@ import server.motion.service.PlayerMotionService;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketMessage;
 import server.socket.service.SocketProcessOutgoingService;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Slf4j
 @ServerWebSocket("/v1/communication-socket")
@@ -64,15 +60,17 @@ public class CommunicationSocket {
     }
 
     private void updateSessionParams(WebSocketSession session, SocketMessage message) {
+        // This is currently required to get session actor ID - needs to be refactored to use
+        // set session parameters
+        // TODO: will require updates to tests to remove this dependency
         if (message.getPlayerMotion() != null
                 && motionValid(message.getPlayerMotion().getMotion())) {
-            sessionParamHelper.setMotion(
-                    session,
-                    message.getPlayerMotion().getMotion(),
-                    message.getPlayerMotion().getActorId());
+//                        sessionParamHelper.setMotion(
+//                                session,
+//                                message.getPlayerMotion().getMotion(),
+//                                message.getPlayerMotion().getActorId());
         } else if (message.getMonster() != null && motionValid(message.getMonster().getMotion())) {
-            sessionParamHelper.setMotion(
-                    session, message.getMonster().getMotion(), message.getMonster().getActorId());
+            sessionParamHelper.setMotion(session, message.getMonster().getMotion());
         }
     }
 

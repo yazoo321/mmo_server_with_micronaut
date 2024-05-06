@@ -36,13 +36,10 @@ public class ActorStatsRepository {
     }
 
     @Cacheable(value = ACTOR_STATS_CACHE, parameters = "actorId")
-//            value = ACTOR_STATS_CACHE,
-//            parameters = "actorId")
     public Single<Stats> fetchActorStats(String actorId) {
         return Single.fromPublisher(actorStats.find(eq("actorId", actorId)));
     }
 
-//    @CacheInvalidate(value = ACTOR_STATS_CACHE, parameters = {"stats.actorId"})
     @CachePut(value = ACTOR_STATS_CACHE, parameters = "actorId")
     public Single<Stats> updateStats(String actorId, Stats stats) {
         Bson filter = Filters.eq("actorId", stats.getActorId());
@@ -51,10 +48,7 @@ public class ActorStatsRepository {
                 .map(res -> stats);
     }
 
-
-    @CacheInvalidate(
-            value = ACTOR_STATS_CACHE,
-            parameters = "actorId")
+    @CacheInvalidate(value = ACTOR_STATS_CACHE, parameters = "actorId")
     public Single<DeleteResult> deleteStats(String actorId) {
         return Single.fromPublisher(actorStats.deleteOne(eq("actorId", actorId)));
     }

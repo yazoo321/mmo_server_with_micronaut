@@ -60,8 +60,9 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         }
 
         String targetId = skillTarget.getTargetId();
-        Motion targetMotion = sessionParamHelper.getSharedActorMotion(targetId);
-        Motion actorMotion = sessionParamHelper.getSharedActorMotion(combatData.getActorId());
+        Motion targetMotion = actorMotionRepository.fetchActorMotion(targetId).blockingGet();
+        Motion actorMotion =
+                actorMotionRepository.fetchActorMotion(combatData.getActorId()).blockingGet();
 
         int x = targetMotion.getX() - actorMotion.getX();
         int y = targetMotion.getY() - actorMotion.getY();

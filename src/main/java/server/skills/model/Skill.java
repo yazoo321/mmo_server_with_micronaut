@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.websocket.WebSocketSession;
-import jakarta.inject.Inject;
 import java.util.Map;
 import java.util.Random;
 import lombok.NoArgsConstructor;
@@ -14,6 +13,7 @@ import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.combat.service.CombatService;
+import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.restoration.heals.BasicHeal;
@@ -48,12 +48,12 @@ public abstract class Skill {
 
     @JsonProperty private Integer travelSpeed;
 
-
     protected WebSocketSession session;
 
     // populated via factory methods
     protected SocketResponseSubscriber socketResponseSubscriber;
     protected SessionParamHelper sessionParamHelper;
+    protected ActorMotionRepository actorMotionRepository;
     protected StatsService statsService;
     protected CombatService combatService;
 
@@ -65,11 +65,17 @@ public abstract class Skill {
         this.sessionParamHelper = sessionParamHelper;
     }
 
+    public void setActorMotionRepository(ActorMotionRepository actorMotionRepository) {
+        this.actorMotionRepository = actorMotionRepository;
+    }
+
     public void setStatsService(StatsService statsService) {
         this.statsService = statsService;
     }
 
-    public void setCombatService(CombatService combatService) {this.combatService = combatService; }
+    public void setCombatService(CombatService combatService) {
+        this.combatService = combatService;
+    }
 
     public void setSession(WebSocketSession session) {
         this.session = session;
@@ -120,6 +126,7 @@ public abstract class Skill {
         this.cooldown = cooldown;
         this.travelSpeed = travelSpeed;
     }
+
     protected Random rand = new Random();
 
     public abstract void startSkill(

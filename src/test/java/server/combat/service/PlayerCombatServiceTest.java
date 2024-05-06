@@ -30,12 +30,15 @@ import server.items.helper.ItemTestHelper;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
 import server.items.types.ItemType;
+import server.monster.server_integration.model.Monster;
 import server.monster.server_integration.service.MobInstanceService;
 import server.motion.dto.PlayerMotion;
+import server.motion.repository.ActorMotionRepository;
 import server.motion.service.PlayerMotionService;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.session.FakeSession;
+import server.util.PlayerMotionUtil;
 
 @MicronautTest
 class PlayerCombatServiceTest {
@@ -50,6 +53,9 @@ class PlayerCombatServiceTest {
 
     @Inject PlayerMotionService playerMotionService;
 
+    @Inject
+    ActorMotionRepository actorMotionRepository;
+
     @Inject MobInstanceService mobInstanceService;
 
     @Inject EquipItemService equipItemService;
@@ -59,6 +65,9 @@ class PlayerCombatServiceTest {
     @Inject private PlayerCombatService playerCombatService;
 
     @Inject private SocketResponseSubscriber socketResponseSubscriber;
+
+    @Inject
+    PlayerMotionUtil playerMotionUtil;
 
     @MockBean(SocketResponseSubscriber.class)
     public SocketResponseSubscriber socketResponseSubscriber() {
@@ -80,6 +89,7 @@ class PlayerCombatServiceTest {
 
     private void cleanup() {
         itemTestHelper.deleteAllItemData();
+        playerMotionUtil.deleteMotionForPlayers(List.of(CHARACTER_1));
     }
 
     private final String CHARACTER_1 = "character1";
@@ -89,26 +99,29 @@ class PlayerCombatServiceTest {
     void testRequestAttackWithValidRequest() {
         // Given
         // prepare character
-        Stats stats = statsService.initializePlayerStats(CHARACTER_1)
-                .doOnError(err -> err.printStackTrace()).blockingGet();
+        Stats stats =
+                statsService
+                        .initializePlayerStats(CHARACTER_1)
+                        .doOnError(err -> System.out.println(err.getMessage()))
+                        .blockingGet();
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(CHARACTER_1);
         sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
-        PlayerMotion playerMotion =
+        Motion playerMotion =
                 playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         SessionParamHelper.setActorId(session, CHARACTER_1);
-        sessionParamHelper.setMotion(session, playerMotion.getMotion(), CHARACTER_1);
+//        sessionParamHelper.setMotion(session, playerMotion.getMotion());
 
         // create weapon and equip it
         equipWeapon(CHARACTER_1, session);
 
         // prepare mob
         Motion mobMotion = new Motion();
-        mobMotion.setX(playerMotion.getMotion().getX() + 10);
-        mobMotion.setY(playerMotion.getMotion().getY());
-        mobMotion.setZ(playerMotion.getMotion().getZ());
+        mobMotion.setMap(playerMotion.getMap());
+        mobMotion.setX(playerMotion.getX() + 10);
+        mobMotion.setY(playerMotion.getY());
+        mobMotion.setZ(playerMotion.getZ());
 
-        mobInstanceService.createMob(MOB_1, mobMotion).blockingGet();
-        sessionParamHelper.setSharedActorMotion(MOB_1, mobMotion);
+        Monster mob = mobInstanceService.createMob(MOB_1, mobMotion).blockingGet();
 
         // prepare combat request
         CombatRequest validCombatRequest = new CombatRequest();
@@ -130,8 +143,9 @@ class PlayerCombatServiceTest {
                         () -> {
                             try {
                                 return statusService.getActorStatus(MOB_1).isDead();
-//                                statsService.getStatsFor(MOB_1).blockingGet();
-//                                return false;
+                                //
+                                // statsService.getStatsFor(MOB_1).blockingGet();
+                                //                                return false;
                             } catch (NoSuchElementException e) {
                                 // when publisher is empty, the mob was killed and deleted. later
                                 // needs to be refactored to mob death state.

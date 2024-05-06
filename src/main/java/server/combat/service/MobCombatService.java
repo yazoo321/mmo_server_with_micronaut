@@ -49,7 +49,7 @@ public class MobCombatService extends CombatService {
         Stats actorStats = statsService.getStatsFor(actorId).blockingGet();
         Map<String, Double> derivedStats = actorStats.getDerivedStats();
         int distanceThreshold = 200;
-        Motion attackerMotion = sessionParamHelper.getSharedActorMotion(actorId);
+        Motion attackerMotion = actorMotionRepository.fetchActorMotion(actorId).blockingGet();
 
         boolean valid =
                 validatePositionLocation(

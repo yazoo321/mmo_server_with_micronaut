@@ -41,7 +41,7 @@ public class MobInstanceService {
         return mobRepository.getMobsByInstanceIds(actorIds);
     }
 
-    public Single<InsertOneResult> createMob(String mobId, Motion motion) {
+    public Single<Monster> createMob(String mobId, Motion motion) {
         Monster mob = new Monster();
         // TODO: choose whether we need mob ID or not
         mob.setActorId(mobId);
@@ -56,7 +56,7 @@ public class MobInstanceService {
         // also need to create mob attributes
     }
 
-    public Single<InsertOneResult> createMob(Monster mob) {
+    public Single<Monster> createMob(Monster mob) {
         mob.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
         return mobRepository.insertMobInstance(mob);
     }
@@ -78,10 +78,11 @@ public class MobInstanceService {
         // we will set state to death and wait for animations etc
 
         statusService.addStatusToActor(Set.of(new Dead()), mobId);
-        statusService.deleteActorStatus(mobId)
-                        .doOnError(err -> log.error(err.getMessage()))
-                                .delaySubscription(10_000, TimeUnit.MILLISECONDS)
-                                        .subscribe();
+        statusService
+                .deleteActorStatus(mobId)
+                .doOnError(err -> log.error(err.getMessage()))
+                .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                .subscribe();
 
         statsService
                 .deleteStatsFor(mobId)

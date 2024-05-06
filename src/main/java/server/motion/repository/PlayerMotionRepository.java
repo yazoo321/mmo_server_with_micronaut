@@ -10,18 +10,12 @@ import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.micronaut.cache.annotation.CacheConfig;
-import io.micronaut.cache.annotation.CacheInvalidate;
-import io.micronaut.cache.annotation.Cacheable;
-import io.micronaut.scheduling.annotation.Scheduled;
-import io.micronaut.websocket.WebSocketSession;
-import io.netty.util.internal.ConcurrentSet;
+import io.micronaut.cache.annotation.CachePut;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -30,19 +24,16 @@ import server.common.dto.Motion;
 import server.common.mongo.query.MongoDbQueryHelper;
 import server.motion.dto.PlayerMotion;
 import server.motion.dto.exceptions.PlayerMotionException;
-import server.session.SessionParamHelper;
-import server.socket.v1.CommunicationSocket;
 
 @Slf4j
 @Singleton
 @CacheConfig("actor-motion-cache")
 public class PlayerMotionRepository {
 
+    private static final String ACTOR_MOTION_CACHE = "actor-motion-cache";
     private final MongoConfiguration configuration;
     private final MongoClient mongoClient;
     private MongoCollection<PlayerMotion> playerMotionMongoCollection;
-
-    private final String ACTOR_MOTION_CACHE = "actor-motion-cache";
 
     public PlayerMotionRepository(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
@@ -53,17 +44,10 @@ public class PlayerMotionRepository {
     public Single<PlayerMotion> fetchPlayerMotion(String actorId) {
         return Single.fromPublisher(playerMotionMongoCollection.find(eq("actorId", actorId)))
                 .doOnError(
-                        (exception) -> {
+                        (err) -> {
                             log.error("Player motion not found for {}", actorId);
                             throw new PlayerMotionException("Failed to find player motion");
                         });
-    }
-
-    @Cacheable(
-            value = ACTOR_MOTION_CACHE,
-            parameters = {"actorId"})
-    public Single<Motion> fetchMotion(String actorId) {
-        return fetchPlayerMotion(actorId).map(PlayerMotion::getMotion);
     }
 
     public Single<List<PlayerMotion>> fetchPlayersMotion(Set<String> actorId) {
@@ -71,9 +55,10 @@ public class PlayerMotionRepository {
                 .toList();
     }
 
-    public Single<PlayerMotion> insertPlayerMotion(PlayerMotion playerMotion) {
+    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId")
+    public Single<Motion> insertPlayerMotion(String actorId, PlayerMotion playerMotion) {
         return Single.fromPublisher(playerMotionMongoCollection.insertOne(playerMotion))
-                .map(success -> playerMotion);
+                .map(success -> playerMotion.getMotion());
     }
 
     public Single<PlayerMotion> setPlayerOnlineStatus(String actorId, boolean isOnline) {
@@ -82,9 +67,6 @@ public class PlayerMotionRepository {
                         eq("actorId", actorId), set("isOnline", isOnline)));
     }
 
-    @CacheInvalidate(
-            value = ACTOR_MOTION_CACHE,
-            parameters = {"playerMotion.actorId"})
     public Single<PlayerMotion> updateMotion(PlayerMotion playerMotion) {
         return Single.fromPublisher(
                         playerMotionMongoCollection.findOneAndUpdate(

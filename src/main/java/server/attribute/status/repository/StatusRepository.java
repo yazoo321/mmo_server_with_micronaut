@@ -60,7 +60,7 @@ public class StatusRepository {
     @CacheInvalidate(
             value = ACTOR_AGGREGATED_DERIVED,
             parameters = {"actorId"})
-//    TODO: merge parameter for actorStatus for cache
+    //    TODO: merge parameter for actorStatus for cache
     public Single<ActorStatus> updateStatus(String actorId, ActorStatus actorStatus) {
         Bson filter = Filters.eq("actorId", actorStatus.getActorId());
         ReplaceOptions options = new ReplaceOptions().upsert(true);

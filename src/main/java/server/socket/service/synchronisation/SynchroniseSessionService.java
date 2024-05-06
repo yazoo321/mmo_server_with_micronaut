@@ -5,13 +5,13 @@ import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-import server.common.dto.Motion;
-import server.session.SessionParamHelper;
-import server.socket.v1.CommunicationSocket;
-
 import java.util.HashSet;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
+import server.common.dto.Motion;
+import server.motion.repository.ActorMotionRepository;
+import server.session.SessionParamHelper;
+import server.socket.v1.CommunicationSocket;
 
 @Slf4j
 @Singleton
@@ -27,6 +27,7 @@ public class SynchroniseSessionService {
 
     @Inject SynchroniseDroppedItemsService synchroniseDroppedItemsService;
 
+    @Inject ActorMotionRepository actorMotionRepository;
 
     @Scheduled(fixedDelay = "10s", initialDelay = "10s")
     public void syncMotionCacheToDB() {
@@ -49,9 +50,19 @@ public class SynchroniseSessionService {
         sessions.parallelStream()
                 .forEach(
                         session -> {
-                            Motion motion = SessionParamHelper.getMotion(session);
+
+                            Motion motion = SessionParamHelper.getIsServer(session) ?
+                                    SessionParamHelper.getMotion(session) :
+                                    actorMotionRepository
+                                            .fetchActorMotion(
+                                                    SessionParamHelper.getActorId(session))
+                                            .doOnError(err -> log.error(err.getMessage()))
+                                            .blockingGet();
+
                             if (motion == null) {
-                                // possibly the motion is not fully initiated
+                                log.error(
+                                        "Motion unexpectedly null for session with Actor ID: {}",
+                                        SessionParamHelper.getActorId(session));
                                 return;
                             }
 

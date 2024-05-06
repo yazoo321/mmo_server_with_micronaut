@@ -5,15 +5,12 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.repository.StatusRepository;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
-
-import static com.mongodb.client.model.Filters.eq;
 
 @Singleton
 @Slf4j
@@ -45,11 +42,18 @@ public class StatusService {
     }
 
     public void addStatusToActor(Set<Status> statuses, String actorId) {
-        ActorStatus currentStatuses = statusRepository.getActorStatuses(actorId)
-                .doOnError(err-> {log.error(err.getMessage());}).blockingGet();
+        ActorStatus currentStatuses =
+                statusRepository
+                        .getActorStatuses(actorId)
+                        .doOnError(
+                                err -> {
+                                    log.error(err.getMessage());
+                                })
+                        .blockingGet();
         currentStatuses.getActorStatuses().addAll(statuses);
 
-        statusRepository.updateStatus(currentStatuses.getActorId(), currentStatuses)
+        statusRepository
+                .updateStatus(currentStatuses.getActorId(), currentStatuses)
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
 
@@ -62,7 +66,8 @@ public class StatusService {
     }
 
     public void initializeStatus(String actorId) {
-        statusRepository.updateStatus(actorId, new ActorStatus(actorId, Set.of(), false))
+        statusRepository
+                .updateStatus(actorId, new ActorStatus(actorId, Set.of(), false))
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
     }

@@ -12,7 +12,6 @@ import server.motion.dto.PlayerMotion;
 import server.motion.model.PlayerMotionList;
 import server.motion.producer.PlayerMotionUpdateProducer;
 import server.motion.repository.PlayerMotionRepository;
-import server.session.SessionParamHelper;
 
 @Slf4j
 @Singleton
@@ -22,7 +21,7 @@ public class PlayerMotionService {
 
     @Inject PlayerMotionUpdateProducer playerMotionUpdateProducer;
 
-    @Inject SessionParamHelper sessionParamHelper;
+    //    @Inject SessionParamHelper sessionParamHelper;
 
     private static final int DEFAULT_DISTANCE_THRESHOLD = 1000;
 
@@ -41,7 +40,7 @@ public class PlayerMotionService {
                     .yaw(0)
                     .build();
 
-    public Single<PlayerMotion> initializePlayerMotion(String actorId) {
+    public Single<Motion> initializePlayerMotion(String actorId) {
         // can create custom start points for different classes/maps etc
         PlayerMotion playerMotion = new PlayerMotion();
         playerMotion.setMotion(STARTING_MOTION);
@@ -49,22 +48,11 @@ public class PlayerMotionService {
         playerMotion.setIsOnline(false);
         playerMotion.setUpdatedAt(Instant.now());
 
-        sessionParamHelper.setSharedActorMotion(actorId, playerMotion.getMotion());
-
-        return playerMotionRepository.insertPlayerMotion(playerMotion);
+        return playerMotionRepository.insertPlayerMotion(actorId, playerMotion);
     }
 
     public void deletePlayerMotion(String actorId) {
         playerMotionRepository.deletePlayerMotion(actorId).subscribe();
-    }
-
-    public PlayerMotion buildPlayerMotion(String actorId, String map, Motion motion) {
-        motion.setMap(map);
-        return new PlayerMotion(actorId, motion, true, Instant.now());
-    }
-
-    public Single<PlayerMotion> updatePlayerMotion(PlayerMotion playerMotion) {
-        return playerMotionRepository.updateMotion(playerMotion);
     }
 
     // used in v1
@@ -77,6 +65,7 @@ public class PlayerMotionService {
         playerMotionRepository.setPlayerOnlineStatus(actorId, false).subscribe();
     }
 
+    @Deprecated
     public Single<PlayerMotionList> getPlayersNearMe(Motion motion, String actorId) {
         PlayerMotion playerMotion = new PlayerMotion(actorId, motion, true, Instant.now());
         return playerMotionRepository
