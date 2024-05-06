@@ -18,8 +18,6 @@ public class StatusService {
 
     @Inject StatusRepository statusRepository;
 
-    @Inject SessionParamHelper sessionParamHelper;
-
     @Inject UpdateProducer updateProducer;
 
     public ActorStatus getActorStatus(String actorId) {
@@ -35,7 +33,6 @@ public class StatusService {
         actorStatus.getActorStatuses().removeAll(removed);
         statusRepository.updateStatus(actorStatus.getActorId(), actorStatus);
 
-        //        updateActorStatusCache(actorStatus);
         ActorStatus update = new ActorStatus(actorStatus.getActorId(), removed, false);
         // notify the user about removed statuses
         updateProducer.updateStatus(update);
@@ -72,13 +69,4 @@ public class StatusService {
                 .subscribe();
     }
 
-    //    private void updateActorStatusCache(ActorStatus actorStatus) {
-    //        CombatData combatData =
-    //                sessionParamHelper.getSharedActorCombatData(actorStatus.getActorId());
-    //        combatData.setActorStatus(actorStatus);
-    //        combatData.setAggregatedStatusDerived(actorStatus.aggregateDerived());
-    //        combatData.setAggregatedStatusEffects(actorStatus.aggregateStatusEffects());
-    //
-    //        sessionParamHelper.setSharedActorCombatData(actorStatus.getActorId(), combatData);
-    //    }
 }

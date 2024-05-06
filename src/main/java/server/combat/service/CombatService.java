@@ -89,8 +89,6 @@ public class CombatService {
         }
         return actors.stream()
                 .map(actor -> statsService.getStatsFor(actor).blockingGet())
-                //                .filter(s ->
-                // s.getDerivedStats().get(StatsTypes.CURRENT_HP.getType()) > 0)
                 .collect(Collectors.toList());
     }
 

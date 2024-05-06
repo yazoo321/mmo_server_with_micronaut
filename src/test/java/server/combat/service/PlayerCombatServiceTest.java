@@ -109,7 +109,6 @@ class PlayerCombatServiceTest {
         Motion playerMotion =
                 playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         SessionParamHelper.setActorId(session, CHARACTER_1);
-//        sessionParamHelper.setMotion(session, playerMotion.getMotion());
 
         // create weapon and equip it
         equipWeapon(CHARACTER_1, session);
@@ -143,9 +142,6 @@ class PlayerCombatServiceTest {
                         () -> {
                             try {
                                 return statusService.getActorStatus(MOB_1).isDead();
-                                //
-                                // statsService.getStatsFor(MOB_1).blockingGet();
-                                //                                return false;
                             } catch (NoSuchElementException e) {
                                 // when publisher is empty, the mob was killed and deleted. later
                                 // needs to be refactored to mob death state.

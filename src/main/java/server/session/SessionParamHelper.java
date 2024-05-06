@@ -65,10 +65,7 @@ public class SessionParamHelper {
         return (Motion) session.asMap().getOrDefault(SessionParams.MOTION.getType(), null);
     }
 
-
-
     public void setMotion(WebSocketSession session, Motion motion) {
-//        session.put(SessionParams.ACTOR_ID.getType(), actorId);
         session.put(SessionParams.MOTION.getType(), motion);
     }
 
@@ -204,11 +201,6 @@ public class SessionParamHelper {
 
         return data;
     }
-
-    //    private void updatePlayerCombatData(WebSocketSession session) {
-    //        Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
-    //        updatePlayerCombatData(session, equippedItemsMap);
-    //    }
 
     private void updatePlayerCombatData(
             WebSocketSession session, Map<String, EquippedItems> equippedItemsMap) {

@@ -29,8 +29,6 @@ public class SynchroniseDroppedItemsService {
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
     public void handleSynchroniseDroppedItems(Motion motion, WebSocketSession session) {
-        String actorId =
-                (String) session.asMap().getOrDefault(SessionParams.ACTOR_ID.getType(), "");
         if (SessionParamHelper.getIsServer(session)) {
             // don't synchronise dropped items on server instances
             return;

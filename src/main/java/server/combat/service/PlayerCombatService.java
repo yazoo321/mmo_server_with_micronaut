@@ -71,7 +71,6 @@ public class PlayerCombatService extends CombatService {
                         : (int) (double) weapon.getAttackDistance();
 
         Motion attackerMotion = actorMotionRepository.fetchActorMotion(actorId).blockingGet();
-//        Motion attackerMotion = SessionParamHelper.getMotion(session);
 
         boolean valid = actorCombatStateValid(combatData.getCombatState());
 

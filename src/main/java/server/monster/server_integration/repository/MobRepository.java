@@ -43,10 +43,6 @@ public class MobRepository {
         return Single.fromPublisher(mobMotionMongoCollection.find(eq("actorId", actorId)));
     }
 
-//    public Single<Monster> findMobById(String mobId) {
-//        return Single.fromPublisher(mobMotionMongoCollection.find(eq("mobId", mobId)));
-//    }
-
     public Single<Monster> insertMobInstance(Monster mobInstance) {
         return Single.fromPublisher(mobMotionMongoCollection.insertOne(mobInstance))
                 .map(mob -> mobInstance);

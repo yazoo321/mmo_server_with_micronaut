@@ -51,7 +51,6 @@ public class CombatSkillsService {
         validateActorId(session, combatRequest);
         CombatData combatData =
                 sessionParamHelper.getSharedActorCombatData(combatRequest.getActorId());
-        //        checkCombatDataStatsAvailable(combatData);
         Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
         String skillName = combatRequest.getSkillId();
         Skill skill = skillFactory.createSkill(skillName.toLowerCase());
@@ -95,14 +94,6 @@ public class CombatSkillsService {
         //                .subscribe();
     }
 
-    //    private void checkCombatDataStatsAvailable(CombatData combatData) {
-    //        // we will try fetch stats if they're not present before they're needed, error-prone
-    //        Stats stats = statsService.getStatsFor(combatData.getActorId());
-    //        if (combatData.getDerivedStats().size() < 5) {
-    //            Stats stats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
-    //            Stats.mergeLeft(combatData.getDerivedStats(), stats.getDerivedStats());
-    //        }
-    //    }
 
     private void validateActorId(WebSocketSession session, CombatRequest combatRequest) {
         if (SessionParamHelper.getIsPlayer(session)) {

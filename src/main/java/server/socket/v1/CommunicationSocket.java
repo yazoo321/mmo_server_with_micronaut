@@ -65,10 +65,9 @@ public class CommunicationSocket {
         // TODO: will require updates to tests to remove this dependency
         if (message.getPlayerMotion() != null
                 && motionValid(message.getPlayerMotion().getMotion())) {
-//                        sessionParamHelper.setMotion(
-//                                session,
-//                                message.getPlayerMotion().getMotion(),
-//                                message.getPlayerMotion().getActorId());
+                        sessionParamHelper.setMotion(
+                                session,
+                                message.getPlayerMotion().getMotion());
         } else if (message.getMonster() != null && motionValid(message.getMonster().getMotion())) {
             sessionParamHelper.setMotion(session, message.getMonster().getMotion());
         }
