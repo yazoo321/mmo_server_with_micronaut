@@ -64,12 +64,12 @@ public class CommunicationSocketTestBase {
     protected final int TIMEOUT = 10;
 
     @BeforeEach
-    void setup() {
+    public void setup() {
         cleanup();
     }
 
     @AfterAll
-    void tearDown() {
+    public void tearDown() {
         cleanup();
     }
 

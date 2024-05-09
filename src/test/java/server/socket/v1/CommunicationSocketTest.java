@@ -16,12 +16,13 @@ import server.socket.model.SocketMessage;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.model.types.MessageType;
+import server.socket.v1.base.CommunicationSocketTestBase;
 import server.util.websocket.TestWebSocketClient;
 
 @MicronautTest(environments = "kafka")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
-public class CommunicationSocketTest extends CommunicationSocketItemsTest {
+public class CommunicationSocketTest extends CommunicationSocketTestBase {
 
     @Test
     void testBasicMotionUpdateBetween2Players() throws Exception {
