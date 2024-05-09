@@ -35,10 +35,11 @@ public class InventoryRepository {
         return Single.fromPublisher(inventoryCollection.find(eq("actorId", actorId)));
     }
 
-    public Single<UpdateResult> updateInventoryItems(String actorId, List<CharacterItem> items) {
+    public Single<List<CharacterItem>> updateInventoryItems(String actorId, List<CharacterItem> items) {
         return Single.fromPublisher(
                 inventoryCollection.updateOne(
-                        eq("actorId", actorId), set("characterItems", items)));
+                        eq("actorId", actorId), set("characterItems", items)))
+                .map(res -> items);
     }
 
     public Single<UpdateResult> updateInventoryMaxSize(Inventory inventory) {

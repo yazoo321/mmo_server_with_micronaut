@@ -3,6 +3,8 @@ package server.items.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +21,7 @@ public class DroppedItem {
             String itemInstanceId,
             Location location,
             ItemInstance itemInstance,
-            LocalDateTime droppedAt) {
+            Instant droppedAt) {
         this.itemInstanceId = itemInstanceId;
         this.location = location;
         this.itemInstance = itemInstance;
@@ -32,5 +34,5 @@ public class DroppedItem {
     ItemInstance itemInstance;
 
     // This is to have timeout for items that are dropped/spawned
-    LocalDateTime droppedAt;
+    Instant droppedAt;
 }

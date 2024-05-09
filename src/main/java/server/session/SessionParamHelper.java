@@ -204,7 +204,6 @@ public class SessionParamHelper {
 
     private void updatePlayerCombatData(
             WebSocketSession session, Map<String, EquippedItems> equippedItemsMap) {
-
         Stats stats =
                 statsRepository
                         .fetchActorStats(getActorId(session))

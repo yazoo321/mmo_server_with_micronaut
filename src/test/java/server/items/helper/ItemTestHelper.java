@@ -117,9 +117,9 @@ public class ItemTestHelper {
                         inventory.getMaxSize(), inventory.getCharacterItems()));
         items.add(characterItem);
 
-        UpdateResult res = inventoryRepository.updateInventoryItems(actorId, items).blockingGet();
+        inventoryRepository.updateInventoryItems(actorId, items).blockingSubscribe();
 
-        return res.wasAcknowledged() ? characterItem : null;
+        return characterItem;
     }
 
     public Inventory insertInventory(Inventory inventory) {
