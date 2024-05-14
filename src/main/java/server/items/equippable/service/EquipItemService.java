@@ -1,6 +1,7 @@
 package server.items.equippable.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static server.attribute.stats.types.StatsTypes.*;
+
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -21,8 +22,6 @@ import server.items.inventory.model.exceptions.InventoryException;
 import server.items.inventory.service.InventoryService;
 import server.items.model.ItemInstance;
 import server.items.types.ItemType;
-
-import static server.attribute.stats.types.StatsTypes.*;
 
 @Slf4j
 @Singleton
@@ -46,7 +45,8 @@ public class EquipItemService {
                                     getCharacterItemByInstance(items, itemInstanceId);
                             ItemInstance instance = characterItem.getItemInstance();
 
-                            String slotType = characterItem.getItemInstance().getItem().getCategory();
+                            String slotType =
+                                    characterItem.getItemInstance().getItem().getCategory();
 
                             // TODO: Make this async
                             EquippedItems equippedItem =
@@ -56,8 +56,7 @@ public class EquipItemService {
                             if (equippedItem != null) {
                                 items = getItemsAfterUnequip(equippedItem);
                                 // the items object has been refreshed, need to re-sync object
-                                characterItem =
-                                        getCharacterItemByInstance(items, itemInstanceId);
+                                characterItem = getCharacterItemByInstance(items, itemInstanceId);
                             }
 
                             equippedItem =
@@ -69,33 +68,39 @@ public class EquipItemService {
                             // setting location to 'invalid' value, to not show it in inventory
                             characterItem.setLocation(new Location2D(-1, -1));
                             // TODO: Make this async
-                            inventoryService.updateInventoryItems(actorId, items).blockingSubscribe();
+                            inventoryService
+                                    .updateInventoryItems(actorId, items)
+                                    .blockingSubscribe();
 
                             return equipRepository
                                     .insert(equippedItem, actorId)
-                                    .map(its -> {
-                                        updateCharacterItemStats(actorId);
-                                        return its;
-                                    });
+                                    .map(
+                                            its -> {
+                                                updateCharacterItemStats(actorId);
+                                                return its;
+                                            });
                         });
     }
 
     public Single<String> unEquipItem(String itemInstanceId, String actorId) {
         return inventoryService
                 .unequipItem(itemInstanceId, actorId)
-                .doOnError(e -> {throw new EquipException("Failed to un-equip item");})
-                .map(itemList -> {
-                    equipRepository.deleteEquippedItem(itemInstanceId).blockingSubscribe();
-                    updateCharacterItemStats(actorId);
+                .doOnError(
+                        e -> {
+                            throw new EquipException("Failed to un-equip item");
+                        })
+                .map(
+                        itemList -> {
+                            equipRepository.deleteEquippedItem(itemInstanceId).blockingSubscribe();
+                            updateCharacterItemStats(actorId);
 
-                    return itemInstanceId;
-                });
+                            return itemInstanceId;
+                        });
     }
 
     private List<CharacterItem> getItemsAfterUnequip(EquippedItems item) {
         return unequipItemAndGetInventory(
-                item.getItemInstance().getItemInstanceId(),
-                item.getActorId())
+                        item.getItemInstance().getItemInstanceId(), item.getActorId())
                 .blockingGet()
                 .getCharacterItems();
     }
@@ -154,16 +159,17 @@ public class EquipItemService {
         for (EquippedItems item : items) {
             if (item.getCategory().equals(ItemType.WEAPON.getType())) {
                 Map<String, Double> itemEffects = item.getItemInstance().getItem().getItemEffects();
-                itemEffects.put(MAIN_HAND_ATTACK_SPEED.getType(),
+                itemEffects.put(
+                        MAIN_HAND_ATTACK_SPEED.getType(),
                         itemEffects.get(BASE_ATTACK_SPEED.getType()));
             }
 
             if (item.getCategory().equals(ItemType.SHIELD.getType())) {
                 Map<String, Double> itemEffects = item.getItemInstance().getItem().getItemEffects();
-                itemEffects.put(OFF_HAND_ATTACK_SPEED.getType(),
+                itemEffects.put(
+                        OFF_HAND_ATTACK_SPEED.getType(),
                         itemEffects.get(BASE_ATTACK_SPEED.getType()));
             }
         }
-
     }
 }

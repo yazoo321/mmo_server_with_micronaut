@@ -10,8 +10,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
-import server.items.equippable.model.EquippedItems;
-import server.items.equippable.model.exceptions.EquipException;
 import server.items.equippable.service.EquipItemService;
 import server.items.inventory.model.CharacterItem;
 import server.items.inventory.model.Inventory;
@@ -42,10 +40,14 @@ public class InventoryService {
                                             inventory -> {
                                                 addItemToInventory(inventory, itemInstance);
                                                 // these should be chained.
-                                                itemService.deleteDroppedItem(
-                                                        request.getItemInstanceId()).blockingSubscribe();
+                                                itemService
+                                                        .deleteDroppedItem(
+                                                                request.getItemInstanceId())
+                                                        .blockingSubscribe();
 
-                                                inventoryRepository.updateInventoryItems(request.getActorId(),
+                                                inventoryRepository
+                                                        .updateInventoryItems(
+                                                                request.getActorId(),
                                                                 inventory.getCharacterItems())
                                                         .blockingSubscribe();
 
@@ -56,17 +58,11 @@ public class InventoryService {
 
     private void addItemToInventory(Inventory inventory, ItemInstance itemInstance) {
         // check for example if inventory is full
-        List<CharacterItem> items =
-                inventory.getCharacterItems();
-        Location2D position =
-                getNextAvailableSlot(
-                        inventory.getMaxSize(), items);
+        List<CharacterItem> items = inventory.getCharacterItems();
+        Location2D position = getNextAvailableSlot(inventory.getMaxSize(), items);
 
         CharacterItem newCharacterItem =
-                new CharacterItem(
-                        inventory.getActorId(),
-                        position,
-                        itemInstance);
+                new CharacterItem(inventory.getActorId(), position, itemInstance);
 
         items.add(newCharacterItem);
     }
@@ -78,7 +74,9 @@ public class InventoryService {
                 .flatMap(
                         inventory -> {
                             List<CharacterItem> items = inventory.getCharacterItems();
-                            CharacterItem foundItem = EquipItemService.getCharacterItemByInstance(items, itemInstanceId);
+                            CharacterItem foundItem =
+                                    EquipItemService.getCharacterItemByInstance(
+                                            items, itemInstanceId);
 
                             Location2D loc =
                                     getNextAvailableSlot(
@@ -100,8 +98,9 @@ public class InventoryService {
                         inventory -> {
                             List<CharacterItem> itemsList = inventory.getCharacterItems();
 
-                            CharacterItem item = EquipItemService.getCharacterItemByInstance(
-                                    itemsList, itemInstanceId);
+                            CharacterItem item =
+                                    EquipItemService.getCharacterItemByInstance(
+                                            itemsList, itemInstanceId);
 
                             itemsList.remove(item);
 

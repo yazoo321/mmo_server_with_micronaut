@@ -2,12 +2,9 @@ package server.items.service;
 
 import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.disposables.Disposable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,24 +31,18 @@ public class ItemService {
     private Single<DroppedItem> createDroppedItem(Item foundItem, Location location) {
         String itemInstanceId = UUID.randomUUID().toString();
 
-        ItemInstance instance =
-                new ItemInstance(foundItem.getItemId(), itemInstanceId, foundItem);
+        ItemInstance instance = new ItemInstance(foundItem.getItemId(), itemInstanceId, foundItem);
         return itemRepository
                 .upsertItemInstance(instance)
                 .doOnError(e -> log.error(e.getMessage()))
                 .flatMap(ins -> createDroppedItem(location, ins));
     }
 
-    private Single<DroppedItem> createDroppedItem(Location location,
-                                                  ItemInstance itemInstance) {
+    private Single<DroppedItem> createDroppedItem(Location location, ItemInstance itemInstance) {
         DroppedItem droppedItem =
                 new DroppedItem(
-                        itemInstance.getItemInstanceId(),
-                        location,
-                        itemInstance,
-                        Instant.now());
-        return itemRepository.createDroppedItem(
-                droppedItem);
+                        itemInstance.getItemInstanceId(), location, itemInstance, Instant.now());
+        return itemRepository.createDroppedItem(droppedItem);
     }
 
     public Single<DroppedItem> dropExistingItem(String itemInstanceId, Location location) {

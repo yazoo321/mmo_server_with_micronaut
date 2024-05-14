@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import server.common.configuration.MongoConfiguration;
 import server.items.equippable.model.EquippedItems;
@@ -27,8 +26,8 @@ import server.items.equippable.model.EquippedItems;
 @CacheConfig("actor-equip-cache, actor-equip-cache-map")
 public class EquipRepository {
 
-    private final static String ACTOR_EQUIP_CACHE_MAP = "actor-equip-cache-map";
-    private final static String ACTOR_EQUIP_CACHE = "actor-equip-cache";
+    private static final String ACTOR_EQUIP_CACHE_MAP = "actor-equip-cache-map";
+    private static final String ACTOR_EQUIP_CACHE = "actor-equip-cache";
 
     // This repository is connected to MongoDB
     MongoConfiguration playerCharacterConfiguration;
@@ -45,8 +44,7 @@ public class EquipRepository {
     @CacheInvalidate(
             value = {ACTOR_EQUIP_CACHE_MAP, ACTOR_EQUIP_CACHE},
             parameters = "actorId",
-            async = true
-    )
+            async = true)
     public Single<EquippedItems> insert(EquippedItems equippedItems, String actorId) {
         return Single.fromPublisher(equippedItemsCollection.insertOne(equippedItems))
                 .map(res -> equippedItems);
@@ -54,15 +52,21 @@ public class EquipRepository {
 
     @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorId")
     public Single<List<EquippedItems>> getEquippedItemsForCharacter(String actorId) {
-        return Flowable.fromPublisher(equippedItemsCollection.find(eq("actorId", actorId))).toList();
+        return Flowable.fromPublisher(equippedItemsCollection.find(eq("actorId", actorId)))
+                .toList();
     }
 
     @Cacheable(value = ACTOR_EQUIP_CACHE_MAP, parameters = "actorId")
     public Single<Map<String, EquippedItems>> getActorEquippedItems(String actorId) {
         return getEquippedItemsForCharacter(actorId)
-            .doOnError(e -> log.error(e.getMessage()))
-            .map(items -> items
-                    .stream().collect(Collectors.toMap(EquippedItems::getCategory, Function.identity())));
+                .doOnError(e -> log.error(e.getMessage()))
+                .map(
+                        items ->
+                                items.stream()
+                                        .collect(
+                                                Collectors.toMap(
+                                                        EquippedItems::getCategory,
+                                                        Function.identity())));
     }
 
     @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorIds")
@@ -81,8 +85,7 @@ public class EquipRepository {
     @CacheInvalidate(
             value = {ACTOR_EQUIP_CACHE_MAP, ACTOR_EQUIP_CACHE},
             parameters = "actorId",
-            async = true
-    )
+            async = true)
     public Single<DeleteResult> deleteEquippedItem(String itemInstanceId) {
         // TODO: Consider duplicating item instance ID as nested query is slower
         return Single.fromPublisher(

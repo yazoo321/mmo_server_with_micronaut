@@ -95,7 +95,6 @@ public class CombatSkillsService {
         //                .subscribe();
     }
 
-
     private void validateActorId(WebSocketSession session, CombatRequest combatRequest) {
         // TODO: actually validate request.
         if (SessionParamHelper.getIsPlayer(session)) {

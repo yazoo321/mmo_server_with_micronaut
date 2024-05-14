@@ -6,7 +6,6 @@ import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import server.items.equippable.model.EquippedItems;
 import server.items.equippable.service.EquipItemService;
 import server.items.inventory.model.ItemInstanceIds;
 import server.items.inventory.model.response.GenericInventoryData;

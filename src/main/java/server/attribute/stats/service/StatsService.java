@@ -179,7 +179,7 @@ public class StatsService {
 
     void handleDifference(Map<String, Double> updated, Stats stats) {
         if (!updated.isEmpty()) {
-//          TODO: Make this async, its blocking to help with tests only
+            //          TODO: Make this async, its blocking to help with tests only
             repository
                     .updateStats(stats.getActorId(), stats)
                     .doOnError(err -> log.error("Failed to update stats, {}", err.getMessage()))

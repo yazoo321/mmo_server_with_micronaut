@@ -38,8 +38,7 @@ public class CombatService {
 
     @Inject ActorMotionRepository actorMotionRepository;
 
-    @Inject
-    EquipItemService equipItemService;
+    @Inject EquipItemService equipItemService;
 
     boolean validatePositionLocation(
             CombatData combatData,
@@ -50,9 +49,11 @@ public class CombatService {
         // TODO: Refactor mob/player motion calls
         // TODO: Make async
 
-        Motion targetMotion = actorMotionRepository.fetchActorMotion(target)
-                .doOnError(err->log.error(err.getMessage()))
-                .blockingGet();
+        Motion targetMotion =
+                actorMotionRepository
+                        .fetchActorMotion(target)
+                        .doOnError(err -> log.error(err.getMessage()))
+                        .blockingGet();
 
         if (targetMotion == null) {
             combatData.getTargets().remove(target);

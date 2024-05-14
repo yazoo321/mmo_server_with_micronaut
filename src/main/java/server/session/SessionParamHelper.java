@@ -148,5 +148,4 @@ public class SessionParamHelper {
 
         return droppedItems;
     }
-
 }

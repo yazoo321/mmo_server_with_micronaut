@@ -37,10 +37,11 @@ public class MonsterServerListener {
     public void receiveCreateMob(Monster monster) {
         mobInstanceService
                 .createMob(monster)
-                .doOnSuccess(mob -> {
-                    statsService.initializeMobStats(monster.getActorId());
-                    statusService.initializeStatus(monster.getActorId());
-                })
+                .doOnSuccess(
+                        mob -> {
+                            statsService.initializeMobStats(monster.getActorId());
+                            statusService.initializeStatus(monster.getActorId());
+                        })
                 .doOnError(error -> log.error("Error on creating mob, {}", error.getMessage()))
                 .subscribe();
     }
