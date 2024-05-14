@@ -1,16 +1,15 @@
 
 plugins {
 	id "com.github.johnrengelman.shadow" version "8.1.1"
-	id "io.micronaut.application" version "4.1.2"
+	id "io.micronaut.application" version "4.3.0"
 	id 'com.avast.gradle.docker-compose' version '0.17.5'
 	id "com.diffplug.spotless" version "6.22.0"
 	id("io.micronaut.openapi") version "4.1.2"
 	id 'org.graalvm.buildtools.native' version '0.9.28'
 }
 
-version = "0.7"
+version = "0.8"
 group = "mmo_server"
-
 
 spotless {
 	// optional: limit format enforcement to just the files changed by this feature branch

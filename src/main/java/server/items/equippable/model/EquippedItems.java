@@ -1,5 +1,6 @@
 package server.items.equippable.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
@@ -55,6 +56,7 @@ public abstract class EquippedItems {
     ItemInstance itemInstance;
     String category;
 
+    @JsonIgnore
     public Double getBaseAttackSpeed() {
         if (this.category.equalsIgnoreCase(ItemType.WEAPON.getType())
                 || this.category.equalsIgnoreCase(ItemType.SHIELD.getType())) {
@@ -65,6 +67,7 @@ public abstract class EquippedItems {
         return null;
     }
 
+    @JsonIgnore
     public Double getAttackDistance() {
         if (this.category.equalsIgnoreCase(ItemType.WEAPON.getType())
                 || this.category.equalsIgnoreCase(ItemType.SHIELD.getType())) {

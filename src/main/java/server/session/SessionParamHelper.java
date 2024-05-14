@@ -8,20 +8,15 @@ import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
-import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.common.configuration.redis.JacksonCodecCombatData;
 import server.common.configuration.redis.JacksonCodecMotion;
 import server.common.dto.Motion;
 import server.common.uuid.UUIDHelper;
-import server.items.equippable.model.EquippedItems;
-import server.items.types.ItemType;
 import server.motion.model.SessionParams;
 import server.session.model.CacheDomains;
 import server.session.model.CacheKey;
@@ -152,90 +147,5 @@ public class SessionParamHelper {
         }
 
         return droppedItems;
-    }
-
-    public Map<String, EquippedItems> getEquippedItems(WebSocketSession session) {
-        Map<String, EquippedItems> equippedItemsMap =
-                (Map<String, EquippedItems>)
-                        session.asMap().get(SessionParams.EQUIPPED_ITEMS.getType());
-
-        if (equippedItemsMap == null) {
-            return setEquippedItems(session, new ArrayList<>());
-        }
-
-        return equippedItemsMap;
-    }
-
-    public void addToEquippedItems(WebSocketSession session, EquippedItems equippedItems) {
-        Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
-
-        equippedItemsMap.put(equippedItems.getCategory(), equippedItems);
-
-        updatePlayerCombatData(session, equippedItemsMap);
-    }
-
-    public void removeFromEquippedItems(WebSocketSession session, String itemInstanceId) {
-        Map<String, EquippedItems> equippedItemsMap = getEquippedItems(session);
-
-        for (String key : equippedItemsMap.keySet()) {
-            if (equippedItemsMap
-                    .get(key)
-                    .getItemInstance()
-                    .getItemInstanceId()
-                    .equals(itemInstanceId)) {
-                equippedItemsMap.remove(key);
-            }
-        }
-
-        updatePlayerCombatData(session, equippedItemsMap);
-    }
-
-    public Map<String, EquippedItems> setEquippedItems(
-            WebSocketSession session, List<EquippedItems> equippedItems) {
-        Map<String, EquippedItems> data =
-                equippedItems.stream()
-                        .collect(Collectors.toMap(EquippedItems::getCategory, Function.identity()));
-        session.put(SessionParams.EQUIPPED_ITEMS.getType(), data);
-
-        updatePlayerCombatData(session, data);
-
-        return data;
-    }
-
-    private void updatePlayerCombatData(
-            WebSocketSession session, Map<String, EquippedItems> equippedItemsMap) {
-
-        Stats stats =
-                statsRepository
-                        .fetchActorStats(getActorId(session))
-                        .doOnError(
-                                err ->
-                                        log.error(
-                                                "Error fetching actor stats: {}", err.getMessage()))
-                        .blockingGet();
-
-        EquippedItems mainHand = equippedItemsMap.get(ItemType.WEAPON.getType());
-        EquippedItems offHand = equippedItemsMap.get(ItemType.SHIELD.getType());
-
-        boolean changed =
-                stats.setDerived(StatsTypes.MAIN_HAND_ATTACK_SPEED, getBaseSpeed(mainHand));
-
-        if (offHand != null) {
-            changed =
-                    stats.setDerived(StatsTypes.OFF_HAND_ATTACK_SPEED, offHand.getBaseAttackSpeed())
-                            || changed;
-        }
-
-        if (changed) {
-            statsRepository.updateStats(stats.getActorId(), stats).blockingSubscribe();
-        }
-    }
-
-    private static Double getBaseSpeed(EquippedItems item) {
-        if (item != null) {
-            return item.getBaseAttackSpeed() != null ? item.getBaseAttackSpeed() : 1.0;
-        } else {
-            return 1.0;
-        }
     }
 }

@@ -4,7 +4,6 @@ import static org.awaitility.Awaitility.await;
 
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -18,7 +17,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.reactivestreams.Publisher;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
@@ -32,7 +30,6 @@ import server.items.model.ItemInstance;
 import server.items.types.ItemType;
 import server.monster.server_integration.model.Monster;
 import server.monster.server_integration.service.MobInstanceService;
-import server.motion.dto.PlayerMotion;
 import server.motion.repository.ActorMotionRepository;
 import server.motion.service.PlayerMotionService;
 import server.session.SessionParamHelper;
@@ -53,8 +50,7 @@ class PlayerCombatServiceTest {
 
     @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    ActorMotionRepository actorMotionRepository;
+    @Inject ActorMotionRepository actorMotionRepository;
 
     @Inject MobInstanceService mobInstanceService;
 
@@ -66,8 +62,7 @@ class PlayerCombatServiceTest {
 
     @Inject private SocketResponseSubscriber socketResponseSubscriber;
 
-    @Inject
-    PlayerMotionUtil playerMotionUtil;
+    @Inject PlayerMotionUtil playerMotionUtil;
 
     @MockBean(SocketResponseSubscriber.class)
     public SocketResponseSubscriber socketResponseSubscriber() {
@@ -99,19 +94,17 @@ class PlayerCombatServiceTest {
     void testRequestAttackWithValidRequest() {
         // Given
         // prepare character
-        Stats stats =
-                statsService
-                        .initializePlayerStats(CHARACTER_1)
-                        .doOnError(err -> System.out.println(err.getMessage()))
-                        .blockingGet();
+        statsService
+                .initializePlayerStats(CHARACTER_1)
+                .doOnError(err -> System.out.println(err.getMessage()))
+                .blockingSubscribe();
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(CHARACTER_1);
         sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
-        Motion playerMotion =
-                playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
+        Motion playerMotion = playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         SessionParamHelper.setActorId(session, CHARACTER_1);
 
         // create weapon and equip it
-        equipWeapon(CHARACTER_1, session);
+        equipWeapon(CHARACTER_1);
 
         // prepare mob
         Motion mobMotion = new Motion();
@@ -127,6 +120,7 @@ class PlayerCombatServiceTest {
         validCombatRequest.setTargets(new HashSet<>(List.of(MOB_1)));
 
         // When
+        // Wait until the item stats have synchronised as its async
         playerCombatService.requestAttack(session, validCombatRequest);
 
         // Then
@@ -150,7 +144,7 @@ class PlayerCombatServiceTest {
                         });
     }
 
-    private EquippedItems equipWeapon(String actorId, WebSocketSession session) {
+    private EquippedItems equipWeapon(String actorId) {
         itemTestHelper.prepareInventory(actorId);
 
         Item item = itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
@@ -161,10 +155,6 @@ class PlayerCombatServiceTest {
 
         EquippedItems equippedItem =
                 equipItemService.equipItem(itemInstance.getItemInstanceId(), actorId).blockingGet();
-
-        if (session != null) {
-            sessionParamHelper.addToEquippedItems(session, equippedItem);
-        }
 
         return equippedItem;
     }

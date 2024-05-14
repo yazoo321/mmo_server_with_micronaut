@@ -2,7 +2,7 @@ package server.items.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -50,7 +50,7 @@ public class ItemServiceTest {
                         "itemInstanceId",
                         locationToDrop,
                         new ItemInstance(weapon.getItemId(), "itemInstanceId", weapon),
-                        LocalDateTime.now());
+                        Instant.now());
 
         // When
         DroppedItem actual =

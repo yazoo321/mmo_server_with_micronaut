@@ -4,7 +4,7 @@ import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -22,65 +22,34 @@ public class ItemService {
     @Inject ItemRepository itemRepository;
 
     public Single<DroppedItem> createNewDroppedItem(String itemId, Location location) {
-        LocalDateTime now = LocalDateTime.now();
-
         return itemRepository
                 .findByItemId(itemId)
-                .doOnError(
-                        e ->
-                                log.error(
-                                        "Failed to find item when creating dropped item, {}",
-                                        e.getMessage()))
-                .flatMap(
-                        foundItem -> {
-                            String itemInstanceId = UUID.randomUUID().toString();
+                .doOnError(e -> log.error(e.getMessage()))
+                .flatMap(foundItem -> createDroppedItem(foundItem, location));
+    }
 
-                            ItemInstance instance =
-                                    new ItemInstance(itemId, itemInstanceId, foundItem);
-                            return itemRepository
-                                    .upsertItemInstance(instance)
-                                    .doOnError(
-                                            e ->
-                                                    log.error(
-                                                            "failed to generate item instance for"
-                                                                    + " dropped item, {}",
-                                                            e.getMessage()))
-                                    .flatMap(
-                                            ins -> {
-                                                DroppedItem droppedItem =
-                                                        new DroppedItem(
-                                                                itemInstanceId,
-                                                                location,
-                                                                instance,
-                                                                now);
-                                                return itemRepository.createDroppedItem(
-                                                        droppedItem);
-                                            });
-                        });
+    private Single<DroppedItem> createDroppedItem(Item foundItem, Location location) {
+        String itemInstanceId = UUID.randomUUID().toString();
+
+        ItemInstance instance = new ItemInstance(foundItem.getItemId(), itemInstanceId, foundItem);
+        return itemRepository
+                .upsertItemInstance(instance)
+                .doOnError(e -> log.error(e.getMessage()))
+                .flatMap(ins -> createDroppedItem(location, ins));
+    }
+
+    private Single<DroppedItem> createDroppedItem(Location location, ItemInstance itemInstance) {
+        DroppedItem droppedItem =
+                new DroppedItem(
+                        itemInstance.getItemInstanceId(), location, itemInstance, Instant.now());
+        return itemRepository.createDroppedItem(droppedItem);
     }
 
     public Single<DroppedItem> dropExistingItem(String itemInstanceId, Location location) {
-        LocalDateTime now = LocalDateTime.now();
         return itemRepository
                 .findItemInstanceById(itemInstanceId)
-                .doOnError(
-                        e ->
-                                log.error(
-                                        "Failed to get item instance to drop item, {}",
-                                        e.getMessage()))
-                .flatMap(
-                        itemInstance -> {
-                            DroppedItem droppedItem =
-                                    new DroppedItem(itemInstanceId, location, itemInstance, now);
-                            return itemRepository
-                                    .createDroppedItem(droppedItem)
-                                    .map(item -> item)
-                                    .doOnError(
-                                            e ->
-                                                    log.error(
-                                                            "failed to create dropped item, {}",
-                                                            e.getMessage()));
-                        });
+                .doOnError(e -> log.error(e.getMessage()))
+                .flatMap(itemInstance -> createDroppedItem(location, itemInstance));
     }
 
     public Single<DroppedItem> getDroppedItemByInstanceId(String instanceId) {

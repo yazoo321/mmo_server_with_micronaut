@@ -100,7 +100,6 @@ public class ItemSocketIntegration {
                 .getEquippedItems(request.getActorId())
                 .doOnSuccess(
                         equippedItems -> {
-                            sessionParamHelper.setEquippedItems(session, equippedItems);
                             if (equippedItems.isEmpty()) {
                                 return;
                             }
@@ -124,7 +123,6 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         equippedItems -> {
-                            sessionParamHelper.addToEquippedItems(session, equippedItems);
                             sendInventoryToPlayer(session, request.getActorId());
 
                             GenericInventoryData equipData = new GenericInventoryData();
@@ -150,8 +148,6 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to un-equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         unequippedItemInstanceId -> {
-                            sessionParamHelper.removeFromEquippedItems(
-                                    session, unequippedItemInstanceId);
                             sendInventoryToPlayer(session, request.getActorId());
 
                             GenericInventoryData equipData = new GenericInventoryData();

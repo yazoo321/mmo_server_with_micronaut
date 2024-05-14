@@ -10,7 +10,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
-import server.items.equippable.model.exceptions.EquipException;
+import server.items.equippable.service.EquipItemService;
 import server.items.inventory.model.CharacterItem;
 import server.items.inventory.model.Inventory;
 import server.items.inventory.model.exceptions.InventoryException;
@@ -30,102 +30,62 @@ public class InventoryService {
     public Single<Inventory> pickupItem(GenericInventoryData request) {
         return itemService
                 .getDroppedItemByInstanceId(request.getItemInstanceId())
-                .doOnError(
-                        e -> {
-                            log.error("Failed to find dropped item, {}", e.getMessage());
-                            throw e;
-                        })
+                .doOnError(e -> log.error(e.getMessage()))
                 .flatMap(
                         droppedItem -> {
-                            ItemInstance instance = droppedItem.getItemInstance();
+                            ItemInstance itemInstance = droppedItem.getItemInstance();
                             return inventoryRepository
                                     .getCharacterInventory(request.getActorId())
                                     .flatMap(
                                             inventory -> {
-                                                // check for example if inventory is full
-                                                List<CharacterItem> items =
-                                                        inventory.getCharacterItems();
-                                                Location2D position =
-                                                        getNextAvailableSlot(
-                                                                inventory.getMaxSize(), items);
-
-                                                if (position == null) {
-                                                    throw new InventoryException(
-                                                            "No available slots in inventory");
-                                                }
-
-                                                CharacterItem newCharacterItem =
-                                                        new CharacterItem(
-                                                                request.getActorId(),
-                                                                position,
-                                                                instance);
-
-                                                items.add(newCharacterItem);
-
+                                                addItemToInventory(inventory, itemInstance);
                                                 // these should be chained.
                                                 itemService
                                                         .deleteDroppedItem(
                                                                 request.getItemInstanceId())
-                                                        .blockingGet();
+                                                        .blockingSubscribe();
 
                                                 inventoryRepository
                                                         .updateInventoryItems(
-                                                                request.getActorId(), items)
-                                                        .blockingGet();
+                                                                request.getActorId(),
+                                                                inventory.getCharacterItems())
+                                                        .blockingSubscribe();
 
                                                 return getInventory(request.getActorId());
                                             });
                         });
     }
 
+    private void addItemToInventory(Inventory inventory, ItemInstance itemInstance) {
+        // check for example if inventory is full
+        List<CharacterItem> items = inventory.getCharacterItems();
+        Location2D position = getNextAvailableSlot(inventory.getMaxSize(), items);
+
+        CharacterItem newCharacterItem =
+                new CharacterItem(inventory.getActorId(), position, itemInstance);
+
+        items.add(newCharacterItem);
+    }
+
     public Single<List<CharacterItem>> unequipItem(String itemInstanceId, String actorId) {
         // this is basically finding the nearest slot and placing item there
         return getInventory(actorId)
                 .doOnError(e -> log.error("Failed to get characters inventory, {}", e.getMessage()))
-                .map(
+                .flatMap(
                         inventory -> {
+                            List<CharacterItem> items = inventory.getCharacterItems();
+                            CharacterItem foundItem =
+                                    EquipItemService.getCharacterItemByInstance(
+                                            items, itemInstanceId);
+
                             Location2D loc =
                                     getNextAvailableSlot(
                                             inventory.getMaxSize(), inventory.getCharacterItems());
-
-                            if (loc == null) {
-                                throw new EquipException("Inventory full to un-equip item");
-                            }
-
-                            List<CharacterItem> items = inventory.getCharacterItems();
-
-                            CharacterItem foundItem =
-                                    items.stream()
-                                            .filter(
-                                                    i ->
-                                                            i.getItemInstance()
-                                                                    .getItemInstanceId()
-                                                                    .equals(itemInstanceId))
-                                            .findFirst()
-                                            .orElse(null);
-
-                            if (foundItem == null) {
-                                // this is unexpected, the item should exist in the inventory
-                                log.error(
-                                        "Un-equip item unexpectedly failed for character {} and"
-                                                + " itemInstanceId {}",
-                                        actorId,
-                                        itemInstanceId);
-                                throw new EquipException("Un-equip has unexpectedly failed");
-                            }
-
                             foundItem.setLocation(loc);
-                            // TODO: make async
-                            inventoryRepository
-                                    .updateInventoryItems(actorId, items)
-                                    .doOnError(
-                                            err ->
-                                                    log.error(
-                                                            "Failed to update inventory items, {}",
-                                                            err.getMessage()))
-                                    .blockingSubscribe();
 
-                            return items;
+                            return inventoryRepository
+                                    .updateInventoryItems(actorId, items)
+                                    .doOnError(e -> log.error(e.getMessage()));
                         });
     }
 
@@ -137,30 +97,16 @@ public class InventoryService {
                 .flatMap(
                         inventory -> {
                             List<CharacterItem> itemsList = inventory.getCharacterItems();
-                            List<CharacterItem> characterItem =
-                                    itemsList.stream()
-                                            .filter(
-                                                    ci ->
-                                                            ci.getItemInstance()
-                                                                    .getItemInstanceId()
-                                                                    .equalsIgnoreCase(
-                                                                            itemInstanceId))
-                                            .toList();
 
-                            if (characterItem == null || characterItem.isEmpty()) {
-                                throw new InventoryException("character item not found");
-                            }
+                            CharacterItem item =
+                                    EquipItemService.getCharacterItemByInstance(
+                                            itemsList, itemInstanceId);
 
-                            CharacterItem item = characterItem.get(0);
                             itemsList.remove(item);
 
                             inventoryRepository
                                     .updateInventoryItems(actorId, itemsList)
-                                    .doOnError(
-                                            err ->
-                                                    log.error(
-                                                            "Failed to update inventory items, {}",
-                                                            err.getMessage()))
+                                    .doOnError(e -> log.error(e.getMessage()))
                                     .subscribe();
 
                             // TODO: if dropItem fails, we need to revert the removal of item from
@@ -174,7 +120,7 @@ public class InventoryService {
         return inventoryRepository.getCharacterInventory(actorId);
     }
 
-    public Single<UpdateResult> updateInventoryItems(
+    public Single<List<CharacterItem>> updateInventoryItems(
             String actorId, List<CharacterItem> characterItems) {
         return inventoryRepository.updateInventoryItems(actorId, characterItems);
     }
@@ -217,7 +163,7 @@ public class InventoryService {
             }
         }
 
-        return null;
+        throw new InventoryException("No available slots in inventory");
     }
 
     public void clearAllDataForCharacter(String actorId) {

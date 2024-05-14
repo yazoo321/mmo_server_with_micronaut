@@ -51,13 +51,14 @@ public class CombatSkillsService {
         validateActorId(session, combatRequest);
         CombatData combatData =
                 sessionParamHelper.getSharedActorCombatData(combatRequest.getActorId());
-        Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
         String skillName = combatRequest.getSkillId();
         Skill skill = skillFactory.createSkill(skillName.toLowerCase());
 
         if (!skill.canApply(combatData, combatRequest.getSkillTarget())) {
             return;
         }
+
+        Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
         activatedSkills.put(skillName, Instant.now());
         sessionParamHelper.setSharedActorCombatData(combatRequest.getActorId(), combatData);
         try {
@@ -94,8 +95,8 @@ public class CombatSkillsService {
         //                .subscribe();
     }
 
-
     private void validateActorId(WebSocketSession session, CombatRequest combatRequest) {
+        // TODO: actually validate request.
         if (SessionParamHelper.getIsPlayer(session)) {
             combatRequest.setActorId(SessionParamHelper.getActorId(session));
             combatRequest.getSkillTarget().setCasterId(SessionParamHelper.getActorId(session));

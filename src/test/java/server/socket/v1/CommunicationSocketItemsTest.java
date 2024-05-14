@@ -3,7 +3,6 @@ package server.socket.v1;
 import static org.awaitility.Awaitility.await;
 
 import io.micronaut.context.annotation.Property;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import server.common.dto.Location;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.Item;
@@ -27,8 +25,6 @@ import server.util.websocket.TestWebSocketClient;
 
 // This test is designed to test the items flow
 // dropping items, picking items up, etc.
-@MicronautTest(environments = "kafka")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
 public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 
@@ -43,7 +39,6 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
         initializeCharacters(playerClient1, playerClient2);
 
         ItemInstance createdItem = prepareCharactersAndItems();
-
 
         Location dropLocation = new Location(createBaseMotion());
         SocketMessage dropRequestChar1 =

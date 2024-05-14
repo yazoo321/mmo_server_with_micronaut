@@ -3,7 +3,6 @@ package server.items.helper;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.ne;
 
-import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
@@ -117,9 +116,9 @@ public class ItemTestHelper {
                         inventory.getMaxSize(), inventory.getCharacterItems()));
         items.add(characterItem);
 
-        UpdateResult res = inventoryRepository.updateInventoryItems(actorId, items).blockingGet();
+        inventoryRepository.updateInventoryItems(actorId, items).blockingSubscribe();
 
-        return res.wasAcknowledged() ? characterItem : null;
+        return characterItem;
     }
 
     public Inventory insertInventory(Inventory inventory) {
