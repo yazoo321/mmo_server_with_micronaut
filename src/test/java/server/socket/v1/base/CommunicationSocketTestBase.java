@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.micronaut.context.BeanContext;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.runtime.server.EmbeddedServer;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.websocket.WebSocketClient;
 import jakarta.inject.Inject;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import server.common.dto.Motion;
@@ -29,6 +31,8 @@ import server.socket.model.types.MessageType;
 import server.util.PlayerMotionUtil;
 import server.util.websocket.TestWebSocketClient;
 
+@MicronautTest(environments = "kafka")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CommunicationSocketTestBase {
 
     @Inject protected BeanContext beanContext;

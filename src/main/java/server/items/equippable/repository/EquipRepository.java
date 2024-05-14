@@ -43,11 +43,10 @@ public class EquipRepository {
     }
 
     @CacheInvalidate(
-            value = ACTOR_EQUIP_CACHE_MAP,
-            parameters = {"actorId"})
-    @CacheInvalidate(
-            value = ACTOR_EQUIP_CACHE,
-            parameters = "actorId")
+            value = {ACTOR_EQUIP_CACHE_MAP, ACTOR_EQUIP_CACHE},
+            parameters = "actorId",
+            async = true
+    )
     public Single<EquippedItems> insert(EquippedItems equippedItems, String actorId) {
         return Single.fromPublisher(equippedItemsCollection.insertOne(equippedItems))
                 .map(res -> equippedItems);
@@ -80,11 +79,10 @@ public class EquipRepository {
     }
 
     @CacheInvalidate(
-            value = ACTOR_EQUIP_CACHE_MAP,
-            parameters = {"actorId"})
-    @CacheInvalidate(
-            value = ACTOR_EQUIP_CACHE,
-            parameters = {"actorId"})
+            value = {ACTOR_EQUIP_CACHE_MAP, ACTOR_EQUIP_CACHE},
+            parameters = "actorId",
+            async = true
+    )
     public Single<DeleteResult> deleteEquippedItem(String itemInstanceId) {
         // TODO: Consider duplicating item instance ID as nested query is slower
         return Single.fromPublisher(

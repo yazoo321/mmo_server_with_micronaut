@@ -27,8 +27,6 @@ import server.util.websocket.TestWebSocketClient;
 
 // This test is designed to test the items flow
 // dropping items, picking items up, etc.
-@MicronautTest(environments = "kafka")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
 public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 

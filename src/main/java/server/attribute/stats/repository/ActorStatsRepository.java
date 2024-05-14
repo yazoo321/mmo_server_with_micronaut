@@ -49,7 +49,7 @@ public class ActorStatsRepository {
                 .map(res -> stats);
     }
 
-    @CacheInvalidate(value = ACTOR_STATS_CACHE, parameters = "actorId")
+    @CacheInvalidate(value = ACTOR_STATS_CACHE, parameters = "actorId", async = true)
     public Single<DeleteResult> deleteStats(String actorId) {
         return Single.fromPublisher(actorStats.deleteOne(eq("actorId", actorId)));
     }

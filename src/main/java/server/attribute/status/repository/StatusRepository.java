@@ -52,14 +52,10 @@ public class StatusRepository {
     }
 
     @CacheInvalidate(
-            value = ACTOR_STATUS_CACHE,
-            parameters = {"actorId"})
-    @CacheInvalidate(
-            value = ACTOR_AGGREGATED_STATUSES,
-            parameters = {"actorId"})
-    @CacheInvalidate(
-            value = ACTOR_AGGREGATED_DERIVED,
-            parameters = {"actorId"})
+            value = {ACTOR_AGGREGATED_STATUSES, ACTOR_STATUS_CACHE, ACTOR_STATUS_CACHE},
+            parameters = {"actorId"},
+            async = true
+    )
     //    TODO: merge parameter for actorStatus for cache
     public Single<ActorStatus> updateStatus(String actorId, ActorStatus actorStatus) {
         Bson filter = Filters.eq("actorId", actorStatus.getActorId());
@@ -83,14 +79,10 @@ public class StatusRepository {
     }
 
     @CacheInvalidate(
-            value = ACTOR_STATUS_CACHE,
-            parameters = {"actorId"})
-    @CacheInvalidate(
-            value = ACTOR_AGGREGATED_STATUSES,
-            parameters = {"actorId"})
-    @CacheInvalidate(
-            value = ACTOR_AGGREGATED_DERIVED,
-            parameters = {"actorId"})
+            value = {ACTOR_STATUS_CACHE, ACTOR_AGGREGATED_STATUSES, ACTOR_AGGREGATED_DERIVED},
+            parameters = {"actorId"},
+            async = true
+    )
     public Single<DeleteResult> deleteActorStatuses(String actorId) {
         return Single.fromPublisher(actorStatusCollection.deleteOne(eq("actorId", actorId)));
     }
