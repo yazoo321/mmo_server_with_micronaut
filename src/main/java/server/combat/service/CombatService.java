@@ -16,6 +16,7 @@ import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
+import server.items.equippable.service.EquipItemService;
 import server.monster.server_integration.service.MobInstanceService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
@@ -36,6 +37,9 @@ public class CombatService {
     @Inject ClientUpdatesService clientUpdatesService;
 
     @Inject ActorMotionRepository actorMotionRepository;
+
+    @Inject
+    EquipItemService equipItemService;
 
     boolean validatePositionLocation(
             CombatData combatData,

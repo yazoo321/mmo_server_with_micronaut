@@ -108,7 +108,7 @@ public class StatsService {
                             handleDifference(updated, stats);
                         })
                 .doOnError(err -> log.error("Failed to update item stats, {}", err.getMessage()))
-                .subscribe();
+                .blockingSubscribe();
     }
 
     public Stats takeDamage(Stats stats, Map<DamageTypes, Double> damageMap) {
@@ -179,10 +179,11 @@ public class StatsService {
 
     void handleDifference(Map<String, Double> updated, Stats stats) {
         if (!updated.isEmpty()) {
+//          TODO: Make this async, its blocking to help with tests only
             repository
                     .updateStats(stats.getActorId(), stats)
                     .doOnError(err -> log.error("Failed to update stats, {}", err.getMessage()))
-                    .subscribe();
+                    .blockingGet();
             Stats notifyUpdates =
                     Stats.builder().actorId(stats.getActorId()).derivedStats(updated).build();
             updateProducer.updateStats(notifyUpdates);

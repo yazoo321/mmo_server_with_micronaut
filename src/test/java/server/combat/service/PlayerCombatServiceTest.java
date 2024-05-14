@@ -99,11 +99,10 @@ class PlayerCombatServiceTest {
     void testRequestAttackWithValidRequest() {
         // Given
         // prepare character
-        Stats stats =
-                statsService
-                        .initializePlayerStats(CHARACTER_1)
-                        .doOnError(err -> System.out.println(err.getMessage()))
-                        .blockingGet();
+        statsService
+                .initializePlayerStats(CHARACTER_1)
+                .doOnError(err -> System.out.println(err.getMessage()))
+                .blockingSubscribe();
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(CHARACTER_1);
         sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
         Motion playerMotion =
@@ -111,7 +110,7 @@ class PlayerCombatServiceTest {
         SessionParamHelper.setActorId(session, CHARACTER_1);
 
         // create weapon and equip it
-        equipWeapon(CHARACTER_1, session);
+        equipWeapon(CHARACTER_1);
 
         // prepare mob
         Motion mobMotion = new Motion();
@@ -127,6 +126,7 @@ class PlayerCombatServiceTest {
         validCombatRequest.setTargets(new HashSet<>(List.of(MOB_1)));
 
         // When
+        // Wait until the item stats have synchronised as its async
         playerCombatService.requestAttack(session, validCombatRequest);
 
         // Then
@@ -150,7 +150,7 @@ class PlayerCombatServiceTest {
                         });
     }
 
-    private EquippedItems equipWeapon(String actorId, WebSocketSession session) {
+    private EquippedItems equipWeapon(String actorId) {
         itemTestHelper.prepareInventory(actorId);
 
         Item item = itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
@@ -161,10 +161,6 @@ class PlayerCombatServiceTest {
 
         EquippedItems equippedItem =
                 equipItemService.equipItem(itemInstance.getItemInstanceId(), actorId).blockingGet();
-
-        if (session != null) {
-            sessionParamHelper.addToEquippedItems(session, equippedItem);
-        }
 
         return equippedItem;
     }

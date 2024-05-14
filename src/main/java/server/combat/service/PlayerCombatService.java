@@ -55,7 +55,7 @@ public class PlayerCombatService extends CombatService {
         // Extract relevant combat data
         String actorId = SessionParamHelper.getActorId(session);
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
-        Map<String, EquippedItems> items = sessionParamHelper.getEquippedItems(session);
+        Map<String, EquippedItems> items = equipItemService.getEquippedItemsMap(actorId).blockingGet();
         Stats actorStats = statsService.getStatsFor(actorId).blockingGet();
         Map<String, Double> derivedStats = actorStats.getDerivedStats();
 
@@ -174,7 +174,8 @@ public class PlayerCombatService extends CombatService {
 
     private void requestAttackSwing(
             WebSocketSession session, CombatData combatData, boolean isMainHand) {
-        Map<String, EquippedItems> items = sessionParamHelper.getEquippedItems(session);
+        String actorId = SessionParamHelper.getActorId(session);
+        Map<String, EquippedItems> items = equipItemService.getEquippedItemsMap(actorId).blockingGet();
 
         // Get the equipped weapon
         EquippedItems weapon = isMainHand ? items.get("WEAPON") : items.get("SHIELD");

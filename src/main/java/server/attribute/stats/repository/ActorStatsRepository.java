@@ -2,6 +2,7 @@ package server.attribute.stats.repository;
 
 import static com.mongodb.client.model.Filters.eq;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.DeleteResult;
@@ -40,7 +41,7 @@ public class ActorStatsRepository {
         return Single.fromPublisher(actorStats.find(eq("actorId", actorId)));
     }
 
-    @CachePut(value = ACTOR_STATS_CACHE, parameters = "actorId")
+    @CachePut(value = ACTOR_STATS_CACHE, parameters = "actorId", async = true)
     public Single<Stats> updateStats(String actorId, Stats stats) {
         Bson filter = Filters.eq("actorId", stats.getActorId());
         ReplaceOptions options = new ReplaceOptions().upsert(true);

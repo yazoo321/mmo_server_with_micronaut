@@ -1,5 +1,6 @@
 package server.items.equippable.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -19,6 +20,9 @@ import server.items.inventory.model.Inventory;
 import server.items.inventory.model.exceptions.InventoryException;
 import server.items.inventory.service.InventoryService;
 import server.items.model.ItemInstance;
+import server.items.types.ItemType;
+
+import static server.attribute.stats.types.StatsTypes.*;
 
 @Slf4j
 @Singleton
@@ -68,7 +72,7 @@ public class EquipItemService {
                             inventoryService.updateInventoryItems(actorId, items).blockingSubscribe();
 
                             return equipRepository
-                                    .insert(equippedItem)
+                                    .insert(equippedItem, actorId)
                                     .map(its -> {
                                         updateCharacterItemStats(actorId);
                                         return its;
@@ -105,6 +109,10 @@ public class EquipItemService {
         return equipRepository.getEquippedItemsForCharacter(actorId);
     }
 
+    public Single<Map<String, EquippedItems>> getEquippedItemsMap(String actorId) {
+        return equipRepository.getActorEquippedItems(actorId);
+    }
+
     public Single<List<EquippedItems>> getEquippedItems(Set<String> actorIds) {
         return equipRepository.getEquippedItemsForCharacters(actorIds);
     }
@@ -127,6 +135,7 @@ public class EquipItemService {
                 .doOnError(e -> log.error(e.getMessage()))
                 .doOnSuccess(
                         items -> {
+                            addCustomEffectsToMainHandAndOffhand(items);
                             Map<String, Double> effects = new HashMap<>();
                             items.forEach(
                                     i ->
@@ -137,6 +146,24 @@ public class EquipItemService {
                                                             .getItemEffects()));
                             statsService.updateItemStats(actorId, effects);
                         })
-                .subscribe();
+                .blockingSubscribe();
+    }
+
+    public void addCustomEffectsToMainHandAndOffhand(List<EquippedItems> items) {
+        // we're not going to permanently add these properties
+        for (EquippedItems item : items) {
+            if (item.getCategory().equals(ItemType.WEAPON.getType())) {
+                Map<String, Double> itemEffects = item.getItemInstance().getItem().getItemEffects();
+                itemEffects.put(MAIN_HAND_ATTACK_SPEED.getType(),
+                        itemEffects.get(BASE_ATTACK_SPEED.getType()));
+            }
+
+            if (item.getCategory().equals(ItemType.SHIELD.getType())) {
+                Map<String, Double> itemEffects = item.getItemInstance().getItem().getItemEffects();
+                itemEffects.put(OFF_HAND_ATTACK_SPEED.getType(),
+                        itemEffects.get(BASE_ATTACK_SPEED.getType()));
+            }
+        }
+
     }
 }

@@ -44,7 +44,7 @@ public class ActorMotionRepository {
         }
     }
 
-    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId")
+    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId", async = true)
     public Motion updateActorMotion(String actorId, Motion motion) {
         Motion prev = motionMap.put(actorId, motion);
         if (null == prev) {
