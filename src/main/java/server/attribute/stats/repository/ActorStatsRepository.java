@@ -1,8 +1,5 @@
 package server.attribute.stats.repository;
 
-import static com.mongodb.client.model.Filters.eq;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.DeleteResult;
@@ -18,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.conversions.Bson;
 import server.attribute.stats.model.Stats;
 import server.common.configuration.MongoConfiguration;
+
+import static com.mongodb.client.model.Filters.eq;
 
 @Slf4j
 @Singleton

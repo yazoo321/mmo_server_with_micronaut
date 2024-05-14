@@ -124,7 +124,6 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to equip item, {}", e.getMessage()))
                 .doOnSuccess(
                         equippedItems -> {
-//                            sessionParamHelper.addToEquippedItems(session, equippedItems);
                             sendInventoryToPlayer(session, request.getActorId());
 
                             GenericInventoryData equipData = new GenericInventoryData();

@@ -88,7 +88,6 @@ public class InventoryService {
                             return inventoryRepository
                                     .updateInventoryItems(actorId, items)
                                     .doOnError(e -> log.error(e.getMessage()));
-//                            return items;
                         });
     }
 
