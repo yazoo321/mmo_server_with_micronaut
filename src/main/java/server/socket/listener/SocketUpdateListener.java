@@ -8,7 +8,6 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.ItemInstanceIds;
@@ -94,8 +93,9 @@ public class SocketUpdateListener {
     @Topic("notify-un-equip-items")
     void notifyUnEquipItem(ItemInstanceIds itemInstanceIds) {
 
-        if (itemInstanceIds == null || itemInstanceIds.getItemInstanceIds() == null ||
-                itemInstanceIds.getItemInstanceIds().isEmpty()) {
+        if (itemInstanceIds == null
+                || itemInstanceIds.getItemInstanceIds() == null
+                || itemInstanceIds.getItemInstanceIds().isEmpty()) {
             return;
         }
         GenericInventoryData equipData = new GenericInventoryData();
@@ -107,7 +107,7 @@ public class SocketUpdateListener {
                         .messageType(SocketResponseType.REMOVE_EQUIP_ITEM.getType())
                         .build();
 
-        clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse,
-                itemInstanceIds.getActorId());
+        clientUpdatesService.sendUpdateToListeningIncludingSelf(
+                socketResponse, itemInstanceIds.getActorId());
     }
 }

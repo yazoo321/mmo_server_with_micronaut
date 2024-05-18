@@ -19,7 +19,6 @@ import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.restoration.heals.BasicHeal;
 import server.socket.model.SocketResponse;
-import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.types.SkillMessageType;
 import server.socket.service.ClientUpdatesService;
 
@@ -131,7 +130,6 @@ public abstract class Skill {
         }
         return res;
     }
-
 
     protected void updateSessionInitiateSkill(String castor, SkillTarget skillTarget) {
         SocketResponse message = new SocketResponse();

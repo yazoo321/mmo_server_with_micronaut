@@ -1,7 +1,6 @@
 package server.socket.v1;
 
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.netty.websocket.NettyWebSocketSession;
 import io.micronaut.websocket.WebSocketSession;
 import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
@@ -31,8 +30,7 @@ public class CommunicationSocket {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    UDPServer udpServer;
+    @Inject UDPServer udpServer;
 
     private final ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
 
@@ -76,9 +74,7 @@ public class CommunicationSocket {
         // TODO: will require updates to tests to remove this dependency
         if (message.getPlayerMotion() != null
                 && motionValid(message.getPlayerMotion().getMotion())) {
-                        sessionParamHelper.setMotion(
-                                session,
-                                message.getPlayerMotion().getMotion());
+            sessionParamHelper.setMotion(session, message.getPlayerMotion().getMotion());
         } else if (message.getMonster() != null && motionValid(message.getMonster().getMotion())) {
             sessionParamHelper.setMotion(session, message.getMonster().getMotion());
         }

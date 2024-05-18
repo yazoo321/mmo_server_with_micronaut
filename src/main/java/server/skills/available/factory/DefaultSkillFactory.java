@@ -12,7 +12,6 @@ import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.restoration.heals.BasicHeal;
 import server.skills.model.Skill;
-import server.socket.model.SocketResponseSubscriber;
 import server.socket.service.ClientUpdatesService;
 
 @Singleton
@@ -20,7 +19,7 @@ public class DefaultSkillFactory implements SkillFactory {
 
     Map<String, Class<? extends Skill>> skillTypes = new HashMap<>();
 
-//    @Inject SocketResponseSubscriber socketResponseSubscriber;
+    //    @Inject SocketResponseSubscriber socketResponseSubscriber;
     @Inject ClientUpdatesService clientUpdatesService;
 
     @Inject SessionParamHelper sessionParamHelper;
@@ -42,7 +41,7 @@ public class DefaultSkillFactory implements SkillFactory {
             Class<? extends Skill> skillClass = skillTypes.get(skillType);
             Skill skill = skillClass.getDeclaredConstructor().newInstance();
             skill.setClientUpdatesService(clientUpdatesService);
-//            skill.setSocketResponseSubscriber(socketResponseSubscriber);
+            //            skill.setSocketResponseSubscriber(socketResponseSubscriber);
             skill.setStatsService(statsService);
             skill.setSessionParamHelper(sessionParamHelper);
             skill.setCombatService(combatService);

@@ -29,6 +29,7 @@ public class StatusListener {
                         .actorStatus(actorStatus)
                         .build();
 
-        clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, actorStatus.getActorId());
+        clientUpdatesService.sendUpdateToListeningIncludingSelf(
+                socketResponse, actorStatus.getActorId());
     }
 }

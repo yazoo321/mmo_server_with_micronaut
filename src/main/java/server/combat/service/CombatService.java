@@ -79,10 +79,12 @@ public class CombatService {
 
                 if (!inRange) {
                     clientUpdatesService.sendToSelf(
-                            session, SocketResponse.messageWithType(SocketResponseType.COMBAT_TOO_FAR));
+                            session,
+                            SocketResponse.messageWithType(SocketResponseType.COMBAT_TOO_FAR));
                     return false;
                 }
-                clientUpdatesService.sendToSelf(session,
+                clientUpdatesService.sendToSelf(
+                        session,
                         SocketResponse.messageWithType(SocketResponseType.COMBAT_NOT_FACING));
             }
             return false;
@@ -136,7 +138,8 @@ public class CombatService {
             mobInstanceService.handleMobDeath(stats.getActorId());
             sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);
 
-            notifyClientsToRemoveMobs(stats.getActorId());        }
+            notifyClientsToRemoveMobs(stats.getActorId());
+        }
     }
 
     private void notifyClientsToRemoveMobs(String actorId) {

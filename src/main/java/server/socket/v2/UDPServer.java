@@ -6,14 +6,13 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-import server.socket.model.SocketMessage;
-import server.socket.service.SocketProcessOutgoingService;
-
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
+import server.socket.model.SocketMessage;
+import server.socket.service.SocketProcessOutgoingService;
 
 @Slf4j
 @Singleton
@@ -27,17 +26,18 @@ public class UDPServer {
 
     ConcurrentHashMap<String, WebSocketSession> validIps = new ConcurrentHashMap<>();
 
-    @Inject
-    SocketProcessOutgoingService socketProcessService;
+    @Inject SocketProcessOutgoingService socketProcessService;
 
     public UDPServer() {
-        Thread serverThread = new Thread(() -> {
-            try {
-                startServer();
-            } catch (Exception e) {
-               log.error(e.getMessage());
-            }
-        });
+        Thread serverThread =
+                new Thread(
+                        () -> {
+                            try {
+                                startServer();
+                            } catch (Exception e) {
+                                log.error(e.getMessage());
+                            }
+                        });
         serverThread.start();
     }
 
@@ -52,7 +52,9 @@ public class UDPServer {
     public void send(SocketMessage message) {
         try {
             byte[] data = writer.writeValueAsBytes(message);
-            DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("localhost"), UDP_PORT);
+            DatagramPacket packet =
+                    new DatagramPacket(
+                            data, data.length, InetAddress.getByName("localhost"), UDP_PORT);
             DatagramSocket socket = new DatagramSocket();
             socket.send(packet);
         } catch (Exception e) {
@@ -71,7 +73,8 @@ public class UDPServer {
 
                 String hostAddress = packet.getAddress().getHostName();
                 if (!validIps.contains(hostAddress)) {
-                    log.error("UDP received message from {} which is not connected to websocket",
+                    log.error(
+                            "UDP received message from {} which is not connected to websocket",
                             hostAddress);
                     continue;
                 }

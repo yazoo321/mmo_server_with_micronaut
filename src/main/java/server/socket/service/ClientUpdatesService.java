@@ -4,7 +4,6 @@ import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -27,21 +26,23 @@ public class ClientUpdatesService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-
     public void sendUpdateToListeningPlayers(SocketResponse message, String actorId) {
-        broadcaster.broadcast(message, sessionIsPlayerAndListensToActor(actorId))
+        broadcaster
+                .broadcast(message, sessionIsPlayerAndListensToActor(actorId))
                 .subscribe(socketResponseSubscriber);
     }
 
     public void sendUpdateToListening(SocketResponse message, String actorId) {
         // this is to send message to both, players and mobs, but excluding self.
-        broadcaster.broadcast(message, sessionListensToActorId(actorId))
+        broadcaster
+                .broadcast(message, sessionListensToActorId(actorId))
                 .subscribe(socketResponseSubscriber);
     }
 
     public void sendUpdateToListeningIncludingSelf(SocketResponse message, String actorId) {
         // send message to anyone subscribed to this actor
-        broadcaster.broadcast(message, sessionListensToActorsOrIsTheActor(actorId))
+        broadcaster
+                .broadcast(message, sessionListensToActorsOrIsTheActor(actorId))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -166,5 +167,4 @@ public class ClientUpdatesService {
 
         return actorId.equalsIgnoreCase(playerOrMob) || serverName.equalsIgnoreCase(playerOrMob);
     }
-
 }
