@@ -7,6 +7,8 @@ import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
+import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseType;
 import server.socket.service.ClientUpdatesService;
 
 @Slf4j
@@ -21,6 +23,12 @@ public class StatsListener {
 
     @Topic("update-actor-stats")
     public void receiveUpdatePlayerAttributes(Stats stats) {
-        clientUpdatesService.sendStatsUpdates(stats);
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.STATS_UPDATE.getType())
+                        .stats(stats)
+                        .build();
+
+        clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, stats.getActorId());
     }
 }

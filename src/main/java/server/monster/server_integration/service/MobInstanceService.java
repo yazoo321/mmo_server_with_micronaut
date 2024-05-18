@@ -1,6 +1,5 @@
 package server.monster.server_integration.service;
 
-import com.mongodb.client.result.InsertOneResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import java.time.Instant;

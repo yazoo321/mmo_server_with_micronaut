@@ -52,10 +52,6 @@ public class SessionParamHelper {
         return combatData;
     }
 
-    public void updateStats(Stats stats) {
-        statsRepository.updateStats(stats.getActorId(), stats);
-    }
-
     public static Motion getMotion(WebSocketSession session) {
         return (Motion) session.asMap().getOrDefault(SessionParams.MOTION.getType(), null);
     }
