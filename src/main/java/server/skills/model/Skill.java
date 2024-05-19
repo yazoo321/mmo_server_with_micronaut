@@ -9,6 +9,7 @@ import io.micronaut.websocket.WebSocketSession;
 import java.util.Map;
 import java.util.Random;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import server.attribute.stats.service.StatsService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
@@ -18,8 +19,8 @@ import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.restoration.heals.BasicHeal;
 import server.socket.model.SocketResponse;
-import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.types.SkillMessageType;
+import server.socket.service.ClientUpdatesService;
 
 @Serdeable
 @ReflectiveAccess
@@ -51,35 +52,11 @@ public abstract class Skill {
     protected WebSocketSession session;
 
     // populated via factory methods
-    protected SocketResponseSubscriber socketResponseSubscriber;
-    protected SessionParamHelper sessionParamHelper;
-    protected ActorMotionRepository actorMotionRepository;
-    protected StatsService statsService;
-    protected CombatService combatService;
-
-    public void setSocketResponseSubscriber(SocketResponseSubscriber socketResponseSubscriber) {
-        this.socketResponseSubscriber = socketResponseSubscriber;
-    }
-
-    public void setSessionParamHelper(SessionParamHelper sessionParamHelper) {
-        this.sessionParamHelper = sessionParamHelper;
-    }
-
-    public void setActorMotionRepository(ActorMotionRepository actorMotionRepository) {
-        this.actorMotionRepository = actorMotionRepository;
-    }
-
-    public void setStatsService(StatsService statsService) {
-        this.statsService = statsService;
-    }
-
-    public void setCombatService(CombatService combatService) {
-        this.combatService = combatService;
-    }
-
-    public void setSession(WebSocketSession session) {
-        this.session = session;
-    }
+    @Setter protected ClientUpdatesService clientUpdatesService;
+    @Setter protected SessionParamHelper sessionParamHelper;
+    @Setter protected ActorMotionRepository actorMotionRepository;
+    @Setter protected StatsService statsService;
+    @Setter protected CombatService combatService;
 
     public String getName() {
         return name;
@@ -165,6 +142,6 @@ public abstract class Skill {
 
         message.setCombatRequest(request);
 
-        session.send(message).subscribe(socketResponseSubscriber);
+        clientUpdatesService.sendToSelf(session, message);
     }
 }

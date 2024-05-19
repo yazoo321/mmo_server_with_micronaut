@@ -53,4 +53,8 @@ public class SocketResponse {
     ActorSkills actorSkills;
 
     List<ActorActionbar> actionbarList;
+
+    public static SocketResponse messageWithType(SocketResponseType type) {
+        return SocketResponse.builder().messageType(type.getType()).build();
+    }
 }

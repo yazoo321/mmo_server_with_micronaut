@@ -20,6 +20,8 @@ import server.items.equippable.service.EquipItemService;
 import server.monster.server_integration.service.MobInstanceService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
+import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseType;
 import server.socket.service.ClientUpdatesService;
 
 @Slf4j
@@ -76,10 +78,14 @@ public class CombatService {
                 sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
 
                 if (!inRange) {
-                    clientUpdatesService.notifySessionCombatTooFar(session);
+                    clientUpdatesService.sendToSelf(
+                            session,
+                            SocketResponse.messageWithType(SocketResponseType.COMBAT_TOO_FAR));
                     return false;
                 }
-                clientUpdatesService.notifySessionCombatNotFacing(session);
+                clientUpdatesService.sendToSelf(
+                        session,
+                        SocketResponse.messageWithType(SocketResponseType.COMBAT_NOT_FACING));
             }
             return false;
         }
@@ -103,7 +109,13 @@ public class CombatService {
         request.setItemInstanceId(itemInstanceId);
         request.setActorId(actorId);
 
-        clientUpdatesService.sendAttackAnimUpdates(request);
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.INITIATE_ATTACK.getType())
+                        .combatRequest(request)
+                        .build();
+
+        clientUpdatesService.sendUpdateToListeningPlayers(socketResponse, actorId);
     }
 
     public void handleActorDeath(Stats stats) {
@@ -125,7 +137,18 @@ public class CombatService {
                     .subscribe();
             mobInstanceService.handleMobDeath(stats.getActorId());
             sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);
-            clientUpdatesService.notifyServerOfRemovedMobs(Set.of(stats.getActorId()));
+
+            notifyClientsToRemoveMobs(stats.getActorId());
         }
+    }
+
+    private void notifyClientsToRemoveMobs(String actorId) {
+        // needs to be delayed
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.REMOVE_MOBS.getType())
+                        .lostMobs(Set.of(actorId))
+                        .build();
+        clientUpdatesService.sendUpdateToListening(socketResponse, actorId);
     }
 }

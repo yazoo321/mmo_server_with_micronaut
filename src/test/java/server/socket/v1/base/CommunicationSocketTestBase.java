@@ -107,9 +107,13 @@ public class CommunicationSocketTestBase {
         return client;
     }
 
-    protected TestWebSocketClient initiateSocketAsPlayer(String actorId) {
+    protected void initiatePlayer(String actorId) {
         playerMotionService.initializePlayerMotion(actorId).blockingSubscribe();
         itemTestHelper.prepareInventory(actorId);
+    }
+
+    protected TestWebSocketClient initiateSocketAsPlayer(String actorId) {
+        initiatePlayer(actorId);
 
         TestWebSocketClient playerClient = createWebSocketClient(embeddedServer.getPort());
 

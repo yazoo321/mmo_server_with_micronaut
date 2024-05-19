@@ -4,21 +4,13 @@ import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
-import server.attribute.status.model.ActorStatus;
-import server.combat.model.CombatRequest;
 import server.common.dto.Location;
 import server.common.dto.Motion;
-import server.items.equippable.model.EquippedItems;
-import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.DroppedItem;
-import server.monster.server_integration.model.Monster;
-import server.motion.dto.PlayerMotion;
 import server.motion.model.SessionParams;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
@@ -34,57 +26,28 @@ public class ClientUpdatesService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-    @Inject SessionParamHelper sessionParamHelper;
-
-    public void sendMotionUpdatesToSubscribedClients(PlayerMotion playerMotion) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.PLAYER_MOTION_UPDATE.getType())
-                        .playerMotion(Map.of(playerMotion.getActorId(), playerMotion))
-                        .playerKeys(Set.of(playerMotion.getActorId()))
-                        .build();
-
+    public void sendUpdateToListeningPlayers(SocketResponse message, String actorId) {
         broadcaster
-                .broadcast(socketResponse, listensToMotionUpdate(playerMotion.getActorId()))
+                .broadcast(message, sessionIsPlayerAndListensToActor(actorId))
                 .subscribe(socketResponseSubscriber);
     }
 
-    public void notifySessionCombatTooFar(WebSocketSession session) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.COMBAT_TOO_FAR.getType())
-                        .build();
-        session.send(socketResponse).subscribe(socketResponseSubscriber);
-    }
-
-    public void notifySessionCombatNotFacing(WebSocketSession session) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.COMBAT_NOT_FACING.getType())
-                        .build();
-        session.send(socketResponse).subscribe(socketResponseSubscriber);
-    }
-
-    public void notifyServerOfRemovedMobs(Set<String> actorIds) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.REMOVE_MOBS.getType())
-                        .lostMobs(actorIds)
-                        .build();
-        broadcaster.broadcast(socketResponse).subscribe(socketResponseSubscriber);
-    }
-
-    public void sendMotionUpdatesToSubscribedClients(Monster monster) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.MOB_MOTION_UPDATE.getType())
-                        .monsters(Map.of(monster.getActorId(), monster))
-                        .mobKeys(Set.of(monster.getActorId()))
-                        .build();
-
+    public void sendUpdateToListening(SocketResponse message, String actorId) {
+        // this is to send message to both, players and mobs, but excluding self.
         broadcaster
-                .broadcast(socketResponse, listensToMotionUpdate(monster.getActorId()))
+                .broadcast(message, sessionListensToActorId(actorId))
                 .subscribe(socketResponseSubscriber);
+    }
+
+    public void sendUpdateToListeningIncludingSelf(SocketResponse message, String actorId) {
+        // send message to anyone subscribed to this actor
+        broadcaster
+                .broadcast(message, sessionListensToActorsOrIsTheActor(actorId))
+                .subscribe(socketResponseSubscriber);
+    }
+
+    public void sendToSelf(WebSocketSession session, SocketResponse message) {
+        session.send(message).subscribe(socketResponseSubscriber);
     }
 
     public void sendDroppedItemUpdates(DroppedItem droppedItem) {
@@ -114,85 +77,9 @@ public class ClientUpdatesService {
                 .subscribe(socketResponseSubscriber);
     }
 
-    public void sendItemEquipUpdates(List<EquippedItems> equippedItems) {
-        if (equippedItems == null || equippedItems.isEmpty()) {
-            return;
-        }
-        String actorId = equippedItems.get(0).getActorId();
-        GenericInventoryData equipData = new GenericInventoryData();
-        equipData.setActorId(actorId);
-        equipData.setEquippedItems(equippedItems);
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .inventoryData(equipData)
-                        .messageType(SocketResponseType.ADD_EQUIP_ITEM.getType())
-                        .build();
-
-        broadcaster
-                .broadcast(socketResponse, listensToMotionUpdate(actorId))
-                .subscribe(socketResponseSubscriber);
-    }
-
-    public void sendItemUnEquipUpdates(String actorId, List<String> itemInstanceIds) {
-        if (itemInstanceIds == null || itemInstanceIds.isEmpty()) {
-            return;
-        }
-        GenericInventoryData equipData = new GenericInventoryData();
-        equipData.setActorId(actorId);
-        equipData.setItemInstanceIds(itemInstanceIds);
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .inventoryData(equipData)
-                        .messageType(SocketResponseType.REMOVE_EQUIP_ITEM.getType())
-                        .build();
-
-        broadcaster
-                .broadcast(socketResponse, listensToMotionUpdate(actorId))
-                .subscribe(socketResponseSubscriber);
-    }
-
-    public void sendStatsUpdates(Stats stats) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.STATS_UPDATE.getType())
-                        .stats(stats)
-                        .build();
-
-        broadcaster
-                .broadcast(socketResponse, notifyStatsFor(stats.getActorId(), stats))
-                .subscribe(socketResponseSubscriber);
-    }
-
-    public void sendStatusUpdates(ActorStatus actorStatus) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.STATS_UPDATE.getType())
-                        .actorStatus(actorStatus)
-                        .build();
-
-        broadcaster
-                .broadcast(socketResponse, notifyStatusFor(actorStatus.getActorId()))
-                .subscribe(socketResponseSubscriber);
-    }
-
-    public void sendAttackAnimUpdates(CombatRequest combatRequest) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.INITIATE_ATTACK.getType())
-                        .combatRequest(combatRequest)
-                        .build();
-
-        // TODO: let server ignore all anim updates
-        broadcaster
-                .broadcast(socketResponse, listensToUpdateFor(combatRequest.getActorId()))
-                .subscribe(socketResponseSubscriber);
-    }
-
     private Predicate<WebSocketSession> listensToItemPickup(String itemInstanceId) {
         return s -> {
-            String serverName = (String) s.asMap().get(SessionParams.SERVER_NAME.getType());
-
-            if (!serverName.isBlank()) {
+            if (SessionParamHelper.getIsServer(s)) {
                 return false;
                 // servers don't need item updates
             }
@@ -238,63 +125,46 @@ public class ClientUpdatesService {
         };
     }
 
-    private boolean sessionListensToPlayerOrMob(WebSocketSession s, String playerOrMob) {
-        boolean isServer = SessionParamHelper.getIsServer(s);
-        // server does not track mobs
-        Set<String> mobs = isServer ? Set.of() : SessionParamHelper.getTrackingMobs(s);
-        Set<String> players = SessionParamHelper.getTrackingPlayers(s);
-
-        return mobs.contains(playerOrMob) || players.contains(playerOrMob);
+    private Predicate<WebSocketSession> sessionIsPlayerAndListensToActor(String playerOrMob) {
+        return s -> sessionIsPlayerAndListensToActor(s, playerOrMob);
     }
 
-    private boolean sessionIsThePlayerOrMob(WebSocketSession s, String playerOrMob) {
+    private boolean sessionIsPlayerAndListensToActor(WebSocketSession s, String actorId) {
+        if (SessionParamHelper.getIsServer(s)) {
+            return false;
+        }
+
+        Set<String> actorIds = SessionParamHelper.getTrackingMobs(s);
+        actorIds.addAll(SessionParamHelper.getTrackingPlayers(s));
+
+        return actorIds.contains(actorId);
+    }
+
+    private Predicate<WebSocketSession> sessionListensToActorId(String actorId) {
+        return s -> sessionListensToActorId(s, actorId);
+    }
+
+    private boolean sessionListensToActorId(WebSocketSession s, String actorId) {
+        boolean isServer = SessionParamHelper.getIsServer(s);
+        // server does not track mob updates
+        Set<String> actorIds = isServer ? Set.of() : SessionParamHelper.getTrackingMobs(s);
+        actorIds.addAll(SessionParamHelper.getTrackingPlayers(s));
+
+        return actorIds.contains(actorId);
+    }
+
+    private Predicate<WebSocketSession> sessionListensToActorsOrIsTheActor(String actorId) {
+        return s -> sessionListensToActorsOrIsTheActor(s, actorId);
+    }
+
+    private boolean sessionListensToActorsOrIsTheActor(WebSocketSession s, String actorId) {
+        return sessionIsTheActor(s, actorId) || sessionListensToActorId(s, actorId);
+    }
+
+    private boolean sessionIsTheActor(WebSocketSession s, String playerOrMob) {
         String actorId = SessionParamHelper.getActorId(s);
         String serverName = SessionParamHelper.getServerName(s);
 
         return actorId.equalsIgnoreCase(playerOrMob) || serverName.equalsIgnoreCase(playerOrMob);
-    }
-
-    private Predicate<WebSocketSession> listensToUpdateFor(String actorId) {
-        return s ->
-                (sessionIsThePlayerOrMob(s, actorId) || sessionListensToPlayerOrMob(s, actorId));
-    }
-
-    // TODO: Consider renaming
-    private Predicate<WebSocketSession> notifyStatsFor(String playerOrMob, Stats stats) {
-        return s -> {
-            boolean isThePlayerOrMob = false;
-            if (sessionIsThePlayerOrMob(s, playerOrMob)) {
-                isThePlayerOrMob = true;
-                // update session cache about stats
-                if (!stats.getDerivedStats().isEmpty()) {
-                    sessionParamHelper.updateStats(stats);
-                }
-            }
-
-            return isThePlayerOrMob || sessionListensToPlayerOrMob(s, playerOrMob);
-        };
-    }
-
-    private Predicate<WebSocketSession> notifyStatusFor(String actorId) {
-        return s -> {
-            boolean isThePlayerOrMob = sessionIsThePlayerOrMob(s, actorId);
-
-            return isThePlayerOrMob || sessionListensToPlayerOrMob(s, actorId);
-        };
-    }
-
-    private Predicate<WebSocketSession> listensToMotionUpdate(String playerOrMob) {
-        // we will report to player every time they call update about other players nearby
-        return s -> sessionListensToPlayerOrMob(s, playerOrMob);
-    }
-
-    private Predicate<WebSocketSession> serverListeningToActorUpdates(String actorId) {
-        // we will report to player every time they call update about other players nearby
-        return s -> sessionIsServerAndListensToMob(s, actorId);
-    }
-
-    private boolean sessionIsServerAndListensToMob(WebSocketSession s, String actorId) {
-        return SessionParamHelper.getIsServer(s)
-                && SessionParamHelper.getTrackingMobs(s).contains(actorId);
     }
 }

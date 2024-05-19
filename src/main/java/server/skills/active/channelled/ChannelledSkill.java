@@ -118,7 +118,7 @@ public abstract class ChannelledSkill extends ActiveSkill {
         request.setActorId(actorId);
         message.setCombatRequest(request);
 
-        session.send(message).subscribe(socketResponseSubscriber);
+        clientUpdatesService.sendUpdateToListeningIncludingSelf(message, actorId);
     }
 
     private void notifyStopChannel(String actorId, boolean channelSuccess) {
@@ -129,6 +129,6 @@ public abstract class ChannelledSkill extends ActiveSkill {
         combat.setSkillId(getName());
         message.setCombatRequest(combat);
 
-        session.send(message).subscribe(socketResponseSubscriber);
+        clientUpdatesService.sendUpdateToListeningIncludingSelf(message, actorId);
     }
 }

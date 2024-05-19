@@ -23,6 +23,7 @@ public enum SocketResponseType {
     INITIATE_ATTACK("INITIATE_ATTACK"),
     COMBAT_TOO_FAR("COMBAT_TOO_FAR"),
     COMBAT_NOT_FACING("COMBAT_NOT_FACING"),
+    SKILL_ON_CD("SKILL_ON_CD"),
     UPDATE_ACTIONBAR("UPDATE_ACTIONBAR");
 
     public final String type;

@@ -10,7 +10,6 @@ import jakarta.inject.Singleton;
 import java.util.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
 import server.combat.model.CombatData;
 import server.common.configuration.redis.JacksonCodecCombatData;
@@ -50,10 +49,6 @@ public class SessionParamHelper {
         }
 
         return combatData;
-    }
-
-    public void updateStats(Stats stats) {
-        statsRepository.updateStats(stats.getActorId(), stats);
     }
 
     public static Motion getMotion(WebSocketSession session) {
