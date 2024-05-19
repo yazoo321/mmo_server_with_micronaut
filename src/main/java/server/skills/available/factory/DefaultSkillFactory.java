@@ -19,7 +19,6 @@ public class DefaultSkillFactory implements SkillFactory {
 
     Map<String, Class<? extends Skill>> skillTypes = new HashMap<>();
 
-    //    @Inject SocketResponseSubscriber socketResponseSubscriber;
     @Inject ClientUpdatesService clientUpdatesService;
 
     @Inject SessionParamHelper sessionParamHelper;
@@ -41,7 +40,6 @@ public class DefaultSkillFactory implements SkillFactory {
             Class<? extends Skill> skillClass = skillTypes.get(skillType);
             Skill skill = skillClass.getDeclaredConstructor().newInstance();
             skill.setClientUpdatesService(clientUpdatesService);
-            //            skill.setSocketResponseSubscriber(socketResponseSubscriber);
             skill.setStatsService(statsService);
             skill.setSessionParamHelper(sessionParamHelper);
             skill.setCombatService(combatService);
