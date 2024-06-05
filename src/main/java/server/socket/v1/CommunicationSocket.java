@@ -41,6 +41,9 @@ public class CommunicationSocket {
         // TODO: get player/server name via injected headers
         try {
             updateSessionParams(session, message);
+            if (message.getMonster() != null) {
+                log.info("{}", message.getMonster());
+            }
             socketProcessService.processMessage(message, session);
         } catch (Exception e) {
             // avoid closing connection
@@ -50,13 +53,13 @@ public class CommunicationSocket {
 
     @OnClose
     public void onClose(WebSocketSession session) {
-        socketSessions.remove(session);
         String actorId = (String) session.asMap().get(SessionParams.ACTOR_ID.getType());
         if (actorId == null) {
             log.error("player name should not be null on disconnect");
             return;
         }
         playerMotionService.disconnectPlayer(actorId);
+        socketSessions.remove(session);
     }
 
     private void updateSessionParams(WebSocketSession session, SocketMessage message) {

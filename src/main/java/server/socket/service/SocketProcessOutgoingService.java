@@ -118,7 +118,7 @@ public class SocketProcessOutgoingService {
     }
 
     private void handleCreateMob(SocketMessage message, WebSocketSession session) {
-        SessionParamHelper.addTrackingMobs(session, Set.of(message.getMobId()));
+        SessionParamHelper.addTrackingMobs(session, Set.of(message.getActorId()));
         updateProducer.sendCreateMob(message.getMonster());
     }
 

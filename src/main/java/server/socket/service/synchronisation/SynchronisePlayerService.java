@@ -46,9 +46,6 @@ public class SynchronisePlayerService {
                 .getNearbyPlayersAsync(motion, actorId, distanceThreshold)
                 .doOnSuccess(
                         list -> {
-                            if (list == null || list.isEmpty()) {
-                                return;
-                            }
                             Set<String> actorIds =
                                     list.stream()
                                             .map(PlayerMotion::getActorId)

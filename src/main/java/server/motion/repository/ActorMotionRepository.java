@@ -31,6 +31,10 @@ public class ActorMotionRepository {
 
     @Cacheable(value = ACTOR_MOTION_CACHE, parameters = "actorId")
     public Single<Motion> fetchActorMotion(String actorId) {
+        if (actorId == null || actorId.isBlank()) {
+            return null;
+        }
+
         if (UUIDHelper.isPlayer(actorId)) {
             return playerMotionRepository
                     .fetchPlayerMotion(actorId)
@@ -46,6 +50,10 @@ public class ActorMotionRepository {
 
     @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId")
     public Motion updateActorMotion(String actorId, Motion motion) {
+        if (actorId == null) {
+            log.error("actorId null when trying to update motion");
+            return null;
+        }
         Motion prev = motionMap.put(actorId, motion);
         if (null == prev) {
             // sync it now if its fresh
