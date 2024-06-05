@@ -10,6 +10,7 @@ import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.micronaut.cache.annotation.CacheConfig;
+import io.micronaut.cache.annotation.CacheInvalidate;
 import io.micronaut.cache.annotation.CachePut;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
@@ -61,6 +62,7 @@ public class PlayerMotionRepository {
                 .map(success -> playerMotion.getMotion());
     }
 
+    @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId")
     public Single<PlayerMotion> setPlayerOnlineStatus(String actorId, boolean isOnline) {
         return Single.fromPublisher(
                 playerMotionMongoCollection.findOneAndUpdate(

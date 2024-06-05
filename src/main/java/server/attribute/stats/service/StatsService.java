@@ -145,7 +145,7 @@ public class StatsService {
                             }
                             applyRegen(stats);
                         })
-                .doOnError(err -> log.error("Failed to apply regen, {}", err.getMessage()))
+                .doOnError(err -> log.error("Failed to apply regen for actor: {}, {}", actorName, err.getMessage()))
                 .subscribe();
     }
 

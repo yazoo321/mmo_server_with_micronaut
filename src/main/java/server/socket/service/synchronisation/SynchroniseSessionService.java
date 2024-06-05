@@ -50,6 +50,10 @@ public class SynchroniseSessionService {
         sessions.parallelStream()
                 .forEach(
                         session -> {
+                            if (!SessionParamHelper.getIsServer(session) && !SessionParamHelper.getIsPlayer(session)) {
+                                // session is not initialized
+                                return;
+                            }
 
                             Motion motion = SessionParamHelper.getIsServer(session) ?
                                     SessionParamHelper.getMotion(session) :
