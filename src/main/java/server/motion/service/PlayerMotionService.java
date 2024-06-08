@@ -23,7 +23,7 @@ public class PlayerMotionService {
 
     //    @Inject SessionParamHelper sessionParamHelper;
 
-    private static final int DEFAULT_DISTANCE_THRESHOLD = 1000;
+    private static final int DEFAULT_DISTANCE_THRESHOLD = 20_000;
 
     public static final Motion STARTING_MOTION =
             Motion.builder()

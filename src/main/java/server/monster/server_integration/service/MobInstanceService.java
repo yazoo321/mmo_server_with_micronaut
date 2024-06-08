@@ -80,14 +80,14 @@ public class MobInstanceService {
         statusService
                 .deleteActorStatus(mobId)
                 .doOnError(err -> log.error(err.getMessage()))
-                .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                .delaySubscription(2_000, TimeUnit.MILLISECONDS)
                 .subscribe();
 
         statsService
                 .deleteStatsFor(mobId)
                 .doOnError(
                         err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
-                .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                .delaySubscription(2_000, TimeUnit.MILLISECONDS)
                 .subscribe();
 
         Single.fromCallable(
@@ -100,7 +100,7 @@ public class MobInstanceService {
                                                                 "Failed to delete mob instance, {}",
                                                                 err.getMessage()))
                                         .subscribe())
-                .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                .delaySubscription(2_000, TimeUnit.MILLISECONDS)
                 .doOnError(err -> log.error("error on handling mob death, {}", err.getMessage()))
                 .subscribe();
     }

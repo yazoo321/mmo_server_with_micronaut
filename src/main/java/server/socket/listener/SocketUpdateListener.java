@@ -38,6 +38,7 @@ public class SocketUpdateListener {
                         .playerKeys(Set.of(playerMotion.getActorId()))
                         .build();
 
+        log.info("{}", playerMotion);
         clientUpdatesService.sendUpdateToListening(socketResponse, playerMotion.getActorId());
     }
 
@@ -50,6 +51,7 @@ public class SocketUpdateListener {
                         .mobKeys(Set.of(monster.getActorId()))
                         .build();
 
+        log.info("{}", monster);
         clientUpdatesService.sendUpdateToListeningPlayers(socketResponse, monster.getActorId());
     }
 

@@ -50,9 +50,12 @@ public class CommunicationSocket {
         // TODO: get player/server name via injected headers
         try {
             updateSessionParams(session, message);
-            if (message.getMonster() != null) {
-                log.info("{}", message.getMonster());
-            }
+//            if (message.getMonster() != null && !message.getMonster().getMobId().isBlank()) {
+//                log.info("{}", message.getMonster());
+//            }
+//            if (message.getPlayerMotion() != null && !message.getPlayerMotion().getActorId().isBlank()) {
+//                log.info("{}", message.getPlayerMotion());
+//            }
             socketProcessService.processMessage(message, session);
         } catch (Exception e) {
             // avoid closing connection

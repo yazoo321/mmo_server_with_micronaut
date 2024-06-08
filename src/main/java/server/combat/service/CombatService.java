@@ -115,7 +115,7 @@ public class CombatService {
                         .combatRequest(request)
                         .build();
 
-        clientUpdatesService.sendUpdateToListeningPlayers(socketResponse, actorId);
+        clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, actorId);
     }
 
     public void handleActorDeath(Stats stats) {
@@ -127,14 +127,6 @@ public class CombatService {
             // TODO: implement player death
             statsService.addHealth(stats, 300.0);
         } else {
-            statsService
-                    .deleteStatsFor(stats.getActorId())
-                    .doOnError(
-                            err ->
-                                    log.error(
-                                            "Failed to delete stats on death, {}",
-                                            err.getMessage()))
-                    .subscribe();
             mobInstanceService.handleMobDeath(stats.getActorId());
             sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);
 
@@ -149,6 +141,6 @@ public class CombatService {
                         .messageType(SocketResponseType.REMOVE_MOBS.getType())
                         .lostMobs(Set.of(actorId))
                         .build();
-        clientUpdatesService.sendUpdateToListening(socketResponse, actorId);
+        clientUpdatesService.sendUpdateToListeningIncludingServer(socketResponse, actorId);
     }
 }

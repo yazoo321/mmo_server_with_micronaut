@@ -4,6 +4,8 @@ import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -36,6 +38,13 @@ public class ClientUpdatesService {
         // this is to send message to both, players and mobs, but excluding self.
         broadcaster
                 .broadcast(message, sessionListensToActorId(actorId))
+                .subscribe(socketResponseSubscriber);
+    }
+
+    public void sendUpdateToListeningIncludingServer(SocketResponse message, String actorId) {
+        // this is to send message to both, players and mobs, but excluding self.
+        broadcaster
+                .broadcast(message, sessionListensToActorIdWithServer(actorId))
                 .subscribe(socketResponseSubscriber);
     }
 
@@ -144,10 +153,21 @@ public class ClientUpdatesService {
         return s -> sessionListensToActorId(s, actorId);
     }
 
+    private Predicate<WebSocketSession> sessionListensToActorIdWithServer(String actorId) {
+        return s -> sessionListensToActorIdWithServer(s, actorId);
+    }
+
     private boolean sessionListensToActorId(WebSocketSession s, String actorId) {
         boolean isServer = SessionParamHelper.getIsServer(s);
         // server does not track mob updates
-        Set<String> actorIds = isServer ? Set.of() : SessionParamHelper.getTrackingMobs(s);
+        Set<String> actorIds = isServer ? new HashSet<>() : SessionParamHelper.getTrackingMobs(s);
+        actorIds.addAll(SessionParamHelper.getTrackingPlayers(s));
+
+        return actorIds.contains(actorId);
+    }
+
+    private boolean sessionListensToActorIdWithServer(WebSocketSession s, String actorId) {
+        Set<String> actorIds = SessionParamHelper.getTrackingMobs(s);
         actorIds.addAll(SessionParamHelper.getTrackingPlayers(s));
 
         return actorIds.contains(actorId);

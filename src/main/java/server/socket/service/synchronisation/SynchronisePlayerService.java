@@ -35,7 +35,7 @@ public class SynchronisePlayerService {
 
     @Inject EquipItemService equipItemService;
 
-    private static final Integer DEFAULT_DISTANCE_THRESHOLD = 1000;
+    private static final Integer DEFAULT_DISTANCE_THRESHOLD = 20_000;
 
     public void handleSynchronisePlayers(Motion motion, WebSocketSession session) {
         int distanceThreshold = DEFAULT_DISTANCE_THRESHOLD;
