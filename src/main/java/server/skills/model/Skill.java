@@ -21,6 +21,7 @@ import server.skills.available.restoration.heals.BasicHeal;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.SkillMessageType;
 import server.socket.service.ClientUpdatesService;
+import server.socket.service.WebsocketClientUpdatesService;
 
 @Serdeable
 @ReflectiveAccess
@@ -52,7 +53,7 @@ public abstract class Skill {
     protected WebSocketSession session;
 
     // populated via factory methods
-    @Setter protected ClientUpdatesService clientUpdatesService;
+    @Setter protected WebsocketClientUpdatesService clientUpdatesService;
     @Setter protected SessionParamHelper sessionParamHelper;
     @Setter protected ActorMotionRepository actorMotionRepository;
     @Setter protected StatsService statsService;

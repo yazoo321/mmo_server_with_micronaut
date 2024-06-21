@@ -30,4 +30,6 @@ public class SocketMessage {
     CombatRequest combatRequest;
 
     ActorActionbar actorActionbar;
+
+    String customData;
 }

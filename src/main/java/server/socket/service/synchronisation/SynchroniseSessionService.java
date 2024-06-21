@@ -7,10 +7,13 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
+import server.socket.service.SocketProcessOutgoingService;
 import server.socket.v1.CommunicationSocket;
 
 @Slf4j
@@ -19,7 +22,8 @@ public class SynchroniseSessionService {
     // we need to synchronise certain data for sessions
     // for example, what characters are nearby
 
-    @Inject CommunicationSocket socket;
+    @Inject
+    SocketProcessOutgoingService socketService;
 
     @Inject SynchronisePlayerService synchronisePlayerService;
 
@@ -29,25 +33,11 @@ public class SynchroniseSessionService {
 
     @Inject ActorMotionRepository actorMotionRepository;
 
-    @Scheduled(fixedDelay = "10s", initialDelay = "10s")
-    public void syncMotionCacheToDB() {
-        ConcurrentSet<WebSocketSession> sessions = socket.getLiveSessions();
-        Set<String> actorsMotion = new HashSet<>();
-
-        sessions.parallelStream()
-                .forEach(
-                        session -> {
-                            actorsMotion.add(SessionParamHelper.getActorId(session));
-                        });
-
-        // TODO: Find a way to get sync all these actors to repo in 1 call
-    }
-
     @Scheduled(fixedDelay = "500ms")
     public void evaluateNearbyPlayers() {
-        ConcurrentSet<WebSocketSession> sessions = socket.getLiveSessions();
+        ConcurrentMap<String, WebSocketSession> sessions = socketService.getLiveSessions();
 
-        sessions.parallelStream()
+        sessions.values().parallelStream()
                 .forEach(
                         session -> {
                             if (!SessionParamHelper.getIsServer(session) && !SessionParamHelper.getIsPlayer(session)) {

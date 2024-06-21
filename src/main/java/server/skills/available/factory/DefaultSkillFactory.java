@@ -13,13 +13,15 @@ import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.restoration.heals.BasicHeal;
 import server.skills.model.Skill;
 import server.socket.service.ClientUpdatesService;
+import server.socket.service.WebsocketClientUpdatesService;
 
 @Singleton
 public class DefaultSkillFactory implements SkillFactory {
 
     Map<String, Class<? extends Skill>> skillTypes = new HashMap<>();
 
-    @Inject ClientUpdatesService clientUpdatesService;
+    @Inject
+    WebsocketClientUpdatesService clientUpdatesService;
 
     @Inject SessionParamHelper sessionParamHelper;
 

@@ -27,37 +27,7 @@ public class ClientUpdatesService {
     @Inject WebSocketBroadcaster broadcaster;
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
-
-    public void sendUpdateToListeningPlayers(SocketResponse message, String actorId) {
-        broadcaster
-                .broadcast(message, sessionIsPlayerAndListensToActor(actorId))
-                .subscribe(socketResponseSubscriber);
-    }
-
-    public void sendUpdateToListening(SocketResponse message, String actorId) {
-        // this is to send message to both, players and mobs, but excluding self.
-        broadcaster
-                .broadcast(message, sessionListensToActorId(actorId))
-                .subscribe(socketResponseSubscriber);
-    }
-
-    public void sendUpdateToListeningIncludingServer(SocketResponse message, String actorId) {
-        // this is to send message to both, players and mobs, but excluding self.
-        broadcaster
-                .broadcast(message, sessionListensToActorIdWithServer(actorId))
-                .subscribe(socketResponseSubscriber);
-    }
-
-    public void sendUpdateToListeningIncludingSelf(SocketResponse message, String actorId) {
-        // send message to anyone subscribed to this actor
-        broadcaster
-                .broadcast(message, sessionListensToActorsOrIsTheActor(actorId))
-                .subscribe(socketResponseSubscriber);
-    }
-
-    public void sendToSelf(WebSocketSession session, SocketResponse message) {
-        session.send(message).subscribe(socketResponseSubscriber);
-    }
+    
 
     public void sendDroppedItemUpdates(DroppedItem droppedItem) {
         SocketResponse socketResponse =
@@ -134,7 +104,7 @@ public class ClientUpdatesService {
         };
     }
 
-    private Predicate<WebSocketSession> sessionIsPlayerAndListensToActor(String playerOrMob) {
+    Predicate<WebSocketSession> sessionIsPlayerAndListensToActor(String playerOrMob) {
         return s -> sessionIsPlayerAndListensToActor(s, playerOrMob);
     }
 
@@ -149,11 +119,11 @@ public class ClientUpdatesService {
         return actorIds.contains(actorId);
     }
 
-    private Predicate<WebSocketSession> sessionListensToActorId(String actorId) {
+    Predicate<WebSocketSession> sessionListensToActorId(String actorId) {
         return s -> sessionListensToActorId(s, actorId);
     }
 
-    private Predicate<WebSocketSession> sessionListensToActorIdWithServer(String actorId) {
+    Predicate<WebSocketSession> sessionListensToActorIdWithServer(String actorId) {
         return s -> sessionListensToActorIdWithServer(s, actorId);
     }
 
@@ -173,7 +143,7 @@ public class ClientUpdatesService {
         return actorIds.contains(actorId);
     }
 
-    private Predicate<WebSocketSession> sessionListensToActorsOrIsTheActor(String actorId) {
+    Predicate<WebSocketSession> sessionListensToActorsOrIsTheActor(String actorId) {
         return s -> sessionListensToActorsOrIsTheActor(s, actorId);
     }
 

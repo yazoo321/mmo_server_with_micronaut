@@ -10,6 +10,7 @@ import server.attribute.status.model.ActorStatus;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.ClientUpdatesService;
+import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
@@ -19,7 +20,8 @@ import server.socket.service.ClientUpdatesService;
         clientId = "status_client")
 public class StatusListener {
 
-    @Inject ClientUpdatesService clientUpdatesService;
+    @Inject
+    WebsocketClientUpdatesService clientUpdatesService;
 
     @Topic("update-actor-status")
     public void receiveUpdateActorStatus(ActorStatus actorStatus) {
