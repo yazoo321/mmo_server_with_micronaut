@@ -31,17 +31,6 @@ public class CommunicationSocket {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject UDPServer udpServer;
-
-//    private final ConcurrentMap<String, WebSocketSession> actorSessions = new ConcurrentHashMap<>();
-
-//    public void addActorSession(String actorId, WebSocketSession session) {
-//        actorSessions.put(actorId, session);
-//    }
-//
-//    public void removeActorSession(String actorId) {
-//        actorSessions.remove(actorId);
-//    }
 
     @OnOpen
     public void onOpen(WebSocketSession session, HttpRequest<?> request) {
@@ -56,12 +45,6 @@ public class CommunicationSocket {
         } else {
             System.err.println("Remote address is null");
         }
-
-//        if (request.getOrigin().isPresent()) {
-//            SessionParamHelper.setAddress(session, request.getOrigin().get());
-//        } else {
-//            log.warn("request origin is not present");
-//        }
     }
 
     @OnMessage

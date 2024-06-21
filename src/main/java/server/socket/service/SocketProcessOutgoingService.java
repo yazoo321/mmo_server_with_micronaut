@@ -262,7 +262,6 @@ public class SocketProcessOutgoingService {
         }
 
         sessionCache.setUdpSession(useId, new UdpAddressHolder(address, port));
-//        communicationSocket.addActorSession(useId, session);
     }
 
     private boolean validate(String value, String name) {
