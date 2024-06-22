@@ -7,15 +7,21 @@ import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import lombok.extern.slf4j.Slf4j;
 import server.actionbar.service.ActionbarService;
 import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
 import server.motion.dto.PlayerMotion;
 import server.session.SessionParamHelper;
+import server.session.cache.UdpSessionCache;
 import server.skills.service.CombatSkillsService;
 import server.socket.model.SocketMessage;
+import server.socket.model.UdpAddressHolder;
 import server.socket.model.types.MessageType;
 import server.socket.model.types.SkillMessageType;
 import server.socket.producer.UpdateProducer;
@@ -42,7 +48,21 @@ public class SocketProcessOutgoingService {
 
     @Inject ActionbarService actionbarService;
 
+    @Inject
+    UdpSessionCache sessionCache;
+
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
+
+    Map<String, Consumer<SocketMessage>> udpFunctionMap;
+
+    private final ConcurrentMap<String, WebSocketSession> actorSessions = new ConcurrentHashMap<>();
+
+    public ConcurrentMap<String, WebSocketSession> getLiveSessions() {
+        return actorSessions;
+    }
+    public void removeActorSession(String actorId) {
+        actorSessions.remove(actorId);
+    }
 
     public SocketProcessOutgoingService() {
         this.functionMap =
@@ -68,6 +88,13 @@ public class SocketProcessOutgoingService {
                 SkillMessageType.FETCH_ACTIONBAR.getType(), this::handleFetchActionBar);
         this.functionMap.put(
                 SkillMessageType.UPDATE_ACTIONBAR.getType(), this::handleUpdateActionBar);
+
+
+        this.udpFunctionMap = new HashMap<>(
+                Map.of(
+                        MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate
+                )
+        );
     }
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {
@@ -84,8 +111,26 @@ public class SocketProcessOutgoingService {
         }
     }
 
+    public void processUDPMessage(SocketMessage socketMessage) {
+        String updateType = socketMessage.getUpdateType();
+
+        if (updateType == null) {
+            throw new InvalidParameterException("message type missing");
+        }
+
+        if (udpFunctionMap.containsKey(updateType)) {
+            udpFunctionMap.get(updateType).accept(socketMessage);
+        } else {
+            log.error("Did not recognise update type, {}", updateType);
+        }
+    }
+
     // update motion for player
     private void handlePlayerMotionUpdate(SocketMessage message, WebSocketSession session) {
+        handlePlayerMotionUpdate(message);
+    }
+
+    private void handlePlayerMotionUpdate(SocketMessage message) {
         PlayerMotion motion = message.getPlayerMotion();
 
         Map<String, String> validateFields =
@@ -200,6 +245,20 @@ public class SocketProcessOutgoingService {
 
         SessionParamHelper.setServerName(session, serverName);
         SessionParamHelper.setActorId(session, actorId);
+
+        String useId = actorId == null || actorId.isBlank() ? serverName : actorId;
+
+        actorSessions.put(useId, session);
+
+        String address = SessionParamHelper.getAddress(session);
+        Integer port = Integer.parseInt(message.getCustomData());
+
+        if (address == null || address.isBlank()) {
+            log.error("Address cannot be blank");
+            throw new RuntimeException("UDP address not configured");
+        }
+
+        sessionCache.setUdpSession(useId, new UdpAddressHolder(address, port));
     }
 
     private boolean validate(String value, String name) {

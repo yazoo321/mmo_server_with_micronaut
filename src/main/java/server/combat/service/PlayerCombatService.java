@@ -29,7 +29,8 @@ import server.socket.service.ClientUpdatesService;
 @Singleton
 public class PlayerCombatService extends CombatService {
 
-    @Inject ClientUpdatesService clientUpdatesService;
+    @Inject
+    ClientUpdatesService clientUpdatesService;
 
     Random rand = new Random();
 

@@ -18,6 +18,9 @@ import server.motion.dto.PlayerMotion;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.ClientUpdatesService;
+import server.socket.service.UdpClientUpdateService;
+import server.socket.service.WebsocketClientUpdatesService;
+import server.utils.FeatureFlag;
 
 @Slf4j
 @KafkaListener(
@@ -27,7 +30,13 @@ import server.socket.service.ClientUpdatesService;
         clientId = "socket_listener")
 public class SocketUpdateListener {
 
-    @Inject ClientUpdatesService clientUpdatesService;
+    @Inject
+    WebsocketClientUpdatesService websocketClientUpdatesService;
+    @Inject
+    UdpClientUpdateService udpClientUpdateService;
+
+    @Inject
+    FeatureFlag featureFlag;
 
     @Topic("player-motion-update-result")
     void receivePlayerMotionUpdate(PlayerMotion playerMotion) {
@@ -39,7 +48,12 @@ public class SocketUpdateListener {
                         .build();
 
         log.info("{}", playerMotion);
-        clientUpdatesService.sendUpdateToListening(socketResponse, playerMotion.getActorId());
+
+        if (featureFlag.getEnableUdp()) {
+            udpClientUpdateService.sendUpdateToListening(socketResponse, playerMotion.getActorId());
+        } else {
+            websocketClientUpdatesService.sendUpdateToListening(socketResponse, playerMotion.getActorId());
+        }
     }
 
     @Topic("mob-motion-update-result")
@@ -52,7 +66,7 @@ public class SocketUpdateListener {
                         .build();
 
         log.info("{}", monster);
-        clientUpdatesService.sendUpdateToListeningPlayers(socketResponse, monster.getActorId());
+        websocketClientUpdatesService.sendUpdateToListeningPlayers(socketResponse, monster.getActorId());
     }
 
     @Topic("item-added-to-map")
@@ -66,12 +80,12 @@ public class SocketUpdateListener {
                                         droppedItem))
                         .build();
 
-        clientUpdatesService.sendDroppedItemUpdates(droppedItem);
+        websocketClientUpdatesService.sendDroppedItemUpdates(droppedItem);
     }
 
     @Topic("item-removed-from-map")
     void itemRemovedFromMap(String itemInstanceId) {
-        clientUpdatesService.sendItemPickupUpdates(itemInstanceId);
+        websocketClientUpdatesService.sendItemPickupUpdates(itemInstanceId);
     }
 
     @Topic("notify-equip-items")
@@ -89,7 +103,7 @@ public class SocketUpdateListener {
                         .messageType(SocketResponseType.ADD_EQUIP_ITEM.getType())
                         .build();
 
-        clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, actorId);
+        websocketClientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, actorId);
     }
 
     @Topic("notify-un-equip-items")
@@ -109,7 +123,7 @@ public class SocketUpdateListener {
                         .messageType(SocketResponseType.REMOVE_EQUIP_ITEM.getType())
                         .build();
 
-        clientUpdatesService.sendUpdateToListeningIncludingSelf(
+        websocketClientUpdatesService.sendUpdateToListeningIncludingSelf(
                 socketResponse, itemInstanceIds.getActorId());
     }
 }

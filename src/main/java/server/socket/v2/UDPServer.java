@@ -3,15 +3,14 @@ package server.socket.v2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.util.concurrent.ConcurrentHashMap;
+
+import java.net.*;
+
 import lombok.extern.slf4j.Slf4j;
 import server.socket.model.SocketMessage;
+import server.socket.model.SocketResponse;
 import server.socket.service.SocketProcessOutgoingService;
 
 @Slf4j
@@ -24,11 +23,12 @@ public class UDPServer {
     private static final ObjectReader reader = mapper.reader();
     private static final ObjectWriter writer = mapper.writer();
 
-    ConcurrentHashMap<String, WebSocketSession> validIps = new ConcurrentHashMap<>();
+    private DatagramSocket socket = new DatagramSocket();
 
-    @Inject SocketProcessOutgoingService socketProcessService;
 
-    public UDPServer() {
+    @Inject SocketProcessOutgoingService socketProcessOutgoingService;
+
+    public UDPServer() throws SocketException {
         Thread serverThread =
                 new Thread(
                         () -> {
@@ -41,21 +41,12 @@ public class UDPServer {
         serverThread.start();
     }
 
-    public void addValidIp(String ip, WebSocketSession session) {
-        validIps.put(ip, session);
-    }
-
-    public void removeValidIp(String ip) {
-        validIps.remove(ip);
-    }
-
-    public void send(SocketMessage message) {
+    public void send(SocketResponse message, InetAddress address, Integer port) {
         try {
             byte[] data = writer.writeValueAsBytes(message);
             DatagramPacket packet =
                     new DatagramPacket(
-                            data, data.length, InetAddress.getByName("localhost"), UDP_PORT);
-            DatagramSocket socket = new DatagramSocket();
+                            data, data.length, address, port);
             socket.send(packet);
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,23 +62,41 @@ public class UDPServer {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
 
-                String hostAddress = packet.getAddress().getHostName();
-                if (!validIps.contains(hostAddress)) {
-                    log.error(
-                            "UDP received message from {} which is not connected to websocket",
-                            hostAddress);
+                SocketMessage message = reader.readValue(packet.getData(), SocketMessage.class);
+
+                String actorId = getActorId(message);
+
+                if (actorId == null) {
+                    log.error("UDP message did not contain actor ID, {}", message);
+
                     continue;
                 }
 
-                SocketMessage message = reader.readValue(packet.getData(), SocketMessage.class);
-
-                WebSocketSession session = validIps.get(hostAddress);
-
-                socketProcessService.processMessage(message, session);
+                socketProcessOutgoingService.processUDPMessage(message);
                 log.info("Message received! {}", message);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            startServer();
         }
     }
+
+    private String getActorId(SocketMessage message) {
+        if (message.getActorId() != null) {
+            return message.getActorId();
+        }
+
+        if (message.getPlayerMotion() != null && message.getPlayerMotion().getActorId() != null
+                && !message.getPlayerMotion().getActorId().isBlank()) {
+            return message.getPlayerMotion().getActorId();
+        }
+
+        if (message.getMonster() != null && message.getMonster().getActorId() != null
+                && !message.getMonster().getActorId().isBlank()) {
+            return message.getMonster().getActorId();
+        }
+
+        return null;
+    }
+
 }

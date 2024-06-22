@@ -6,16 +6,16 @@ import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
-import io.netty.util.internal.ConcurrentSet;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
-import server.motion.model.SessionParams;
 import server.motion.service.PlayerMotionService;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketMessage;
 import server.socket.service.SocketProcessOutgoingService;
-import server.socket.v2.UDPServer;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 @Slf4j
 @ServerWebSocket("/v1/communication-socket")
@@ -30,19 +30,20 @@ public class CommunicationSocket {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject UDPServer udpServer;
-
-    private final ConcurrentSet<WebSocketSession> socketSessions = new ConcurrentSet<>();
 
     @OnOpen
     public void onOpen(WebSocketSession session, HttpRequest<?> request) {
-        if (request.getOrigin().isPresent()) {
-            udpServer.addValidIp(request.getOrigin().get(), session);
+        InetSocketAddress remoteAddress = request.getRemoteAddress();
+
+        if (remoteAddress != null) {
+            // Get the IP address from the remote address
+            InetAddress address = remoteAddress.getAddress();
+
+            // Store the address in the session or use it as needed
+            SessionParamHelper.setAddress(session, address.getHostAddress());
         } else {
-            log.warn("request origin is not present");
+            System.err.println("Remote address is null");
         }
-        // TODO: get player/server name via headers
-        socketSessions.add(session);
     }
 
     @OnMessage
@@ -50,12 +51,6 @@ public class CommunicationSocket {
         // TODO: get player/server name via injected headers
         try {
             updateSessionParams(session, message);
-//            if (message.getMonster() != null && !message.getMonster().getMobId().isBlank()) {
-//                log.info("{}", message.getMonster());
-//            }
-//            if (message.getPlayerMotion() != null && !message.getPlayerMotion().getActorId().isBlank()) {
-//                log.info("{}", message.getPlayerMotion());
-//            }
             socketProcessService.processMessage(message, session);
         } catch (Exception e) {
             // avoid closing connection
@@ -65,13 +60,22 @@ public class CommunicationSocket {
 
     @OnClose
     public void onClose(WebSocketSession session) {
-        String actorId = (String) session.asMap().get(SessionParams.ACTOR_ID.getType());
-        if (actorId == null) {
-            log.error("player name should not be null on disconnect");
-            return;
+        String sessionId;
+        if (SessionParamHelper.getIsPlayer(session)) {
+            sessionId = SessionParamHelper.getActorId(session);
+            if (sessionId == null) {
+                log.error("player name should not be null on disconnect");
+                return;
+            }
+            playerMotionService.disconnectPlayer(sessionId);
+        } else {
+            sessionId = SessionParamHelper.getServerName(session);
+            if (sessionId == null) {
+                log.error("server name should not be null on disconnect");
+            }
         }
-        playerMotionService.disconnectPlayer(actorId);
-        socketSessions.remove(session);
+
+        socketProcessService.removeActorSession(sessionId);
     }
 
     public void updateSessionParams(WebSocketSession session, SocketMessage message) {
@@ -93,7 +97,4 @@ public class CommunicationSocket {
                 && !motion.getMap().equalsIgnoreCase("false");
     }
 
-    public ConcurrentSet<WebSocketSession> getLiveSessions() {
-        return socketSessions;
-    }
 }

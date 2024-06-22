@@ -19,6 +19,7 @@ import server.common.uuid.UUIDHelper;
 import server.motion.model.SessionParams;
 import server.session.model.CacheDomains;
 import server.session.model.CacheKey;
+import server.socket.model.UdpAddressHolder;
 
 @Singleton
 @NonNull @Slf4j
@@ -30,12 +31,19 @@ public class SessionParamHelper {
     RedisCommands<String, Motion> motionCache;
     RedisCommands<String, CombatData> combatDataCache;
 
-    @Inject ActorStatsRepository statsRepository;
-
     public SessionParamHelper(RedisClient redisClient) {
         motionCache = redisClient.connect(new JacksonCodecMotion(objectMapper)).sync();
         combatDataCache = redisClient.connect(new JacksonCodecCombatData(objectMapper)).sync();
     }
+
+    public static void setAddress(WebSocketSession session, String address) {
+        session.put(CacheDomains.CLIENT_ADDRESS.getDomain(), address);
+    }
+
+    public static String getAddress(WebSocketSession session) {
+        return (String) session.asMap().get(CacheDomains.CLIENT_ADDRESS.getDomain());
+    }
+
 
     public void setSharedActorCombatData(String actorId, CombatData combatData) {
         combatDataCache.set(CacheKey.of(CacheDomains.COMBAT_DATA, actorId), combatData);
@@ -52,6 +60,7 @@ public class SessionParamHelper {
     }
 
     public static Motion getMotion(WebSocketSession session) {
+        // this should only be used by server
         return (Motion) session.asMap().getOrDefault(SessionParams.MOTION.getType(), null);
     }
 

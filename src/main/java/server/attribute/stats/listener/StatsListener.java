@@ -10,6 +10,7 @@ import server.attribute.stats.model.Stats;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.ClientUpdatesService;
+import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
@@ -19,7 +20,8 @@ import server.socket.service.ClientUpdatesService;
         clientId = "stats_client")
 public class StatsListener {
 
-    @Inject ClientUpdatesService clientUpdatesService;
+    @Inject
+    WebsocketClientUpdatesService clientUpdatesService;
 
     @Topic("update-actor-stats")
     public void receiveUpdatePlayerAttributes(Stats stats) {
