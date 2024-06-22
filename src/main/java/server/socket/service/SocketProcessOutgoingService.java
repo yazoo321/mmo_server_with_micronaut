@@ -27,7 +27,6 @@ import server.socket.model.types.SkillMessageType;
 import server.socket.producer.UpdateProducer;
 import server.socket.service.integrations.attributes.StatsSocketIntegration;
 import server.socket.service.integrations.items.ItemSocketIntegration;
-import server.socket.v1.CommunicationSocket;
 
 @Slf4j
 @Singleton
@@ -48,8 +47,6 @@ public class SocketProcessOutgoingService {
     @Inject MobCombatService mobCombatService;
 
     @Inject ActionbarService actionbarService;
-
-    @Inject SessionParamHelper sessionParamHelper;
 
     @Inject
     UdpSessionCache sessionCache;

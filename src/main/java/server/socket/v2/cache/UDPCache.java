@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum UDP_Cache {
+public enum UDPCache {
 
     UPDATED_AT("updated_at"),
     ADDRESS("address");
