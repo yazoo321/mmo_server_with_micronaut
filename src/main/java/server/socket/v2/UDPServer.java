@@ -26,6 +26,9 @@ public class UDPServer {
     private static final ObjectReader reader = mapper.reader();
     private static final ObjectWriter writer = mapper.writer();
 
+    private DatagramSocket socket = new DatagramSocket();
+
+
     @Inject SocketProcessOutgoingService socketProcessOutgoingService;
 
     public UDPServer() throws SocketException {
@@ -47,8 +50,6 @@ public class UDPServer {
             DatagramPacket packet =
                     new DatagramPacket(
                             data, data.length, address, port);
-            DatagramSocket socket = new DatagramSocket();
-//            MulticastSocket socket = new MulticastSocket();
             socket.send(packet);
         } catch (Exception e) {
             e.printStackTrace();
