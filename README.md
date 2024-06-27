@@ -14,35 +14,35 @@ Each of the posts contains a video overview.
 - Part 5: How to spawn mobs and sync them to this server: https://unreal-mmo-dev.com/2023/05/15/43-how-to-spawn-and-control-mobs-using-unreal-engine-for-mmo/
 
 ## Character creation examples:
-- Part 1: overview using N-Hance Assets: https://ylazarev.com/2022/08/10/20-unreal-engine-mmo-style-character-creation-with-n-hance-assets/
-- Part 2: Complex nested options: https://ylazarev.com/2022/08/17/21-unreal-engine-character-creation-part-2-complex-nested-options/
-- Part 3: Apply nested options to meshes: https://ylazarev.com/2022/08/27/22-unreal-engine-character-creation-part-3-apply-options-to-mesh-n-hance/
-- Part 4: Connecting implementation with the server: https://ylazarev.com/2022/09/29/23-unreal-engine-character-creation-part-4-connect-to-custom-server/
-- Part 5: Select character screen connected with server: https://ylazarev.com/2022/10/08/24-unreal-engine-character-creation-part-5-select-character-with-server/
+- Part 1: overview using N-Hance Assets: https://unreal-mmo-dev.com/2022/08/10/20-unreal-engine-mmo-style-character-creation-with-n-hance-assets/
+- Part 2: Complex nested options: https://unreal-mmo-dev.com/2022/08/17/21-unreal-engine-character-creation-part-2-complex-nested-options/
+- Part 3: Apply nested options to meshes: https://unreal-mmo-dev.com/2022/08/27/22-unreal-engine-character-creation-part-3-apply-options-to-mesh-n-hance/
+- Part 4: Connecting implementation with the server: https://unreal-mmo-dev.com/2022/09/29/23-unreal-engine-character-creation-part-4-connect-to-custom-server/
+- Part 5: Select character screen connected with server: https://unreal-mmo-dev.com/2022/10/08/24-unreal-engine-character-creation-part-5-select-character-with-server/
 
 ## Logging into the game:
-- Part 1: https://ylazarev.com/2022/10/19/24-unreal-engine-logging-into-a-custom-server/
-- Part 2: https://ylazarev.com/2022/10/26/26-unreal-engine-synchronize-motion-with-a-custom-server/
-- part 3: https://ylazarev.com/2022/11/14/27-unreal-engine-display-nearby-players-with-custom-server/
-- part 4: https://ylazarev.com/2022/11/24/28-unreal-engine-synchronize-nearby-player-appearance/
+- Part 1: https://unreal-mmo-dev.com/2022/10/19/24-unreal-engine-logging-into-a-custom-server/
+- Part 2: https://unreal-mmo-dev.com/2022/10/26/26-unreal-engine-synchronize-motion-with-a-custom-server/
+- part 3: https://unreal-mmo-dev.com/2022/11/14/27-unreal-engine-display-nearby-players-with-custom-server/
+- part 4: https://unreal-mmo-dev.com/2022/11/24/28-unreal-engine-synchronize-nearby-player-appearance/
 
 ## Inventory Implementation
-- Base implementation: https://ylazarev.com/2022/05/11/creating-mmo-rpg-style-inventory-system-with-java-and-mongodb/
-- Base integration with UE: https://ylazarev.com/2022/05/27/14-mmo-rpg-inventory-in-unreal-engine-server/
-- Customise inventory: https://ylazarev.com/2022/06/12/16-ue-customized-mmo-rpg-inventory/
-- Equipping items example: https://ylazarev.com/2022/07/02/17-java-mmo-rpg-inventory-implementation-equipping-items/
-- Equipping items continued: https://ylazarev.com/2022/07/24/19-unreal-engine-equip-inventory-items-with-custom-server/
+- Base implementation: https://unreal-mmo-dev.com/2022/05/11/creating-mmo-rpg-style-inventory-system-with-java-and-mongodb/
+- Base integration with UE: https://unreal-mmo-dev.com/2022/05/27/14-mmo-rpg-inventory-in-unreal-engine-server/
+- Customise inventory: https://unreal-mmo-dev.com/2022/06/12/16-ue-customized-mmo-rpg-inventory/
+- Equipping items example: https://unreal-mmo-dev.com/2022/07/02/17-java-mmo-rpg-inventory-implementation-equipping-items/
+- Equipping items continued: https://unreal-mmo-dev.com/2022/07/24/19-unreal-engine-equip-inventory-items-with-custom-server/
 
 ## Base components, JWT no longer in use, in favor of using Cognito or alternatives
-- Configuring MongoDB & creation of characters for account: https://ylazarev.com/2021/05/08/7-java-micronaut-with-mongodb-character-controller/
+- Configuring MongoDB & creation of characters for account: https://unreal-mmo-dev.com/2021/05/08/7-java-micronaut-with-mongodb-character-controller/
 
 - Setting up Micronaut, jooq, flyway (deprecated with v0.7):
-https://ylazarev.com/2021/04/18/4-java-micronaut-dockered-postgres/
+https://unreal-mmo-dev.com/2021/04/18/4-java-micronaut-dockered-postgres/
 
 - Setting up JWT Authentication (deprecated):
-https://ylazarev.com/2021/04/26/5-java-micronaut-jwt-authentication/
+https://unreal-mmo-dev.com/2021/04/26/5-java-micronaut-jwt-authentication/
 
-- Encode password for user, integrate with JWT: https://ylazarev.com/2021/05/04/6-java-secure-encode-user-credential/
+- Encode password for user, integrate with JWT: https://unreal-mmo-dev.com/2021/05/04/6-java-secure-encode-user-credential/
 
 This project branches from the Micronaut template found here:
 https://github.com/yazoo321/micronaut_template

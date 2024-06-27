@@ -3,7 +3,7 @@
 #
 blogpost covering introduction of this module:
 
-https://ylazarev.com/2022/05/11/creating-mmo-rpg-style-inventory-system-with-java-and-mongodb/
+https://unreal-mmo-dev.com/2022/05/11/creating-mmo-rpg-style-inventory-system-with-java-and-mongodb/
 
 Youtube video containing a summary and live testing:
 https://youtu.be/Udm_cTfi7ms
