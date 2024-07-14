@@ -25,6 +25,7 @@ public class PlayerLevelStatsService {
             List.of(
                     ClassTypes.MAGE.getType(),
                     ClassTypes.FIGHTER.getType(),
+                    ClassTypes.RANGER.getType(),
                     ClassTypes.CLERIC.getType());
 
     public Single<Stats> initializeCharacterClass(String actorId, String playerClass) {
@@ -63,6 +64,16 @@ public class PlayerLevelStatsService {
                 .flatMap(
                         stats -> {
                             Map<String, Integer> baseAttr = stats.getBaseStats();
+
+                            int currentXp = stats.getBaseStat(StatsTypes.XP);
+                            int currentLevel = stats.getBaseStat(StatsTypes.LEVEL);
+
+                            int xpRequired = xpRequiredForLevel(currentLevel + 1);
+
+                            if (currentXp < xpRequired) {
+                                return null;
+                            }
+
                             baseAttr.put(classToLevel, baseAttr.get(classToLevel) + 1);
                             stats.recalculateDerivedStats();
                             return statsRepository.updateStats(stats.getActorId(), stats);
@@ -71,29 +82,53 @@ public class PlayerLevelStatsService {
                         err -> log.error("Failed to get stats on level up, {}", err.getMessage()));
     }
 
+    public void handleAddXp(Stats targetStats, Stats actorStats) {
+        if (!actorStats.isPlayer()) {
+            return;
+        }
+        int xpToAdd = evalXpToAdd(targetStats, actorStats);
+
+        addPlayerXp(actorStats, xpToAdd)
+                .doOnError(err -> log.error("error adding xp, {}", err.getMessage()))
+                .subscribe();
+    }
+
     public Single<Stats> addPlayerXp(String actorId, Integer xpToAdd) {
-        if (xpToAdd < 1) {
+        if (xpToAdd == null || xpToAdd < 1) {
             throw new IllegalArgumentException("Bad request to add player XP");
         }
 
         return statsService
                 .getStatsFor(actorId)
-                .doOnSuccess(
-                        stats -> {
-                            Map<String, Double> attr = stats.getDerivedStats();
-                            attr.put(
-                                    StatsTypes.XP.type,
-                                    attr.getOrDefault(StatsTypes.XP.type, 0.0) + xpToAdd);
-                            Map<String, Double> dataToSend =
-                                    Map.of(StatsTypes.XP.type, attr.get(StatsTypes.XP.type));
-                            statsService.handleDifference(dataToSend, stats);
-                        })
+                .flatMap(stats -> addPlayerXp(stats, xpToAdd))
                 .doOnError(err -> log.error("Failed to add XP, {}", err.getMessage()));
+    }
+
+    public int evalXpToAdd(Stats targetStats, Stats actorStats) {
+        int deadActorLevel = targetStats.getBaseStat(StatsTypes.LEVEL);
+        int levelDiff = deadActorLevel
+                - actorStats.getBaseStat(StatsTypes.LEVEL);
+
+        int xpPerLevel = 100;
+
+        float multiplier = (float) ((levelDiff / 10) + 1);
+
+        return Float.valueOf(deadActorLevel * xpPerLevel * multiplier).intValue();
+    }
+
+    public Single<Stats> addPlayerXp(Stats playerStats, Integer xpToAdd) {
+        playerStats.addToBase(StatsTypes.XP, xpToAdd);
+        return statsService.update(playerStats);
     }
 
     private boolean isClassValid(String className) {
         // consider other validations
 
         return AVAILABLE_CLASSES.contains(className);
+    }
+
+    private int xpRequiredForLevel(int level) {
+//      TODO: make better equations for level and xp
+        return 1000 * level;
     }
 }

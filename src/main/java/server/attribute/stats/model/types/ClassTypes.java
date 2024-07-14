@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum ClassTypes {
     MAGE("mage"),
     FIGHTER("fighter"),
-    CLERIC("cleric");
+    CLERIC("cleric"),
+    RANGER("ranger");
 
     public final String type;
 }

@@ -48,7 +48,7 @@ public class MobCombatService extends CombatService {
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
         Stats actorStats = statsService.getStatsFor(actorId).blockingGet();
         Map<String, Double> derivedStats = actorStats.getDerivedStats();
-        int distanceThreshold = 200;
+        int distanceThreshold = 250;
         Motion attackerMotion = actorMotionRepository.fetchActorMotion(actorId).blockingGet();
 
         boolean valid =
@@ -91,15 +91,15 @@ public class MobCombatService extends CombatService {
 
             // Create a damage map (currently only physical damage)
             Map<DamageTypes, Double> damageMap = calculateDamageMap(derivedStats);
-            Stats stats = statsService.takeDamage(target, damageMap);
+            target = statsService.takeDamage(target, damageMap);
             if (isMainHand) {
                 combatData.setMainHandLastAttack(Instant.now());
             } else {
                 combatData.setOffhandLastAttack(Instant.now());
             }
 
-            if (stats.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-                handleActorDeath(stats);
+            if (target.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
+                handleActorDeath(target, actorStats);
                 combatData.getTargets().remove(target.getActorId());
             }
 

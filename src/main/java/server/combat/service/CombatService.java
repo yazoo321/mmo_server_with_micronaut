@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
+import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
@@ -43,6 +44,9 @@ public class CombatService {
     @Inject ActorMotionRepository actorMotionRepository;
 
     @Inject EquipItemService equipItemService;
+
+    @Inject
+    PlayerLevelStatsService playerLevelStatsService;
 
     boolean validatePositionLocation(
             CombatData combatData,
@@ -120,16 +124,34 @@ public class CombatService {
         clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, actorId);
     }
 
-    public void handleActorDeath(Stats stats) {
+    public void handleActorDeath(Stats targetStats, String actorId) {
+        if (targetStats.getDerived(StatsTypes.CURRENT_HP) > 0.0) {
+            return;
+        }
+
+        statsService.getStatsFor(actorId)
+                .doOnError(err -> log.error("Failed to get stats, {}", err.getMessage()))
+                .doOnSuccess(actorStats -> {
+                    handleActorDeath(targetStats, actorStats);
+                })
+                .subscribe();
+    }
+
+    public void handleActorDeath(Stats stats, Stats killerStats) {
         if (stats.getDerived(StatsTypes.CURRENT_HP) > 0.0) {
             return;
         }
+
+        if (killerStats.isPlayer()) {
+            playerLevelStatsService.handleAddXp(stats, killerStats);
+        }
+
 
         if (stats.isPlayer()) {
             // TODO: implement player death
             statsService.addHealth(stats, 300.0);
         } else {
-            mobInstanceService.handleMobDeath(stats.getActorId());
+            mobInstanceService.handleMobDeath(stats, killerStats);
             sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);
 
             notifyClientsToRemoveMobs(stats.getActorId());

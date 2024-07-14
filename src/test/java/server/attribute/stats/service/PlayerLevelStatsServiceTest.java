@@ -2,9 +2,13 @@ package server.attribute.stats.service;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
@@ -18,6 +22,8 @@ import server.attribute.stats.helpers.StatsTestHelper;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.StatsTypes;
+
+import static org.awaitility.Awaitility.await;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -35,7 +41,8 @@ public class PlayerLevelStatsServiceTest {
         return Stream.of(
                 Arguments.of(ClassTypes.CLERIC.getType()),
                 Arguments.of(ClassTypes.FIGHTER.getType()),
-                Arguments.of(ClassTypes.MAGE.getType()));
+                Arguments.of(ClassTypes.MAGE.getType()),
+                Arguments.of(ClassTypes.RANGER.getType()));
     }
 
     @BeforeEach
@@ -78,6 +85,9 @@ public class PlayerLevelStatsServiceTest {
                 .initializeCharacterClass(ACTOR_ID, characterClass)
                 .blockingSubscribe();
 
+        // you need enough XP to level:
+        playerLevelStatsService.addPlayerXp(ACTOR_ID, 1_000_000).blockingSubscribe();
+
         // when
         playerLevelStatsService.handleLevelUp(ACTOR_ID, characterClass).blockingSubscribe();
         Map<String, Integer> expectedTags =
@@ -98,17 +108,25 @@ public class PlayerLevelStatsServiceTest {
                 .initializeCharacterClass(ACTOR_ID, ClassTypes.FIGHTER.getType())
                 .blockingSubscribe();
 
-        Double expectedXp = 700.0;
+        Integer expectedXp = 700;
 
         // when
         playerLevelStatsService.addPlayerXp(ACTOR_ID, 500).blockingSubscribe();
         playerLevelStatsService.addPlayerXp(ACTOR_ID, 200).blockingSubscribe();
 
         // then
+
+        await().pollDelay(300, TimeUnit.MILLISECONDS)
+                .timeout(Duration.of(2, ChronoUnit.SECONDS))
+                .until(() -> {
+                    Stats stats = statsService.getStatsFor(ACTOR_ID).blockingGet();
+
+                    Integer actualXp = stats.getBaseStat(StatsTypes.XP);
+                    return actualXp.equals(expectedXp);
+                });
+
         Stats stats = statsService.getStatsFor(ACTOR_ID).blockingGet();
-
-        Double actualXp = stats.getDerived(StatsTypes.XP);
-
+        Integer actualXp = stats.getBaseStat(StatsTypes.XP);
         Assertions.assertThat(actualXp).isEqualTo(expectedXp);
     }
 
