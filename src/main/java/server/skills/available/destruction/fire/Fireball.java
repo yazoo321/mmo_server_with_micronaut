@@ -39,12 +39,12 @@ public class Fireball extends ChannelledSkill {
         Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
         dmgAmt = dmgAmt * healAmp * (1 + rand.nextDouble(0.15));
 
-        Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.MAGIC, dmgAmt);
+        Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.FIRE, dmgAmt);
 
         String target = skillTarget.getTargetId();
         Stats targetStats = statsService.getStatsFor(target).blockingGet();
 
-        Stats stats = statsService.takeDamage(targetStats, damageMap);
+        Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());
 
         checkDeath(stats);
     }

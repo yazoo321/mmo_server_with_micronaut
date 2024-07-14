@@ -42,6 +42,11 @@ public class PlayerCombatService extends CombatService {
                 sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
         combatData.setTargets(combatRequest.getTargets());
 
+        if (sessionsInCombat.contains(SessionParamHelper.getActorId(session))) {
+            sessionParamHelper.setSharedActorCombatData(SessionParamHelper.getActorId(session), combatData);
+            // this can mean a change of target, we want to update the combat data but not to start another attack loop
+            return;
+        }
         sessionsInCombat.add(SessionParamHelper.getActorId(session));
         sessionParamHelper.setSharedActorCombatData(
                 SessionParamHelper.getActorId(session), combatData);
@@ -122,7 +127,7 @@ public class PlayerCombatService extends CombatService {
 
             // Create a damage map (currently only physical damage)
             Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
-            target = statsService.takeDamage(target, damageMap);
+            target = statsService.takeDamage(target, damageMap, actorId);
             if (isMainHand) {
                 combatData.setMainHandLastAttack(Instant.now());
             } else {
@@ -170,7 +175,10 @@ public class PlayerCombatService extends CombatService {
                             return true;
                         })
                 .delaySubscription(100, TimeUnit.MILLISECONDS)
-                .doOnError(er -> log.error("Error encountered, {}", er.getMessage()))
+                .doOnError(er -> {
+                    log.error("Error encountered, {}", er.getMessage());
+                    sessionsInCombat.remove(SessionParamHelper.getActorId(session));
+                })
                 .subscribe();
     }
 
