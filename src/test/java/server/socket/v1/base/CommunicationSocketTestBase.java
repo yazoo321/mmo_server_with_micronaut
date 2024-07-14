@@ -145,8 +145,8 @@ public class CommunicationSocketTestBase {
         SocketMessage socketMsg = createMessageForMotionWithinRange(actorId);
         Motion motion = socketMsg.getPlayerMotion().getMotion();
 
-        motion.setX(10_000);
-        motion.setY(10_000);
+        motion.setX(20_000);
+        motion.setY(20_000);
 
         return socketMsg;
     }

@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.model.derived.Dead;
 import server.attribute.status.service.StatusService;
@@ -73,8 +74,11 @@ public class MobInstanceService {
         return MotionResult.builder().monster(monster).build();
     }
 
-    public void handleMobDeath(String mobId) {
+    public void handleMobDeath(Stats mobStats, Stats actorStats) {
         // we will set state to death and wait for animations etc
+        String mobId = mobStats.getActorId();
+
+
 
         statusService.addStatusToActor(Set.of(new Dead()), mobId);
         statusService

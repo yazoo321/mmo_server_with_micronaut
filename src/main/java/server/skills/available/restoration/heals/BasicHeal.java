@@ -48,7 +48,7 @@ public class BasicHeal extends ChannelledSkill {
 
         Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());
 
-        checkDeath(stats);
+        checkDeath(stats, combatData.getActorId());
     }
 
     @Override

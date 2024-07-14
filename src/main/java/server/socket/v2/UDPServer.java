@@ -25,6 +25,10 @@ public class UDPServer {
 
     private DatagramSocket socket = new DatagramSocket();
 
+    // TODO: put to config?
+    private static final int RETRIES = 5;
+    private int attempts = 0;
+
 
     @Inject SocketProcessOutgoingService socketProcessOutgoingService;
 
@@ -76,8 +80,12 @@ public class UDPServer {
                 log.info("Message received! {}", message);
             }
         } catch (Exception e) {
+            log.error("Server failed with stacktrace: {}", e.getMessage());
             e.printStackTrace();
-            startServer();
+            attempts++;
+            if (attempts < RETRIES) {
+                startServer();
+            }
         }
     }
 

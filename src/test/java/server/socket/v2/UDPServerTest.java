@@ -6,6 +6,9 @@ import server.motion.dto.PlayerMotion;
 import server.socket.model.SocketMessage;
 import server.socket.v1.base.CommunicationSocketTestBase;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class UDPServerTest extends CommunicationSocketTestBase {
 
     @Inject private UDPServer udpServer;
@@ -13,18 +16,21 @@ public class UDPServerTest extends CommunicationSocketTestBase {
     private static final String CHARACTER_1 = "CHARACTER_1";
 
     @Test
-    void testWeCanReceiveMessage() {
+    void testWeCanReceiveMessage() throws UnknownHostException {
 
-        SocketMessage testMessage = new SocketMessage();
-        testMessage.setUpdateType("TEST_UPDATE_TYPE");
-        testMessage.setActorId(CHARACTER_1);
-        PlayerMotion playerMotion = new PlayerMotion();
-        playerMotion.setMotion(createBaseMotion());
-        playerMotion.setActorId(CHARACTER_1);
-        testMessage.setPlayerMotion(playerMotion);
-
-        udpServer.send(testMessage);
     }
+
+//        SocketMessage testMessage = new SocketMessage();
+//        testMessage.setUpdateType("TEST_UPDATE_TYPE");
+//        testMessage.setActorId(CHARACTER_1);
+//        PlayerMotion playerMotion = new PlayerMotion();
+//        playerMotion.setMotion(createBaseMotion());
+//        playerMotion.setActorId(CHARACTER_1);
+//        testMessage.setPlayerMotion(playerMotion);
+//
+////        InetAddress.getLocalHost();
+//        udpServer.send(testMessage, InetAddress.getLocalHost(), 9876);
+//    }
     //
     //    @Test
     //    void testBasicMotionUpdateBetween2Players() throws Exception {

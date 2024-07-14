@@ -135,7 +135,7 @@ public class PlayerCombatService extends CombatService {
             }
 
             if (target.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-                handleActorDeath(target);
+                handleActorDeath(target, actorStats);
                 combatData.getTargets().remove(target.getActorId());
             }
 
