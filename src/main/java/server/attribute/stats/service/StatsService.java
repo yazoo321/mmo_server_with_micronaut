@@ -90,6 +90,10 @@ public class StatsService {
         return repository.updateStats(playerStats.getActorId(), playerStats);
     }
 
+    public Single<Stats> update(Stats stats) {
+        return repository.updateStats(stats.getActorId(), stats);
+    }
+
     public Single<Stats> getStatsFor(String actorId) {
         return repository.fetchActorStats(actorId);
     }

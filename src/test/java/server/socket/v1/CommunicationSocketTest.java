@@ -18,6 +18,7 @@ import server.socket.v1.base.CommunicationSocketTestBase;
 import server.util.websocket.TestWebSocketClient;
 
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
+@Property(name = "feature-flags.enableUdp", value = "false")
 public class CommunicationSocketTest extends CommunicationSocketTestBase {
 
     @Test
