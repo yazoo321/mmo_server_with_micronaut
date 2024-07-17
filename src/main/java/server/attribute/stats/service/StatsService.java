@@ -140,13 +140,6 @@ public class StatsService {
 
         updateProducer.updateDamage(damageSource);
 
-//        damageMap.forEach(
-//                (k, v) -> {
-//                    Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
-//                    currentHp -= v;
-//                    setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
-//                });
-
         return stats;
     }
 
