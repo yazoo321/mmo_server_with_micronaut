@@ -34,6 +34,11 @@ public class MobCombatService extends CombatService {
         CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
         combatData.setTargets(combatRequest.getTargets());
 
+        if (sessionsInCombat.contains(actorId)) {
+            sessionParamHelper.setSharedActorCombatData(actorId, combatData);
+            // this can mean a change of target, we want to update the combat data but not to start another attack loop
+            return;
+        }
         sessionsInCombat.add(actorId);
         sessionParamHelper.setSharedActorCombatData(actorId, combatData);
         attackLoop(actorId);
@@ -91,7 +96,7 @@ public class MobCombatService extends CombatService {
 
             // Create a damage map (currently only physical damage)
             Map<DamageTypes, Double> damageMap = calculateDamageMap(derivedStats);
-            target = statsService.takeDamage(target, damageMap);
+            target = statsService.takeDamage(target, damageMap, actorId);
             if (isMainHand) {
                 combatData.setMainHandLastAttack(Instant.now());
             } else {
@@ -116,36 +121,45 @@ public class MobCombatService extends CombatService {
     }
 
     void attackLoop(String actorId) {
-        CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
-        if (combatData == null) {
-            // mob likely died, later we can specify death state to be certain instead.
+        try {
+            CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
+            if (combatData == null) {
+                // mob likely died, later we can specify death state to be certain instead.
+                sessionsInCombat.remove(actorId);
+            }
+
+            Set<String> targets = combatData.getTargets();
+
+            List<Stats> targetStats = getTargetStats(targets);
+
+            if (targetStats.isEmpty()) {
+                log.warn("Target stats empty");
+                sessionsInCombat.remove(actorId);
+                return;
+            }
+
+            targetStats.forEach(
+                    stat -> {
+                        tryAttack(actorId, stat, true);
+                        //            tryAttack(session, stat, "OFF_HAND");
+                    });
+
+
+            Single.fromCallable(
+                            () -> {
+                                attackLoop(actorId);
+                                return true;
+                            })
+                    .delaySubscription(100, TimeUnit.MILLISECONDS)
+                    .doOnError(er -> {
+                        log.error("Error encountered, {}", er.getMessage());
+                        sessionsInCombat.remove(actorId);
+                    })
+                    .subscribe();
+        } catch (Exception e) {
+            log.error("Exception in attack loop: {}", e.getMessage());
             sessionsInCombat.remove(actorId);
         }
-
-        Set<String> targets = combatData.getTargets();
-
-        List<Stats> targetStats = getTargetStats(targets);
-
-        if (targetStats.isEmpty()) {
-            log.warn("Target stats empty");
-            sessionsInCombat.remove(actorId);
-            return;
-        }
-
-        targetStats.forEach(
-                stat -> {
-                    tryAttack(actorId, stat, true);
-                    //            tryAttack(session, stat, "OFF_HAND");
-                });
-
-        Single.fromCallable(
-                        () -> {
-                            attackLoop(actorId);
-                            return true;
-                        })
-                .delaySubscription(100, TimeUnit.MILLISECONDS)
-                .doOnError(er -> log.error("Error encountered, {}", er.getMessage()))
-                .subscribe();
     }
 
     private void requestAttackSwing(String actorId, CombatData combatData, boolean isMainHand) {

@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.actionbar.model.ActorActionbar;
+import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatRequest;
@@ -49,6 +50,8 @@ public class SocketResponse {
     Stats stats;
 
     ActorStatus actorStatus;
+
+    DamageSource damageSource;
 
     ActorSkills actorSkills;
 

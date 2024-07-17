@@ -6,7 +6,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.stats.types.DamageTypes;
@@ -115,14 +118,27 @@ public class StatsService {
                 .blockingSubscribe();
     }
 
-    public Stats takeDamage(Stats stats, Map<DamageTypes, Double> damageMap) {
+    public Stats takeDamage(Stats stats, Map<DamageTypes, Double> damageMap, String sourceActor) {
         // TODO: send stat update once, send map of damage
-        damageMap.forEach(
-                (k, v) -> {
-                    Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
-                    currentHp -= v;
-                    setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
-                });
+
+        Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
+
+        Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
+        currentHp = currentHp - totalDamage;
+
+        setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
+
+        Map<String, Double> damageMapString = damageMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(e -> e.getKey().getType(), Map.Entry::getValue));
+
+        DamageSource damageSource = DamageSource.builder()
+                .damageMap(damageMapString)
+                .actorId(stats.getActorId())
+                .sourceActorId(sourceActor)
+                .build();
+
+        updateProducer.updateDamage(damageSource);
 
         return stats;
     }

@@ -6,10 +6,10 @@ import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
-import server.socket.service.ClientUpdatesService;
 import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
@@ -32,5 +32,17 @@ public class StatsListener {
                         .build();
 
         clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, stats.getActorId());
+    }
+
+    @Topic("damage-updates")
+    public void receiveDamageUpdates(DamageSource damageSource) {
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.DAMAGE_UPDATE.getType())
+                        .damageSource(damageSource)
+                        .build();
+
+        clientUpdatesService.sendUpdateToListeningIncludingSelf(
+                socketResponse, damageSource.getActorId());
     }
 }
