@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import server.actionbar.service.ActionbarService;
 import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
+import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
 import server.session.SessionParamHelper;
 import server.session.cache.UdpSessionCache;
@@ -92,7 +93,8 @@ public class SocketProcessOutgoingService {
 
         this.udpFunctionMap = new HashMap<>(
                 Map.of(
-                        MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate
+                        MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate,
+                        MessageType.MOB_MOTION.getType(), this::handleMobMotionUpdate
                 )
         );
     }
@@ -157,9 +159,12 @@ public class SocketProcessOutgoingService {
         updateProducer.sendPlayerMotionUpdate(message.getPlayerMotion());
     }
 
-    // update motion for monster
-    private void handleMobMotionUpdate(SocketMessage message, WebSocketSession session) {
+    private void handleMobMotionUpdate(SocketMessage message) {
         updateProducer.sendMobMotionUpdate(message.getMonster());
+    }
+
+    private void handleMobMotionUpdate(SocketMessage message, WebSocketSession session) {
+        handleMobMotionUpdate(message);
     }
 
     private void handleCreateMob(SocketMessage message, WebSocketSession session) {

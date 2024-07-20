@@ -14,6 +14,7 @@ import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.items.model.DroppedItem;
 import server.motion.model.SessionParams;
+import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
@@ -27,6 +28,9 @@ public class ClientUpdatesService {
     @Inject WebSocketBroadcaster broadcaster;
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
+
+    @Inject
+    ActorMotionRepository actorMotionRepository;
     
 
     public void sendDroppedItemUpdates(DroppedItem droppedItem) {
@@ -81,7 +85,9 @@ public class ClientUpdatesService {
                 // servers don't need item updates
                 return false;
             }
-            Motion motion = SessionParamHelper.getMotion(s);
+            // TODO: needs to be batched
+            String actorId = SessionParamHelper.getActorId(s);
+            Motion motion = actorMotionRepository.fetchActorMotion(actorId).blockingGet();
 
             if (motion == null) {
                 return false;

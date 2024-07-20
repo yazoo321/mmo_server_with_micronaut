@@ -46,12 +46,7 @@ public class SynchroniseSessionService {
                             }
 
                             Motion motion = SessionParamHelper.getIsServer(session) ?
-                                    SessionParamHelper.getMotion(session) :
-                                    actorMotionRepository
-                                            .fetchActorMotion(
-                                                    SessionParamHelper.getActorId(session))
-                                            .doOnError(err -> log.error(err.getMessage()))
-                                            .blockingGet();
+                                    getServerMotion(session) : getPlayerMotion(session);
 
                             if (motion == null) {
                                 log.error(
@@ -65,5 +60,26 @@ public class SynchroniseSessionService {
                             synchroniseDroppedItemsService.handleSynchroniseDroppedItems(
                                     motion, session);
                         });
+    }
+
+    private Motion getServerMotion(WebSocketSession session) {
+        Set<String> trackingMobs = SessionParamHelper.getTrackingMobs(session);
+        if (trackingMobs.iterator().hasNext()) {
+            String actorId = trackingMobs.iterator().next();
+            return actorMotionRepository
+                    .fetchActorMotion(actorId)
+                    .doOnError(err -> log.error(err.getMessage()))
+                    .blockingGet();
+        } else {
+            return null;
+        }
+    }
+
+    private Motion getPlayerMotion(WebSocketSession session) {
+        return actorMotionRepository
+                .fetchActorMotion(
+                        SessionParamHelper.getActorId(session))
+                .doOnError(err -> log.error(err.getMessage()))
+                .blockingGet();
     }
 }

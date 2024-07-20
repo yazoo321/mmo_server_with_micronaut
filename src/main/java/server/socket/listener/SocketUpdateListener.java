@@ -66,7 +66,12 @@ public class SocketUpdateListener {
                         .build();
 
         log.info("{}", monster);
-        websocketClientUpdatesService.sendUpdateToListeningPlayers(socketResponse, monster.getActorId());
+
+        if (featureFlag.getEnableUdp()) {
+            udpClientUpdateService.sendUpdateToListening(socketResponse, monster.getActorId());
+        } else {
+            websocketClientUpdatesService.sendUpdateToListening(socketResponse, monster.getActorId());
+        }
     }
 
     @Topic("item-added-to-map")
