@@ -151,7 +151,7 @@ public class CombatService {
             // TODO: implement player death
             statsService.addHealth(stats, 300.0);
         } else {
-            mobInstanceService.handleMobDeath(stats, killerStats);
+            mobInstanceService.handleMobDeath(stats.getActorId());
             sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);
 
             notifyClientsToRemoveMobs(stats.getActorId());

@@ -74,12 +74,8 @@ public class MobInstanceService {
         return MotionResult.builder().monster(monster).build();
     }
 
-    public void handleMobDeath(Stats mobStats, Stats actorStats) {
+    public void handleMobDeath(String mobId) {
         // we will set state to death and wait for animations etc
-        String mobId = mobStats.getActorId();
-
-
-
         statusService.addStatusToActor(Set.of(new Dead()), mobId);
         statusService
                 .deleteActorStatus(mobId)

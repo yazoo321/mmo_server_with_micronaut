@@ -14,6 +14,8 @@ import server.monster.server_integration.service.MobInstanceService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 
+import java.util.List;
+
 @Slf4j
 @KafkaListener(
         groupId = "mmo-server",
@@ -44,6 +46,12 @@ public class MonsterServerListener {
                         })
                 .doOnError(error -> log.error("Error on creating mob, {}", error.getMessage()))
                 .subscribe();
+    }
+
+
+    @Topic("remove-mobs-from-game")
+    public void receiveRemoveMobsFromGame(List<String> actorIds) {
+        actorIds.parallelStream().forEach(id -> mobInstanceService.handleMobDeath(id));
     }
 
     @Topic("mob-motion-update")

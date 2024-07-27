@@ -22,6 +22,9 @@ public interface UpdateProducer {
     @Topic("create-mob")
     void sendCreateMob(Monster monster);
 
+    @Topic("remove-mobs-from-game")
+    void removeMobsFromGame(List<String> actorIds);
+
     @Topic("player-motion-update")
     void sendPlayerMotionUpdate(PlayerMotion playerMotion);
 

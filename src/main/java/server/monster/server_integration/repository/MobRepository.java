@@ -69,7 +69,7 @@ public class MobRepository {
     }
 
     public Single<List<Monster>> getMobsNearby(Location location) {
-        return MongoDbQueryHelper.nearbyMobMotionFinder(mobMotionMongoCollection, location, 2000);
+        return MongoDbQueryHelper.nearbyMobMotionFinder(mobMotionMongoCollection, location, 20_000);
     }
 
     public Single<DeleteResult> deleteMobsNotUpdatedWithin(Instant time) {
