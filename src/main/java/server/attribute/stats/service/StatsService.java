@@ -7,7 +7,6 @@ import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
@@ -128,15 +127,16 @@ public class StatsService {
 
         setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
 
-        Map<String, Double> damageMapString = damageMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(e -> e.getKey().getType(), Map.Entry::getValue));
+        Map<String, Double> damageMapString =
+                damageMap.entrySet().stream()
+                        .collect(Collectors.toMap(e -> e.getKey().getType(), Map.Entry::getValue));
 
-        DamageSource damageSource = DamageSource.builder()
-                .damageMap(damageMapString)
-                .actorId(stats.getActorId())
-                .sourceActorId(sourceActor)
-                .build();
+        DamageSource damageSource =
+                DamageSource.builder()
+                        .damageMap(damageMapString)
+                        .actorId(stats.getActorId())
+                        .sourceActorId(sourceActor)
+                        .build();
 
         updateProducer.updateDamage(damageSource);
 
@@ -165,7 +165,12 @@ public class StatsService {
                             }
                             applyRegen(stats);
                         })
-                .doOnError(err -> log.error("Failed to apply regen for actor: {}, {}", actorName, err.getMessage()))
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "Failed to apply regen for actor: {}, {}",
+                                        actorName,
+                                        err.getMessage()))
                 .subscribe();
     }
 
@@ -206,6 +211,19 @@ public class StatsService {
                     .blockingGet();
             Stats notifyUpdates =
                     Stats.builder().actorId(stats.getActorId()).derivedStats(updated).build();
+            updateProducer.updateStats(notifyUpdates);
+        }
+    }
+
+    void handleBaseDifference(Map<String, Integer> updated, Stats stats) {
+        if (!updated.isEmpty()) {
+            //          TODO: Make this async, its blocking to help with tests only
+            repository
+                    .updateStats(stats.getActorId(), stats)
+                    .doOnError(err -> log.error("Failed to update stats, {}", err.getMessage()))
+                    .blockingGet();
+            Stats notifyUpdates =
+                    Stats.builder().actorId(stats.getActorId()).baseStats(updated).build();
             updateProducer.updateStats(notifyUpdates);
         }
     }

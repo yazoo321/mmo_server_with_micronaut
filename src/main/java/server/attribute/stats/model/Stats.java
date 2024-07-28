@@ -61,17 +61,12 @@ public class Stats {
     }
 
     public Integer addToBase(StatsTypes type, Integer val) {
-        if (baseStats.containsKey(type.getType())
-                && baseStats.get(type.getType()).equals(val)) {
-            // avoid a write
-        } else if (!baseStats.containsKey(type.getType())) {
-            baseStats.put(type.getType(), val);
-        } else {
-            baseStats.put(type.getType(), baseStats.getOrDefault(type.getType(), 0) + val);
-        }
+        Integer updated = baseStats.getOrDefault(type.getType(), 0) + val;
+        baseStats.put(type.getType(), updated);
 
-        return baseStats.get(type.getType());
+        return updated;
     }
+
     public Double getDerived(StatsTypes type) {
         return derivedStats.getOrDefault(type.getType(), 0.0);
     }
@@ -85,19 +80,6 @@ public class Stats {
             derivedStats.put(type.getType(), val);
             return true;
         }
-    }
-
-    public Double addToDerived(StatsTypes type, Double val) {
-        if (derivedStats.containsKey(type.getType())
-                && derivedStats.get(type.getType()).equals(val)) {
-            // avoid a write
-        } else if (!derivedStats.containsKey(type.getType())) {
-            derivedStats.put(type.getType(), val);
-        } else {
-            derivedStats.put(type.getType(), derivedStats.getOrDefault(type.getType(), 0.0) + val);
-        }
-
-        return derivedStats.get(type.getType());
     }
 
     public void setBase(StatsTypes type, int value) {

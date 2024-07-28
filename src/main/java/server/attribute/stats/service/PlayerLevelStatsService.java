@@ -88,9 +88,7 @@ public class PlayerLevelStatsService {
         }
         int xpToAdd = evalXpToAdd(targetStats, actorStats);
 
-        addPlayerXp(actorStats, xpToAdd)
-                .doOnError(err -> log.error("error adding xp, {}", err.getMessage()))
-                .subscribe();
+        addPlayerXp(actorStats, xpToAdd);
     }
 
     public Single<Stats> addPlayerXp(String actorId, Integer xpToAdd) {
@@ -100,14 +98,13 @@ public class PlayerLevelStatsService {
 
         return statsService
                 .getStatsFor(actorId)
-                .flatMap(stats -> addPlayerXp(stats, xpToAdd))
+                .doOnSuccess(stats -> addPlayerXp(stats, xpToAdd))
                 .doOnError(err -> log.error("Failed to add XP, {}", err.getMessage()));
     }
 
     public int evalXpToAdd(Stats targetStats, Stats actorStats) {
         int deadActorLevel = targetStats.getBaseStat(StatsTypes.LEVEL);
-        int levelDiff = deadActorLevel
-                - actorStats.getBaseStat(StatsTypes.LEVEL);
+        int levelDiff = deadActorLevel - actorStats.getBaseStat(StatsTypes.LEVEL);
 
         int xpPerLevel = 100;
 
@@ -116,9 +113,11 @@ public class PlayerLevelStatsService {
         return Float.valueOf(deadActorLevel * xpPerLevel * multiplier).intValue();
     }
 
-    public Single<Stats> addPlayerXp(Stats playerStats, Integer xpToAdd) {
-        playerStats.addToBase(StatsTypes.XP, xpToAdd);
-        return statsService.update(playerStats);
+    public void addPlayerXp(Stats playerStats, Integer xpToAdd) {
+        int newXp = playerStats.addToBase(StatsTypes.XP, xpToAdd);
+        Map<String, Integer> updated = Map.of(StatsTypes.XP.getType(), newXp);
+        statsService.handleBaseDifference(updated, playerStats);
+        //        return statsService.update(playerStats);
     }
 
     private boolean isClassValid(String className) {
@@ -128,7 +127,7 @@ public class PlayerLevelStatsService {
     }
 
     private int xpRequiredForLevel(int level) {
-//      TODO: make better equations for level and xp
+        //      TODO: make better equations for level and xp
         return 1000 * level;
     }
 }
