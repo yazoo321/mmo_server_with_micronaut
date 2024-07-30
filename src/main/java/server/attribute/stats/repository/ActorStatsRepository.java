@@ -40,7 +40,8 @@ public class ActorStatsRepository {
         return Single.fromPublisher(actorStats.find(eq("actorId", actorId)));
     }
 
-    @CachePut(value = ACTOR_STATS_CACHE, parameters = "actorId")
+    // TODO: Identify why async required
+    @CachePut(value = ACTOR_STATS_CACHE, parameters = "actorId", async = true)
     public Single<Stats> updateStats(String actorId, Stats stats) {
         Bson filter = Filters.eq("actorId", stats.getActorId());
         ReplaceOptions options = new ReplaceOptions().upsert(true);
@@ -48,6 +49,7 @@ public class ActorStatsRepository {
                 .map(res -> stats);
     }
 
+    // TODO: Identify why async required
     @CacheInvalidate(value = ACTOR_STATS_CACHE, parameters = "actorId", async = true)
     public Single<DeleteResult> deleteStats(String actorId) {
         return Single.fromPublisher(actorStats.deleteOne(eq("actorId", actorId)));

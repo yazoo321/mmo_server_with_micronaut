@@ -26,7 +26,7 @@ public class UDPServer {
     private DatagramSocket socket = new DatagramSocket();
 
     // TODO: put to config?
-    private static final int RETRIES = 5;
+    private static final int RETRIES = 10;
     private int attempts = 0;
 
 
@@ -77,14 +77,18 @@ public class UDPServer {
                 }
 
                 socketProcessOutgoingService.processUDPMessage(message);
-                log.info("Message received! {}", message);
+//                log.info("Message received! {}", message);
             }
+        } catch (BindException e) {
+          log.error("Bind exception detected, another thread already using this");
         } catch (Exception e) {
             log.error("Server failed with stacktrace: {}", e.getMessage());
             e.printStackTrace();
             attempts++;
             if (attempts < RETRIES) {
                 startServer();
+            } else {
+                log.error("Critical error, server failed too many times, shutting down");
             }
         }
     }

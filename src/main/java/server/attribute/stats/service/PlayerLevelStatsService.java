@@ -126,7 +126,16 @@ public class PlayerLevelStatsService {
 
     public void addPlayerXp(Stats playerStats, Integer xpToAdd) {
         int newXp = playerStats.addToBase(StatsTypes.XP, xpToAdd);
-        Map<String, Integer> updated = Map.of(StatsTypes.XP.getType(), newXp);
+        Map<String, Integer> updated = new HashMap<>(Map.of(StatsTypes.XP.getType(), newXp));
+
+        int canLevel = playerStats.getBaseStat(StatsTypes.CAN_LEVEL);
+        if (canLevel == 0) {
+            if (newXp >= xpRequiredForLevel(playerStats.getBaseStat(StatsTypes.LEVEL))) {
+                updated.put(StatsTypes.CAN_LEVEL.getType(), 1);
+                playerStats.setBase(StatsTypes.CAN_LEVEL, 1);
+            }
+        }
+
         statsService.handleBaseDifference(updated, playerStats);
         //        return statsService.update(playerStats);
     }

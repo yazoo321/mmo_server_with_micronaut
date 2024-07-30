@@ -50,8 +50,8 @@ public enum StatsTypes {
 
     // Level stats
     XP("XP"),
+    XP_TO_NEXT_LEVEL("XP_TO_NEXT_LEVEL"),
     LEVEL("LEVEL"),
-
     CAN_LEVEL("CAN_LEVEL"),
 
     // Mob specific stats

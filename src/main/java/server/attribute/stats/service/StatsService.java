@@ -209,7 +209,7 @@ public class StatsService {
             repository
                     .updateStats(stats.getActorId(), stats)
                     .doOnError(err -> log.error("Failed to update stats, {}", err.getMessage()))
-                    .blockingGet();
+                    .blockingSubscribe();
             Stats notifyUpdates =
                     Stats.builder().actorId(stats.getActorId()).derivedStats(updated).build();
             updateProducer.updateStats(notifyUpdates);
@@ -222,7 +222,7 @@ public class StatsService {
             repository
                     .updateStats(stats.getActorId(), stats)
                     .doOnError(err -> log.error("Failed to update stats, {}", err.getMessage()))
-                    .blockingGet();
+                    .blockingSubscribe();
             Stats notifyUpdates =
                     Stats.builder().actorId(stats.getActorId()).baseStats(updated).build();
             updateProducer.updateStats(notifyUpdates);

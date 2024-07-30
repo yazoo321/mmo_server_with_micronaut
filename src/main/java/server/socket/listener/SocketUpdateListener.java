@@ -47,7 +47,7 @@ public class SocketUpdateListener {
                         .playerKeys(Set.of(playerMotion.getActorId()))
                         .build();
 
-        log.info("{}", playerMotion);
+//        log.info("{}", playerMotion);
 
         if (featureFlag.getEnableUdp()) {
             udpClientUpdateService.sendUpdateToListening(socketResponse, playerMotion.getActorId());
@@ -65,7 +65,7 @@ public class SocketUpdateListener {
                         .mobKeys(Set.of(monster.getActorId()))
                         .build();
 
-        log.info("{}", monster);
+//        log.info("{}", monster);
 
         if (featureFlag.getEnableUdp()) {
             udpClientUpdateService.sendUpdateToListening(socketResponse, monster.getActorId());

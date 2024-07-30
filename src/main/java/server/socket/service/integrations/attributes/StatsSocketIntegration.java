@@ -18,7 +18,6 @@ public class StatsSocketIntegration {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-    @Inject SessionParamHelper sessionParamHelper;
 
     public void handleFetchStats(String actorId, WebSocketSession session) {
         statsService
