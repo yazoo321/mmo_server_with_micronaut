@@ -40,7 +40,7 @@ public class ActorStatsRepository {
         return Single.fromPublisher(actorStats.find(eq("actorId", actorId)));
     }
 
-    @CachePut(value = ACTOR_STATS_CACHE, parameters = "actorId", async = true)
+    @CachePut(value = ACTOR_STATS_CACHE, parameters = "actorId")
     public Single<Stats> updateStats(String actorId, Stats stats) {
         Bson filter = Filters.eq("actorId", stats.getActorId());
         ReplaceOptions options = new ReplaceOptions().upsert(true);

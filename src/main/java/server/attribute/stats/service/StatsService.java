@@ -59,7 +59,7 @@ public class StatsService {
         mobStats.setDerived(StatsTypes.CURRENT_HP, mobStats.getDerived(StatsTypes.MAX_HP));
         mobStats.setAttributePoints(0);
 
-        repository.updateStats(mobStats.getActorId(), mobStats).subscribe();
+        repository.updateStats(mobStats.getActorId(), mobStats).blockingSubscribe();
         CombatData combatData = new CombatData(actorId);
         sessionParamHelper.setSharedActorCombatData(actorId, combatData);
     }
@@ -75,7 +75,8 @@ public class StatsService {
                                 StatsTypes.STR.getType(), 15,
                                 StatsTypes.STA.getType(), 15,
                                 StatsTypes.DEX.getType(), 15,
-                                StatsTypes.INT.getType(), 15)));
+                                StatsTypes.INT.getType(), 15,
+                                StatsTypes.AVAILABLE_PTS.getType(), 0)));
 
         playerStats
                 .getDerivedStats()
