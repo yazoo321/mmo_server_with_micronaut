@@ -105,7 +105,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\":\"apiTest2\",\n    \"appearanceInfo\": {\n        \"race\":\"human\",\n        \"gender\": \"m\",\n        \"hairStyle\": \"h_m_style_1\",\n        \"hairColor\": \"color1\",\n        \"skinColor\": \"h_m_style_1\",\n        \"facialFeature\": \"feature_1\"\n    },\n    \"className\": \"fighter\"\n}",
+					"raw": "{\n    \"name\":\"apiTest2\",\n    \"appearanceInfo\": {\n        \"race\":\"human\",\n        \"gender\": \"m\",\n        \"hairStyle\": \"h_m_style_1\",\n        \"hairColor\": \"color1\",\n        \"skinColor\": \"h_m_style_1\",\n        \"facialFeature\": \"feature_1\"\n    },\n    \"className\": \"FIGHTER\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"

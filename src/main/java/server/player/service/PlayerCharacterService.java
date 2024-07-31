@@ -52,7 +52,7 @@ public class PlayerCharacterService {
     public Character createCharacter(
             CreateCharacterRequest createCharacterRequest, String username) {
         log.info("Creating character: {}", createCharacterRequest.getName());
-        createCharacterRequest.setClassName(createCharacterRequest.getClassName().toLowerCase());
+        createCharacterRequest.setClassName(createCharacterRequest.getClassName().toUpperCase());
 
         Character newCharacter = new Character();
         newCharacter.setName(createCharacterRequest.getName());

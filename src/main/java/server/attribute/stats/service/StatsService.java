@@ -59,7 +59,7 @@ public class StatsService {
         mobStats.setDerived(StatsTypes.CURRENT_HP, mobStats.getDerived(StatsTypes.MAX_HP));
         mobStats.setAttributePoints(0);
 
-        repository.updateStats(mobStats.getActorId(), mobStats).subscribe();
+        repository.updateStats(mobStats.getActorId(), mobStats).blockingSubscribe();
         CombatData combatData = new CombatData(actorId);
         sessionParamHelper.setSharedActorCombatData(actorId, combatData);
     }
@@ -75,7 +75,8 @@ public class StatsService {
                                 StatsTypes.STR.getType(), 15,
                                 StatsTypes.STA.getType(), 15,
                                 StatsTypes.DEX.getType(), 15,
-                                StatsTypes.INT.getType(), 15)));
+                                StatsTypes.INT.getType(), 15,
+                                StatsTypes.AVAILABLE_PTS.getType(), 0)));
 
         playerStats
                 .getDerivedStats()
@@ -123,7 +124,8 @@ public class StatsService {
         Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
 
         Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
-        currentHp = currentHp - totalDamage;
+        currentHp = Math.min(stats.getDerived(StatsTypes.MAX_HP),
+                currentHp - totalDamage);
 
         setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
 
@@ -208,7 +210,7 @@ public class StatsService {
             repository
                     .updateStats(stats.getActorId(), stats)
                     .doOnError(err -> log.error("Failed to update stats, {}", err.getMessage()))
-                    .blockingGet();
+                    .blockingSubscribe();
             Stats notifyUpdates =
                     Stats.builder().actorId(stats.getActorId()).derivedStats(updated).build();
             updateProducer.updateStats(notifyUpdates);
@@ -221,10 +223,15 @@ public class StatsService {
             repository
                     .updateStats(stats.getActorId(), stats)
                     .doOnError(err -> log.error("Failed to update stats, {}", err.getMessage()))
-                    .blockingGet();
+                    .blockingSubscribe();
             Stats notifyUpdates =
                     Stats.builder().actorId(stats.getActorId()).baseStats(updated).build();
             updateProducer.updateStats(notifyUpdates);
         }
+    }
+
+    void evaluateDerivedStats(Stats stats) {
+        Map<String, Double> updated = stats.recalculateDerivedStats();
+        handleDifference(updated, stats);
     }
 }

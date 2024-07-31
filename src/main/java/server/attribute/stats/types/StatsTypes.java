@@ -13,6 +13,8 @@ public enum StatsTypes {
     INT("INT"),
     STA("STA"),
 
+    AVAILABLE_PTS("AVAILABLE_PTS"),
+
     // Derived stats
     MAX_HP("MAX_HP"),
     MAX_MP("MAX_MP"),
@@ -48,7 +50,9 @@ public enum StatsTypes {
 
     // Level stats
     XP("XP"),
+    XP_TO_NEXT_LEVEL("XP_TO_NEXT_LEVEL"),
     LEVEL("LEVEL"),
+    CAN_LEVEL("CAN_LEVEL"),
 
     // Mob specific stats
     MAIN_HAND_ATTACK_SPEED("MAIN_HAND_ATTACK_SPEED"),

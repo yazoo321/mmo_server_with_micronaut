@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ClassTypes {
-    MAGE("mage"),
-    FIGHTER("fighter"),
-    CLERIC("cleric"),
-    RANGER("ranger");
+    MAGE("MAGE"),
+    FIGHTER("FIGHTER"),
+    CLERIC("CLERIC"),
+    RANGER("RANGER");
 
     public final String type;
 }
