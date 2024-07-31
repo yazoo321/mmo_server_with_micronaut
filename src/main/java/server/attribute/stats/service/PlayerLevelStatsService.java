@@ -178,7 +178,6 @@ public class PlayerLevelStatsService {
         }
 
         statsService.handleBaseDifference(updated, playerStats);
-        //        return statsService.update(playerStats);
     }
 
     public void handleAddBaseStat(String actorId, String statType) {
