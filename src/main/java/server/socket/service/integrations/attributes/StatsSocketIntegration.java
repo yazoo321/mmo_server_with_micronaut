@@ -4,8 +4,10 @@ import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
 import server.session.SessionParamHelper;
+import server.socket.model.SocketMessage;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
@@ -16,8 +18,12 @@ public class StatsSocketIntegration {
 
     @Inject StatsService statsService;
 
+    @Inject
+    PlayerLevelStatsService playerLevelStatsService;
+
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
+    // TODO: Offload load via kafka
 
     public void handleFetchStats(String actorId, WebSocketSession session) {
         statsService
@@ -35,5 +41,15 @@ public class StatsSocketIntegration {
                 .doOnError(
                         e -> log.error("Failed to fetch stats for {}, {}", actorId, e.getMessage()))
                 .subscribe();
+    }
+
+    public void handleAddBaseStat(SocketMessage socketMessage, WebSocketSession session) {
+        // TODO: increase validation
+        if (!socketMessage.getActorId().equalsIgnoreCase(SessionParamHelper.getActorId(session))) {
+            log.error("Invalid request for adding base stat! Session belongs to: {}, socket message: {}",
+                    SessionParamHelper.getActorId(session), socketMessage);
+            return;
+        }
+        playerLevelStatsService.handleAddBaseStat(socketMessage.getActorId(), socketMessage.getCustomData());
     }
 }

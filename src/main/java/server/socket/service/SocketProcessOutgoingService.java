@@ -89,6 +89,7 @@ public class SocketProcessOutgoingService {
                 SkillMessageType.FETCH_ACTIONBAR.getType(), this::handleFetchActionBar);
         this.functionMap.put(
                 SkillMessageType.UPDATE_ACTIONBAR.getType(), this::handleUpdateActionBar);
+        this.functionMap.put(MessageType.ADD_STAT.getType(), this::handleAddStat);
 
 
         this.udpFunctionMap = new HashMap<>(
@@ -200,6 +201,10 @@ public class SocketProcessOutgoingService {
     private void handleFetchStats(SocketMessage message, WebSocketSession session) {
         String actorId = message.getActorId();
         attributeSocketIntegration.handleFetchStats(actorId, session);
+    }
+
+    private void handleAddStat(SocketMessage message, WebSocketSession session) {
+        attributeSocketIntegration.handleAddBaseStat(message, session);
     }
 
     private void handleTryAttack(SocketMessage message, WebSocketSession session) {

@@ -22,7 +22,9 @@ public enum MessageType {
     STOP_ATTACK("STOP_ATTACK"),
     SET_SESSION_ID("SET_SESSION_ID"),
 
-    UPDATE_ACTOR_SKILLS("UPDATE_ACTOR_SKILLS");
+    UPDATE_ACTOR_SKILLS("UPDATE_ACTOR_SKILLS"),
+
+    ADD_STAT("ADD_STAT");
 
     public final String type;
 }

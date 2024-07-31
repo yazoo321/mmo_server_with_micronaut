@@ -124,7 +124,8 @@ public class StatsService {
         Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
 
         Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
-        currentHp = currentHp - totalDamage;
+        currentHp = Math.min(stats.getDerived(StatsTypes.MAX_HP),
+                currentHp - totalDamage);
 
         setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
 
@@ -227,5 +228,10 @@ public class StatsService {
                     Stats.builder().actorId(stats.getActorId()).baseStats(updated).build();
             updateProducer.updateStats(notifyUpdates);
         }
+    }
+
+    void evaluateDerivedStats(Stats stats) {
+        Map<String, Double> updated = stats.recalculateDerivedStats();
+        handleDifference(updated, stats);
     }
 }

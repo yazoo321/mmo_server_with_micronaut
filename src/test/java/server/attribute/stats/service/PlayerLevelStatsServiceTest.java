@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
@@ -132,7 +133,7 @@ public class PlayerLevelStatsServiceTest {
 
     private Map<String, Integer> buildBaseExpectedNumTagsForCharacterClass(
             String characterClass, Integer expectedLevel) {
-        List<String> classesAvailable = PlayerLevelStatsService.AVAILABLE_CLASSES;
+        Set<String> classesAvailable = PlayerLevelStatsService.AVAILABLE_CLASSES;
         Map<String, Integer> expectedTags = new HashMap<>();
         classesAvailable.forEach(
                 c -> expectedTags.put(c, c.equals(characterClass) ? expectedLevel : 0));

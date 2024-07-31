@@ -61,8 +61,12 @@ public class Stats {
     }
 
     public Integer addToBase(StatsTypes type, Integer val) {
-        Integer updated = baseStats.getOrDefault(type.getType(), 0) + val;
-        baseStats.put(type.getType(), updated);
+        return addToBase(type.getType(), val);
+    }
+
+    public Integer addToBase(String type, Integer val) {
+        Integer updated = baseStats.getOrDefault(type, 0) + val;
+        baseStats.put(type, updated);
 
         return updated;
     }
@@ -87,7 +91,7 @@ public class Stats {
     }
 
     public Map<String, Double> recalculateDerivedStats() {
-        Map<String, Double> updatedDerived = this.getDerivedStats();
+        Map<String, Double> updatedDerived = new HashMap<>(this.getDerivedStats());
         int strength = getBaseStat(StatsTypes.STR);
         int dexterity = getBaseStat(StatsTypes.DEX);
         int stamina = getBaseStat(StatsTypes.STA);

@@ -6,6 +6,8 @@ import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
@@ -21,12 +23,20 @@ public class PlayerLevelStatsService {
 
     @Inject ActorStatsRepository statsRepository;
 
-    public static final List<String> AVAILABLE_CLASSES =
-            List.of(
+    public static final Set<String> AVAILABLE_CLASSES =
+            Set.of(
                     ClassTypes.MAGE.getType(),
                     ClassTypes.FIGHTER.getType(),
                     ClassTypes.RANGER.getType(),
                     ClassTypes.CLERIC.getType());
+
+    public static final Set<String> AVAILABLE_BASE_STAT =
+            Set.of(
+                    StatsTypes.STR.getType(),
+                    StatsTypes.STA.getType(),
+                    StatsTypes.INT.getType(),
+                    StatsTypes.DEX.getType());
+
 
     public Single<Stats> initializeCharacterClass(String actorId, String playerClass) {
         if (!isClassValid(playerClass)) {
@@ -63,27 +73,32 @@ public class PlayerLevelStatsService {
                 .getStatsFor(actorId)
                 .doOnSuccess(
                         stats -> {
-                            Map<String, Integer> baseAttr = stats.getBaseStats();
-
                             int currentXp = stats.getBaseStat(StatsTypes.XP);
                             int currentLevel = stats.getBaseStat(StatsTypes.LEVEL);
-
-                            int xpRequired = xpRequiredForLevel(currentLevel + 1);
+                            int xpRequired = xpRequiredForLevel(currentLevel);
 
                             if (currentXp < xpRequired) {
+                                log.error("Tried to level but not got enough XP!, {}", actorId);
                                 return;
                             }
 
                             int availablePts = stats.addToBase(StatsTypes.AVAILABLE_PTS, 5);
-                            baseAttr.put(classToLevel, baseAttr.getOrDefault(classToLevel, 0) + 1);
-                            int newLevel = baseAttr.get(classToLevel);
+                            int newLevel = stats.addToBase(classToLevel, 1);
+                            int baseLevel = stats.addToBase(StatsTypes.LEVEL, 1);
+
+                            int canLevel = currentXp > xpRequiredForLevel(baseLevel) ? 1 : 0;
+                            stats.setBase(StatsTypes.CAN_LEVEL, canLevel);
 
                             Map<String, Integer> baseChange =
                                     Map.of(
                                             classToLevel,
                                             newLevel,
                                             StatsTypes.AVAILABLE_PTS.getType(),
-                                            availablePts);
+                                            availablePts,
+                                            StatsTypes.LEVEL.getType(),
+                                            baseLevel,
+                                            StatsTypes.CAN_LEVEL.getType(),
+                                            canLevel);
                             Map<String, Double> derivedChanged = stats.recalculateDerivedStats();
 
                             statsService.handleBaseDifference(baseChange, stats);
@@ -91,6 +106,32 @@ public class PlayerLevelStatsService {
                         })
                 .doOnError(
                         err -> log.error("Failed to get stats on level up, {}", err.getMessage()));
+    }
+
+    private Single<Stats> handleAddStatPoint(String actorId, String stat) {
+        if (!isBaseStatValid(stat)) {
+            log.error("Tried adding invalid {} stat, {}", stat, actorId);
+        }
+
+        return statsService
+                .getStatsFor(actorId)
+                .doOnSuccess(
+                        stats -> {
+                            int availablePoints = stats.addToBase(StatsTypes.AVAILABLE_PTS, -1);
+                            if (availablePoints < 0) {
+                                return;
+                            }
+
+                            int updated = stats.addToBase(stat, 1);
+                            Map<String, Integer> baseChange = Map.of(
+                                    stat, updated,
+                                    StatsTypes.AVAILABLE_PTS.getType(), availablePoints);
+                            Map<String, Double> derivedChanged = stats.recalculateDerivedStats();
+
+                            statsService.handleBaseDifference(baseChange, stats);
+                            statsService.handleDifference(derivedChanged, stats);
+                        })
+                .doOnError(e-> log.error(e.getMessage()));
     }
 
     public void handleAddXp(Stats targetStats, Stats actorStats) {
@@ -140,10 +181,28 @@ public class PlayerLevelStatsService {
         //        return statsService.update(playerStats);
     }
 
+    public void handleAddBaseStat(String actorId, String statType) {
+        if (isClassValid(statType)) {
+            handleLevelUp(actorId, statType).subscribe();
+            return;
+        }
+
+        if (isBaseStatValid(statType)) {
+            handleAddStatPoint(actorId, statType).subscribe();
+            return;
+        }
+
+        log.error("Erroneous stat type being added: {} on actor: {}", statType, actorId);
+    }
+
     private boolean isClassValid(String className) {
         // consider other validations
 
         return AVAILABLE_CLASSES.contains(className);
+    }
+
+    private boolean isBaseStatValid(String statType) {
+        return AVAILABLE_BASE_STAT.contains(statType);
     }
 
     private int xpRequiredForLevel(int level) {
