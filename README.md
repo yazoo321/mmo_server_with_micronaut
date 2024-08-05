@@ -6,6 +6,15 @@ Currently working on:
 # Documentation within blog:
 Each of the posts contains a video overview.
 
+## Stats system and level ups
+- handling level ups: https://unreal-mmo-dev.com/2024/08/02/devlog-62-how-i-added-xp-and-level-ups-in-our-mmo-rpg-style-game-with-ue-and-java/
+- base stats system, used with items: https://unreal-mmo-dev.com/2023/07/19/45-how-to-handle-rpg-stats-system-and-equipping-items-in-java/
+
+## UDP communication, player & motion sync
+- integration: https://unreal-mmo-dev.com/2024/06/27/devlog-60-how-to-handle-mmo-style-motion-with-ue-and-custom-server-over-udp/
+- UDP with Object deliver in UE: https://unreal-mmo-dev.com/2024/06/20/devlog-59-udp-with-free-object-deliverer-plugin-in-ue/
+
+
 ## Websocket communication, player and mob motion sync
 - Part 1: Overview of architecture: https://unreal-mmo-dev.com/2023/05/10/39-how-to-synchronize-motion-effectively-with-ue-and-custom-server/
 - Part 2: Dive into the backend flow https://unreal-mmo-dev.com/2023/05/11/40-how-to-make-a-good-backend-for-your-mmo-game-and-unreal-engine/
