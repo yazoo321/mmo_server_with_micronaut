@@ -14,6 +14,11 @@ public enum StatsTypes {
     STA("STA"),
 
     AVAILABLE_PTS("AVAILABLE_PTS"),
+    // Level stats
+    XP("XP"),
+    XP_TO_NEXT_LEVEL("XP_TO_NEXT_LEVEL"),
+    LEVEL("LEVEL"),
+    CAN_LEVEL("CAN_LEVEL"),
 
     // Derived stats
     MAX_HP("MAX_HP"),
@@ -47,12 +52,6 @@ public enum StatsTypes {
 
     PHY_REDUCTION("PHY_REDUCTION"),
     MGC_REDUCTION("MGC_REDUCTION"),
-
-    // Level stats
-    XP("XP"),
-    XP_TO_NEXT_LEVEL("XP_TO_NEXT_LEVEL"),
-    LEVEL("LEVEL"),
-    CAN_LEVEL("CAN_LEVEL"),
 
     // Mob specific stats
     MAIN_HAND_ATTACK_SPEED("MAIN_HAND_ATTACK_SPEED"),
