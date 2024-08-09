@@ -2,7 +2,6 @@ package server.actionbar.repository;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
@@ -42,20 +41,24 @@ public class ActionbarRepository {
     }
 
     public void updateActorActionbar(ActorActionbar actorActionbar) {
-        Bson filter = Filters.and(
-                eq("actorId", actorActionbar.getActorId()),
-                eq("actionbarId", actorActionbar.getActionbarId()));
+        Bson filter =
+                Filters.and(
+                        eq("actorId", actorActionbar.getActorId()),
+                        eq("actionbarId", actorActionbar.getActionbarId()));
 
         ReplaceOptions options = new ReplaceOptions().upsert(true);
-        Single.fromPublisher(actionbarMongoCollection.replaceOne(filter, actorActionbar, options)).subscribe();
+        Single.fromPublisher(actionbarMongoCollection.replaceOne(filter, actorActionbar, options))
+                .subscribe();
 
-//        Single.fromPublisher(
-//                        actionbarMongoCollection.findOneAndUpdate(
-//                                and(
-//                                        eq("actorId", actorActionbar.getActorId()),
-//                                        eq("actionbarId", actorActionbar.getActionbarId())),
-//                                set("actionbarContent", actorActionbar.getActionbarContent())))
-//                .subscribe();
+        //        Single.fromPublisher(
+        //                        actionbarMongoCollection.findOneAndUpdate(
+        //                                and(
+        //                                        eq("actorId", actorActionbar.getActorId()),
+        //                                        eq("actionbarId",
+        // actorActionbar.getActionbarId())),
+        //                                set("actionbarContent",
+        // actorActionbar.getActionbarContent())))
+        //                .subscribe();
     }
 
     public void deleteActorActionbar(String actorId, String actionId) {

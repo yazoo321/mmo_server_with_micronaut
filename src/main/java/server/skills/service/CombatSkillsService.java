@@ -41,8 +41,7 @@ public class CombatSkillsService {
 
     @Inject CombatService combatService;
 
-    @Inject
-    ActionbarService actionbarService;
+    @Inject ActionbarService actionbarService;
 
     public CombatSkillsService() {
         objectMapper.registerSubtypes(Fireball.class, BasicHeal.class);
