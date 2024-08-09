@@ -42,14 +42,6 @@ public class ActorSkillsRepository {
                         eq("actorId", actorId), set("skills", skills)));
     }
 
-    //
-    //    public Map<String, Instant>  getActorSkillsInUse(String actorId) {
-    //        CombatData combatData = sessionParamHelper.getSharedActorCombatData(actorId);
-    //        Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
-    //
-    //        return activatedSkills;
-    //    }
-
     private void prepareCollections() {
         this.actorSkillsMongoCollection =
                 mongoClient

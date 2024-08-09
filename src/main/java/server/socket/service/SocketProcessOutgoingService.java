@@ -11,12 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
 import lombok.extern.slf4j.Slf4j;
 import server.actionbar.service.ActionbarService;
 import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
-import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
 import server.session.SessionParamHelper;
 import server.session.cache.UdpSessionCache;
@@ -49,8 +47,7 @@ public class SocketProcessOutgoingService {
 
     @Inject ActionbarService actionbarService;
 
-    @Inject
-    UdpSessionCache sessionCache;
+    @Inject UdpSessionCache sessionCache;
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
 
@@ -61,6 +58,7 @@ public class SocketProcessOutgoingService {
     public ConcurrentMap<String, WebSocketSession> getLiveSessions() {
         return actorSessions;
     }
+
     public void removeActorSession(String actorId) {
         actorSessions.remove(actorId);
     }
@@ -91,13 +89,11 @@ public class SocketProcessOutgoingService {
                 SkillMessageType.UPDATE_ACTIONBAR.getType(), this::handleUpdateActionBar);
         this.functionMap.put(MessageType.ADD_STAT.getType(), this::handleAddStat);
 
-
-        this.udpFunctionMap = new HashMap<>(
-                Map.of(
-                        MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate,
-                        MessageType.MOB_MOTION.getType(), this::handleMobMotionUpdate
-                )
-        );
+        this.udpFunctionMap =
+                new HashMap<>(
+                        Map.of(
+                                MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate,
+                                MessageType.MOB_MOTION.getType(), this::handleMobMotionUpdate));
     }
 
     public void processMessage(SocketMessage socketMessage, WebSocketSession session) {

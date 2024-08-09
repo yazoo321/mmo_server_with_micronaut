@@ -27,6 +27,10 @@ public class ActionbarService {
                 .getActorActionbar(actorId)
                 .doOnSuccess(
                         actionbar -> {
+                            if (actionbar == null || actionbar.isEmpty()) {
+                                return;
+                            }
+
                             SocketResponse response = new SocketResponse();
                             response.setMessageType(SocketResponseType.UPDATE_ACTIONBAR.getType());
                             response.setActionbarList(actionbar);
