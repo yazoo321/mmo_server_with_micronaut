@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.service.StatsService;
+import server.actionbar.service.ActionbarService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.combat.service.CombatService;
@@ -33,8 +33,6 @@ public class CombatSkillsService {
 
     @Inject DefaultSkillFactory skillFactory;
 
-    @Inject StatsService statsService;
-
     @Inject ActorSkillsRepository actorSkillsRepository;
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
@@ -42,6 +40,8 @@ public class CombatSkillsService {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Inject CombatService combatService;
+
+    @Inject ActionbarService actionbarService;
 
     public CombatSkillsService() {
         objectMapper.registerSubtypes(Fireball.class, BasicHeal.class);
@@ -78,18 +78,25 @@ public class CombatSkillsService {
 
         session.send(socketResponse).subscribe(socketResponseSubscriber);
 
+        actionbarService.getActorActionbar(session);
+
         // TODO: Make skills either dynamically evaluated, or taken from repo
 
-        //        actorSkillsRepository.getActorSkills(actorId)
-        //                .doOnSuccess(actorSkills -> {
+        //        actorSkillsRepository
+        //                .getActorSkills(actorId)
+        //                .doOnSuccess(
+        //                        actorSkills -> {
         //                            SocketResponse socketResponse = new SocketResponse();
         //                            socketResponse.setActorSkills(actorSkills);
         //
-        // socketResponse.setMessageType(MessageType.UPDATE_ACTOR_SKILLS.getType());
+        //                            socketResponse.setMessageType(
+        //                                    MessageType.UPDATE_ACTOR_SKILLS.getType());
         //
         //
         // session.send(socketResponse).subscribe(socketResponseSubscriber);
-        //                })
+        //
+        //
+        //                        })
         //                .doOnError(err -> log.error("Failed to send skills to actor, {}",
         // err.getMessage()))
         //                .subscribe();

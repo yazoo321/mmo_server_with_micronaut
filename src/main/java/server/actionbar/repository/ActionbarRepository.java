@@ -2,8 +2,9 @@ package server.actionbar.repository;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
 
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
@@ -12,6 +13,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.conversions.Bson;
 import server.actionbar.model.ActorActionbar;
 import server.common.configuration.MongoConfiguration;
 import server.session.SessionParamHelper;
@@ -39,13 +41,24 @@ public class ActionbarRepository {
     }
 
     public void updateActorActionbar(ActorActionbar actorActionbar) {
-        Single.fromPublisher(
-                        actionbarMongoCollection.findOneAndUpdate(
-                                and(
-                                        eq("actorId", actorActionbar.getActorId()),
-                                        eq("actionbarId", actorActionbar.getActionbarId())),
-                                set("actionbarContent", actorActionbar.getActionbarContent())))
+        Bson filter =
+                Filters.and(
+                        eq("actorId", actorActionbar.getActorId()),
+                        eq("actionbarId", actorActionbar.getActionbarId()));
+
+        ReplaceOptions options = new ReplaceOptions().upsert(true);
+        Single.fromPublisher(actionbarMongoCollection.replaceOne(filter, actorActionbar, options))
                 .subscribe();
+
+        //        Single.fromPublisher(
+        //                        actionbarMongoCollection.findOneAndUpdate(
+        //                                and(
+        //                                        eq("actorId", actorActionbar.getActorId()),
+        //                                        eq("actionbarId",
+        // actorActionbar.getActionbarId())),
+        //                                set("actionbarContent",
+        // actorActionbar.getActionbarContent())))
+        //                .subscribe();
     }
 
     public void deleteActorActionbar(String actorId, String actionId) {
