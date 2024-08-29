@@ -91,7 +91,7 @@ public class EquipItemService {
                         })
                 .map(
                         itemList -> {
-                            equipRepository.deleteEquippedItem(itemInstanceId).blockingSubscribe();
+                            equipRepository.deleteEquippedItem(actorId, itemInstanceId).blockingSubscribe();
                             updateCharacterItemStats(actorId);
 
                             return itemInstanceId;

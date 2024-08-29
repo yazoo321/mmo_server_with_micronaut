@@ -78,7 +78,7 @@ public class CombatSkillsService {
 
         session.send(socketResponse).subscribe(socketResponseSubscriber);
 
-        actionbarService.getActorActionbar(session);
+//        actionbarService.getActorActionbar(session);
 
         // TODO: Make skills either dynamically evaluated, or taken from repo
 

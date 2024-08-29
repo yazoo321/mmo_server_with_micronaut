@@ -49,16 +49,6 @@ public class ActionbarRepository {
         ReplaceOptions options = new ReplaceOptions().upsert(true);
         Single.fromPublisher(actionbarMongoCollection.replaceOne(filter, actorActionbar, options))
                 .subscribe();
-
-        //        Single.fromPublisher(
-        //                        actionbarMongoCollection.findOneAndUpdate(
-        //                                and(
-        //                                        eq("actorId", actorActionbar.getActorId()),
-        //                                        eq("actionbarId",
-        // actorActionbar.getActionbarId())),
-        //                                set("actionbarContent",
-        // actorActionbar.getActionbarContent())))
-        //                .subscribe();
     }
 
     public void deleteActorActionbar(String actorId, String actionId) {

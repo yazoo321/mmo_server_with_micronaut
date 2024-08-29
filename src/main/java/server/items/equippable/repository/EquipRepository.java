@@ -50,13 +50,13 @@ public class EquipRepository {
                 .map(res -> equippedItems);
     }
 
-    @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorId")
+//    @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorId")
     public Single<List<EquippedItems>> getEquippedItemsForCharacter(String actorId) {
         return Flowable.fromPublisher(equippedItemsCollection.find(eq("actorId", actorId)))
                 .toList();
     }
 
-    @Cacheable(value = ACTOR_EQUIP_CACHE_MAP, parameters = "actorId")
+//    @Cacheable(value = ACTOR_EQUIP_CACHE_MAP, parameters = "actorId")
     public Single<Map<String, EquippedItems>> getActorEquippedItems(String actorId) {
         return getEquippedItemsForCharacter(actorId)
                 .doOnError(e -> log.error(e.getMessage()))
@@ -69,7 +69,7 @@ public class EquipRepository {
                                                         Function.identity())));
     }
 
-    @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorIds")
+//    @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorIds")
     public Single<List<EquippedItems>> getEquippedItemsForCharacters(Set<String> actorIds) {
         return Flowable.fromPublisher(equippedItemsCollection.find(in("actorId", actorIds)))
                 .toList();
@@ -86,7 +86,7 @@ public class EquipRepository {
             value = {ACTOR_EQUIP_CACHE_MAP, ACTOR_EQUIP_CACHE},
             parameters = "actorId",
             async = true)
-    public Single<DeleteResult> deleteEquippedItem(String itemInstanceId) {
+    public Single<DeleteResult> deleteEquippedItem(String actorId, String itemInstanceId) {
         // TODO: Consider duplicating item instance ID as nested query is slower
         return Single.fromPublisher(
                 equippedItemsCollection.deleteOne(

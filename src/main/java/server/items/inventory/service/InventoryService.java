@@ -131,7 +131,7 @@ public class InventoryService {
         inventory.setActorId(actorId);
         inventory.setCharacterItems(new ArrayList<>());
         inventory.setGold(0);
-        inventory.setMaxSize(new Location2D(4, 10));
+        inventory.setMaxSize(new Location2D(8, 8));
 
         return inventoryRepository.upsert(inventory);
     }

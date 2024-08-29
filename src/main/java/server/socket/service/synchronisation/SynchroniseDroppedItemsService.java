@@ -119,7 +119,6 @@ public class SynchroniseDroppedItemsService {
                         .messageType(SocketResponseType.REMOVE_ITEMS_FROM_MAP.getType())
                         .itemInstanceIds(lostItemIds)
                         .build();
-
         session.send(socketResponse).subscribe(socketResponseSubscriber);
     }
 }
