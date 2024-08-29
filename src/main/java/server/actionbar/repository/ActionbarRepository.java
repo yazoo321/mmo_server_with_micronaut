@@ -58,6 +58,12 @@ public class ActionbarRepository {
                 .subscribe();
     }
 
+    public void deleteActorActionbar(String actorId) {
+        Single.fromPublisher(
+                actionbarMongoCollection.deleteMany(eq("actorId", actorId))
+        ).subscribe();
+    }
+
     private void prepareCollections() {
         this.actionbarMongoCollection =
                 mongoClient

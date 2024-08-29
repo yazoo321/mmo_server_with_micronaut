@@ -7,9 +7,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import server.actionbar.service.ActionbarService;
 import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
+import server.items.equippable.service.EquipItemService;
 import server.items.inventory.service.InventoryService;
 import server.motion.service.PlayerMotionService;
 import server.player.model.AccountCharactersResponse;
@@ -32,6 +34,12 @@ public class PlayerCharacterService {
     @Inject StatsService statsService;
 
     @Inject StatusService statusService;
+
+    @Inject
+    ActionbarService actionbarService;
+
+    @Inject
+    EquipItemService equipItemService;
 
     public AccountCharactersResponse getAccountCharacters(String username) {
         List<Character> characterList = playerCharacterRepository.findByAccount(username);
@@ -102,6 +110,9 @@ public class PlayerCharacterService {
         playerMotionService.deletePlayerMotion(actorId);
         playerCharacterRepository.deleteByActorId(actorId);
         statsService.deleteStatsFor(actorId).subscribe();
+        statusService.deleteActorStatus(actorId).subscribe();
+        actionbarService.deleteActorActionbar(actorId);
+        equipItemService.deleteCharacterEquippedItems(actorId);
     }
 
     // TODO: Support deletes

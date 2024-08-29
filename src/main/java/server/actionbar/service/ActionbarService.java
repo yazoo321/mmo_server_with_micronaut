@@ -57,4 +57,8 @@ public class ActionbarService {
             actionbarRepository.updateActorActionbar(actorActionbar);
         }
     }
+
+    public void deleteActorActionbar(String actorId) {
+        actionbarRepository.deleteActorActionbar(actorId);
+    }
 }
