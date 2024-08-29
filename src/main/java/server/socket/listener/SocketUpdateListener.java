@@ -47,7 +47,7 @@ public class SocketUpdateListener {
                         .playerKeys(Set.of(playerMotion.getActorId()))
                         .build();
 
-//        log.info("{}", playerMotion);
+        log.info("{}", playerMotion);
 
         if (featureFlag.getEnableUdp()) {
             udpClientUpdateService.sendUpdateToListening(socketResponse, playerMotion.getActorId());

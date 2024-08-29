@@ -1,5 +1,6 @@
 package server.socket.service.integrations.items;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -33,6 +34,9 @@ public class ItemSocketIntegration {
     @Inject EquipItemService equipItemService;
 
     @Inject SessionParamHelper sessionParamHelper;
+
+    ObjectMapper objectMapper = new ObjectMapper();
+
 
     public void handleDropItem(GenericInventoryData request, WebSocketSession session) {
         inventoryService

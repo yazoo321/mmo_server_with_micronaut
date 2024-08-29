@@ -103,8 +103,7 @@ public class SocketProcessOutgoingService {
             throw new InvalidParameterException("message type missing");
         }
 
-        if (functionMap.containsKey(updateType)) {
-            functionMap.get(updateType).accept(socketMessage, session);
+        if (functionMap.containsKey(updateType)) {functionMap.get(updateType).accept(socketMessage, session);
         } else {
             log.error("Did not recognise update type, {}", updateType);
         }
