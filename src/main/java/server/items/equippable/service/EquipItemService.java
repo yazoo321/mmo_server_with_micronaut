@@ -2,6 +2,7 @@ package server.items.equippable.service;
 
 import static server.attribute.stats.types.StatsTypes.*;
 
+import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -34,54 +35,63 @@ public class EquipItemService {
     @Inject StatsService statsService;
 
     public Single<EquippedItems> equipItem(String itemInstanceId, String actorId) {
-        // in order to equip item, first un-equip item from slot if one exists
-        return inventoryService
-                .getInventory(actorId)
-                .doOnError(e -> log.error("Failed to get character inventory, {}", e.getMessage()))
-                .flatMap(
-                        inventory -> {
-                            List<CharacterItem> items = inventory.getCharacterItems();
-                            CharacterItem characterItem =
-                                    getCharacterItemByInstance(items, itemInstanceId);
-                            ItemInstance instance = characterItem.getItemInstance();
+        return inventoryService.getInventory(actorId)
+                .doOnError(e ->
+                        log.error("Failed to get character inventory: {}", e.getMessage()))
+                .flatMap(inventory -> {
+                    List<CharacterItem> items = inventory.getCharacterItems();
+                    CharacterItem characterItem = getCharacterItemByInstance(items, itemInstanceId);
+                    ItemInstance instance = characterItem.getItemInstance();
+                    String slotType = instance.getItem().getCategory();
 
-                            String slotType =
-                                    characterItem.getItemInstance().getItem().getCategory();
-
-                            // TODO: Make this async
-                            EquippedItems equippedItem =
-                                    equipRepository
-                                            .getCharacterItemSlot(actorId, slotType)
-                                            .blockingGet();
-                            if (equippedItem != null) {
-                                items = getItemsAfterUnequip(equippedItem);
-                                // the items object has been refreshed, need to re-sync object
-                                characterItem = getCharacterItemByInstance(items, itemInstanceId);
-                            }
-
-                            equippedItem =
-                                    characterItem
-                                            .getItemInstance()
-                                            .getItem()
-                                            .createEquippedItem(actorId, instance);
-
-                            // setting location to 'invalid' value, to not show it in inventory
-                            characterItem.setLocation(new Location2D(-1, -1));
-                            // TODO: Make this async
-                            inventoryService
-                                    .updateInventoryItems(actorId, items)
-                                    .blockingSubscribe();
-
-                            return equipRepository
-                                    .insert(equippedItem, actorId)
-                                    .map(
-                                            its -> {
-                                                updateCharacterItemStats(actorId);
-                                                return its;
-                                            });
-                        });
+                    // Check if an item is already equipped in the same slot
+                    return equipRepository.getCharacterItemSlot(actorId, slotType)
+                            .flatMapSingle(existingEquippedItem -> {
+                                // If an item is already equipped, unequip it
+                                return unEquipItemAndGetCharacterItems(existingEquippedItem.getItemInstance().getItemInstanceId(), actorId)
+                                        .flatMap(updatedCharacterItems ->
+                                                updateAndEquipItem(
+                                                        actorId, updatedCharacterItems, itemInstanceId));
+                            })
+                            .switchIfEmpty(Single.defer(() ->
+                                    updateAndEquipItem(actorId, items, itemInstanceId)));
+                })
+                .onErrorResumeNext(e -> {
+                    log.error("Error during item equip: {}", e.getMessage());
+                    return Single.error(new EquipException("Failed to equip item"));
+                });
     }
 
+    private Single<EquippedItems> updateAndEquipItem(String actorId, List<CharacterItem> items, String itemInstanceId) {
+        CharacterItem characterItem = getCharacterItemByInstance(items, itemInstanceId);
+        ItemInstance instance = characterItem.getItemInstance();
+        // Set location to 'invalid' to remove from inventory display
+        characterItem.setLocation(new Location2D(-1, -1));
+
+        // Update inventory with the new state
+        return inventoryService.updateInventoryItems(actorId, items)
+                .flatMap(updated -> {
+                    EquippedItems equippedItem = instance.getItem().createEquippedItem(actorId, instance);
+                    return equipRepository.insert(equippedItem, actorId)
+                            .doOnSuccess(its -> updateCharacterItemStats(actorId));
+                });
+    }
+
+    public Single<List<CharacterItem>> unEquipItemAndGetCharacterItems(String itemInstanceId, String actorId) {
+        return inventoryService
+                .unequipItem(itemInstanceId, actorId)
+                .doOnError(
+                        e -> {
+                            throw new EquipException("Failed to un-equip item");
+                        })
+                .map(
+                        itemList -> {
+                            equipRepository.deleteEquippedItem(actorId, itemInstanceId).blockingSubscribe();
+                            updateCharacterItemStats(actorId);
+
+                            return itemList;
+                        });
+    }
     public Single<String> unEquipItem(String itemInstanceId, String actorId) {
         return inventoryService
                 .unequipItem(itemInstanceId, actorId)
@@ -171,5 +181,10 @@ public class EquipItemService {
                         itemEffects.get(BASE_ATTACK_SPEED.getType()));
             }
         }
+    }
+
+    public void deleteCharacterEquippedItems(String actorId) {
+        // used by delete character
+        equipRepository.deleteActorEquippedItems(actorId);
     }
 }

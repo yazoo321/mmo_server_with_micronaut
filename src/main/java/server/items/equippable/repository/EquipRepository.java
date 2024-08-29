@@ -93,6 +93,16 @@ public class EquipRepository {
                         eq("itemInstance.itemInstanceId", itemInstanceId)));
     }
 
+    @CacheInvalidate(
+            value = {ACTOR_EQUIP_CACHE_MAP, ACTOR_EQUIP_CACHE},
+            parameters = "actorId",
+            async = true)
+    public void deleteActorEquippedItems(String actorId) {
+        Single.fromPublisher(
+                equippedItemsCollection.deleteMany(eq("actorId", actorId))
+        ).subscribe();
+    }
+
     private void prepareCollections() {
         this.equippedItemsCollection =
                 mongoClient

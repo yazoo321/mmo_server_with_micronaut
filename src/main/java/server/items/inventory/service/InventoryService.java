@@ -30,31 +30,28 @@ public class InventoryService {
     public Single<Inventory> pickupItem(GenericInventoryData request) {
         return itemService
                 .getDroppedItemByInstanceId(request.getItemInstanceId())
-                .doOnError(e -> log.error(e.getMessage()))
-                .flatMap(
-                        droppedItem -> {
-                            ItemInstance itemInstance = droppedItem.getItemInstance();
-                            return inventoryRepository
-                                    .getCharacterInventory(request.getActorId())
-                                    .flatMap(
-                                            inventory -> {
-                                                addItemToInventory(inventory, itemInstance);
-                                                // these should be chained.
-                                                itemService
-                                                        .deleteDroppedItem(
-                                                                request.getItemInstanceId())
-                                                        .blockingSubscribe();
+                .doOnError(e -> log.error("Failed to get dropped item: {}", e.getMessage()))
+                .flatMap(droppedItem -> {
+                    ItemInstance itemInstance = droppedItem.getItemInstance();
+                    return inventoryRepository.getCharacterInventory(request.getActorId())
+                            .flatMap(inventory -> {
+                                addItemToInventory(inventory, itemInstance);
 
-                                                inventoryRepository
-                                                        .updateInventoryItems(
-                                                                request.getActorId(),
-                                                                inventory.getCharacterItems())
-                                                        .blockingSubscribe();
-
-                                                return getInventory(request.getActorId());
-                                            });
-                        });
+                                // Chain the deletion of the dropped item and inventory update using flatMapCompletable
+                                return itemService.deleteDroppedItem(request.getItemInstanceId())
+                                        .flatMap(deletedResult ->
+                                                inventoryRepository.updateInventoryItems(
+                                                        request.getActorId(), inventory.getCharacterItems())
+                                        )
+                                        .flatMap(characterItemList -> Single.just(inventory));
+                            });
+                })
+                .onErrorResumeNext(e -> {
+                    log.error("Error during item pickup: {}", e.getMessage());
+                    return Single.error(new InventoryException("Failed to pick up item"));
+                });
     }
+
 
     private void addItemToInventory(Inventory inventory, ItemInstance itemInstance) {
         // check for example if inventory is full
