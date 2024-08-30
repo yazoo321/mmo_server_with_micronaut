@@ -24,7 +24,9 @@ public enum MessageType {
 
     UPDATE_ACTOR_SKILLS("UPDATE_ACTOR_SKILLS"),
 
-    ADD_STAT("ADD_STAT");
+    ADD_STAT("ADD_STAT"),
+
+    MOVE_ITEM("MOVE_ITEM");
 
     public final String type;
 }

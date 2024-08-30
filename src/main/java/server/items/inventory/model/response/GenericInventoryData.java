@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Location;
+import server.common.dto.Location2D;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.Inventory;
 import server.items.model.DroppedItem;
@@ -28,4 +29,9 @@ public class GenericInventoryData {
     List<DroppedItem> droppedItems;
 
     List<String> itemInstanceIds;
+
+    // move item
+    // use item instance ID to locate source item
+    Location2D to;
+    String category;
 }

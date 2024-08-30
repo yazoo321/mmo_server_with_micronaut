@@ -56,12 +56,38 @@ public class InventoryService {
     private void addItemToInventory(Inventory inventory, ItemInstance itemInstance) {
         // check for example if inventory is full
         List<CharacterItem> items = inventory.getCharacterItems();
-        Location2D position = getNextAvailableSlot(inventory.getMaxSize(), items);
+        Location2D position = inventory.getNextAvailableSlot();
 
         CharacterItem newCharacterItem =
                 new CharacterItem(inventory.getActorId(), position, itemInstance);
 
         items.add(newCharacterItem);
+    }
+
+    public Single<Inventory> moveItem(String actorId, String itemInstanceId, Location2D to) {
+        return getInventory(actorId)
+                .doOnError(er -> log.error(er.getMessage()))
+                .map(inventory -> {
+                    CharacterItem movingItem = inventory.getItemByInstanceId(itemInstanceId);
+                    CharacterItem itemAtLocation = inventory.getItemAtLocation(to);
+                    // if item exists at location, let's swap their locations
+
+                    if (movingItem == null) {
+                        log.error("error moving item, failed to find item to move");
+
+                        throw new InventoryException("Failed to move item, item not found");
+                    }
+
+                    if (itemAtLocation != null) {
+                        itemAtLocation.setLocation(movingItem.getLocation());
+                    }
+
+                    movingItem.setLocation(to);
+
+                    inventoryRepository.updateInventoryItems(actorId, inventory.getCharacterItems()).subscribe();
+
+                    return inventory;
+                });
     }
 
     public Single<List<CharacterItem>> unequipItem(String itemInstanceId, String actorId) {
@@ -75,9 +101,7 @@ public class InventoryService {
                                     EquipItemService.getCharacterItemByInstance(
                                             items, itemInstanceId);
 
-                            Location2D loc =
-                                    getNextAvailableSlot(
-                                            inventory.getMaxSize(), inventory.getCharacterItems());
+                            Location2D loc = inventory.getNextAvailableSlot();
                             foundItem.setLocation(loc);
 
                             return inventoryRepository
@@ -137,48 +161,10 @@ public class InventoryService {
         return inventoryRepository.updateInventoryMaxSize(inventory);
     }
 
-    public Location2D getNextAvailableSlot(Location2D maxSize, List<CharacterItem> items) {
-        // Implement this as per your requirement, based on position for example.
-        //        Location2D maxSize = inventory.getMaxSize();
-        //        List<CharacterItem> items = inventory.getCharacterItems();
-        int[][] invArr = new int[maxSize.getX()][maxSize.getY()];
-
-        items.forEach(
-                i -> {
-                    Location2D loc = i.getLocation();
-                    // process only valid locations, ignore 'equipped' items
-                    if (loc != null && loc.getX() > -1) {
-                        invArr[loc.getX()][loc.getY()] = 1;
-                    }
-                });
-
-        for (int x = 0; x < maxSize.getY(); x++) {
-            for (int y = 0; y < maxSize.getX(); y++) {
-                if (invArr[x][y] != 1) {
-                    return new Location2D(x, y);
-                }
-            }
-        }
-
-        throw new InventoryException("No available slots in inventory");
-    }
 
     public void clearAllDataForCharacter(String actorId) {
         // This is for test purposes!
         inventoryRepository.deleteAllInventoryDataForCharacter(actorId).subscribe();
     }
 
-    private CharacterItem getItemAtLocation(Location2D location, Inventory inventory) {
-        List<CharacterItem> items = inventory.getCharacterItems();
-
-        Optional<CharacterItem> item =
-                items.stream().filter(i -> i.getLocation().equals(location)).findFirst();
-
-        if (item.isPresent()) {
-            return item.get();
-        } else {
-            log.warn("item was not found in the inventory");
-            return null;
-        }
-    }
 }
