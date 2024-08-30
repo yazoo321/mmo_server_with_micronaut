@@ -88,6 +88,7 @@ public class SocketProcessOutgoingService {
         this.functionMap.put(
                 SkillMessageType.UPDATE_ACTIONBAR.getType(), this::handleUpdateActionBar);
         this.functionMap.put(MessageType.ADD_STAT.getType(), this::handleAddStat);
+        this.functionMap.put(MessageType.MOVE_ITEM.getType(), this::handleMoveItem);
 
         this.udpFunctionMap =
                 new HashMap<>(
@@ -200,6 +201,10 @@ public class SocketProcessOutgoingService {
 
     private void handleAddStat(SocketMessage message, WebSocketSession session) {
         attributeSocketIntegration.handleAddBaseStat(message, session);
+    }
+
+    private void handleMoveItem(SocketMessage message, WebSocketSession session) {
+        itemSocketIntegration.handleMoveItem(message.getInventoryRequest(), session);
     }
 
     private void handleTryAttack(SocketMessage message, WebSocketSession session) {

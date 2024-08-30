@@ -7,7 +7,9 @@ import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import server.common.dto.Location2D;
 import server.items.equippable.service.EquipItemService;
+import server.items.inventory.model.Inventory;
 import server.items.inventory.model.ItemInstanceIds;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.inventory.service.InventoryService;
@@ -82,15 +84,7 @@ public class ItemSocketIntegration {
                         inventory -> {
                             updateProducer.removeItemFromMap(request.getItemInstanceId());
 
-                            GenericInventoryData inventoryData = new GenericInventoryData();
-                            inventoryData.setInventory(inventory);
-                            SocketResponse response =
-                                    SocketResponse.builder()
-                                            .messageType(
-                                                    SocketResponseType.INVENTORY_UPDATE.getType())
-                                            .inventoryData(inventoryData)
-                                            .build();
-                            session.send(response).subscribe(socketResponseSubscriber);
+                            sendInventory(inventory, session);
                         })
                 .subscribe();
     }
@@ -184,18 +178,34 @@ public class ItemSocketIntegration {
                 .doOnError(e -> log.error("Failed to fetch inventory, {}", e.getMessage()))
                 .doOnSuccess(
                         inventory -> {
-                            GenericInventoryData inventoryData = new GenericInventoryData();
-                            inventoryData.setInventory(inventory);
-
-                            SocketResponse res =
-                                    SocketResponse.builder()
-                                            .inventoryData(inventoryData)
-                                            .messageType(
-                                                    SocketResponseType.INVENTORY_UPDATE.getType())
-                                            .build();
-
-                            session.send(res).subscribe(socketResponseSubscriber);
+                            sendInventory(inventory, session);
                         })
                 .subscribe();
+    }
+
+    private void sendInventory(Inventory inventory, WebSocketSession session) {
+        GenericInventoryData inventoryData = new GenericInventoryData();
+        inventoryData.setInventory(inventory);
+
+        SocketResponse res =
+                SocketResponse.builder()
+                        .inventoryData(inventoryData)
+                        .messageType(
+                                SocketResponseType.INVENTORY_UPDATE.getType())
+                        .build();
+
+        session.send(res).subscribe(socketResponseSubscriber);
+    }
+
+    public void handleMoveItem(GenericInventoryData request, WebSocketSession session) {
+        String itemInstanceId = request.getItemInstanceId();
+        Location2D to = request.getTo();
+        String category = request.getCategory();
+
+        if (to != null) {
+            inventoryService.moveItem(SessionParamHelper.getActorId(session), itemInstanceId, to)
+                    .doOnSuccess(inventory -> sendInventory(inventory, session))
+                    .subscribe();
+        }
     }
 }

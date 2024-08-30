@@ -111,9 +111,7 @@ public class ItemTestHelper {
         CharacterItem characterItem = new CharacterItem();
         characterItem.setItemInstance(itemInstance);
         characterItem.setActorId(actorId);
-        characterItem.setLocation(
-                inventoryService.getNextAvailableSlot(
-                        inventory.getMaxSize(), inventory.getCharacterItems()));
+        characterItem.setLocation(inventory.getNextAvailableSlot());
         items.add(characterItem);
 
         inventoryRepository.updateInventoryItems(actorId, items).blockingSubscribe();
