@@ -1,12 +1,24 @@
 # Items readme
 
-#
-blogpost covering introduction of this module:
+## Documentation and videos
 
-https://unreal-mmo-dev.com/2022/05/11/creating-mmo-rpg-style-inventory-system-with-java-and-mongodb/
-
+Introduction of inventory using MongoDB:
+post: https://unreal-mmo-dev.com/2022/05/11/creating-mmo-rpg-style-inventory-system-with-java-and-mongodb/
 Youtube video containing a summary and live testing:
 https://youtu.be/Udm_cTfi7ms
+
+Inventory overview (Aug 2024) and drag and drop functionality with UE:
+https://unreal-mmo-dev.com/2024/09/02/devlog-64-how-to-add-drag-and-drop-to-inventory-in-ue/
+
+UE Specific, how to create animated character in inventory widget: https://unreal-mmo-dev.com/2023/01/23/33-unreal-engine-inventory-character/
+
+Integrating dynamic inventory with UE (deprecated parts): https://unreal-mmo-dev.com/2023/06/29/44-how-to-integrate-dynamic-mmo-inventory-with-your-unreal-engine/
+
+Handle RPG Style stats and equipping items: https://unreal-mmo-dev.com/2023/07/19/45-how-to-handle-rpg-stats-system-and-equipping-items-in-java/
+
+Integrating equipping items and stats system: https://unreal-mmo-dev.com/2023/07/21/46-how-to-integrate-equipping-items-and-stats-system-in-ue-using-websockets/
+
+Modify character mesh on item equips: https://unreal-mmo-dev.com/2023/09/03/48-how-to-modify-your-character-mesh-on-item-equips-in-unreal-engine/
 
 ###
 The key parts of items is as follows:

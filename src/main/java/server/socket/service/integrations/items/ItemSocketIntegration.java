@@ -132,8 +132,8 @@ public class ItemSocketIntegration {
                                             .messageType(
                                                     SocketResponseType.ADD_EQUIP_ITEM.getType())
                                             .build();
-                            session.send(res)
-                                    .subscribe(socketResponseSubscriber); // notify this player
+//                            session.send(res)
+//                                    .subscribe(socketResponseSubscriber); // notify this player
                             updateProducer.notifyEquipItems(
                                     List.of(equippedItems)); // notify other players
                         })
