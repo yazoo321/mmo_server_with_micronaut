@@ -31,15 +31,12 @@ public class StatsService {
         Stats mobStats = new Stats();
         // TODO: parameterize from server
         int level = 10;
-        double baseAttackSpeed = 5.0;
-        double weaponDamage = 20;
-
         mobStats.setActorId(actorId);
 
         mobStats.setBaseStats(
                 new HashMap<>(
                         Map.of(
-                                StatsTypes.STR.getType(), 50,
+                                StatsTypes.STR.getType(), 100,
                                 StatsTypes.STA.getType(), 100,
                                 StatsTypes.DEX.getType(), 100,
                                 StatsTypes.INT.getType(), 100)));
@@ -52,8 +49,6 @@ public class StatsService {
                                         StatsTypes.CURRENT_MP.getType(), 50.0)));
 
         mobStats.setBase(StatsTypes.LEVEL, level);
-        mobStats.setDerived(StatsTypes.MAIN_HAND_ATTACK_SPEED, baseAttackSpeed);
-        mobStats.setDerived(StatsTypes.WEAPON_DAMAGE, weaponDamage);
 
         mobStats.recalculateDerivedStats();
         mobStats.setDerived(StatsTypes.CURRENT_HP, mobStats.getDerived(StatsTypes.MAX_HP));

@@ -94,14 +94,14 @@ public class SocketUpdateListener {
     }
 
     @Topic("notify-equip-items")
-    void notifyItemEquip(List<EquippedItems> equippedItems) {
-        if (equippedItems == null || equippedItems.isEmpty()) {
+    void notifyItemEquip(EquippedItems equippedItems) {
+        if (equippedItems == null) {
             return;
         }
-        String actorId = equippedItems.get(0).getActorId();
+        String actorId = equippedItems.getActorId();
         GenericInventoryData equipData = new GenericInventoryData();
         equipData.setActorId(actorId);
-        equipData.setEquippedItems(equippedItems);
+        equipData.setEquippedItems(List.of(equippedItems));
         SocketResponse socketResponse =
                 SocketResponse.builder()
                         .inventoryData(equipData)

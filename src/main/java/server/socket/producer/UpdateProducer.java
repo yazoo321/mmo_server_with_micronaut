@@ -23,7 +23,7 @@ public interface UpdateProducer {
     void sendCreateMob(Monster monster);
 
     @Topic("remove-mobs-from-game")
-    void removeMobsFromGame(List<String> actorIds);
+    void removeMobsFromGame(String actorIds);
 
     @Topic("player-motion-update")
     void sendPlayerMotionUpdate(PlayerMotion playerMotion);
@@ -35,7 +35,7 @@ public interface UpdateProducer {
     void removeItemFromMap(String itemInstanceId);
 
     @Topic("notify-equip-items")
-    void notifyEquipItems(List<EquippedItems> equippedItems);
+    void notifyEquipItems(EquippedItems equippedItems);
 
     @Topic("notify-un-equip-items")
     void notifyUnEquipItems(ItemInstanceIds itemInstanceIds);

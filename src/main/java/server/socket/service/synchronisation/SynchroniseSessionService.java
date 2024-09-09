@@ -63,7 +63,7 @@ public class SynchroniseSessionService {
     }
 
     private Motion getServerMotion(WebSocketSession session) {
-        Set<String> trackingMobs = SessionParamHelper.getTrackingMobs(session);
+         Set<String> trackingMobs = SessionParamHelper.getTrackingMobs(session);
         if (trackingMobs.iterator().hasNext()) {
             String actorId = trackingMobs.iterator().next();
             return actorMotionRepository

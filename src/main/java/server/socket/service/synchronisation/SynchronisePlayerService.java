@@ -82,9 +82,8 @@ public class SynchronisePlayerService {
         if (newPlayers == null || newPlayers.isEmpty()) {
             return;
         }
-
-        resolveCharacterMotion(newPlayers, session);
         resolveCharacterAppearance(newPlayers, session);
+        resolveCharacterMotion(newPlayers, session);
         resolveCharacterEquips(newPlayers, session);
     }
 

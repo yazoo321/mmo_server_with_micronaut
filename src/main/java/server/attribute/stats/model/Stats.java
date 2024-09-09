@@ -7,6 +7,8 @@ import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
 import lombok.Builder;
 import lombok.Data;
 import server.attribute.stats.types.StatsTypes;
@@ -91,7 +93,7 @@ public class Stats {
     }
 
     public Map<String, Double> recalculateDerivedStats() {
-        Map<String, Double> updatedDerived = new HashMap<>(this.getDerivedStats());
+        Map<String, Double> updatedDerived = new HashMap<>();
         int strength = getBaseStat(StatsTypes.STR);
         int dexterity = getBaseStat(StatsTypes.DEX);
         int stamina = getBaseStat(StatsTypes.STA);
@@ -112,7 +114,7 @@ public class Stats {
                         ? updatedDerived.get(StatsTypes.MAX_MP.getType())
                         : getDerived(StatsTypes.CURRENT_MP));
 
-        updatedDerived.put(StatsTypes.ATTACK_SPEED.getType(), 50.0 + dexterity);
+        updatedDerived.put(StatsTypes.ATTACK_SPEED.getType(), 50.0 + (dexterity / 2));
         updatedDerived.put(StatsTypes.CAST_SPEED.getType(), 50.0 + intelligence);
         updatedDerived.put(StatsTypes.PHY_AMP.getType(), 1 + strength * 0.01);
         updatedDerived.put(StatsTypes.MAG_AMP.getType(), 1 + intelligence * 0.01);
@@ -121,9 +123,14 @@ public class Stats {
         updatedDerived.put(StatsTypes.HP_REGEN.getType(), 0.5 + (stamina / 100));
         updatedDerived.put(StatsTypes.MP_REGEN.getType(), 1.0 + (intelligence / 100));
 
+        // evaluate base derived stats when there's no items equipped
+        updatedDerived.put(StatsTypes.WEAPON_DAMAGE.getType(), 10.0 + (strength / 4));
+        updatedDerived.put(StatsTypes.MAIN_HAND_ATTACK_SPEED.getType(), 2.0);
         // add other effects, such as item and statuses (buffs etc)
         Map<String, Double> otherEffects = mergeStats(itemEffects, statusEffects);
         updatedDerived = mergeStats(updatedDerived, otherEffects);
+
+
 
         // evaluate if new entries are different to old ones
         MapDifference<String, Double> diff = Maps.difference(derivedStats, updatedDerived);

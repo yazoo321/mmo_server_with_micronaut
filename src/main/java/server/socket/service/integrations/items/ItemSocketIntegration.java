@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -126,16 +128,7 @@ public class ItemSocketIntegration {
                             GenericInventoryData equipData = new GenericInventoryData();
                             equipData.setEquippedItems(List.of(equippedItems));
                             equipData.setActorId(equippedItems.getActorId());
-                            SocketResponse res =
-                                    SocketResponse.builder()
-                                            .inventoryData(equipData)
-                                            .messageType(
-                                                    SocketResponseType.ADD_EQUIP_ITEM.getType())
-                                            .build();
-//                            session.send(res)
-//                                    .subscribe(socketResponseSubscriber); // notify this player
-                            updateProducer.notifyEquipItems(
-                                    List.of(equippedItems)); // notify other players
+                            updateProducer.notifyEquipItems(equippedItems); // notify other players
                         })
                 .subscribe();
     }

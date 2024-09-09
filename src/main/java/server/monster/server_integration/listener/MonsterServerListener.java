@@ -50,8 +50,8 @@ public class MonsterServerListener {
 
 
     @Topic("remove-mobs-from-game")
-    public void receiveRemoveMobsFromGame(List<String> actorIds) {
-        actorIds.parallelStream().forEach(id -> mobInstanceService.handleMobDeath(id));
+    public void receiveRemoveMobsFromGame(String actorId) {
+        mobInstanceService.handleMobDeath(actorId);
     }
 
     @Topic("mob-motion-update")
