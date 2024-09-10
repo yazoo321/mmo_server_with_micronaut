@@ -32,7 +32,7 @@ kafka:
       processing.guarantee: "exactly_once"
       auto.offset.reset: "earliest"
   bootstrap:
-    servers: 127.0.0.1:9093
+    servers: kafka1:9093
   security:
     protocol: SASL_PLAINTEXT
   sasl:
@@ -42,7 +42,7 @@ kafka:
   consumers:
     mmo-server:
       bootstrap:
-        servers: 127.0.0.1:9093
+        servers: kafka1:9093
       session:
         timeout:
           ms: 30000
@@ -52,7 +52,8 @@ kafka:
 
 mongodb:
 #  Set username/password as env vars
-  uri: mongodb://mongo_mmo_server:mongo_password@localhost:27017/mmo_server?authSource=admin
+#  uri: mongodb://mongo_mmo_server:mongo_password@localhost:27017/mmo_server?authSource=admin
+  uri: mongodb://mongo_db:mongo_password@mongo_db:27017/mmo_server?authSource=admin  # Use the Kubernetes service name and port
   options:
     maxConnectionIdleTime: 15000
     readConcern: majority
@@ -80,12 +81,14 @@ mongo-database:
 
 redisson:
   single-server-config:
-    address: "redis://127.0.0.1:6379"
+#    address: "redis://127.0.0.1:6379"
+  address: "redis://redis:6379"  # Use the Kubernetes service name and port
   threads: 3
   netty-threads: 6
 
 redis:
-  uri: redis://localhost
+  uri: redis://redis:6379  # Use the Kubernetes service name and port
+  #  uri: redis://localhost
   io-thread-pool-size: 5
   computation-thread-pool-size: 4
 #  ssl: true
