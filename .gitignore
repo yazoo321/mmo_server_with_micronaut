@@ -12,3 +12,9 @@ out/
 .settings
 .classpath
 .factorypath
+
+.terraform
+terraform.tfvars
+terraform.tfstate.backup
+.terraform.lock.hcl
+terraform.tfstate

@@ -6,8 +6,8 @@ resource "azurerm_kubernetes_cluster" "main" {
 
   default_node_pool {
     name       = "default"
-    node_count = 2
-    vm_size    = "Standard_A1_v2"
+    node_count = 1
+    vm_size    = "Standard_B2s"
   }
 
   identity {
@@ -17,4 +17,15 @@ resource "azurerm_kubernetes_cluster" "main" {
   tags = {
     environment = "production"
   }
+}
+
+output "client_certificate" {
+  value     = azurerm_kubernetes_cluster.main.kube_config[0].client_certificate
+  sensitive = true
+}
+
+output "kube_config" {
+  value = azurerm_kubernetes_cluster.main.kube_config_raw
+
+  sensitive = true
 }

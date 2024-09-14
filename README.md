@@ -82,14 +82,14 @@ Do note that you will need to change these for production use.
 Some useful kafka CLI commands:
 ```aidl
 // create topic:
-kafka-topics --create --bootstrap-server localhost:9093 --replication-factor 1 --partitions 1 --topic test
+kafka-topics --create --bootstrap-server kafka1:9093 --replication-factor 1 --partitions 1 --topic test
 --command-config /etc/kafka/configs/config.properties
 
 // producer example:
-kafka-console-producer --broker-list localhost:9093 --topic test --producer.config /etc/kafka/configs/config.properties
+kafka-console-producer --broker-list kafka1:9093 --topic test --producer.config /etc/kafka/configs/config.properties
 
 // consumer example:
-kafka-console-consumer --bootstrap-server localhost:9093 --topic test --from-beginning --partition 0
+kafka-console-consumer --bootstrap-server kafka1:9093 --topic test --from-beginning --partition 0
 --consumer.config /etc/kafka/configs/config.properties
 ```
 Micronaut also offers some useful documentation: https://guides.micronaut.io/latest/micronaut-kafka-maven-java.html

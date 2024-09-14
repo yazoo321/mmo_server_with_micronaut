@@ -3,12 +3,14 @@ resource "kubernetes_persistent_volume" "mongo" {
     name = "mongo-pv"
   }
   spec {
-    capacity {
+    capacity = {
       storage = "1Gi"
     }
     access_modes = ["ReadWriteOnce"]
-    host_path {
-      path = "/mnt/data/mongo"
+    persistent_volume_source {
+      host_path {
+        path = "/mnt/data/mongo"
+      }
     }
     storage_class_name = "manual"
   }
@@ -17,11 +19,12 @@ resource "kubernetes_persistent_volume" "mongo" {
 resource "kubernetes_persistent_volume_claim" "mongo" {
   metadata {
     name = "mongo-pvc"
+    namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
     access_modes = ["ReadWriteOnce"]
     resources {
-      requests {
+      requests = {
         storage = "1Gi"
       }
     }
@@ -32,14 +35,15 @@ resource "kubernetes_persistent_volume_claim" "mongo" {
 resource "kubernetes_service" "mongo" {
   metadata {
     name = "mongo-service"
+    namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
-    selector {
+    selector = {
       app = "mongo"
     }
-    ports {
-      port     = 27017
-      target_port = 27017
+    port {
+      port          = 27017
+      target_port   = 27017
     }
     type = "ClusterIP"
   }
