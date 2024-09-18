@@ -38,17 +38,39 @@
    }
 
    data = {
-     kafka_server_jaas_conf = <<-EOT
-      KafkaServer {
-        org.apache.kafka.common.security.plain.PlainLoginModule required
-        username="kafka"
-        password="password123";
-      };
-      Client {
-        org.apache.zookeeper.server.auth.DigestLoginModule required
-        username="kafka"
-        password="password123";
-      };
+#     kafka_server_jaas_conf = <<-EOT
+#      KafkaServer {
+#        org.apache.kafka.common.security.plain.PlainLoginModule required
+#        username="kafka"
+#        password="password123";
+#      };
+#    EOT
+
+#    server_properties = <<-EOT
+#      # Define listeners
+#      listeners=SASL_PLAINTEXT://0.0.0.0:9093
+#      advertised.listeners=SASL_PLAINTEXT://kafka-broker:9093
+#
+#      # Enable SASL_PLAINTEXT security protocol
+#      security.protocol=SASL_PLAINTEXT
+#      sasl.mechanism=PLAIN
+#
+#      # Define JAAS configuration for SASL
+#      sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="kafka" password="password123";
+#
+#      # Logging configuration
+#      log.dirs=/var/lib/kafka/data
+#    EOT
+    server_properties = <<-EOT
+      # Define listeners
+      listeners=PLAINTEXT://0.0.0.0:9092
+      advertised.listeners=PLAINTEXT://kafka-broker:9092
+
+      # Enable PLAINTEXT security protocol (no SASL)
+      security.protocol=PLAINTEXT
+
+      # Logging configuration
+      log.dirs=/var/lib/kafka/data
     EOT
    }
  }

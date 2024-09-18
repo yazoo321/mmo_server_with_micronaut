@@ -55,24 +55,10 @@ public class PlayerMotionService {
         playerMotionRepository.deletePlayerMotion(actorId).subscribe();
     }
 
-    // used in v1
-    public Single<PlayerMotion> updatePlayerMotion(String actorId, Motion motion) {
-        PlayerMotion playerMotion = new PlayerMotion(actorId, motion, true, Instant.now());
-        return playerMotionRepository.updateMotion(playerMotion);
-    }
-
     public void disconnectPlayer(String actorId) {
         playerMotionRepository.setPlayerOnlineStatus(actorId, false).subscribe();
     }
 
-    @Deprecated
-    public Single<PlayerMotionList> getPlayersNearMe(Motion motion, String actorId) {
-        PlayerMotion playerMotion = new PlayerMotion(actorId, motion, true, Instant.now());
-        return playerMotionRepository
-                .getPlayersNearby(playerMotion, DEFAULT_DISTANCE_THRESHOLD)
-                .doOnError(e -> log.error("Failed to get players motion, {}", e.getMessage()))
-                .map(PlayerMotionList::new);
-    }
 
     public Single<List<PlayerMotion>> getNearbyPlayersAsync(
             Motion motion, String actorId, Integer threshold) {

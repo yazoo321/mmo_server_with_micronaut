@@ -69,7 +69,8 @@ public class PlayerMotionRepository {
                         eq("actorId", actorId), set("isOnline", isOnline)));
     }
 
-    public Single<PlayerMotion> updateMotion(PlayerMotion playerMotion) {
+    @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId")
+    public Single<PlayerMotion> updateMotion(String actorId, PlayerMotion playerMotion) {
         return Single.fromPublisher(
                         playerMotionMongoCollection.findOneAndUpdate(
                                 eq("actorId", playerMotion.getActorId()),
@@ -82,6 +83,7 @@ public class PlayerMotionRepository {
                 .map(success -> playerMotion);
     }
 
+    @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId")
     public Single<DeleteResult> deletePlayerMotion(String actorId) {
         return Single.fromPublisher(playerMotionMongoCollection.deleteOne(eq("actorId", actorId)));
     }

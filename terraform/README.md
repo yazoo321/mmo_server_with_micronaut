@@ -52,18 +52,32 @@ docker push openmmoregistry/myapp/mmo-server
 - `az aks update -n <aks-cluster-name> -g <resource-group-name> --attach-acr <acr-name>`
 - `az aks update -n myAKSCluster -g myGameResourceGroup --attach-acr openmmoregistry`
 
+# Manual requirements: AKS Dual stack
+Terraform is not able to create the dual stack automatically for us, this is required for the IPv6
+in order to achieve this, we have to do it via CLI
+Further documentation:
+https://learn.microsoft.com/en-us/azure/aks/configure-kubenet-dual-stack?tabs=azure-cli%2Ckubectl
+
+manual requirements:
+```
+az feature register --namespace "Microsoft.ContainerService" --name "AKS-EnableDualStack"
+az provider register --namespace Microsoft.ContainerService
+
+az aks update  --resource-group myGameResourceGroup  --name myAKSCluster --networkProfile.ipFamilies ipv4,ipv6
+az aks update  --resource-group myGameResourceGroup  --name myAKSCluster --network-plugin azure 
+```
 
 ## Debugging
 a useful way to debug is using kubectl
 
-First you'd need to get credentials:
+## First you'd need to get credentials:
 - `az aks get-credentials --resource-group <resource_group> --name <aks-cluster-name>`
 
 for example
 - `az aks get-credentials --resource-group myGameResourceGroup --name myAKSCluster`
 
 1. `kubectl get pods` (can extend to `kubectl get pods --all-namespaces`)
-2. alternatively: `kubectl get pods -n micronaut-namespace`
+2. alternatively: `kubectl get pods -n main`
 3. `kubectl logs <pod-name> --all-containers=true`
 
 another example:
@@ -72,6 +86,9 @@ getting pod: `main          kafka-6d74548c5f-v82xh                0/1     CrashL
 check its logs using: 
 `kubectl logs kafka-6d74548c5f-v82xh -n main`
 
+tail logs for server:
+`kubectl logs -f mmo-server-649f8684d4-nfc5q -n main`
+
 ### Debug docker images
 `az acr repository list --name openmmoregistry --output table`
 
@@ -79,3 +96,19 @@ check its logs using:
 `kubectl get svc`
 you may need to specify namespace:
 `kubectl get svc -n main`
+
+### Get kafka configs
+`kubectl describe configmap kafka-config -n main`
+
+## Connecting UE application to micronaut app
+Currently there's no domain name used
+in order to get the IP, we can use:
+`kubectl get svc -n main`
+
+We need to look for the micronaut app server, like this:
+```
+NAME                   TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)        AGE
+micronaut-app-service   LoadBalancer   10.0.0.1       52.123.45.67    80:31234/TCP   5m
+```
+
+copy and use the external IP

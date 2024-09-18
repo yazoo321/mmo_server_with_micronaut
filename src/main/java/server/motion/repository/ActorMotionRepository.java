@@ -66,9 +66,10 @@ public class ActorMotionRepository {
     public void syncMotionWithRepo() {
         // we pull motion information from the cache and we update the cache as first resort
         // TODO: Convert to batch process
-
+        log.info("Running syncMotionWithRepo scheduler");
         for (String id : motionMap.keySet()) {
             Motion motion = motionMap.get(id);
+            log.info("Saving motion for {}, {}", id, motion);
             handleUpdate(id, motion);
             motionMap.remove(id);
         }
@@ -77,7 +78,7 @@ public class ActorMotionRepository {
     private void handleUpdate(String actorId, Motion motion) {
         if (UUIDHelper.isPlayer(actorId)) {
             playerMotionRepository
-                    .updateMotion(new PlayerMotion(actorId, motion, null, null))
+                    .updateMotion(actorId, new PlayerMotion(actorId, motion, null, null))
                     .doOnError(err -> log.error(err.getMessage()))
                     .subscribe();
         } else {

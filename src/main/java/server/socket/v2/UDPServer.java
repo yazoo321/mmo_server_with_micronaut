@@ -33,9 +33,11 @@ public class UDPServer {
     @Inject SocketProcessOutgoingService socketProcessOutgoingService;
 
     public UDPServer() throws SocketException {
+        log.info("Starting udp server");
         Thread serverThread =
                 new Thread(
                         () -> {
+                            log.info("initialized udp server thread");
                             try {
                                 startServer();
                             } catch (Exception e) {
@@ -62,6 +64,8 @@ public class UDPServer {
             DatagramSocket socket = new DatagramSocket(UDP_PORT);
             byte[] buffer = new byte[1024];
 
+            log.info("UDP server started");
+
             while (true) {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
@@ -77,12 +81,13 @@ public class UDPServer {
                 }
 
                 socketProcessOutgoingService.processUDPMessage(message);
-//                log.info("Message received! {}", message);
+                log.info("Message received! {}", message);
             }
         } catch (BindException e) {
           log.error("Bind exception detected, another thread already using this");
         } catch (Exception e) {
             log.error("Server failed with stacktrace: {}", e.getMessage());
+            socket.disconnect();
             e.printStackTrace();
             attempts++;
             if (attempts < RETRIES) {

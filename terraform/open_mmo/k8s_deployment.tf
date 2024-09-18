@@ -10,7 +10,7 @@ resource "kubernetes_deployment" "mongo" {
     namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
-    replicas = 1
+    replicas = 0
     selector {
       match_labels = {
         app = "mongo"
@@ -49,7 +49,7 @@ resource "kubernetes_deployment" "redis" {
     namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
-    replicas = 1
+    replicas = 0
     selector {
       match_labels = {
         app = "redis"
@@ -106,7 +106,7 @@ resource "kubernetes_deployment" "zookeeper" {
     namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
-    replicas = 1
+    replicas = 0
     selector {
       match_labels = {
         app = "zookeeper"
@@ -170,7 +170,7 @@ resource "kubernetes_deployment" "kafka" {
     namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
-    replicas = 1
+    replicas = 0
     selector {
       match_labels = {
         app = "kafka"
@@ -195,46 +195,73 @@ resource "kubernetes_deployment" "kafka" {
             name  = "KAFKA_ZOOKEEPER_CONNECT"
             value = "zookeeper:2181"
           }
+#          env {
+#            name  = "ZOOKEEPER_SASL_ENABLED"
+#            value = "false"
+#          }
+#          env {
+#            name  = "KAFKA_ADVERTISED_LISTENERS"
+#            value = "PLAINTEXT://kafka-broker:9092,SASL_PLAINTEXT://kafka-broker:9093"
+#          }
           env {
             name  = "KAFKA_ADVERTISED_LISTENERS"
-            value = "PLAINTEXT://kafka:9092,SASL_PLAINTEXT://kafka:9093"
+            value = "PLAINTEXT://kafka-broker:9092"
+          }
+#          env {
+#            name  = "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP"
+#            value = "PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT"
+#          }
+          env {
+            name  = "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP"
+            value = "PLAINTEXT:PLAINTEXT"
           }
           env {
-            name  = "ZOOKEEPER_SASL_ENABLED"
-            value = "false"
+            name  = "KAFKA_SECURITY_INTER_BROKER_PROTOCOL"
+            value = "PLAINTEXT"
+          }
+          env {
+            name  = "KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL"
+            value = "PLAIN"
+          }
+#          env {
+#            name  = "KAFKA_OPTS"
+#            value = "-Djava.security.auth.login.config=/etc/kafka/configs/kafka_server_jaas.conf"
+#          }
+          env {
+            name  = "KAFKA_AUTO_CREATE_TOPICS_ENABLE"
+            value = "true"
           }
           env {
             name  = "KAFKA_SASL_ENABLED_MECHANISMS"
             value = "PLAIN"
           }
           env {
-            name  = "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP"
-            value = "PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT"
-          }
-          env {
-            name  = "KAFKA_SECURITY_INTER_BROKER_PROTOCOL"
-            value = "SASL_PLAINTEXT"
-          }
-          env {
-            name  = "KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL"
-            value = "PLAIN"
-          }
-          env {
-            name  = "KAFKA_OPTS"
-            value = "-Djava.security.auth.login.config=/etc/kafka/configs/kafka_server_jaas.conf"
-          }
-          env {
-            name  = "KAFKA_AUTO_CREATE_TOPICS_ENABLE"
-            value = "true"
+            name  = "KAFKA_DEFAULT_REPLICATION_FACTOR"
+            value = "1"
           }
           env {
             name  = "KAFKA_LOG_RETENTION_HOURS"
             value = "1"
           }
+          env {
+            name  = "KAFKA_NUM_PARTITIONS"
+            value = "2"
+          }
+          env {
+            name  = "KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR"
+            value = "1"
+          }
+
+#          volume_mount {
+#            name       = "kafka-config"
+#            mount_path = "/etc/kafka/configs/kafka_server_jaas.conf"
+#            sub_path   = "kafka_server_jaas_conf"
+#          }
+
           volume_mount {
             name       = "kafka-config"
-            mount_path = "/etc/kafka/configs/kafka_server_jaas.conf"  # Full path including the correct filename
-            sub_path   = "kafka_server_jaas_conf"  # Key from the ConfigMap, but it will be mounted as kafka_server_jaas.conf
+            mount_path = "/etc/kafka/configs/config.properties"
+            sub_path   = "server_properties"
           }
         }
 
@@ -275,12 +302,14 @@ resource "kubernetes_service" "kafka" {
 resource "kubernetes_deployment" "micronaut_vm" {
   metadata {
     name = "mmo-server"
+    namespace = kubernetes_namespace.main.metadata[0].name
+
     labels = {
       app = "mmo-server"
     }
   }
   spec {
-    replicas = 1
+    replicas = 0
     selector {
       match_labels = {
         app = "mmo-server"
