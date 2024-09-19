@@ -38,10 +38,10 @@ public class SynchroniseSessionService {
     public void evaluateNearbyPlayers() {
         ConcurrentMap<String, WebSocketSession> sessions = socketService.getLiveSessions();
 
-        Set<String> actorIdSessions = sessions.values().stream().map(SessionParamHelper::getActorId).collect(Collectors.toSet());
-        if (!actorIdSessions.isEmpty()) {
-            log.info("evaluateNearbyPlayers: active sessions: {}", actorIdSessions);
-        }
+//        Set<String> actorIdSessions = sessions.values().stream().map(SessionParamHelper::getActorId).collect(Collectors.toSet());
+//        if (!actorIdSessions.isEmpty()) {
+//            log.info("evaluateNearbyPlayers: active sessions: {}", actorIdSessions);
+//        }
 
         sessions.values().parallelStream()
                 .forEach(

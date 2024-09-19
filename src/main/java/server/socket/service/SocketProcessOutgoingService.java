@@ -153,7 +153,7 @@ public class SocketProcessOutgoingService {
             }
         }
 
-        log.info("sending player motion update");
+//        log.info("sending player motion update");
         updateProducer.sendPlayerMotionUpdate(message.getPlayerMotion());
     }
 

@@ -40,7 +40,7 @@ public class CommunicationSocket {
             InetAddress address = remoteAddress.getAddress();
 
             // Store the address in the session or use it as needed
-            log.info("Opening socket connection, address host: {}", address.getHostAddress());
+//            log.info("Opening socket connection, address host: {}", address.getHostAddress());
             SessionParamHelper.setAddress(session, address.getHostAddress());
         } else {
             System.err.println("Remote address is null");
