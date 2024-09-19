@@ -71,7 +71,7 @@ public class UDPServer {
                 socket.receive(packet);
 
                 SocketMessage message = reader.readValue(packet.getData(), SocketMessage.class);
-
+                log.info("Message received! {}", message);
                 String actorId = getActorId(message);
 
                 if (actorId == null) {
@@ -81,7 +81,7 @@ public class UDPServer {
                 }
 
                 socketProcessOutgoingService.processUDPMessage(message);
-                log.info("Message received! {}", message);
+
             }
         } catch (BindException e) {
           log.error("Bind exception detected, another thread already using this");

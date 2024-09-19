@@ -36,7 +36,7 @@ services:
       - kafka-net
     tmpfs: "/datalog"
   kafka1:
-    container_name: kafka
+    container_name: kafka-broker
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper

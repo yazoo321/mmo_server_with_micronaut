@@ -1,7 +1,17 @@
 ## MMO Server implementation (work in progress)
 
 Currently working on:
-- Receiving info from UE server about mobs to process and pass to player clients
+- Deploying to azure with Terraform
+
+## Build locally with docker
+you may need to add some entries to your HOSTS file to point services from `docker-compose.yml` to `application.yml`
+The relevant entries are:
+```
+127.0.0.1 redis
+127.0.0.1 mongo-service
+127.0.0.1 kafka-broker
+```
+In windows, the hosts file can be found in: `C:\Windows\System32\drivers\etc\hosts.file`
 
 # Documentation within blog:
 Each of the posts contains a video overview.

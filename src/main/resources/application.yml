@@ -1,3 +1,4 @@
+# May require to edit hosts to add connection between docker
 micronaut:
   application:
     name: mmo_server
