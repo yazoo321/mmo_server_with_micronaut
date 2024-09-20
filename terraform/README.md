@@ -11,6 +11,10 @@ In order to deploy the application, we would use a container registry
 ### Create container registry:
 `az acr create --resource-group myGameResourceGroup --name openmmoregistry --sku Basic`
 
+## Integrate AKS with ACR
+- `az aks update -n <aks-cluster-name> -g <resource-group-name> --attach-acr <acr-name>`
+- `az aks update -n myAKSCluster -g myGameResourceGroup --attach-acr openmmoregistry`
+
 (change myGameResourceGroup to your resource group)
 (change openmmoregistry to your desired name)
 
@@ -48,9 +52,6 @@ docker push openmmoregistry/myapp/mmo-server
 - `docker tag myapp/mmo-server openmmoregistry.azurecr.io/myapp/mmo-server`
 - `docker push openmmoregistry.azurecr.io/myapp/mmo-server`
 
-## Integrate AKS with ACR
-- `az aks update -n <aks-cluster-name> -g <resource-group-name> --attach-acr <acr-name>`
-- `az aks update -n myAKSCluster -g myGameResourceGroup --attach-acr openmmoregistry`
 
 # Manual requirements: AKS Dual stack
 Terraform is not able to create the dual stack automatically for us, this is required for the IPv6
