@@ -29,29 +29,25 @@ resource "azurerm_kubernetes_cluster" "main" {
     environment = "production"
   }
 
-#  depends_on = [
-#    azurerm_container_registry.acr
-#  ]
+  depends_on = [azurerm_container_registry.acr]
 }
 
-## Define the Azure Container Registry
-#resource "azurerm_container_registry" "acr" {
-#  name                = "openmmoregistry"
-#  resource_group_name = azurerm_resource_group.main.name
-#  location            = azurerm_resource_group.main.location
-#  sku                 = "Basic"
-#  admin_enabled       = true
-#}
+# Define the Azure Container Registry
+resource "azurerm_container_registry" "acr" {
+  name                = "openmmoregistry"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  sku                 = "Basic"
+  admin_enabled       = true
+}
 
-## Attach the ACR to the AKS cluster
-#resource "azurerm_role_assignment" "acr_to_aks" {
-#  principal_id   = azurerm_kubernetes_cluster.main.identity[0].principal_id
-#  role_definition_name = "AcrPull"
-#  scope          = azurerm_container_registry.acr.id
-#  depends_on     = [
-#    azurerm_kubernetes_cluster.main
-#  ]
-#}
+# Attach the ACR to the AKS cluster
+resource "azurerm_role_assignment" "acr_to_aks" {
+  principal_id          = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
+  role_definition_name  = "AcrPull"
+  scope                 = azurerm_container_registry.acr.id
+  depends_on            = [azurerm_kubernetes_cluster.main]
+}
 
 output "client_certificate" {
   value     = azurerm_kubernetes_cluster.main.kube_config[0].client_certificate
@@ -60,6 +56,5 @@ output "client_certificate" {
 
 output "kube_config" {
   value = azurerm_kubernetes_cluster.main.kube_config_raw
-
   sensitive = true
 }

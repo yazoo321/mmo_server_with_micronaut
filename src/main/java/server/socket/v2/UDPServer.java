@@ -27,6 +27,9 @@ public class UDPServer {
     private static final ObjectReader reader = mapper.reader();
     private static final ObjectWriter writer = mapper.writer();
 
+//    used for local testing only
+    private DatagramSocket backupSocket = new DatagramSocket();
+
 
     // TODO: put to config?
     private static final int RETRIES = 10;
@@ -51,7 +54,9 @@ public class UDPServer {
     }
     public UDPServer() throws SocketException {
         log.info("Starting udp server");
-        List.of(UDP_PORT, 5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010).forEach(
+        List.of(UDP_PORT
+//                , 5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010
+        ).forEach(
                 this::startServerOnPort
         );
     }
@@ -59,6 +64,10 @@ public class UDPServer {
     public void send(SocketResponse message, InetAddress address, Integer port) {
         try {
             DatagramSocket socket = openSockets.get(port);
+            if (socket == null) {
+                // should only happen during local testing
+                socket = backupSocket;
+            }
             byte[] data = writer.writeValueAsBytes(message);
             DatagramPacket packet =
                     new DatagramPacket(
@@ -109,7 +118,7 @@ public class UDPServer {
 //        log.info("Socket address: {}", packet.getSocketAddress());
 
         SocketMessage message = reader.readValue(packet.getData(), SocketMessage.class);
-//        log.info("Message received! {}", message);
+        log.info("Message received! {}", message);
         String actorId = getActorId(message);
 
         if (actorId == null) {
