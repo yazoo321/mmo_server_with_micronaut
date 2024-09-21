@@ -15,6 +15,7 @@ import server.items.equippable.service.EquipItemService;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.SessionParams;
+import server.motion.repository.ActorMotionRepository;
 import server.motion.service.PlayerMotionService;
 import server.player.model.Character;
 import server.player.service.PlayerCharacterService;
@@ -35,17 +36,20 @@ public class SynchronisePlayerService {
 
     @Inject EquipItemService equipItemService;
 
+    @Inject ActorMotionRepository actorMotionRepository;
+
     private static final Integer DEFAULT_DISTANCE_THRESHOLD = 20_000;
 
     public void handleSynchronisePlayers(Motion motion, WebSocketSession session) {
         int distanceThreshold = DEFAULT_DISTANCE_THRESHOLD;
 
         String actorId = SessionParamHelper.getActorId(session);
-
+//        log.info("handleSynchronisePlayers: actorId: {}, motion: {}", actorId, motion);
         playerMotionService
                 .getNearbyPlayersAsync(motion, actorId, distanceThreshold)
                 .doOnSuccess(
                         list -> {
+//                            log.info("Detected nearby players for actor: {}: {}", actorId, list);
                             Set<String> actorIds =
                                     list.stream()
                                             .map(PlayerMotion::getActorId)
@@ -54,6 +58,7 @@ public class SynchronisePlayerService {
                             evaluateNewPlayers(actorIds, session);
                             // update the names that we follow
                             session.put(SessionParams.TRACKING_PLAYERS.getType(), actorIds);
+//                            log.info("Actor: {}, tracking players: {}", actorId, actorIds);
                         })
                 .doOnError(
                         (error) ->
@@ -82,6 +87,7 @@ public class SynchronisePlayerService {
         if (newPlayers == null || newPlayers.isEmpty()) {
             return;
         }
+//        log.info("handleNewPlayers: actorId: {}, new players: {}", SessionParamHelper.getActorId(session), newPlayers);
         resolveCharacterAppearance(newPlayers, session);
         resolveCharacterMotion(newPlayers, session);
         resolveCharacterEquips(newPlayers, session);

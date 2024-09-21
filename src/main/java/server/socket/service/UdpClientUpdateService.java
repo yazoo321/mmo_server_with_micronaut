@@ -8,11 +8,9 @@ import server.session.SessionParamHelper;
 import server.session.cache.UdpSessionCache;
 import server.socket.model.SocketResponse;
 import server.socket.model.UdpAddressHolder;
-import server.socket.v1.CommunicationSocket;
 import server.socket.v2.UDPServer;
 
 import java.net.InetAddress;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.function.Predicate;
 
@@ -41,6 +39,7 @@ public class UdpClientUpdateService extends ClientUpdatesService  {
 
                     try {
                         UdpAddressHolder addressHolder = sessionCache.fetchUdpSession(id);
+//                        log.info("Sending udp message to: {} : {}", addressHolder.getHost(), addressHolder.getPort());
                         udpServer.send(message, InetAddress.getByName(addressHolder.getHost()), addressHolder.getPort());
                     } catch (UnknownHostException e) {
                         log.error("Error sending UDP message, {}", e.getMessage());

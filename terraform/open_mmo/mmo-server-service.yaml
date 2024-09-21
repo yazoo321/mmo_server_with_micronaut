@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mmo-server-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: mmo-server  # Make sure this matches the label of your pod
+  ports:
+    - protocol: TCP
+      port: 80  # External port
+      targetPort: 8081  # Port your application listens on

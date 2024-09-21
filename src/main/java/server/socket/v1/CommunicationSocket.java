@@ -40,6 +40,7 @@ public class CommunicationSocket {
             InetAddress address = remoteAddress.getAddress();
 
             // Store the address in the session or use it as needed
+//            log.info("Opening socket connection, address host: {}", address.getHostAddress());
             SessionParamHelper.setAddress(session, address.getHostAddress());
         } else {
             System.err.println("Remote address is null");
@@ -74,7 +75,7 @@ public class CommunicationSocket {
                 log.error("server name should not be null on disconnect");
             }
         }
-
+        log.info("Disconnecting {}", sessionId);
         socketProcessService.removeActorSession(sessionId);
     }
 

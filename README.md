@@ -1,7 +1,17 @@
 ## MMO Server implementation (work in progress)
 
 Currently working on:
-- Receiving info from UE server about mobs to process and pass to player clients
+- Deploying to azure with Terraform
+
+## Build locally with docker
+you may need to add some entries to your HOSTS file to point services from `docker-compose.yml` to `application.yml`
+The relevant entries are:
+```
+127.0.0.1 redis
+127.0.0.1 mongo-service
+127.0.0.1 kafka-broker
+```
+In windows, the hosts file can be found in: `C:\Windows\System32\drivers\etc\hosts.file`
 
 # Documentation within blog:
 Each of the posts contains a video overview.
@@ -82,14 +92,14 @@ Do note that you will need to change these for production use.
 Some useful kafka CLI commands:
 ```aidl
 // create topic:
-kafka-topics --create --bootstrap-server localhost:9093 --replication-factor 1 --partitions 1 --topic test
+kafka-topics --create --bootstrap-server kafka1:9093 --replication-factor 1 --partitions 1 --topic test
 --command-config /etc/kafka/configs/config.properties
 
 // producer example:
-kafka-console-producer --broker-list localhost:9093 --topic test --producer.config /etc/kafka/configs/config.properties
+kafka-console-producer --broker-list kafka1:9093 --topic test --producer.config /etc/kafka/configs/config.properties
 
 // consumer example:
-kafka-console-consumer --bootstrap-server localhost:9093 --topic test --from-beginning --partition 0
+kafka-console-consumer --bootstrap-server kafka1:9093 --topic test --from-beginning --partition 0
 --consumer.config /etc/kafka/configs/config.properties
 ```
 Micronaut also offers some useful documentation: https://guides.micronaut.io/latest/micronaut-kafka-maven-java.html

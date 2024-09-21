@@ -25,6 +25,8 @@ public class PlayerMotionUpdateListener {
     @Topic("player-motion-update")
     public void receive(PlayerMotion playerMotion) {
         // TODO: validate
+//        log.info("received player motion in player-motion-update");
+//        log.info("{}", playerMotion);
         actorMotionRepository.updateActorMotion(
                 playerMotion.getActorId(), playerMotion.getMotion());
         playerMotionService.relayPlayerMotion(playerMotion);

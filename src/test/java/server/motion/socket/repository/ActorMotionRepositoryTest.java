@@ -92,7 +92,7 @@ public class ActorMotionRepositoryTest {
         expectedPlayerMotion.setMotion(motion);
 
         // prepare update requests
-        when(playerMotionRepository.updateMotion(any(PlayerMotion.class)))
+        when(playerMotionRepository.updateMotion(anyString(), any(PlayerMotion.class)))
                 .thenReturn(Single.just(expectedPlayerMotion));
         when(mobRepository.updateMotionOnly(actorId, motion))
                 .thenReturn(Single.just(expectedMob));
@@ -105,7 +105,7 @@ public class ActorMotionRepositoryTest {
         assertThat(updatedMotion).isEqualTo(motion);
 
         if (UUIDHelper.isPlayer(actorId)) {
-            verify(playerMotionRepository).updateMotion(any(PlayerMotion.class));
+            verify(playerMotionRepository).updateMotion(anyString(), any(PlayerMotion.class));
             verifyNoInteractions(mobRepository);
         } else {
             verify(mobRepository).updateMotionOnly(eq(actorId), eq(motion));

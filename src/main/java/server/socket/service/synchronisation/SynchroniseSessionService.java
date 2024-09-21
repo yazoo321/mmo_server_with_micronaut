@@ -8,6 +8,7 @@ import jakarta.inject.Singleton;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
@@ -36,6 +37,11 @@ public class SynchroniseSessionService {
     @Scheduled(fixedDelay = "500ms")
     public void evaluateNearbyPlayers() {
         ConcurrentMap<String, WebSocketSession> sessions = socketService.getLiveSessions();
+
+//        Set<String> actorIdSessions = sessions.values().stream().map(SessionParamHelper::getActorId).collect(Collectors.toSet());
+//        if (!actorIdSessions.isEmpty()) {
+//            log.info("evaluateNearbyPlayers: active sessions: {}", actorIdSessions);
+//        }
 
         sessions.values().parallelStream()
                 .forEach(
