@@ -76,7 +76,7 @@ public class PlayerMotionRepository {
                                 eq("actorId", playerMotion.getActorId()),
                                 Updates.combine(
                                         Updates.set("motion", playerMotion.getMotion()),
-                                        Updates.set("isOnline", true),
+                                        Updates.set("isOnline", playerMotion.getIsOnline()),
                                         Updates.set(
                                                 "updatedAt",
                                                 Instant.now().truncatedTo(ChronoUnit.MICROS)))))

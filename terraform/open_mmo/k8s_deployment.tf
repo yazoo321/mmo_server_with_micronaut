@@ -10,7 +10,7 @@ resource "kubernetes_deployment" "mongo" {
     namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
-    replicas = 0
+    replicas = 1
     selector {
       match_labels = {
         app = "mongo"
@@ -49,7 +49,7 @@ resource "kubernetes_deployment" "redis" {
     namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
-    replicas = 0
+    replicas = 1
     selector {
       match_labels = {
         app = "redis"
@@ -106,7 +106,7 @@ resource "kubernetes_deployment" "zookeeper" {
     namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
-    replicas = 0
+    replicas = 1
     selector {
       match_labels = {
         app = "zookeeper"
@@ -170,7 +170,7 @@ resource "kubernetes_deployment" "kafka" {
     namespace = kubernetes_namespace.main.metadata[0].name
   }
   spec {
-    replicas = 0
+    replicas = 1
     selector {
       match_labels = {
         app = "kafka"
@@ -309,7 +309,7 @@ resource "kubernetes_deployment" "micronaut_vm" {
     }
   }
   spec {
-    replicas = 0
+    replicas = 1
     selector {
       match_labels = {
         app = "mmo-server"

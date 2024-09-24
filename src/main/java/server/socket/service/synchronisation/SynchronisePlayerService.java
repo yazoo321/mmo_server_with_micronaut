@@ -38,7 +38,7 @@ public class SynchronisePlayerService {
 
     @Inject ActorMotionRepository actorMotionRepository;
 
-    private static final Integer DEFAULT_DISTANCE_THRESHOLD = 20_000;
+    private static final Integer DEFAULT_DISTANCE_THRESHOLD = 10_000;
 
     public void handleSynchronisePlayers(Motion motion, WebSocketSession session) {
         int distanceThreshold = DEFAULT_DISTANCE_THRESHOLD;
@@ -79,6 +79,14 @@ public class SynchronisePlayerService {
                         .filter(i -> !actorIds.contains(i))
                         .collect(Collectors.toSet());
 
+        if (!newPlayers.isEmpty()) {
+            log.info("Actor: {}: Detected new players: {}", SessionParamHelper.getActorId(session), newPlayers);
+        }
+
+        if (!lostPlayers.isEmpty()) {
+            log.info("Actor: {}: Lost players: {}", SessionParamHelper.getActorId(session), lostPlayers);
+        }
+
         handleNewPlayers(session, newPlayers);
         handleLostPlayers(session, lostPlayers);
     }
@@ -88,9 +96,9 @@ public class SynchronisePlayerService {
             return;
         }
 //        log.info("handleNewPlayers: actorId: {}, new players: {}", SessionParamHelper.getActorId(session), newPlayers);
-        resolveCharacterAppearance(newPlayers, session);
-        resolveCharacterMotion(newPlayers, session);
-        resolveCharacterEquips(newPlayers, session);
+        resolveCharacterAppearanceAndSendMotion(newPlayers, session);
+//        resolveCharacterMotion(newPlayers, session);
+//        resolveCharacterEquips(newPlayers, session);
     }
 
     private void handleLostPlayers(WebSocketSession session, Set<String> lostPlayers) {
@@ -173,7 +181,7 @@ public class SynchronisePlayerService {
                 .subscribe();
     }
 
-    private void resolveCharacterAppearance(Set<String> newPlayers, WebSocketSession session) {
+    private void resolveCharacterAppearanceAndSendMotion(Set<String> newPlayers, WebSocketSession session) {
         playerCharacterService
                 .getCharactersByNames(newPlayers)
                 .doOnError(
@@ -197,6 +205,10 @@ public class SynchronisePlayerService {
                                             .playerKeys(characterMap.keySet())
                                             .build();
                             session.send(response).subscribe(socketResponseSubscriber);
+
+//                          To avoid timing issues, send motion and equips after base appearance
+                            resolveCharacterMotion(newPlayers, session);
+                            resolveCharacterEquips(newPlayers, session);
                         })
                 .subscribe();
     }

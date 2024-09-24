@@ -31,91 +31,91 @@ resource "azurerm_public_ip" "micronaut_pip" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-  sku                 = "Standard"
+  sku                 = "Basic"
   lifecycle           {
     create_before_destroy = true
   }
   ip_version = "IPv4"  # You can duplicate this block for IPv6 or use "IPv4" and "IPv6" if available
 }
+# We will want to enable IPv6 in near future, but not utilised right now
+#resource "azurerm_public_ip" "micronaut_ipv6_pip" {
+#  name                = "micronaut-ipv6-pip"
+#  location            = azurerm_resource_group.main.location
+#  resource_group_name = azurerm_resource_group.main.name
+#  allocation_method   = "Static"
+#  sku                 = "Basic"
+#  ip_version          = "IPv6"  # Enable IPv6
+#  lifecycle           {
+#    create_before_destroy = true
+#  }
+#}
 
-resource "azurerm_public_ip" "micronaut_ipv6_pip" {
-  name                = "micronaut-ipv6-pip"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  ip_version          = "IPv6"  # Enable IPv6
-  lifecycle           {
-    create_before_destroy = true
-  }
-}
-
-# Define the Network Security Group
-resource "azurerm_network_security_group" "default_security_group" {
-  name                = "acceptanceTestSecurityGroup1"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-}
-
-# Define outbound TCP rule
-resource "azurerm_network_security_rule" "outbound_tcp" {
-  name                        = "outbound_tcp"
-  priority                    = 100
-  direction                   = "Outbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  resource_group_name         = azurerm_network_security_group.default_security_group.resource_group_name
-  network_security_group_name = azurerm_network_security_group.default_security_group.name
-}
-
-# Define inbound TCP rule
-resource "azurerm_network_security_rule" "inbound_tcp" {
-  name                        = "inbound_tcp"
-  priority                    = 101
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  resource_group_name         = azurerm_network_security_group.default_security_group.resource_group_name
-  network_security_group_name = azurerm_network_security_group.default_security_group.name
-}
-
-# Define inbound UDP rule
-resource "azurerm_network_security_rule" "inbound_udp" {
-  name                        = "inbound_udp"
-  priority                    = 102
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Udp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  resource_group_name         = azurerm_network_security_group.default_security_group.resource_group_name
-  network_security_group_name = azurerm_network_security_group.default_security_group.name
-}
-
-# Define outbound UDP rule
-resource "azurerm_network_security_rule" "outbound_udp" {
-  name                        = "outbound_udp"
-  priority                    = 103
-  direction                   = "Outbound"
-  access                      = "Allow"
-  protocol                    = "Udp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  resource_group_name         = azurerm_network_security_group.default_security_group.resource_group_name
-  network_security_group_name = azurerm_network_security_group.default_security_group.name
-}
+## Define the Network Security Group
+#resource "azurerm_network_security_group" "default_security_group" {
+#  name                = "acceptanceTestSecurityGroup1"
+#  location            = azurerm_resource_group.main.location
+#  resource_group_name = azurerm_resource_group.main.name
+#}
+#
+## Define outbound TCP rule
+#resource "azurerm_network_security_rule" "outbound_tcp" {
+#  name                        = "outbound_tcp"
+#  priority                    = 100
+#  direction                   = "Outbound"
+#  access                      = "Allow"
+#  protocol                    = "Tcp"
+#  source_port_range           = "*"
+#  destination_port_range      = "*"
+#  source_address_prefix       = "*"
+#  destination_address_prefix  = "*"
+#  resource_group_name         = azurerm_network_security_group.default_security_group.resource_group_name
+#  network_security_group_name = azurerm_network_security_group.default_security_group.name
+#}
+#
+## Define inbound TCP rule
+#resource "azurerm_network_security_rule" "inbound_tcp" {
+#  name                        = "inbound_tcp"
+#  priority                    = 101
+#  direction                   = "Inbound"
+#  access                      = "Allow"
+#  protocol                    = "Tcp"
+#  source_port_range           = "*"
+#  destination_port_range      = "*"
+#  source_address_prefix       = "*"
+#  destination_address_prefix  = "*"
+#  resource_group_name         = azurerm_network_security_group.default_security_group.resource_group_name
+#  network_security_group_name = azurerm_network_security_group.default_security_group.name
+#}
+#
+## Define inbound UDP rule
+#resource "azurerm_network_security_rule" "inbound_udp" {
+#  name                        = "inbound_udp"
+#  priority                    = 102
+#  direction                   = "Inbound"
+#  access                      = "Allow"
+#  protocol                    = "Udp"
+#  source_port_range           = "*"
+#  destination_port_range      = "*"
+#  source_address_prefix       = "*"
+#  destination_address_prefix  = "*"
+#  resource_group_name         = azurerm_network_security_group.default_security_group.resource_group_name
+#  network_security_group_name = azurerm_network_security_group.default_security_group.name
+#}
+#
+## Define outbound UDP rule
+#resource "azurerm_network_security_rule" "outbound_udp" {
+#  name                        = "outbound_udp"
+#  priority                    = 103
+#  direction                   = "Outbound"
+#  access                      = "Allow"
+#  protocol                    = "Udp"
+#  source_port_range           = "*"
+#  destination_port_range      = "*"
+#  source_address_prefix       = "*"
+#  destination_address_prefix  = "*"
+#  resource_group_name         = azurerm_network_security_group.default_security_group.resource_group_name
+#  network_security_group_name = azurerm_network_security_group.default_security_group.name
+#}
 
 resource "kubernetes_service" "micronaut_service" {
   metadata {
@@ -131,8 +131,13 @@ resource "kubernetes_service" "micronaut_service" {
 
     type                    = "LoadBalancer"
     external_traffic_policy = "Local"
-    ip_families             = ["IPv4", "IPv6"]  # Enable if using dual-stack
-    ip_family_policy        = "RequireDualStack"  # Use "RequireDualStack" for dual-stack
+    ip_families             = ["IPv4"]
+    ip_family_policy        = "SingleStack"
+
+#   Disabled as incur costs and are not currently used
+    #    ip_families             = ["IPv4", "IPv6"]  # Enable if using dual-stack
+    #    ip_family_policy        = "RequireDualStack"  # Use "RequireDualStack" for dual-stack
+
 
     port {
       name        = "main"

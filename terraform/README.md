@@ -1,8 +1,8 @@
 ## Getting Azure credentials
 1. register / login to Azure
 2. Create a new subscription, where you will get yourself the subscription ID
-3. Execute: az ad sp create-for-rbac --name "<service-principal-name>" --role="Contributor" --scopes="/subscriptions/<subscription-id>"
-4. the command will return the new client id and secret that you will need to populate main.tf file with (and the subscription ID)
+3. Execute: az ad sp create-for-rbac --name "<service-principal-name>" --role="Owner" --scopes="/subscriptions/<subscription-id>"
+4. the command will return the new client id and secret that you will need to populate terraform.tfvars file with (and the subscription ID)
 5. You can override them in your env variables, or create terraform.tfvars file specifying the variable values
 
 ## Deploying application
@@ -11,7 +11,7 @@ In order to deploy the application, we would use a container registry
 ### Create container registry:
 `az acr create --resource-group myGameResourceGroup --name openmmoregistry --sku Basic`
 
-## Integrate AKS with ACR
+## Manually integrate AKS with ACR (should not be required)
 - `az aks update -n <aks-cluster-name> -g <resource-group-name> --attach-acr <acr-name>`
 - `az aks update -n myAKSCluster -g myGameResourceGroup --attach-acr openmmoregistry`
 
@@ -52,21 +52,6 @@ docker push openmmoregistry/myapp/mmo-server
 - `docker tag myapp/mmo-server openmmoregistry.azurecr.io/myapp/mmo-server`
 - `docker push openmmoregistry.azurecr.io/myapp/mmo-server`
 
-
-# Manual requirements: AKS Dual stack
-Terraform is not able to create the dual stack automatically for us, this is required for the IPv6
-in order to achieve this, we have to do it via CLI
-Further documentation:
-https://learn.microsoft.com/en-us/azure/aks/configure-kubenet-dual-stack?tabs=azure-cli%2Ckubectl
-
-manual requirements:
-```
-az feature register --namespace "Microsoft.ContainerService" --name "AKS-EnableDualStack"
-az provider register --namespace Microsoft.ContainerService
-
-az aks update  --resource-group myGameResourceGroup  --name myAKSCluster --networkProfile.ipFamilies ipv4,ipv6
-az aks update  --resource-group myGameResourceGroup  --name myAKSCluster --network-plugin azure 
-```
 
 ## Debugging
 a useful way to debug is using kubectl

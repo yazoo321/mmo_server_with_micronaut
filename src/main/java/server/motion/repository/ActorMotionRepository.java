@@ -75,9 +75,7 @@ public class ActorMotionRepository {
     @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId")
     public void handleDisconnect(String actorId) {
         fetchActorMotion(actorId)
-                .doOnSuccess(motion -> {
-                    handleUpdate(actorId, motion, false);
-                })
+                .doOnSuccess(motion -> handleUpdate(actorId, motion, false))
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
     }
@@ -90,9 +88,7 @@ public class ActorMotionRepository {
         for (String id : syncActorMotion) {
             // fetch from cache:
             fetchActorMotion(id)
-                    .doOnSuccess(motion -> {
-                        handleUpdate(id, motion, true);
-                    })
+                    .doOnSuccess(motion -> handleUpdate(id, motion, true))
                     .doOnError(err -> log.error(err.getMessage()))
                     .subscribe();
         }
@@ -104,10 +100,16 @@ public class ActorMotionRepository {
     }
 
     private void handleUpdate(String actorId, Motion motion, boolean online) {
+        if (!online) {
+            log.info("updating motion to be offline");
+            log.info("{}, {}", actorId, motion);
+        }
+        syncActorMotion.remove(actorId);
         if (UUIDHelper.isPlayer(actorId)) {
             playerMotionRepository
                     .updateMotion(actorId, new PlayerMotion(actorId, motion, online, Instant.now()))
                     .doOnError(err -> log.error(err.getMessage()))
+                    .doOnSuccess(done -> log.info("Updated! {}", done))
                     .subscribe();
         } else {
             mobRepository
@@ -115,7 +117,5 @@ public class ActorMotionRepository {
                     .doOnError(err -> log.error(err.getMessage()))
                     .subscribe();
         }
-        syncActorMotion.remove(actorId);
-//        motionMap.remove(actorId);
     }
 }
