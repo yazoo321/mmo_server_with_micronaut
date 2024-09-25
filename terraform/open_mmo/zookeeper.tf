@@ -31,3 +31,20 @@ resource "kubernetes_persistent_volume_claim" "zookeeper" {
     storage_class_name = "manual"
   }
 }
+
+resource "kubernetes_service" "zookeeper" {
+  metadata {
+    name      = "zookeeper"
+    namespace = kubernetes_namespace.main.metadata[0].name
+  }
+  spec {
+    selector = {
+      app = "zookeeper"
+    }
+    port {
+      port        = 2181
+      target_port = 2181
+    }
+    type = "ClusterIP"
+  }
+}

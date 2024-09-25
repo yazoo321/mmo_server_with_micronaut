@@ -18,3 +18,4 @@ terraform.tfvars
 terraform.tfstate.backup
 .terraform.lock.hcl
 terraform.tfstate
+*.jar

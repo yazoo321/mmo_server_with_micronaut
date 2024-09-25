@@ -124,7 +124,6 @@ resource "kubernetes_service" "micronaut_service" {
   }
 
   spec {
-
     selector = {
       app = kubernetes_deployment.micronaut_vm.metadata[0].labels["app"]
     }

@@ -31,3 +31,20 @@ resource "kubernetes_persistent_volume_claim" "redis" {
     storage_class_name = "manual"
   }
 }
+
+resource "kubernetes_service" "redis" {
+  metadata {
+    name      = "redis"
+    namespace = kubernetes_namespace.main.metadata[0].name
+  }
+  spec {
+    selector = {
+      app = "redis"
+    }
+    port {
+      port        = 6379
+      target_port = 6379
+    }
+    type = "ClusterIP"
+  }
+}

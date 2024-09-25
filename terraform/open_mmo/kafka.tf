@@ -75,3 +75,26 @@
    }
  }
 
+ resource "kubernetes_service" "kafka" {
+   metadata {
+     name      = "kafka-broker"
+     namespace = kubernetes_namespace.main.metadata[0].name
+   }
+   spec {
+     selector = {
+       app = "kafka"
+     }
+     port {
+       name = "plaintext"
+       port        = 9092
+       target_port = 9092
+     }
+     port {
+       name = "sasl-plaintext"
+       port        = 9093
+       target_port = 9093
+     }
+     type = "ClusterIP"
+   }
+ }
+

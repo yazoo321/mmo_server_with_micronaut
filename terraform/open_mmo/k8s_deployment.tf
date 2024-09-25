@@ -83,23 +83,6 @@ resource "kubernetes_deployment" "redis" {
   }
 }
 
-resource "kubernetes_service" "redis" {
-  metadata {
-    name      = "redis"
-    namespace = kubernetes_namespace.main.metadata[0].name
-  }
-  spec {
-    selector = {
-      app = "redis"
-    }
-    port {
-      port        = 6379
-      target_port = 6379
-    }
-    type = "ClusterIP"
-  }
-}
-
 resource "kubernetes_deployment" "zookeeper" {
   metadata {
     name      = "zookeeper"
@@ -144,23 +127,6 @@ resource "kubernetes_deployment" "zookeeper" {
         }
       }
     }
-  }
-}
-
-resource "kubernetes_service" "zookeeper" {
-  metadata {
-    name      = "zookeeper"
-    namespace = kubernetes_namespace.main.metadata[0].name
-  }
-  spec {
-    selector = {
-      app = "zookeeper"
-    }
-    port {
-      port        = 2181
-      target_port = 2181
-    }
-    type = "ClusterIP"
   }
 }
 
@@ -273,29 +239,6 @@ resource "kubernetes_deployment" "kafka" {
         }
       }
     }
-  }
-}
-
-resource "kubernetes_service" "kafka" {
-  metadata {
-    name      = "kafka-broker"
-    namespace = kubernetes_namespace.main.metadata[0].name
-  }
-  spec {
-    selector = {
-      app = "kafka"
-    }
-    port {
-      name = "plaintext"
-      port        = 9092
-      target_port = 9092
-    }
-    port {
-      name = "sasl-plaintext"
-      port        = 9093
-      target_port = 9093
-    }
-    type = "ClusterIP"
   }
 }
 
