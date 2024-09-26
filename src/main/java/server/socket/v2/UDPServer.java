@@ -54,8 +54,8 @@ public class UDPServer {
     }
     public UDPServer() throws SocketException {
         log.info("Starting udp server");
-        List.of(UDP_PORT,
-                5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010
+        List.of(UDP_PORT
+//                , 5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010
         ).forEach(
                 this::startServerOnPort
         );

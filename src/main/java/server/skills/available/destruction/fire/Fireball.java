@@ -20,7 +20,7 @@ public class Fireball extends ChannelledSkill {
         super(
                 "Fireball",
                 "Hurl a fireball at a selected target",
-                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 300.0),
+                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 80.0),
                 0,
                 1500,
                 false,

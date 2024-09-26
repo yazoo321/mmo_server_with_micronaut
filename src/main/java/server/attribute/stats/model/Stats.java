@@ -120,8 +120,8 @@ public class Stats {
         updatedDerived.put(StatsTypes.MAG_AMP.getType(), 1 + intelligence * 0.01);
         updatedDerived.put(StatsTypes.PHY_CRIT.getType(), 5 + dexterity * 0.1);
 
-        updatedDerived.put(StatsTypes.HP_REGEN.getType(), 0.5 + (stamina / 100));
-        updatedDerived.put(StatsTypes.MP_REGEN.getType(), 1.0 + (intelligence / 100));
+        updatedDerived.put(StatsTypes.HP_REGEN.getType(), 1.0 + (stamina / 5));
+        updatedDerived.put(StatsTypes.MP_REGEN.getType(), 1.0 + (intelligence / 5));
 
         // evaluate base derived stats when there's no items equipped
         updatedDerived.put(StatsTypes.WEAPON_DAMAGE.getType(), 10.0 + (strength / 4));

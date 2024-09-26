@@ -55,8 +55,9 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
 
     @Override
     public void travel(CombatData combatData, SkillTarget skillTarget) {
-        if (getTravelSpeed() == null) {
+        if (getTravelSpeed() == null || getTravelSpeed() == 0) {
             instantEffect(combatData, skillTarget);
+            return;
         }
 
         String targetId = skillTarget.getTargetId();
@@ -74,9 +75,7 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         time = Math.max(Math.floor(time), 100);
 
         scheduler.schedule(
-                () -> {
-                    this.instantEffect(combatData, skillTarget);
-                },
+                () -> this.instantEffect(combatData, skillTarget),
                 (long) time,
                 TimeUnit.MILLISECONDS);
     }

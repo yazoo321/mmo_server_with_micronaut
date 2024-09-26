@@ -22,7 +22,7 @@ public class StatsRegenService {
 
     @Inject StatsService statsService;
 
-    @Scheduled(fixedDelay = "1000ms", initialDelay = "30s")
+    @Scheduled(fixedDelay = "2000ms", initialDelay = "30s")
     public void applyRegen() {
         ConcurrentMap<String, WebSocketSession> sessions = socketService.getLiveSessions();
 

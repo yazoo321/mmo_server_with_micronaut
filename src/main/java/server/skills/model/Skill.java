@@ -143,6 +143,6 @@ public abstract class Skill {
 
         message.setCombatRequest(request);
 
-        clientUpdatesService.sendToSelf(session, message);
+        clientUpdatesService.sendUpdateToListeningIncludingSelf(message, castor);
     }
 }
