@@ -13,6 +13,8 @@ The relevant entries are:
 ```
 In windows, the hosts file can be found in: `C:\Windows\System32\drivers\etc\hosts.file`
 
+In Mac, you need to edit `/etc/hosts` and add the same entries
+
 # Documentation within blog:
 Each of the posts contains a video overview.
 

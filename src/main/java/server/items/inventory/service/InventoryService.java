@@ -6,7 +6,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Location2D;
@@ -31,27 +30,39 @@ public class InventoryService {
         return itemService
                 .getDroppedItemByInstanceId(request.getItemInstanceId())
                 .doOnError(e -> log.error("Failed to get dropped item: {}", e.getMessage()))
-                .flatMap(droppedItem -> {
-                    ItemInstance itemInstance = droppedItem.getItemInstance();
-                    return inventoryRepository.getCharacterInventory(request.getActorId())
-                            .flatMap(inventory -> {
-                                addItemToInventory(inventory, itemInstance);
+                .flatMap(
+                        droppedItem -> {
+                            ItemInstance itemInstance = droppedItem.getItemInstance();
+                            return inventoryRepository
+                                    .getCharacterInventory(request.getActorId())
+                                    .flatMap(
+                                            inventory -> {
+                                                addItemToInventory(inventory, itemInstance);
 
-                                // Chain the deletion of the dropped item and inventory update using flatMapCompletable
-                                return itemService.deleteDroppedItem(request.getItemInstanceId())
-                                        .flatMap(deletedResult ->
-                                                inventoryRepository.updateInventoryItems(
-                                                        request.getActorId(), inventory.getCharacterItems())
-                                        )
-                                        .flatMap(characterItemList -> Single.just(inventory));
-                            });
-                })
-                .onErrorResumeNext(e -> {
-                    log.error("Error during item pickup: {}", e.getMessage());
-                    return Single.error(new InventoryException("Failed to pick up item"));
-                });
+                                                // Chain the deletion of the dropped item and
+                                                // inventory update using flatMapCompletable
+                                                return itemService
+                                                        .deleteDroppedItem(
+                                                                request.getItemInstanceId())
+                                                        .flatMap(
+                                                                deletedResult ->
+                                                                        inventoryRepository
+                                                                                .updateInventoryItems(
+                                                                                        request
+                                                                                                .getActorId(),
+                                                                                        inventory
+                                                                                                .getCharacterItems()))
+                                                        .flatMap(
+                                                                characterItemList ->
+                                                                        Single.just(inventory));
+                                            });
+                        })
+                .onErrorResumeNext(
+                        e -> {
+                            log.error("Error during item pickup: {}", e.getMessage());
+                            return Single.error(new InventoryException("Failed to pick up item"));
+                        });
     }
-
 
     private void addItemToInventory(Inventory inventory, ItemInstance itemInstance) {
         // check for example if inventory is full
@@ -66,28 +77,36 @@ public class InventoryService {
 
     public Single<Inventory> moveItem(String actorId, String itemInstanceId, Location2D to) {
         return getInventory(actorId)
-                .doOnError(er -> log.error(er.getMessage()))
-                .map(inventory -> {
-                    CharacterItem movingItem = inventory.getItemByInstanceId(itemInstanceId);
-                    CharacterItem itemAtLocation = inventory.getItemAtLocation(to);
-                    // if item exists at location, let's swap their locations
+                .doOnError(
+                        er -> {
+                            log.error(er.getMessage());
+                            throw new InventoryException("Failed to move item, item not found");
+                        })
+                .map(
+                        inventory -> {
+                            CharacterItem movingItem =
+                                    inventory.getItemByInstanceId(itemInstanceId);
+                            CharacterItem itemAtLocation = inventory.getItemAtLocation(to);
+                            // if item exists at location, let's swap their locations
 
-                    if (movingItem == null) {
-                        log.error("error moving item, failed to find item to move");
+                            if (movingItem == null) {
+                                log.error("error moving item, failed to find item to move");
 
-                        throw new InventoryException("Failed to move item, item not found");
-                    }
+                                throw new InventoryException("Failed to move item, item not found");
+                            }
 
-                    if (itemAtLocation != null) {
-                        itemAtLocation.setLocation(movingItem.getLocation());
-                    }
+                            if (itemAtLocation != null) {
+                                itemAtLocation.setLocation(movingItem.getLocation());
+                            }
 
-                    movingItem.setLocation(to);
+                            movingItem.setLocation(to);
 
-                    inventoryRepository.updateInventoryItems(actorId, inventory.getCharacterItems()).subscribe();
+                            inventoryRepository
+                                    .updateInventoryItems(actorId, inventory.getCharacterItems())
+                                    .subscribe();
 
-                    return inventory;
-                });
+                            return inventory;
+                        });
     }
 
     public Single<List<CharacterItem>> unequipItem(String itemInstanceId, String actorId) {
@@ -161,10 +180,8 @@ public class InventoryService {
         return inventoryRepository.updateInventoryMaxSize(inventory);
     }
 
-
     public void clearAllDataForCharacter(String actorId) {
         // This is for test purposes!
         inventoryRepository.deleteAllInventoryDataForCharacter(actorId).subscribe();
     }
-
 }

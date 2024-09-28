@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
+import server.common.dto.Motion;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
@@ -30,7 +31,8 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 
     @Test
     void testWhenPlayerDropsItemItIsDropped() {
-        playerMotionService.initializePlayerMotion(CHARACTER_1).blockingSubscribe();
+        Motion player1Motion =
+                playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         playerMotionService.initializePlayerMotion(CHARACTER_2).blockingSubscribe();
 
         TestWebSocketClient playerClient1 = createWebSocketClient(embeddedServer.getPort());
@@ -40,14 +42,14 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 
         ItemInstance createdItem = prepareCharactersAndItems();
 
-        Location dropLocation = new Location(createBaseMotion());
+        Location dropLocation = new Location(player1Motion);
         SocketMessage dropRequestChar1 =
                 dropRequestForCharacter(CHARACTER_1, createdItem.getItemInstanceId(), dropLocation);
 
         playerClient1.send(dropRequestChar1);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
+                .timeout(Duration.of(10, ChronoUnit.SECONDS))
                 .until(
                         () -> {
                             List<String> resTypes =

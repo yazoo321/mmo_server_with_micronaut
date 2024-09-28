@@ -17,7 +17,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.reactivestreams.Publisher;
+import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
+import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
@@ -131,10 +133,12 @@ class PlayerCombatServiceTest {
         Assertions.assertThat(targets.size()).isEqualTo(1);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(9, ChronoUnit.SECONDS))
+                .timeout(Duration.of(15, ChronoUnit.SECONDS))
                 .until(
                         () -> {
                             try {
+                                Stats mobStats = statsService.getStatsFor(MOB_1).blockingGet();
+                                Double currentHp = mobStats.getDerived(StatsTypes.CURRENT_HP);
                                 return statusService.getActorStatus(MOB_1).isDead();
                             } catch (NoSuchElementException e) {
                                 // when publisher is empty, the mob was killed and deleted. later

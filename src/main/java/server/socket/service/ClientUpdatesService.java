@@ -4,7 +4,6 @@ import io.micronaut.websocket.WebSocketBroadcaster;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -29,9 +28,7 @@ public class ClientUpdatesService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-    @Inject
-    ActorMotionRepository actorMotionRepository;
-    
+    @Inject ActorMotionRepository actorMotionRepository;
 
     public void sendDroppedItemUpdates(DroppedItem droppedItem) {
         SocketResponse socketResponse =
@@ -93,7 +90,7 @@ public class ClientUpdatesService {
                 return false;
             }
 
-            int defaultThresholdDistance = 1000;
+            int defaultThresholdDistance = 10_000;
             Location location = new Location(motion);
             if (location.withinThreshold(droppedItem.getLocation(), defaultThresholdDistance)) {
                 // automatically make it listen to this items events

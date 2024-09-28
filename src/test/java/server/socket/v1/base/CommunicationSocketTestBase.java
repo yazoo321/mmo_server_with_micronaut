@@ -145,8 +145,8 @@ public class CommunicationSocketTestBase {
         SocketMessage socketMsg = createMessageForMotionWithinRange(actorId);
         Motion motion = socketMsg.getPlayerMotion().getMotion();
 
-        motion.setX(20_000);
-        motion.setY(20_000);
+        motion.setX(30_000);
+        motion.setY(30_000);
 
         return socketMsg;
     }
@@ -197,8 +197,8 @@ public class CommunicationSocketTestBase {
     protected SocketMessage createMobMessageForMotionOutOfRange(String actorId) {
         SocketMessage msg = createMobMessageForMotionWithinRange(actorId);
 
-        msg.getMonster().getMotion().setX(10_000);
-        msg.getMonster().getMotion().setY(10_000);
+        msg.getMonster().getMotion().setX(30_000);
+        msg.getMonster().getMotion().setY(30_000);
 
         return msg;
     }

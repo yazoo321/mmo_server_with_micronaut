@@ -99,7 +99,7 @@ public class MobRepositoryTest {
     void testGetMobsNearby() {
         Monster mob1 = createMobInstance(actorId1, 10, 10, 10);
         Monster mob2 = createMobInstance(actorId2, 50, 50, 50);
-        Monster mob3 = createMobInstance(actorId3, 5000, 5000, 5000);
+        Monster mob3 = createMobInstance(actorId3, 25000, 25000, 25000);
 
         mobRepository.insertMobInstance(mob1).blockingGet();
         mobRepository.insertMobInstance(mob2).blockingGet();
