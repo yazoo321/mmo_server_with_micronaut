@@ -3,7 +3,6 @@ package server.items.inventory.service;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
-
 import java.util.Arrays;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -34,7 +33,6 @@ public class InventoryServiceTest {
     @Inject ItemTestHelper itemTestHelper;
 
     InventoryRepository inventoryRepository = Mockito.mock(InventoryRepository.class);
-
 
     private static final String ACTOR_ID = "test_character";
 
@@ -138,19 +136,27 @@ public class InventoryServiceTest {
 
         Inventory inventory = new Inventory();
         inventory.setActorId(ACTOR_ID);
-        CharacterItem item = new CharacterItem(ACTOR_ID, new Location2D(0, 0),
-                new ItemInstance("itemId", itemInstanceId, null));
+        CharacterItem item =
+                new CharacterItem(
+                        ACTOR_ID,
+                        new Location2D(0, 0),
+                        new ItemInstance("itemId", itemInstanceId, null));
         inventory.setCharacterItems(List.of(item));
 
-        Mockito.when(inventoryRepository.getCharacterInventory(ACTOR_ID)).thenReturn(Single.just(inventory));
-        Mockito.when(inventoryRepository.updateInventoryItems(Mockito.anyString(), Mockito.anyList()))
+        Mockito.when(inventoryRepository.getCharacterInventory(ACTOR_ID))
+                .thenReturn(Single.just(inventory));
+        Mockito.when(
+                        inventoryRepository.updateInventoryItems(
+                                Mockito.anyString(), Mockito.anyList()))
                 .thenReturn(Single.just(inventory.getCharacterItems()));
 
-        inventoryService.moveItem(ACTOR_ID, itemInstanceId, to)
+        inventoryService
+                .moveItem(ACTOR_ID, itemInstanceId, to)
                 .test()
-                .assertValue(inv ->
-                        inv.getItemByInstanceId(itemInstanceId).getLocation().equals(to));
+                .assertValue(
+                        inv -> inv.getItemByInstanceId(itemInstanceId).getLocation().equals(to));
     }
+
     @Test
     public void moveNonExistentItem() {
         InventoryRepository inventoryRepository = Mockito.mock(InventoryRepository.class);
@@ -164,12 +170,18 @@ public class InventoryServiceTest {
 
         Inventory inventory = new Inventory();
         inventory.setActorId(ACTOR_ID);
-        CharacterItem item = new CharacterItem(ACTOR_ID, new Location2D(0, 0), new ItemInstance());
+        CharacterItem item =
+                new CharacterItem(
+                        ACTOR_ID,
+                        new Location2D(0, 0),
+                        new ItemInstance("itemId", "itemInstanceId", null));
         inventory.setCharacterItems(Arrays.asList(item));
 
-        Mockito.when(inventoryRepository.getCharacterInventory(ACTOR_ID)).thenReturn(Single.just(inventory));
+        Mockito.when(inventoryRepository.getCharacterInventory(ACTOR_ID))
+                .thenReturn(Single.just(inventory));
 
-        inventoryService.moveItem(ACTOR_ID, itemInstanceId, to)
+        inventoryService
+                .moveItem(ACTOR_ID, itemInstanceId, to)
                 .test()
                 .assertError(InventoryException.class);
     }

@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +39,6 @@ public class ItemSocketIntegration {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-
     public void handleDropItem(GenericInventoryData request, WebSocketSession session) {
         inventoryService
                 .dropItem(request.getActorId(), request.getItemInstanceId(), request.getLocation())
@@ -60,8 +57,8 @@ public class ItemSocketIntegration {
                         })
                 .doOnSuccess(
                         droppedItem -> {
-                            updateProducer.addItemToMap(droppedItem);
                             sendInventoryToPlayer(session, request.getActorId());
+                            updateProducer.addItemToMap(droppedItem);
                         })
                 .subscribe();
     }
@@ -169,10 +166,7 @@ public class ItemSocketIntegration {
         inventoryService
                 .getInventory(actorId)
                 .doOnError(e -> log.error("Failed to fetch inventory, {}", e.getMessage()))
-                .doOnSuccess(
-                        inventory -> {
-                            sendInventory(inventory, session);
-                        })
+                .doOnSuccess(inventory -> sendInventory(inventory, session))
                 .subscribe();
     }
 
@@ -183,8 +177,7 @@ public class ItemSocketIntegration {
         SocketResponse res =
                 SocketResponse.builder()
                         .inventoryData(inventoryData)
-                        .messageType(
-                                SocketResponseType.INVENTORY_UPDATE.getType())
+                        .messageType(SocketResponseType.INVENTORY_UPDATE.getType())
                         .build();
 
         session.send(res).subscribe(socketResponseSubscriber);
@@ -196,7 +189,8 @@ public class ItemSocketIntegration {
         String category = request.getCategory();
 
         if (to != null) {
-            inventoryService.moveItem(SessionParamHelper.getActorId(session), itemInstanceId, to)
+            inventoryService
+                    .moveItem(SessionParamHelper.getActorId(session), itemInstanceId, to)
                     .doOnSuccess(inventory -> sendInventory(inventory, session))
                     .subscribe();
         }

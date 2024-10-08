@@ -17,7 +17,6 @@ import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
-import server.socket.service.ClientUpdatesService;
 import server.socket.service.UdpClientUpdateService;
 import server.socket.service.WebsocketClientUpdatesService;
 import server.utils.FeatureFlag;
@@ -30,13 +29,10 @@ import server.utils.FeatureFlag;
         clientId = "socket_listener")
 public class SocketUpdateListener {
 
-    @Inject
-    WebsocketClientUpdatesService websocketClientUpdatesService;
-    @Inject
-    UdpClientUpdateService udpClientUpdateService;
+    @Inject WebsocketClientUpdatesService websocketClientUpdatesService;
+    @Inject UdpClientUpdateService udpClientUpdateService;
 
-    @Inject
-    FeatureFlag featureFlag;
+    @Inject FeatureFlag featureFlag;
 
     @Topic("player-motion-update-result")
     void receivePlayerMotionUpdate(PlayerMotion playerMotion) {
@@ -47,13 +43,14 @@ public class SocketUpdateListener {
                         .playerKeys(Set.of(playerMotion.getActorId()))
                         .build();
 
-//        log.info("Received player motion update result");
-//        log.info("{}", playerMotion);
+        //        log.info("Received player motion update result");
+        //        log.info("{}", playerMotion);
 
         if (featureFlag.getEnableUdp()) {
             udpClientUpdateService.sendUpdateToListening(socketResponse, playerMotion.getActorId());
         } else {
-            websocketClientUpdatesService.sendUpdateToListening(socketResponse, playerMotion.getActorId());
+            websocketClientUpdatesService.sendUpdateToListening(
+                    socketResponse, playerMotion.getActorId());
         }
     }
 
@@ -66,26 +63,18 @@ public class SocketUpdateListener {
                         .mobKeys(Set.of(monster.getActorId()))
                         .build();
 
-//        log.info("{}", monster);
+        //        log.info("{}", monster);
 
         if (featureFlag.getEnableUdp()) {
             udpClientUpdateService.sendUpdateToListening(socketResponse, monster.getActorId());
         } else {
-            websocketClientUpdatesService.sendUpdateToListening(socketResponse, monster.getActorId());
+            websocketClientUpdatesService.sendUpdateToListening(
+                    socketResponse, monster.getActorId());
         }
     }
 
     @Topic("item-added-to-map")
     void itemAddedToMap(DroppedItem droppedItem) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.ADD_ITEMS_TO_MAP.getType())
-                        .droppedItems(
-                                Map.of(
-                                        droppedItem.getItemInstance().getItemInstanceId(),
-                                        droppedItem))
-                        .build();
-
         websocketClientUpdatesService.sendDroppedItemUpdates(droppedItem);
     }
 
