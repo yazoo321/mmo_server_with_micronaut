@@ -2,7 +2,6 @@ package server.socket.producer;
 
 import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
-import java.util.List;
 
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
