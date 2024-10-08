@@ -5,6 +5,10 @@ import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
 @Data
 @NoArgsConstructor
 @Serdeable
@@ -22,6 +26,16 @@ public class Location {
     Integer x;
     Integer y;
     Integer z;
+
+    public double distanceTo(Location other) {
+        return Math.sqrt(Math.pow(this.x - other.x, 2)
+                + Math.pow(this.y - other.y, 2)
+                + Math.pow(this.z - other.z, 2));
+    }
+
+    public static Optional<Location> findNearestLocation(Location currentLocation, List<Location> locations) {
+        return locations.stream().min(Comparator.comparingDouble(currentLocation::distanceTo));
+    }
 
     public boolean matches(Location location) {
         return this.x.equals(location.getX())
@@ -56,4 +70,6 @@ public class Location {
 
         // can add Z if we want to.
     }
+
+
 }

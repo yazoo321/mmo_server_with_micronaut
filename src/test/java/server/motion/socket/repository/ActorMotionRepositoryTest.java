@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import server.attribute.stats.model.types.ClassTypes;
 import server.common.dto.Motion;
 import server.common.uuid.UUIDHelper;
 import server.monster.server_integration.model.Monster;
@@ -19,7 +18,6 @@ import server.motion.dto.PlayerMotion;
 import server.motion.repository.ActorMotionRepository;
 import server.motion.repository.PlayerMotionRepository;
 
-import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Stream;
 
