@@ -14,6 +14,8 @@ import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
 import server.attribute.stats.types.StatsTypes;
+import server.attribute.status.model.derived.Dead;
+import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
@@ -36,6 +38,9 @@ public class CombatService {
     @Inject SessionParamHelper sessionParamHelper;
 
     @Inject StatsService statsService;
+
+    @Inject
+    StatusService statusService;
 
     @Inject
     WebsocketClientUpdatesService clientUpdatesService;
@@ -130,9 +135,7 @@ public class CombatService {
 
         statsService.getStatsFor(actorId)
                 .doOnError(err -> log.error("Failed to get stats, {}", err.getMessage()))
-                .doOnSuccess(actorStats -> {
-                    handleActorDeath(targetStats, actorStats);
-                })
+                .doOnSuccess(actorStats -> handleActorDeath(targetStats, actorStats))
                 .subscribe();
     }
 
@@ -147,8 +150,12 @@ public class CombatService {
 
 
         if (stats.isPlayer()) {
-            // TODO: implement player death
-            statsService.addHealth(stats, 300.0);
+            statusService.removeAllStatuses(stats.getActorId())
+                    .doOnSuccess(status ->
+                            statusService.addStatusToActor(status, Set.of(new Dead()), stats.getActorId()))
+                    .doOnError(er -> log.error(er.getMessage()))
+                    .subscribe();
+
         } else {
             mobInstanceService.handleMobDeath(stats.getActorId());
             sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);

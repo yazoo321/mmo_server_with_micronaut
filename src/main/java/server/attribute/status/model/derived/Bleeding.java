@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @Serdeable
@@ -20,6 +21,7 @@ import java.util.Map;
 public class Bleeding extends Status {
 
     public Bleeding(Instant expiration, String sourceId, Double damage) {
+        this.setId(UUID.randomUUID().toString());
         this.setDerivedEffects(new HashMap<>(Map.of(StatsTypes.CURRENT_HP.getType(), damage)));
         this.setStatusEffects(new HashSet<>());
         this.setExpiration(expiration);

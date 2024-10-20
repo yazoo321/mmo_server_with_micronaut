@@ -26,6 +26,8 @@ import server.socket.model.types.SkillMessageType;
 import server.socket.producer.UpdateProducer;
 import server.socket.service.integrations.attributes.StatsSocketIntegration;
 import server.socket.service.integrations.items.ItemSocketIntegration;
+import server.socket.service.integrations.motion.PlayerMotionIntegration;
+import server.socket.service.integrations.status.StatusSocketIntegration;
 
 @Slf4j
 @Singleton
@@ -38,6 +40,12 @@ public class SocketProcessOutgoingService {
     @Inject ItemSocketIntegration itemSocketIntegration;
 
     @Inject StatsSocketIntegration attributeSocketIntegration;
+
+    @Inject
+    StatusSocketIntegration statusSocketIntegration;
+
+    @Inject
+    PlayerMotionIntegration playerMotionIntegration;
 
     @Inject PlayerCombatService playerCombatService;
 
@@ -64,20 +72,18 @@ public class SocketProcessOutgoingService {
     }
 
     public SocketProcessOutgoingService() {
-        this.functionMap =
-                new HashMap<>(
-                        Map.of(
-                                MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate,
-                                MessageType.CREATE_MOB.getType(), this::handleCreateMob,
-                                MessageType.MOB_MOTION.getType(), this::handleMobMotionUpdate,
-                                MessageType.PICKUP_ITEM.getType(), this::handlePickupItem,
-                                MessageType.DROP_ITEM.getType(), this::handleDropItem,
-                                MessageType.FETCH_INVENTORY.getType(), this::handleFetchInventory,
-                                MessageType.FETCH_EQUIPPED.getType(), this::handleFetchEquipped,
-                                MessageType.EQUIP_ITEM.getType(), this::handleEquipItem,
-                                MessageType.UN_EQUIP_ITEM.getType(), this::handleUnEquipItem,
-                                MessageType.FETCH_STATS.getType(), this::handleFetchStats));
-        // map.of supports up to 10 items
+        this.functionMap = new HashMap<>();
+        this.functionMap.put(MessageType.PLAYER_MOTION.getType(), this::handlePlayerMotionUpdate);
+        this.functionMap.put(MessageType.CREATE_MOB.getType(), this::handleCreateMob);
+        this.functionMap.put(MessageType.MOB_MOTION.getType(), this::handleMobMotionUpdate);
+        this.functionMap.put(MessageType.PICKUP_ITEM.getType(), this::handlePickupItem);
+        this.functionMap.put(MessageType.DROP_ITEM.getType(), this::handleDropItem);
+        this.functionMap.put(MessageType.FETCH_INVENTORY.getType(), this::handleFetchInventory);
+        this.functionMap.put(MessageType.FETCH_EQUIPPED.getType(), this::handleFetchEquipped);
+        this.functionMap.put(MessageType.EQUIP_ITEM.getType(), this::handleEquipItem);
+        this.functionMap.put(MessageType.UN_EQUIP_ITEM.getType(), this::handleUnEquipItem);
+        this.functionMap.put(MessageType.FETCH_STATS.getType(), this::handleFetchStats);
+        this.functionMap.put(MessageType.FETCH_STATUS.getType(), this::handleFetchStatus);
         this.functionMap.put(MessageType.TRY_ATTACK.getType(), this::handleTryAttack);
         this.functionMap.put(MessageType.STOP_ATTACK.getType(), this::handleStopAttack);
         this.functionMap.put(MessageType.SET_SESSION_ID.getType(), this::setSessionId);
@@ -89,6 +95,7 @@ public class SocketProcessOutgoingService {
                 SkillMessageType.UPDATE_ACTIONBAR.getType(), this::handleUpdateActionBar);
         this.functionMap.put(MessageType.ADD_STAT.getType(), this::handleAddStat);
         this.functionMap.put(MessageType.MOVE_ITEM.getType(), this::handleMoveItem);
+        this.functionMap.put(MessageType.RESPAWN_PLAYER.getType(), this::handleRespawnPlayer);
 
         this.udpFunctionMap =
                 new HashMap<>(
@@ -200,12 +207,20 @@ public class SocketProcessOutgoingService {
         attributeSocketIntegration.handleFetchStats(actorId, session);
     }
 
+    private void handleFetchStatus(SocketMessage message, WebSocketSession session) {
+        statusSocketIntegration.handleFetchActorStatus(message.getActorId(), session);
+    }
+
     private void handleAddStat(SocketMessage message, WebSocketSession session) {
         attributeSocketIntegration.handleAddBaseStat(message, session);
     }
 
     private void handleMoveItem(SocketMessage message, WebSocketSession session) {
         itemSocketIntegration.handleMoveItem(message.getInventoryRequest(), session);
+    }
+
+    private void handleRespawnPlayer(SocketMessage message, WebSocketSession session) {
+        playerMotionIntegration.handlePlayerRespawn(message, session);
     }
 
     private void handleTryAttack(SocketMessage message, WebSocketSession session) {
@@ -242,6 +257,10 @@ public class SocketProcessOutgoingService {
 
     private void handleUpdateActionBar(SocketMessage socketMessage, WebSocketSession session) {
         actionbarService.updateActionbarItem(socketMessage.getActorActionbar());
+    }
+
+    private void handleCharacterRespawn(SocketMessage socketMessage, WebSocketSession session) {
+
     }
 
     private void setSessionId(SocketMessage message, WebSocketSession session) {

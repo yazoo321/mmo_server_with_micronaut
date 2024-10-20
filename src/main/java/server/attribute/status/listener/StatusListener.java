@@ -27,7 +27,7 @@ public class StatusListener {
     public void receiveUpdateActorStatus(ActorStatus actorStatus) {
         SocketResponse socketResponse =
                 SocketResponse.builder()
-                        .messageType(SocketResponseType.STATS_UPDATE.getType())
+                        .messageType(SocketResponseType.STATUS_UPDATE.getType())
                         .actorStatus(actorStatus)
                         .build();
 

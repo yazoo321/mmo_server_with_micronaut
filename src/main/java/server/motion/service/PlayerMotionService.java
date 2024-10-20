@@ -60,7 +60,6 @@ public class PlayerMotionService {
 
     public void disconnectPlayer(String actorId) {
         actorMotionRepository.handleDisconnect(actorId);
-//        playerMotionRepository.setPlayerOnlineStatus(actorId, false).subscribe();
     }
 
 
@@ -82,5 +81,9 @@ public class PlayerMotionService {
 
     public void relayPlayerMotion(PlayerMotion playerMotion) {
         playerMotionUpdateProducer.sendPlayerMotionResult(playerMotion);
+    }
+
+    public void handlePlayerRespawn(String actorId, String customData) {
+
     }
 }
