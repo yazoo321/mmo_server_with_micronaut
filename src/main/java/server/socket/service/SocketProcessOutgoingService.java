@@ -26,6 +26,8 @@ import server.socket.model.types.SkillMessageType;
 import server.socket.producer.UpdateProducer;
 import server.socket.service.integrations.attributes.StatsSocketIntegration;
 import server.socket.service.integrations.items.ItemSocketIntegration;
+import server.socket.service.integrations.motion.PlayerMotionIntegration;
+import server.socket.service.integrations.status.StatusSocketIntegration;
 
 @Slf4j
 @Singleton
@@ -38,6 +40,12 @@ public class SocketProcessOutgoingService {
     @Inject ItemSocketIntegration itemSocketIntegration;
 
     @Inject StatsSocketIntegration attributeSocketIntegration;
+
+    @Inject
+    StatusSocketIntegration statusSocketIntegration;
+
+    @Inject
+    PlayerMotionIntegration playerMotionIntegration;
 
     @Inject PlayerCombatService playerCombatService;
 
@@ -75,6 +83,7 @@ public class SocketProcessOutgoingService {
         this.functionMap.put(MessageType.EQUIP_ITEM.getType(), this::handleEquipItem);
         this.functionMap.put(MessageType.UN_EQUIP_ITEM.getType(), this::handleUnEquipItem);
         this.functionMap.put(MessageType.FETCH_STATS.getType(), this::handleFetchStats);
+        this.functionMap.put(MessageType.FETCH_STATUS.getType(), this::handleFetchStatus);
         this.functionMap.put(MessageType.TRY_ATTACK.getType(), this::handleTryAttack);
         this.functionMap.put(MessageType.STOP_ATTACK.getType(), this::handleStopAttack);
         this.functionMap.put(MessageType.SET_SESSION_ID.getType(), this::setSessionId);
@@ -86,6 +95,7 @@ public class SocketProcessOutgoingService {
                 SkillMessageType.UPDATE_ACTIONBAR.getType(), this::handleUpdateActionBar);
         this.functionMap.put(MessageType.ADD_STAT.getType(), this::handleAddStat);
         this.functionMap.put(MessageType.MOVE_ITEM.getType(), this::handleMoveItem);
+        this.functionMap.put(MessageType.RESPAWN_PLAYER.getType(), this::handleRespawnPlayer);
 
         this.udpFunctionMap =
                 new HashMap<>(
@@ -197,12 +207,20 @@ public class SocketProcessOutgoingService {
         attributeSocketIntegration.handleFetchStats(actorId, session);
     }
 
+    private void handleFetchStatus(SocketMessage message, WebSocketSession session) {
+        statusSocketIntegration.handleFetchActorStatus(message.getActorId(), session);
+    }
+
     private void handleAddStat(SocketMessage message, WebSocketSession session) {
         attributeSocketIntegration.handleAddBaseStat(message, session);
     }
 
     private void handleMoveItem(SocketMessage message, WebSocketSession session) {
         itemSocketIntegration.handleMoveItem(message.getInventoryRequest(), session);
+    }
+
+    private void handleRespawnPlayer(SocketMessage message, WebSocketSession session) {
+        playerMotionIntegration.handlePlayerRespawn(message, session);
     }
 
     private void handleTryAttack(SocketMessage message, WebSocketSession session) {

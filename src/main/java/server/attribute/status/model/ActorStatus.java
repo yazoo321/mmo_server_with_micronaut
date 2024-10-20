@@ -19,6 +19,8 @@ public class ActorStatus {
     String actorId;
     Set<Status> actorStatuses;
     boolean add;
+    Set<String> statusEffects;
+
 
     public Set<Status> removeOldStatuses() {
         Set<Status> removedStatuses = new HashSet<>();
@@ -36,6 +38,7 @@ public class ActorStatus {
     public Set<String> aggregateStatusEffects() {
         Set<String> statusEffects = new HashSet<>();
         actorStatuses.forEach(status -> statusEffects.addAll(status.getStatusEffects()));
+        this.statusEffects = statusEffects;
 
         return statusEffects;
     }
@@ -47,9 +50,7 @@ public class ActorStatus {
                 status ->
                         status.getDerivedEffects()
                                 .forEach(
-                                        (k, v) -> {
-                                            derived.merge(k, v, Double::sum);
-                                        }));
+                                        (k, v) -> derived.merge(k, v, Double::sum)));
 
         return derived;
     }
@@ -70,5 +71,12 @@ public class ActorStatus {
         }
 
         return false;
+    }
+
+    public boolean canMove() {
+        boolean canMove = true;
+        canMove = canMove && !isDead();
+
+        return canMove;
     }
 }

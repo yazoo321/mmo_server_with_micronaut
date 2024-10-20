@@ -10,6 +10,7 @@ import server.attribute.status.types.StatusTypes;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Serdeable
@@ -18,6 +19,7 @@ import java.util.Set;
 public class Unconscious extends Status {
 
     public Unconscious() {
+        this.setId(UUID.randomUUID().toString());
         this.setDerivedEffects(new HashMap<>());
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(null);

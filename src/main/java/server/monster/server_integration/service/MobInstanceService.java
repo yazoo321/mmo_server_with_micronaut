@@ -75,12 +75,17 @@ public class MobInstanceService {
 
     public void handleMobDeath(String mobId) {
         // we will set state to death and wait for animations etc
-        statusService.addStatusToActor(Set.of(new Dead()), mobId);
-        statusService
-                .deleteActorStatus(mobId)
-                .doOnError(err -> log.error(err.getMessage()))
-                .delaySubscription(2_000, TimeUnit.MILLISECONDS)
+        statusService.removeAllStatuses(mobId)
+                .doOnSuccess(statuses -> {
+                    statusService.addStatusToActor(statuses, Set.of(new Dead()), mobId);
+                    statusService
+                            .deleteActorStatus(mobId)
+                            .doOnError(err -> log.error(err.getMessage()))
+                            .delaySubscription(2_000, TimeUnit.MILLISECONDS)
+                            .subscribe();
+                })
                 .subscribe();
+
 
         statsService
                 .deleteStatsFor(mobId)

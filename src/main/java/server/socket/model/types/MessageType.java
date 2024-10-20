@@ -18,6 +18,7 @@ public enum MessageType {
     EQUIP_ITEM("EQUIP_ITEM"),
     UN_EQUIP_ITEM("UN_EQUIP_ITEM"),
     FETCH_STATS("FETCH_STATS"),
+    FETCH_STATUS("FETCH_STATUS"),
     TRY_ATTACK("TRY_ATTACK"),
     STOP_ATTACK("STOP_ATTACK"),
     SET_SESSION_ID("SET_SESSION_ID"),
@@ -26,7 +27,9 @@ public enum MessageType {
 
     ADD_STAT("ADD_STAT"),
 
-    MOVE_ITEM("MOVE_ITEM");
+    MOVE_ITEM("MOVE_ITEM"),
+
+    RESPAWN_PLAYER("RESPAWN_PLAYER");
 
     public final String type;
 }

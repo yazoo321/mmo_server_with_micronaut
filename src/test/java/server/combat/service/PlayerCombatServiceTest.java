@@ -139,7 +139,7 @@ class PlayerCombatServiceTest {
                             try {
                                 Stats mobStats = statsService.getStatsFor(MOB_1).blockingGet();
                                 Double currentHp = mobStats.getDerived(StatsTypes.CURRENT_HP);
-                                return statusService.getActorStatus(MOB_1).isDead();
+                                return statusService.getActorStatus(MOB_1).blockingGet().isDead();
                             } catch (NoSuchElementException e) {
                                 // when publisher is empty, the mob was killed and deleted. later
                                 // needs to be refactored to mob death state.

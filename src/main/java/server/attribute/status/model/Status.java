@@ -26,6 +26,7 @@ import server.attribute.status.model.derived.*;
 })
 public class Status {
 
+    String id;
     Map<String, Double> derivedEffects;
     Set<String> statusEffects;
     Instant added;

@@ -3,6 +3,7 @@ package server.motion.repository;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
+import server.common.dto.Motion;
 import server.motion.model.SpawnLocation;
 import server.motion.service.PlayerMotionService;
 
@@ -20,13 +21,21 @@ public class RespawnPoints {
     Map<SpawnLocation, List<Location>> spawnLocations = new HashMap<>();
 
     public RespawnPoints() {
-        SpawnLocation tooksworthTown = new SpawnLocation("Tooksworth", "town");
+        SpawnLocation tooksworthTown = new SpawnLocation("tooksworth", "town");
         Location tookworthTownRespawn = new Location(PlayerMotionService.STARTING_MOTION);
 
         this.spawnLocations.put(tooksworthTown, List.of(tookworthTownRespawn));
 
-        SpawnLocation tooksworthCheckpoint1 = new SpawnLocation("Tooksworth", "checkpoint");
+        SpawnLocation tooksworthCheckpoint1 = new SpawnLocation("tooksworth", "checkpoint");
         this.spawnLocations.put(tooksworthCheckpoint1, List.of(tookworthTownRespawn));
+    }
+
+    public Motion getRespawnPointFor(Motion motion, String type) {
+        // In the future, there may not be a respawn point for a given map
+        // and we may need to identify nearest map to respawn to
+        Location location = getRespawnPointFor(motion.getMap(), type, new Location(motion));
+
+        return Motion.fromLocation(motion.getMap(), location);
     }
 
     public Location getRespawnPointFor(String map, String type, Location point) {

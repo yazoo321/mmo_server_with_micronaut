@@ -113,6 +113,26 @@ public class StatsService {
                 .blockingSubscribe();
     }
 
+    public void resetHPAndMP(String actorId, Double hpPercent, Double mpPercent) {
+        getStatsFor(actorId)
+                .doOnSuccess(stats -> {
+                    Map<String, Double> updated = stats.recalculateDerivedStats();
+
+                    Double updatedHp = stats.getDerived(StatsTypes.MAX_HP) * hpPercent;
+                    Double updatedMp = stats.getDerived(StatsTypes.MAX_MP) * mpPercent;
+
+                    stats.setDerived(StatsTypes.CURRENT_HP, updatedHp);
+                    stats.setDerived(StatsTypes.CURRENT_MP, updatedMp);
+
+                    updated.put(StatsTypes.CURRENT_HP.getType(), updatedHp);
+                    updated.put(StatsTypes.CURRENT_MP.getType(), updatedMp);
+
+                    handleDifference(updated, stats);
+                })
+                .doOnError(err -> log.error(err.getMessage()))
+                .subscribe();
+    }
+
     public Stats takeDamage(Stats stats, Map<DamageTypes, Double> damageMap, String sourceActor) {
         // TODO: send stat update once, send map of damage
 

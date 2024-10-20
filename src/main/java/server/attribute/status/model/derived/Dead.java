@@ -5,6 +5,8 @@ import io.micronaut.serde.annotation.Serdeable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import server.attribute.status.model.Status;
@@ -17,6 +19,7 @@ import server.attribute.status.types.StatusTypes;
 public class Dead extends Status {
 
     public Dead() {
+        this.setId(UUID.randomUUID().toString());
         this.setDerivedEffects(new HashMap<>());
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(null);
@@ -28,6 +31,7 @@ public class Dead extends Status {
     public Set<String> defaultStatusEffects() {
         return new HashSet<>(
                 Set.of(
+                        StatusTypes.DEAD.getType(),
                         StatusTypes.CANNOT_ACT.getType(),
                         StatusTypes.CANNOT_MOVE.getType(),
                         StatusTypes.CANNOT_ATTACK.getType(),
