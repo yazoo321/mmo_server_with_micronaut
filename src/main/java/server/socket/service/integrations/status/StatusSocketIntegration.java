@@ -22,7 +22,10 @@ public class StatusSocketIntegration {
 
     public void handleFetchActorStatus(String actorId, WebSocketSession session) {
         statusService.getActorStatus(actorId)
-                .doOnSuccess(status -> sendStatus(status, session))
+                .doOnSuccess(status -> {
+                    status.setAdd(true);
+                    sendStatus(status, session);
+                })
                 .doOnError(err-> log.error(err.getMessage()))
                 .subscribe();
     }
