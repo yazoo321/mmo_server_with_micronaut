@@ -20,4 +20,5 @@ public class MongoConfiguration {
     private String actorStatus;
     private String actorSkills;
     private String actionbar;
+    private String actorAllegiance;
 }

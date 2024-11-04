@@ -102,7 +102,8 @@ dependencies {
 	implementation 'com.google.guava:guava:33.3.0-jre'
 
 	// cache
-	implementation("io.micronaut.cache:micronaut-cache-core:5.0.0")
+	implementation("io.micronaut.cache:micronaut-cache-core:5.0.1")
+	implementation("io.micronaut.cache:micronaut-cache-caffeine:5.0.1")
 
 	// redis
 	implementation("io.micronaut.redis:micronaut-redis-lettuce:6.6.0")
