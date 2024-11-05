@@ -15,13 +15,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.*;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
-import server.attribute.status.model.ActorStatus;
 import server.common.dto.Motion;
 import server.items.helper.ItemTestHelper;
 import server.monster.server_integration.model.Monster;
@@ -47,11 +43,9 @@ public class CommunicationSocketTestBase {
 
     @Inject protected PlayerMotionUtil playerMotionUtil;
 
-    @Inject
-    UpdateProducer updateProducer;
+    @Inject UpdateProducer updateProducer;
 
-    @Inject
-    PlayerCharacterService playerCharacterService;
+    @Inject PlayerCharacterService playerCharacterService;
 
     @Inject
     protected final ObjectMapper objectMapper =
@@ -79,7 +73,6 @@ public class CommunicationSocketTestBase {
     public void setup() {
         cleanup();
     }
-
 
     protected void cleanup() {
         playerMotionUtil.deleteAllMobInstanceData();
@@ -119,6 +112,7 @@ public class CommunicationSocketTestBase {
     protected void destroyPlayer(String actorId) {
         playerCharacterService.deleteCharacter(actorId);
     }
+
     protected void initiatePlayer(String actorId) {
         CreateCharacterRequest createCharacterRequest = new CreateCharacterRequest();
         createCharacterRequest.setClassName("FIGHTER");
@@ -126,7 +120,6 @@ public class CommunicationSocketTestBase {
         createCharacterRequest.setAppearanceInfo(new HashMap<>());
 
         playerCharacterService.createCharacter(createCharacterRequest, "unitTestAcc");
-//        playerMotionService.initializePlayerMotion(actorId).blockingSubscribe();
     }
 
     protected TestWebSocketClient initiateSocketAsPlayer(String actorId) {

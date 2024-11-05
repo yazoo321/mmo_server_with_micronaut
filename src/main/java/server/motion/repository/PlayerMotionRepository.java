@@ -63,7 +63,8 @@ public class PlayerMotionRepository {
     public Single<Motion> insertPlayerMotion(String actorId, PlayerMotion playerMotion) {
         Bson filter = Filters.eq("actorId", actorId);
         ReplaceOptions options = new ReplaceOptions().upsert(true);
-        return Single.fromPublisher(playerMotionMongoCollection.replaceOne(filter, playerMotion, options))
+        return Single.fromPublisher(
+                        playerMotionMongoCollection.replaceOne(filter, playerMotion, options))
                 .map(success -> playerMotion.getMotion());
     }
 

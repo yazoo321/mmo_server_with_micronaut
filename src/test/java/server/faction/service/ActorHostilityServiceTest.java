@@ -1,7 +1,10 @@
 package server.faction.service;
 
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import io.reactivex.rxjava3.core.Single;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -10,21 +13,13 @@ import org.mockito.MockitoAnnotations;
 import server.faction.model.ActorAllegiance;
 import server.faction.model.HostileAllegiance;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 public class ActorHostilityServiceTest {
 
-    @Mock
-    private ActorAllegianceService actorAllegianceService;
+    @Mock private ActorAllegianceService actorAllegianceService;
 
-    @Mock
-    private HostileAllegianceService hostileAllegianceService;
+    @Mock private HostileAllegianceService hostileAllegianceService;
 
-    @InjectMocks
-    private ActorHostilityService actorHostilityService;
+    @InjectMocks private ActorHostilityService actorHostilityService;
 
     @BeforeEach
     public void setUp() {
@@ -42,20 +37,24 @@ public class ActorHostilityServiceTest {
         List<ActorAllegiance> targetAllegiances = List.of(new ActorAllegiance(targetId, "GuildB"));
 
         // Given hostilities between allegiances
-        List<HostileAllegiance> hostileAllegiances = List.of(
-                new HostileAllegiance("GuildA", "GuildB", 5),
-                new HostileAllegiance("GuildA", "GuildC", 3)
-        );
+        List<HostileAllegiance> hostileAllegiances =
+                List.of(
+                        new HostileAllegiance("GuildA", "GuildB", 5),
+                        new HostileAllegiance("GuildA", "GuildC", 3));
 
         // Mock behavior for actor allegiance service
-        when(actorAllegianceService.getActorAllegiance(actorId)).thenReturn(Single.just(actorAllegiances));
-        when(actorAllegianceService.getActorAllegiance(targetId)).thenReturn(Single.just(targetAllegiances));
+        when(actorAllegianceService.getActorAllegiance(actorId))
+                .thenReturn(Single.just(actorAllegiances));
+        when(actorAllegianceService.getActorAllegiance(targetId))
+                .thenReturn(Single.just(targetAllegiances));
 
         // Mock behavior for hostile allegiance service
-        when(hostileAllegianceService.getHostilities(List.of("GuildA"))).thenReturn(Single.just(hostileAllegiances));
+        when(hostileAllegianceService.getHostilities(List.of("GuildA")))
+                .thenReturn(Single.just(hostileAllegiances));
 
         // When
-        Integer hostilityLevel = actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).blockingGet();
+        Integer hostilityLevel =
+                actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).blockingGet();
 
         // Then
         assertThat(hostilityLevel).isEqualTo(5);
@@ -72,19 +71,22 @@ public class ActorHostilityServiceTest {
         List<ActorAllegiance> targetAllegiances = List.of(new ActorAllegiance(targetId, "GuildD"));
 
         // Given no hostile relationships between actor and target allegiances
-        List<HostileAllegiance> hostileAllegiances = List.of(
-                new HostileAllegiance("GuildA", "GuildC", 3)
-        );
+        List<HostileAllegiance> hostileAllegiances =
+                List.of(new HostileAllegiance("GuildA", "GuildC", 3));
 
         // Mock behavior for actor allegiance service
-        when(actorAllegianceService.getActorAllegiance(actorId)).thenReturn(Single.just(actorAllegiances));
-        when(actorAllegianceService.getActorAllegiance(targetId)).thenReturn(Single.just(targetAllegiances));
+        when(actorAllegianceService.getActorAllegiance(actorId))
+                .thenReturn(Single.just(actorAllegiances));
+        when(actorAllegianceService.getActorAllegiance(targetId))
+                .thenReturn(Single.just(targetAllegiances));
 
         // Mock behavior for hostile allegiance service
-        when(hostileAllegianceService.getHostilities(List.of("GuildA"))).thenReturn(Single.just(hostileAllegiances));
+        when(hostileAllegianceService.getHostilities(List.of("GuildA")))
+                .thenReturn(Single.just(hostileAllegiances));
 
         // When
-        Integer hostilityLevel = actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).blockingGet();
+        Integer hostilityLevel =
+                actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).blockingGet();
 
         // Then
         assertThat(hostilityLevel).isEqualTo(0);
@@ -104,17 +106,20 @@ public class ActorHostilityServiceTest {
         List<HostileAllegiance> hostileAllegiances = List.of();
 
         // Mock behavior for actor allegiance service
-        when(actorAllegianceService.getActorAllegiance(actorId)).thenReturn(Single.just(actorAllegiances));
-        when(actorAllegianceService.getActorAllegiance(targetId)).thenReturn(Single.just(targetAllegiances));
+        when(actorAllegianceService.getActorAllegiance(actorId))
+                .thenReturn(Single.just(actorAllegiances));
+        when(actorAllegianceService.getActorAllegiance(targetId))
+                .thenReturn(Single.just(targetAllegiances));
 
         // Mock behavior for hostile allegiance service
-        when(hostileAllegianceService.getHostilities(List.of())).thenReturn(Single.just(hostileAllegiances));
+        when(hostileAllegianceService.getHostilities(List.of()))
+                .thenReturn(Single.just(hostileAllegiances));
 
         // When
-        Integer hostilityLevel = actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).blockingGet();
+        Integer hostilityLevel =
+                actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).blockingGet();
 
         // Then
         assertThat(hostilityLevel).isEqualTo(0);
     }
 }
-

@@ -35,11 +35,9 @@ public class PlayerCharacterService {
 
     @Inject StatusService statusService;
 
-    @Inject
-    ActionbarService actionbarService;
+    @Inject ActionbarService actionbarService;
 
-    @Inject
-    EquipItemService equipItemService;
+    @Inject EquipItemService equipItemService;
 
     public AccountCharactersResponse getAccountCharacters(String username) {
         List<Character> characterList = playerCharacterRepository.findByAccount(username);

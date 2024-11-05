@@ -28,7 +28,10 @@ public class InventoryService {
     @Inject ItemService itemService;
 
     public Single<Inventory> pickupItem(GenericInventoryData request) {
-        log.info("Requesting to pickup item, actor: {}, item instance: {}", request.getActorId(), request.getItemInstanceId());
+        log.info(
+                "Requesting to pickup item, actor: {}, item instance: {}",
+                request.getActorId(),
+                request.getItemInstanceId());
         return itemService
                 .getDroppedItemByInstanceId(request.getItemInstanceId())
                 .doOnError(e -> log.error("Failed to get dropped item: {}", e.getMessage()))
@@ -67,7 +70,10 @@ public class InventoryService {
     }
 
     private void addItemToInventory(Inventory inventory, ItemInstance itemInstance) {
-        log.info("Adding item to inventory, actor id: {}, item instance id: {}", inventory.getActorId(), itemInstance.getItemInstanceId());
+        log.info(
+                "Adding item to inventory, actor id: {}, item instance id: {}",
+                inventory.getActorId(),
+                itemInstance.getItemInstanceId());
         // check for example if inventory is full
         List<CharacterItem> items = inventory.getCharacterItems();
         Location2D position = inventory.getNextAvailableSlot();
@@ -79,7 +85,11 @@ public class InventoryService {
     }
 
     public Single<Inventory> moveItem(String actorId, String itemInstanceId, Location2D to) {
-        log.info("moving item, actor id: {}, item instance id: {}, location: {}", actorId, itemInstanceId, to);
+        log.info(
+                "moving item, actor id: {}, item instance id: {}, location: {}",
+                actorId,
+                itemInstanceId,
+                to);
         return getInventory(actorId)
                 .doOnError(
                         er -> {
@@ -136,7 +146,11 @@ public class InventoryService {
 
     public Single<DroppedItem> dropItem(String actorId, String itemInstanceId, Location location)
             throws InventoryException {
-        log.info("Requesting to drop item, actor id: {}, item instance id: {}, location: {}", actorId, itemInstanceId, location);
+        log.info(
+                "Requesting to drop item, actor id: {}, item instance id: {}, location: {}",
+                actorId,
+                itemInstanceId,
+                location);
         return inventoryRepository
                 .getCharacterInventory(actorId)
                 .doOnError(e -> log.error("Failed to get character inventory, {}", e.getMessage()))
@@ -186,7 +200,10 @@ public class InventoryService {
     }
 
     public Single<UpdateResult> updateInventoryMaxSize(Inventory inventory) {
-        log.info("updating inventory max size for actor: {}, new max size: {}", inventory.getActorId(), inventory.getMaxSize());
+        log.info(
+                "updating inventory max size for actor: {}, new max size: {}",
+                inventory.getActorId(),
+                inventory.getMaxSize());
         return inventoryRepository.updateInventoryMaxSize(inventory);
     }
 

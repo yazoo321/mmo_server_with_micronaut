@@ -60,9 +60,7 @@ public class ActionbarRepository {
     }
 
     public Single<DeleteResult> deleteActorActionbar(String actorId) {
-        return Single.fromPublisher(
-                actionbarMongoCollection.deleteMany(eq("actorId", actorId))
-        );
+        return Single.fromPublisher(actionbarMongoCollection.deleteMany(eq("actorId", actorId)));
     }
 
     private void prepareCollections() {

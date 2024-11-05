@@ -10,7 +10,6 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
-import server.motion.model.PlayerMotionList;
 import server.motion.producer.PlayerMotionUpdateProducer;
 import server.motion.repository.ActorMotionRepository;
 import server.motion.repository.PlayerMotionRepository;
@@ -23,8 +22,7 @@ public class PlayerMotionService {
 
     @Inject PlayerMotionUpdateProducer playerMotionUpdateProducer;
 
-    @Inject
-    ActorMotionRepository actorMotionRepository;
+    @Inject ActorMotionRepository actorMotionRepository;
 
     private static final int DEFAULT_DISTANCE_THRESHOLD = 20_000;
 
@@ -55,7 +53,6 @@ public class PlayerMotionService {
         return playerMotionRepository.insertPlayerMotion(actorId, playerMotion);
     }
 
-
     public Single<DeleteResult> deletePlayerMotion(String actorId) {
         log.info("Deleting player motion: {}", actorId);
         return playerMotionRepository.deletePlayerMotion(actorId);
@@ -65,7 +62,6 @@ public class PlayerMotionService {
         log.info("Disconnecting actor: {}", actorId);
         actorMotionRepository.handleDisconnect(actorId);
     }
-
 
     public Single<List<PlayerMotion>> getNearbyPlayersAsync(
             Motion motion, String actorId, Integer threshold) {
@@ -89,7 +85,5 @@ public class PlayerMotionService {
         playerMotionUpdateProducer.sendPlayerMotionResult(playerMotion);
     }
 
-    public void handlePlayerRespawn(String actorId, String customData) {
-
-    }
+    public void handlePlayerRespawn(String actorId, String customData) {}
 }

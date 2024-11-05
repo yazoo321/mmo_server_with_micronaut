@@ -10,11 +10,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
-import server.common.dto.Motion;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
@@ -30,11 +27,6 @@ import server.util.websocket.TestWebSocketClient;
 // dropping items, picking items up, etc.
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
 public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
-
-//    @AfterAll
-//    void tearDown() {
-//        cleanup();
-//    }
 
     @Test
     void testWhenPlayerDropsItemItIsDropped() {

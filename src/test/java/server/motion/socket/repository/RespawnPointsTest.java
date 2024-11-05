@@ -1,5 +1,6 @@
 package server.motion.socket.repository;
 
+import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,8 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import server.common.dto.Location;
 import server.motion.repository.RespawnPoints;
-
-import java.util.stream.Stream;
 
 public class RespawnPointsTest {
 
@@ -26,8 +25,11 @@ public class RespawnPointsTest {
         return Stream.of(
                 new TestCase("tooksworth", "town", tooksworthLocation, tooksworthLocation),
                 new TestCase("tooksworth", "checkpoint", tooksworthLocation, tooksworthLocation),
-                new TestCase("tooksworth", "nearest", new Location("tooksworth", 5, 5, 5), tooksworthLocation)
-        );
+                new TestCase(
+                        "tooksworth",
+                        "nearest",
+                        new Location("tooksworth", 5, 5, 5),
+                        tooksworthLocation));
     }
 
     @ParameterizedTest
@@ -35,7 +37,8 @@ public class RespawnPointsTest {
     @DisplayName("Test RespawnPoints with different types")
     public void testGetRespawnPointFor(TestCase testCase) {
         // Act
-        Location result = respawnPoints.getRespawnPointFor(testCase.map, testCase.type, testCase.point);
+        Location result =
+                respawnPoints.getRespawnPointFor(testCase.map, testCase.type, testCase.point);
 
         // Assert
         Assertions.assertThat(result)

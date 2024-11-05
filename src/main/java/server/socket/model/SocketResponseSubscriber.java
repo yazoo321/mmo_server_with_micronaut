@@ -36,7 +36,10 @@ public class SocketResponseSubscriber implements Subscriber<SocketResponse> {
     @Override
     public void onError(Throwable throwable) {
         // Add error handling code here
-        log.error("SocketResponseSubscriber encountered an error: {}", throwable.getMessage(), throwable);
+        log.error(
+                "SocketResponseSubscriber encountered an error: {}",
+                throwable.getMessage(),
+                throwable);
     }
 
     @Override
