@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import server.socket.model.SocketMessage;
 import server.socket.model.SocketResponse;
@@ -20,6 +21,11 @@ import server.util.websocket.TestWebSocketClient;
 @Property(name = "spec.name", value = "PlayerMotionSocketTest")
 @Property(name = "feature-flags.enableUdp", value = "false")
 public class CommunicationSocketTest extends CommunicationSocketTestBase {
+
+    @AfterAll
+    void tearDown() {
+        cleanup();
+    }
 
     @Test
     void testBasicMotionUpdateBetween2Players() throws Exception {

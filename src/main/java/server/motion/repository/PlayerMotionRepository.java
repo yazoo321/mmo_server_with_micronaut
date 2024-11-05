@@ -4,6 +4,8 @@ import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -20,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.conversions.Bson;
 import server.common.configuration.MongoConfiguration;
 import server.common.dto.Motion;
 import server.common.mongo.query.MongoDbQueryHelper;
@@ -58,7 +61,10 @@ public class PlayerMotionRepository {
 
     @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId", async = true)
     public Single<Motion> insertPlayerMotion(String actorId, PlayerMotion playerMotion) {
-        return Single.fromPublisher(playerMotionMongoCollection.insertOne(playerMotion))
+        Bson filter = Filters.eq("actorId", actorId);
+        ReplaceOptions options = new ReplaceOptions().upsert(true);
+        return Single.fromPublisher(
+                        playerMotionMongoCollection.replaceOne(filter, playerMotion, options))
                 .map(success -> playerMotion.getMotion());
     }
 
@@ -85,7 +91,8 @@ public class PlayerMotionRepository {
 
     @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId")
     public Single<DeleteResult> deletePlayerMotion(String actorId) {
-        return Single.fromPublisher(playerMotionMongoCollection.deleteOne(eq("actorId", actorId)));
+        // TODO: should be delete one, but sometimes tests can flake
+        return Single.fromPublisher(playerMotionMongoCollection.deleteMany(eq("actorId", actorId)));
     }
 
     public Single<List<PlayerMotion>> getPlayersNearby(

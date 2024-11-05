@@ -127,7 +127,8 @@ public class PlayerCharacterRepository {
     }
 
     public DeleteResult deleteByActorId(String name) {
-        return Single.fromPublisher(characters.deleteOne(eq("name", name))).blockingGet();
+        // TODO: should be deleteOne, but sometimes tests can flake
+        return Single.fromPublisher(characters.deleteMany(eq("name", name))).blockingGet();
     }
 
     public List<Character> getPlayersNear(String actorId) {

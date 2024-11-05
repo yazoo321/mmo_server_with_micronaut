@@ -1,6 +1,8 @@
 package server.actionbar.service;
 
+import com.mongodb.client.result.DeleteResult;
 import io.micronaut.websocket.WebSocketSession;
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +60,7 @@ public class ActionbarService {
         }
     }
 
-    public void deleteActorActionbar(String actorId) {
-        actionbarRepository.deleteActorActionbar(actorId);
+    public Single<DeleteResult> deleteActorActionbar(String actorId) {
+        return actionbarRepository.deleteActorActionbar(actorId);
     }
 }

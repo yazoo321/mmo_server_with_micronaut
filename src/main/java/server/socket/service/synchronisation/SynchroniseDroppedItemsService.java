@@ -39,6 +39,9 @@ public class SynchroniseDroppedItemsService {
                 .doOnError(e -> log.error("Failed to get items in map, {}", e.getMessage()))
                 .doOnSuccess(
                         droppedItems -> {
+                            if (droppedItems.isEmpty()) {
+                                return;
+                            }
                             Map<String, DroppedItem> droppedItemsMap =
                                     droppedItems.stream()
                                             .collect(

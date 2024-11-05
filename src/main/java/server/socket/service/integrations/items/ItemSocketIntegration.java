@@ -57,6 +57,9 @@ public class ItemSocketIntegration {
                         })
                 .doOnSuccess(
                         droppedItem -> {
+                            log.info(
+                                    "Dropped item instance created, returning inventory to player"
+                                            + " and sending item to be broadcasted");
                             sendInventoryToPlayer(session, request.getActorId());
                             updateProducer.addItemToMap(droppedItem);
                         })

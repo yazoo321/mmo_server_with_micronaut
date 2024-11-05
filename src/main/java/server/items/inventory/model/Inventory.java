@@ -1,11 +1,11 @@
 package server.items.inventory.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Location2D;
@@ -31,6 +31,7 @@ public class Inventory {
     Integer gold;
     Location2D maxSize;
 
+    @JsonIgnore
     public CharacterItem getItemAtLocation(Location2D location) {
         Optional<CharacterItem> item =
                 characterItems.stream().filter(i -> i.getLocation().equals(location)).findFirst();
@@ -38,13 +39,17 @@ public class Inventory {
         return item.orElse(null);
     }
 
+    @JsonIgnore
     public CharacterItem getItemByInstanceId(String instanceId) {
         Optional<CharacterItem> item =
-                characterItems.stream().filter(i -> i.getItemInstance().getItemInstanceId().equals(instanceId)).findFirst();
+                characterItems.stream()
+                        .filter(i -> i.getItemInstance().getItemInstanceId().equals(instanceId))
+                        .findFirst();
 
         return item.orElse(null);
     }
 
+    @JsonIgnore
     public Location2D getNextAvailableSlot() {
         int[][] invArr = new int[maxSize.getX()][maxSize.getY()];
 

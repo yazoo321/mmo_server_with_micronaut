@@ -44,6 +44,6 @@ public class InventoryController {
     public void clearAllData(@Header String actorId) {
         // this is a test endpoint
 
-        inventoryService.clearAllDataForCharacter(actorId);
+        inventoryService.clearAllDataForCharacter(actorId).subscribe();
     }
 }

@@ -35,11 +35,9 @@ public class PlayerCharacterService {
 
     @Inject StatusService statusService;
 
-    @Inject
-    ActionbarService actionbarService;
+    @Inject ActionbarService actionbarService;
 
-    @Inject
-    EquipItemService equipItemService;
+    @Inject EquipItemService equipItemService;
 
     public AccountCharactersResponse getAccountCharacters(String username) {
         List<Character> characterList = playerCharacterRepository.findByAccount(username);
@@ -106,13 +104,14 @@ public class PlayerCharacterService {
     }
 
     private void rollbackChanges(String actorId) {
-        inventoryService.clearAllDataForCharacter(actorId);
-        playerMotionService.deletePlayerMotion(actorId);
+        log.warn("Deleting character {}", actorId);
+        inventoryService.clearAllDataForCharacter(actorId).blockingSubscribe();
+        playerMotionService.deletePlayerMotion(actorId).blockingSubscribe();
         playerCharacterRepository.deleteByActorId(actorId);
-        statsService.deleteStatsFor(actorId).subscribe();
-        statusService.deleteActorStatus(actorId).subscribe();
-        actionbarService.deleteActorActionbar(actorId);
-        equipItemService.deleteCharacterEquippedItems(actorId);
+        statsService.deleteStatsFor(actorId).blockingSubscribe();
+        statusService.deleteActorStatus(actorId).blockingSubscribe();
+        actionbarService.deleteActorActionbar(actorId).blockingSubscribe();
+        equipItemService.deleteCharacterEquippedItems(actorId).blockingSubscribe();
     }
 
     // TODO: Support deletes

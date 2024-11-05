@@ -2,7 +2,7 @@ package server.items.equippable.service;
 
 import static server.attribute.stats.types.StatsTypes.*;
 
-import io.reactivex.rxjava3.core.Maybe;
+import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -35,49 +35,72 @@ public class EquipItemService {
     @Inject StatsService statsService;
 
     public Single<EquippedItems> equipItem(String itemInstanceId, String actorId) {
-        return inventoryService.getInventory(actorId)
-                .doOnError(e ->
-                        log.error("Failed to get character inventory: {}", e.getMessage()))
-                .flatMap(inventory -> {
-                    List<CharacterItem> items = inventory.getCharacterItems();
-                    CharacterItem characterItem = getCharacterItemByInstance(items, itemInstanceId);
-                    ItemInstance instance = characterItem.getItemInstance();
-                    String slotType = instance.getItem().getCategory();
+        return inventoryService
+                .getInventory(actorId)
+                .doOnError(e -> log.error("Failed to get character inventory: {}", e.getMessage()))
+                .flatMap(
+                        inventory -> {
+                            List<CharacterItem> items = inventory.getCharacterItems();
+                            CharacterItem characterItem =
+                                    getCharacterItemByInstance(items, itemInstanceId);
+                            ItemInstance instance = characterItem.getItemInstance();
+                            String slotType = instance.getItem().getCategory();
 
-                    // Check if an item is already equipped in the same slot
-                    return equipRepository.getCharacterItemSlot(actorId, slotType)
-                            .flatMapSingle(existingEquippedItem -> {
-                                // If an item is already equipped, unequip it
-                                return unEquipItemAndGetCharacterItems(existingEquippedItem.getItemInstance().getItemInstanceId(), actorId)
-                                        .flatMap(updatedCharacterItems ->
-                                                updateAndEquipItem(
-                                                        actorId, updatedCharacterItems, itemInstanceId));
-                            })
-                            .switchIfEmpty(Single.defer(() ->
-                                    updateAndEquipItem(actorId, items, itemInstanceId)));
-                })
-                .onErrorResumeNext(e -> {
-                    log.error("Error during item equip: {}", e.getMessage());
-                    return Single.error(new EquipException("Failed to equip item"));
-                });
+                            // Check if an item is already equipped in the same slot
+                            return equipRepository
+                                    .getCharacterItemSlot(actorId, slotType)
+                                    .flatMapSingle(
+                                            existingEquippedItem -> {
+                                                // If an item is already equipped, unequip it
+                                                return unEquipItemAndGetCharacterItems(
+                                                                existingEquippedItem
+                                                                        .getItemInstance()
+                                                                        .getItemInstanceId(),
+                                                                actorId)
+                                                        .flatMap(
+                                                                updatedCharacterItems ->
+                                                                        updateAndEquipItem(
+                                                                                actorId,
+                                                                                updatedCharacterItems,
+                                                                                itemInstanceId));
+                                            })
+                                    .switchIfEmpty(
+                                            Single.defer(
+                                                    () ->
+                                                            updateAndEquipItem(
+                                                                    actorId,
+                                                                    items,
+                                                                    itemInstanceId)));
+                        })
+                .onErrorResumeNext(
+                        e -> {
+                            log.error("Error during item equip: {}", e.getMessage());
+                            return Single.error(new EquipException("Failed to equip item"));
+                        });
     }
 
-    private Single<EquippedItems> updateAndEquipItem(String actorId, List<CharacterItem> items, String itemInstanceId) {
+    private Single<EquippedItems> updateAndEquipItem(
+            String actorId, List<CharacterItem> items, String itemInstanceId) {
         CharacterItem characterItem = getCharacterItemByInstance(items, itemInstanceId);
         ItemInstance instance = characterItem.getItemInstance();
         // Set location to 'invalid' to remove from inventory display
         characterItem.setLocation(new Location2D(-1, -1));
 
         // Update inventory with the new state
-        return inventoryService.updateInventoryItems(actorId, items)
-                .flatMap(updated -> {
-                    EquippedItems equippedItem = instance.getItem().createEquippedItem(actorId, instance);
-                    return equipRepository.insert(equippedItem, actorId)
-                            .doOnSuccess(its -> updateCharacterItemStats(actorId));
-                });
+        return inventoryService
+                .updateInventoryItems(actorId, items)
+                .flatMap(
+                        updated -> {
+                            EquippedItems equippedItem =
+                                    instance.getItem().createEquippedItem(actorId, instance);
+                            return equipRepository
+                                    .insert(equippedItem, actorId)
+                                    .doOnSuccess(its -> updateCharacterItemStats(actorId));
+                        });
     }
 
-    public Single<List<CharacterItem>> unEquipItemAndGetCharacterItems(String itemInstanceId, String actorId) {
+    public Single<List<CharacterItem>> unEquipItemAndGetCharacterItems(
+            String itemInstanceId, String actorId) {
         return inventoryService
                 .unequipItem(itemInstanceId, actorId)
                 .doOnError(
@@ -86,12 +109,15 @@ public class EquipItemService {
                         })
                 .map(
                         itemList -> {
-                            equipRepository.deleteEquippedItem(actorId, itemInstanceId).blockingSubscribe();
+                            equipRepository
+                                    .deleteEquippedItem(actorId, itemInstanceId)
+                                    .blockingSubscribe();
                             updateCharacterItemStats(actorId);
 
                             return itemList;
                         });
     }
+
     public Single<String> unEquipItem(String itemInstanceId, String actorId) {
         return inventoryService
                 .unequipItem(itemInstanceId, actorId)
@@ -101,7 +127,9 @@ public class EquipItemService {
                         })
                 .map(
                         itemList -> {
-                            equipRepository.deleteEquippedItem(actorId, itemInstanceId).blockingSubscribe();
+                            equipRepository
+                                    .deleteEquippedItem(actorId, itemInstanceId)
+                                    .blockingSubscribe();
                             updateCharacterItemStats(actorId);
 
                             return itemInstanceId;
@@ -183,8 +211,8 @@ public class EquipItemService {
         }
     }
 
-    public void deleteCharacterEquippedItems(String actorId) {
+    public Single<DeleteResult> deleteCharacterEquippedItems(String actorId) {
         // used by delete character
-        equipRepository.deleteActorEquippedItems(actorId);
+        return equipRepository.deleteActorEquippedItems(actorId);
     }
 }

@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
-import server.common.dto.Motion;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.Item;
 import server.items.model.ItemInstance;
@@ -31,25 +30,24 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 
     @Test
     void testWhenPlayerDropsItemItIsDropped() {
-        Motion player1Motion =
-                playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
-        playerMotionService.initializePlayerMotion(CHARACTER_2).blockingSubscribe();
+        TestWebSocketClient playerClient1 = initiateSocketAsPlayer(CHARACTER_1);
+        TestWebSocketClient playerClient2 = initiateSocketAsPlayer(CHARACTER_2);
 
-        TestWebSocketClient playerClient1 = createWebSocketClient(embeddedServer.getPort());
-        TestWebSocketClient playerClient2 = createWebSocketClient(embeddedServer.getPort());
-
-        initializeCharacters(playerClient1, playerClient2);
+        SocketMessage char1WithinRange = createMessageForMotionWithinRange(CHARACTER_1);
+        SocketMessage char2WithinRange = createMessageForMotionWithinRange(CHARACTER_2);
+        playerClient1.send(char1WithinRange);
+        playerClient2.send(char2WithinRange);
 
         ItemInstance createdItem = prepareCharactersAndItems();
 
-        Location dropLocation = new Location(player1Motion);
+        Location dropLocation = new Location(char1WithinRange.getPlayerMotion().getMotion());
         SocketMessage dropRequestChar1 =
                 dropRequestForCharacter(CHARACTER_1, createdItem.getItemInstanceId(), dropLocation);
 
         playerClient1.send(dropRequestChar1);
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(10, ChronoUnit.SECONDS))
+                .timeout(Duration.of(TIMEOUT, ChronoUnit.SECONDS))
                 .until(
                         () -> {
                             List<String> resTypes =
@@ -88,6 +86,7 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
         Assertions.assertThat(client1DroppedItem.getDroppedItems().size()).isEqualTo(1);
         Assertions.assertThat(client1DroppedItem.getDroppedItems())
                 .usingRecursiveComparison()
+                .ignoringFields("droppedAt") // actuals are chopping a portion of this data
                 .isEqualTo(client2DroppedItem.getDroppedItems());
 
         List<String> instanceIds = client1DroppedItem.getDroppedItems().keySet().stream().toList();
@@ -149,20 +148,6 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
                 .isEqualTo(createdItem.getItemInstanceId());
     }
 
-    private void initializeCharacters(TestWebSocketClient client1, TestWebSocketClient client2) {
-        SocketMessage char1WithinRange = createMessageForMotionWithinRange(CHARACTER_1);
-        SocketMessage char2WithinRange = createMessageForMotionWithinRange(CHARACTER_2);
-
-        client1.send(char1WithinRange);
-        client2.send(char2WithinRange);
-
-        SocketMessage init1 = createMessageForSessionParams(true, CHARACTER_1);
-        SocketMessage init2 = createMessageForSessionParams(true, CHARACTER_2);
-
-        client1.send(init1);
-        client2.send(init2);
-    }
-
     private SocketMessage dropRequestForCharacter(
             String actorId, String itemInstanceId, Location dropLocation) {
         SocketMessage message = new SocketMessage();
@@ -190,9 +175,6 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
     }
 
     private ItemInstance prepareCharactersAndItems() {
-        itemTestHelper.prepareInventory(CHARACTER_1);
-        itemTestHelper.prepareInventory(CHARACTER_2);
-
         Item item = itemTestHelper.createAndInsertItem(ItemType.WEAPON.getType());
         ItemInstance itemInstance =
                 itemTestHelper.createItemInstanceFor(item, UUID.randomUUID().toString());

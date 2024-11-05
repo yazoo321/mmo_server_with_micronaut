@@ -17,6 +17,12 @@ micronaut:
     io:
       type: fixed
       nThreads: 75
+  caches:
+    actorAllegianceCacheLocal:
+      expire-after-write: 60s # Local cache expiration
+      maximum-size: 1000
+      cache-type: caffeine
+
 jackson:
   serialization:
     writeDatesAsTimestamps: false
@@ -46,7 +52,7 @@ kafka:
         servers: kafka-broker:9092
       session:
         timeout:
-          ms: 30000
+          ms: 300000
       auto:
         offset:
           reset: earliest
@@ -78,6 +84,7 @@ mongo-database:
   actor-status: "actorStatus"
   actor-skills: "actorSkills"
   actionbar: "actionbar"
+  actorAllegiance: "actorAllegiance"
 
 redisson:
   single-server-config:
@@ -117,6 +124,9 @@ redis:
       maximumSize: 1000
       value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
     udp-session-cache:
+      maximumSize: 1000
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+    actor-allegiance-cache:
       maximumSize: 1000
       value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
 

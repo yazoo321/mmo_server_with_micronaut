@@ -7,7 +7,6 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.micronaut.cache.annotation.CacheConfig;
 import io.micronaut.cache.annotation.CacheInvalidate;
-import io.micronaut.cache.annotation.Cacheable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
@@ -50,13 +49,13 @@ public class EquipRepository {
                 .map(res -> equippedItems);
     }
 
-//    @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorId")
+    //    @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorId")
     public Single<List<EquippedItems>> getEquippedItemsForCharacter(String actorId) {
         return Flowable.fromPublisher(equippedItemsCollection.find(eq("actorId", actorId)))
                 .toList();
     }
 
-//    @Cacheable(value = ACTOR_EQUIP_CACHE_MAP, parameters = "actorId")
+    //    @Cacheable(value = ACTOR_EQUIP_CACHE_MAP, parameters = "actorId")
     public Single<Map<String, EquippedItems>> getActorEquippedItems(String actorId) {
         return getEquippedItemsForCharacter(actorId)
                 .doOnError(e -> log.error(e.getMessage()))
@@ -69,7 +68,7 @@ public class EquipRepository {
                                                         Function.identity())));
     }
 
-//    @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorIds")
+    //    @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorIds")
     public Single<List<EquippedItems>> getEquippedItemsForCharacters(Set<String> actorIds) {
         return Flowable.fromPublisher(equippedItemsCollection.find(in("actorId", actorIds)))
                 .toList();
@@ -97,10 +96,8 @@ public class EquipRepository {
             value = {ACTOR_EQUIP_CACHE_MAP, ACTOR_EQUIP_CACHE},
             parameters = "actorId",
             async = true)
-    public void deleteActorEquippedItems(String actorId) {
-        Single.fromPublisher(
-                equippedItemsCollection.deleteMany(eq("actorId", actorId))
-        ).subscribe();
+    public Single<DeleteResult> deleteActorEquippedItems(String actorId) {
+        return Single.fromPublisher(equippedItemsCollection.deleteMany(eq("actorId", actorId)));
     }
 
     private void prepareCollections() {
