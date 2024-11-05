@@ -94,6 +94,7 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
         Assertions.assertThat(client1DroppedItem.getDroppedItems().size()).isEqualTo(1);
         Assertions.assertThat(client1DroppedItem.getDroppedItems())
                 .usingRecursiveComparison()
+                .ignoringFields("droppedAt") // actuals are chopping a portion of this data
                 .isEqualTo(client2DroppedItem.getDroppedItems());
 
         List<String> instanceIds = client1DroppedItem.getDroppedItems().keySet().stream().toList();
