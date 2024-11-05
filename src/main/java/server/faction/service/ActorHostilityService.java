@@ -69,11 +69,8 @@ public class ActorHostilityService {
                                                                                     HostileAllegiance
                                                                                             ::getHostilityLevel)
                                                                             .min(Integer::compare)
-                                                                            .orElse(0); // Default
-                                                                    // to 0 if
-                                                                    // no
-                                                                    // hostility
-                                                                    // found
+                                                                            .orElse(0);
+                                                                    // Default to 0 if no hostility found
                                                                 });
                                             });
                         })
