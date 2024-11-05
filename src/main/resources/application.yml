@@ -52,7 +52,7 @@ kafka:
         servers: kafka-broker:9092
       session:
         timeout:
-          ms: 30000
+          ms: 300000
       auto:
         offset:
           reset: earliest

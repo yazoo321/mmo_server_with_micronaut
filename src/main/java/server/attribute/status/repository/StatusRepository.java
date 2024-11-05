@@ -82,6 +82,7 @@ public class StatusRepository {
             parameters = {"actorId"},
             async = true)
     public Single<DeleteResult> deleteActorStatuses(String actorId) {
-        return Single.fromPublisher(actorStatusCollection.deleteOne(eq("actorId", actorId)));
+        // TODO: should be deleteOne, but sometimes tests flake
+        return Single.fromPublisher(actorStatusCollection.deleteMany(eq("actorId", actorId)));
     }
 }

@@ -21,12 +21,12 @@ public class RespawnPointsTest {
 
     // Create a method source for parameterized tests
     static Stream<TestCase> inputs() {
-        Location tooksworthLocation = new Location("Tooksworth", 240, 350, 230);
+        Location tooksworthLocation = new Location("tooksworth", 240, 350, 230);
 
         return Stream.of(
-                new TestCase("Tooksworth", "town", tooksworthLocation, tooksworthLocation),
-                new TestCase("Tooksworth", "checkpoint", tooksworthLocation, tooksworthLocation),
-                new TestCase("Tooksworth", "nearest", new Location("Tooksworth", 5, 5, 5), tooksworthLocation)
+                new TestCase("tooksworth", "town", tooksworthLocation, tooksworthLocation),
+                new TestCase("tooksworth", "checkpoint", tooksworthLocation, tooksworthLocation),
+                new TestCase("tooksworth", "nearest", new Location("tooksworth", 5, 5, 5), tooksworthLocation)
         );
     }
 

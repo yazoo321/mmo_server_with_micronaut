@@ -2,6 +2,7 @@ package server.items.equippable.service;
 
 import static server.attribute.stats.types.StatsTypes.*;
 
+import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
@@ -183,8 +184,8 @@ public class EquipItemService {
         }
     }
 
-    public void deleteCharacterEquippedItems(String actorId) {
+    public Single<DeleteResult> deleteCharacterEquippedItems(String actorId) {
         // used by delete character
-        equipRepository.deleteActorEquippedItems(actorId);
+        return equipRepository.deleteActorEquippedItems(actorId);
     }
 }

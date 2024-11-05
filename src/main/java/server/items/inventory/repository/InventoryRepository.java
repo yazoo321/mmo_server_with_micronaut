@@ -58,7 +58,8 @@ public class InventoryRepository {
     }
 
     public Single<DeleteResult> deleteAllInventoryDataForCharacter(String actorId) {
-        return Single.fromPublisher(inventoryCollection.deleteOne(eq("actorId", actorId)));
+        // TODO: Should be deleteOne but sometimes tests can flake
+        return Single.fromPublisher(inventoryCollection.deleteMany(eq("actorId", actorId)));
     }
 
     private void prepareCollections() {

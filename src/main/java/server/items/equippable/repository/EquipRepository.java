@@ -97,10 +97,10 @@ public class EquipRepository {
             value = {ACTOR_EQUIP_CACHE_MAP, ACTOR_EQUIP_CACHE},
             parameters = "actorId",
             async = true)
-    public void deleteActorEquippedItems(String actorId) {
-        Single.fromPublisher(
+    public Single<DeleteResult> deleteActorEquippedItems(String actorId) {
+        return Single.fromPublisher(
                 equippedItemsCollection.deleteMany(eq("actorId", actorId))
-        ).subscribe();
+        );
     }
 
     private void prepareCollections() {

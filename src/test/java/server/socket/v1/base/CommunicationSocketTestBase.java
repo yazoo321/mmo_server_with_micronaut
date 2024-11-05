@@ -13,20 +13,25 @@ import jakarta.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
+import java.util.concurrent.TimeUnit;
+
+import org.awaitility.Awaitility;
+import org.junit.jupiter.api.*;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
+import server.attribute.status.model.ActorStatus;
 import server.common.dto.Motion;
 import server.items.helper.ItemTestHelper;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
-import server.motion.service.PlayerMotionService;
+import server.player.model.CreateCharacterRequest;
+import server.player.service.PlayerCharacterService;
 import server.socket.model.SocketMessage;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.MessageType;
+import server.socket.producer.UpdateProducer;
 import server.util.PlayerMotionUtil;
 import server.util.websocket.TestWebSocketClient;
 
@@ -40,9 +45,13 @@ public class CommunicationSocketTestBase {
 
     @Inject protected EmbeddedServer embeddedServer;
 
-    @Inject protected PlayerMotionService playerMotionService;
-
     @Inject protected PlayerMotionUtil playerMotionUtil;
+
+    @Inject
+    UpdateProducer updateProducer;
+
+    @Inject
+    PlayerCharacterService playerCharacterService;
 
     @Inject
     protected final ObjectMapper objectMapper =
@@ -71,19 +80,18 @@ public class CommunicationSocketTestBase {
         cleanup();
     }
 
-    @AfterAll
-    public void tearDown() {
-        cleanup();
-    }
 
     protected void cleanup() {
-        playerMotionUtil.deleteAllPlayerMotionData();
         playerMotionUtil.deleteAllMobInstanceData();
+        destroyPlayer(CHARACTER_1);
+        destroyPlayer(CHARACTER_2);
+        destroyPlayer(CHARACTER_3);
+
         itemTestHelper.deleteAllItemData();
     }
 
     protected server.util.websocket.TestWebSocketClient createWebSocketClient(int port) {
-        WebSocketClient webSocketClient = beanContext.getBean(WebSocketClient.class);
+        WebSocketClient webSocketClient = beanContext.createBean(WebSocketClient.class);
         URI uri =
                 UriBuilder.of("ws://localhost")
                         .port(port)
@@ -101,15 +109,24 @@ public class CommunicationSocketTestBase {
         SocketMessage msg = new SocketMessage();
         msg.setUpdateType(MessageType.SET_SESSION_ID.getType());
         msg.setServerName(serverName);
+        msg.setCustomData("9876");
 
         client.send(msg);
 
         return client;
     }
 
+    protected void destroyPlayer(String actorId) {
+        playerCharacterService.deleteCharacter(actorId);
+    }
     protected void initiatePlayer(String actorId) {
-        playerMotionService.initializePlayerMotion(actorId).blockingSubscribe();
-        itemTestHelper.prepareInventory(actorId);
+        CreateCharacterRequest createCharacterRequest = new CreateCharacterRequest();
+        createCharacterRequest.setClassName("FIGHTER");
+        createCharacterRequest.setName(actorId);
+        createCharacterRequest.setAppearanceInfo(new HashMap<>());
+
+        playerCharacterService.createCharacter(createCharacterRequest, "unitTestAcc");
+//        playerMotionService.initializePlayerMotion(actorId).blockingSubscribe();
     }
 
     protected TestWebSocketClient initiateSocketAsPlayer(String actorId) {
@@ -120,6 +137,7 @@ public class CommunicationSocketTestBase {
         SocketMessage msg = new SocketMessage();
         msg.setUpdateType(MessageType.SET_SESSION_ID.getType());
         msg.setActorId(actorId);
+        msg.setCustomData("9876");
 
         playerClient.send(msg);
 
@@ -163,18 +181,6 @@ public class CommunicationSocketTestBase {
         playerMessageWithinRange.setUpdateType(MessageType.PLAYER_MOTION.getType());
 
         return playerMessageWithinRange;
-    }
-
-    protected SocketMessage createMessageForSessionParams(boolean isPlayer, String actorId) {
-        SocketMessage socketMessage = new SocketMessage();
-        socketMessage.setUpdateType(MessageType.SET_SESSION_ID.getType());
-        if (isPlayer) {
-            socketMessage.setActorId(actorId);
-        } else {
-            socketMessage.setServerName(actorId);
-        }
-
-        return socketMessage;
     }
 
     protected SocketMessage createMobMessageForMotionWithinRange(String actorId) {

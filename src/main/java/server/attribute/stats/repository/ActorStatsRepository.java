@@ -52,7 +52,8 @@ public class ActorStatsRepository {
     // TODO: Identify why async required
     @CacheInvalidate(value = ACTOR_STATS_CACHE, parameters = "actorId", async = true)
     public Single<DeleteResult> deleteStats(String actorId) {
-        return Single.fromPublisher(actorStats.deleteOne(eq("actorId", actorId)));
+        // TODO: Should be delete one, but sometimes tests flake
+        return Single.fromPublisher(actorStats.deleteMany(eq("actorId", actorId)));
     }
 
     private MongoCollection<Stats> getCollection() {

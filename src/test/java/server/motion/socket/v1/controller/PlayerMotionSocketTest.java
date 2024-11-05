@@ -77,7 +77,7 @@ public class PlayerMotionSocketTest {
     }
 
     private TestWebSocketClient createWebSocketClient(int port, String map, String actorId) {
-        WebSocketClient webSocketClient = beanContext.getBean(WebSocketClient.class);
+        WebSocketClient webSocketClient = beanContext.createBean(WebSocketClient.class);
         URI uri =
                 UriBuilder.of("ws://localhost")
                         .port(port)

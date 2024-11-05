@@ -1,5 +1,6 @@
 package server.items.inventory.service;
 
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
@@ -27,6 +28,7 @@ public class InventoryService {
     @Inject ItemService itemService;
 
     public Single<Inventory> pickupItem(GenericInventoryData request) {
+        log.info("Requesting to pickup item, actor: {}, item instance: {}", request.getActorId(), request.getItemInstanceId());
         return itemService
                 .getDroppedItemByInstanceId(request.getItemInstanceId())
                 .doOnError(e -> log.error("Failed to get dropped item: {}", e.getMessage()))
@@ -65,6 +67,7 @@ public class InventoryService {
     }
 
     private void addItemToInventory(Inventory inventory, ItemInstance itemInstance) {
+        log.info("Adding item to inventory, actor id: {}, item instance id: {}", inventory.getActorId(), itemInstance.getItemInstanceId());
         // check for example if inventory is full
         List<CharacterItem> items = inventory.getCharacterItems();
         Location2D position = inventory.getNextAvailableSlot();
@@ -76,6 +79,7 @@ public class InventoryService {
     }
 
     public Single<Inventory> moveItem(String actorId, String itemInstanceId, Location2D to) {
+        log.info("moving item, actor id: {}, item instance id: {}, location: {}", actorId, itemInstanceId, to);
         return getInventory(actorId)
                 .doOnError(
                         er -> {
@@ -110,6 +114,7 @@ public class InventoryService {
     }
 
     public Single<List<CharacterItem>> unequipItem(String itemInstanceId, String actorId) {
+        log.info("un equipping item, actor id: {}, item instance id: {}", actorId, itemInstanceId);
         // this is basically finding the nearest slot and placing item there
         return getInventory(actorId)
                 .doOnError(e -> log.error("Failed to get characters inventory, {}", e.getMessage()))
@@ -131,6 +136,7 @@ public class InventoryService {
 
     public Single<DroppedItem> dropItem(String actorId, String itemInstanceId, Location location)
             throws InventoryException {
+        log.info("Requesting to drop item, actor id: {}, item instance id: {}, location: {}", actorId, itemInstanceId, location);
         return inventoryRepository
                 .getCharacterInventory(actorId)
                 .doOnError(e -> log.error("Failed to get character inventory, {}", e.getMessage()))
@@ -157,15 +163,18 @@ public class InventoryService {
     }
 
     public Single<Inventory> getInventory(String actorId) {
+        log.info("Fetching inventory for actor: {}", actorId);
         return inventoryRepository.getCharacterInventory(actorId);
     }
 
     public Single<List<CharacterItem>> updateInventoryItems(
             String actorId, List<CharacterItem> characterItems) {
+        log.info("updating inventory items for actor: {}", actorId);
         return inventoryRepository.updateInventoryItems(actorId, characterItems);
     }
 
     public Single<Inventory> createInventoryForNewCharacter(String actorId) {
+        log.info("creating inventory for actor: {}", actorId);
         Inventory inventory = new Inventory();
 
         inventory.setActorId(actorId);
@@ -177,11 +186,13 @@ public class InventoryService {
     }
 
     public Single<UpdateResult> updateInventoryMaxSize(Inventory inventory) {
+        log.info("updating inventory max size for actor: {}, new max size: {}", inventory.getActorId(), inventory.getMaxSize());
         return inventoryRepository.updateInventoryMaxSize(inventory);
     }
 
-    public void clearAllDataForCharacter(String actorId) {
+    public Single<DeleteResult> clearAllDataForCharacter(String actorId) {
+        log.info("deleting inventory data for actor: {}", actorId);
         // This is for test purposes!
-        inventoryRepository.deleteAllInventoryDataForCharacter(actorId).subscribe();
+        return inventoryRepository.deleteAllInventoryDataForCharacter(actorId);
     }
 }
