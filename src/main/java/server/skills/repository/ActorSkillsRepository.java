@@ -15,35 +15,38 @@ import server.session.SessionParamHelper;
 import server.skills.model.ActorSkills;
 import server.skills.model.Skill;
 
+import javax.annotation.PostConstruct;
+
 @Slf4j
 @Singleton
 public class ActorSkillsRepository {
 
     MongoConfiguration configuration;
     MongoClient mongoClient;
-    MongoCollection<ActorSkills> actorSkillsMongoCollection;
+    MongoCollection<ActorSkills> actorSkillsCollection;
 
     @Inject SessionParamHelper sessionParamHelper;
 
     public ActorSkillsRepository(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
-        prepareCollections();
     }
 
     public Single<ActorSkills> getActorSkills(String actorId) {
-        return Single.fromPublisher(actorSkillsMongoCollection.find(eq("actorId", actorId)))
+        return Single.fromPublisher(actorSkillsCollection.find(eq("actorId", actorId)))
                 .doOnError((exception) -> log.error("actor skills not found for {}", actorId));
     }
 
     public Single<ActorSkills> setActorSkills(String actorId, List<Skill> skills) {
         return Single.fromPublisher(
-                actorSkillsMongoCollection.findOneAndUpdate(
+                actorSkillsCollection.findOneAndUpdate(
                         eq("actorId", actorId), set("skills", skills)));
     }
 
-    private void prepareCollections() {
-        this.actorSkillsMongoCollection =
+
+   @PostConstruct
+   private void prepareCollections() {
+        this.actorSkillsCollection =
                 mongoClient
                         .getDatabase(configuration.getDatabaseName())
                         .getCollection(configuration.getActorSkills(), ActorSkills.class);

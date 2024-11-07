@@ -34,8 +34,7 @@ public class RespawnPoints {
         // In the future, there may not be a respawn point for a given map
         // and we may need to identify nearest map to respawn to
         Location location = getRespawnPointFor(motion.getMap(), type, new Location(motion));
-
-        return Motion.fromLocation(motion.getMap(), location);
+        return Motion.fromLocation(location);
     }
 
     public Location getRespawnPointFor(String map, String type, Location point) {

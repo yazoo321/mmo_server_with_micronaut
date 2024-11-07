@@ -1,47 +1,57 @@
-package server.skills.available.destruction.fire;
+package server.skills.available.restoration.heals;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import io.micronaut.serde.annotation.Serdeable;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
+import server.skills.active.aoe.circle.CircleAoeSkill;
 import server.skills.active.channelled.ChannelledSkill;
+import server.skills.behavior.AoeSkill;
 import server.skills.model.SkillTarget;
 
-@Serdeable
-@JsonTypeName("Fireball")
-@EqualsAndHashCode(callSuper = false)
-public class Fireball extends ChannelledSkill {
+import java.util.Map;
 
-    public Fireball() {
+@Getter
+@JsonTypeName("Aura of Tranquility")
+@EqualsAndHashCode(callSuper = false)
+public class AuraOfTranquility extends CircleAoeSkill {
+
+    public AuraOfTranquility() {
         super(
-                "Fireball",
-                "Hurl a fireball at a selected target",
-                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 80.0),
-                0,
-                1500,
+                "Aura of Tranquility",
+                "Channel an aura of tranquility which periodically heals actors nearby",
+                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), -100.0),
+                1000,
+                3000,
                 false,
                 true,
-                1000,
                 500,
-                Map.of());
+                0,
+                Map.of(),
+                1000,
+                3000,
+                10,
+                true
+        );
     }
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
         Stats actorStats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
         Map<String, Double> actorDerived = actorStats.getDerivedStats();
+
         Double healAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
 
-        Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        dmgAmt = dmgAmt * healAmp * (1 + rand.nextDouble(0.15));
+        Double healAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
+        healAmt = healAmt * healAmp * (1 + rand.nextDouble(0.15));
 
-        Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.FIRE, dmgAmt);
+        Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.POSITIVE, healAmt);
 
         String target = skillTarget.getTargetId();
+
         Stats targetStats = statsService.getStatsFor(target).blockingGet();
 
         Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());

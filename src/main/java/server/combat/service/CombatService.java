@@ -2,6 +2,7 @@ package server.combat.service;
 
 import io.micronaut.websocket.WebSocketSession;
 import io.netty.util.internal.ConcurrentSet;
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
@@ -19,6 +20,8 @@ import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
+import server.common.uuid.UUIDHelper;
+import server.faction.service.ActorHostilityService;
 import server.items.equippable.service.EquipItemService;
 import server.monster.server_integration.service.MobInstanceService;
 import server.motion.repository.ActorMotionRepository;
@@ -51,6 +54,18 @@ public class CombatService {
 
     @Inject
     PlayerLevelStatsService playerLevelStatsService;
+
+    @Inject
+    ActorHostilityService actorHostilityService;
+
+    Single<Boolean> canEngageCombat(String actorId, String targetId) {
+        if (!UUIDHelper.isPlayer(targetId)) {
+            // for now if the target is a mob, we can engage
+            return Single.just(true);
+        }
+
+        return actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).map(hostility -> hostility < 5);
+    }
 
     boolean validatePositionLocation(
             CombatData combatData,

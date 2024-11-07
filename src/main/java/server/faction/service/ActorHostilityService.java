@@ -26,6 +26,7 @@ public class ActorHostilityService {
             value = HOSTILE_ALLEGIANCE_CACHE,
             parameters = {"actorId", "targetId"})
     public Single<Integer> evaluateActorHostilityStatus(String actorId, String targetId) {
+        // TODO: when player party is introduced, will be automatically considered friendly
         // Get actor allegiance asynchronously
         return actorAllegianceService
                 .getActorAllegiance(actorId)

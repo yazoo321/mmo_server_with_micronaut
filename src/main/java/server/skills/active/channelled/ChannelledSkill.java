@@ -105,7 +105,7 @@ public abstract class ChannelledSkill extends ActiveSkill {
                 TimeUnit.MILLISECONDS);
     }
 
-    private boolean channelingInProgress(CombatData combatData) {
+    protected boolean channelingInProgress(CombatData combatData) {
         return combatData.getCombatState().equalsIgnoreCase(CombatState.CHANNELING.getType());
     }
 

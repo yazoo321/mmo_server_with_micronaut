@@ -17,9 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 @ReflectiveAccess
 @NoArgsConstructor
 public class Motion {
-    public static Motion fromLocation(String map, Location location) {
+    public static Motion fromLocation(Location location) {
         Motion motion = new Motion();
-        motion.map = map;
+        motion.map = location.getMap();
         motion.x = location.x;
         motion.y = location.y;
         motion.z = location.z;
