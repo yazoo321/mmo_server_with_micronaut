@@ -27,7 +27,7 @@ public class BasicHeal extends ChannelledSkill {
                 true,
                 500,
                 0,
-                Map.of());
+                Map.of(), 0 , 0 );
     }
 
     @Override

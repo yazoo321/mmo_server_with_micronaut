@@ -27,7 +27,7 @@ public class Fireball extends ChannelledSkill {
                 true,
                 1000,
                 500,
-                Map.of());
+                Map.of(), 0, 0);
     }
 
     @Override

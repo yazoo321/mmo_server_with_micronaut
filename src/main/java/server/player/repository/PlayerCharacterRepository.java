@@ -142,9 +142,9 @@ public class PlayerCharacterRepository {
     }
 
     public UpdateResult checkAndUpdateUserOnline() {
-        LocalDateTime logoutTime = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(10);
+        LocalDateTime logoutTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(5);
 
-        // if is online and not updated in the last 10 seconds, set to logged out.
+        // if is online and not updated in the last 5 mins, set to logged out.
         return Flowable.fromPublisher(
                         characters.updateMany(
                                 combine(eq("isOnline", true), lt("updatedAt", logoutTime)),

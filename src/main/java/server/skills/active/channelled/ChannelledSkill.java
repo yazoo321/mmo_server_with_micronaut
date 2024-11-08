@@ -17,9 +17,9 @@ import server.socket.model.types.SkillMessageType;
 
 public abstract class ChannelledSkill extends ActiveSkill {
 
-    @JsonProperty private final int castTime;
-    @JsonProperty private final boolean allowsMovement;
-    @JsonProperty private final boolean canInterrupt;
+    @JsonProperty protected final int castTime;
+    @JsonProperty protected final boolean allowsMovement;
+    @JsonProperty protected final boolean canInterrupt;
 
     public int getCastTime() {
         return castTime;
@@ -45,8 +45,10 @@ public abstract class ChannelledSkill extends ActiveSkill {
             boolean canInterrupt,
             int maxRange,
             int travelSpeed,
-            Map<String, Integer> requirements) {
-        super(name, description, derived, cooldown, maxRange, travelSpeed, requirements);
+            Map<String, Integer> requirements,
+            int durationMs,
+            int ticks) {
+        super(name, description, derived, cooldown, maxRange, travelSpeed, requirements, durationMs, ticks);
         this.castTime = castTime;
         this.allowsMovement = allowsMovement;
         this.canInterrupt = canInterrupt;
@@ -109,7 +111,7 @@ public abstract class ChannelledSkill extends ActiveSkill {
         return combatData.getCombatState().equalsIgnoreCase(CombatState.CHANNELING.getType());
     }
 
-    private void notifyStartChannel(String actorId) {
+    protected void notifyStartChannel(String actorId) {
         SocketResponse message = new SocketResponse();
         message.setMessageType(SkillMessageType.START_CHANNELLING.getType());
 
@@ -121,7 +123,7 @@ public abstract class ChannelledSkill extends ActiveSkill {
         clientUpdatesService.sendUpdateToListeningIncludingSelf(message, actorId);
     }
 
-    private void notifyStopChannel(String actorId, boolean channelSuccess) {
+    protected void notifyStopChannel(String actorId, boolean channelSuccess) {
         SocketResponse message = new SocketResponse();
         message.setMessageType(SkillMessageType.STOP_CHANNELLING.getType());
         CombatRequest combat = new CombatRequest();

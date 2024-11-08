@@ -1,7 +1,8 @@
-package server.skills.active.aoe.circle;
+package server.skills.active.aoe;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.reactivex.rxjava3.core.Single;
+import server.combat.model.CombatData;
 import server.common.dto.Location;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.behavior.AoeSkill;
@@ -10,29 +11,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class CircleAoeSkill extends ChannelledSkill implements AoeSkill {
+public abstract class AbstractAoeSkill extends ChannelledSkill implements AoeSkill {
     @JsonProperty
     Integer diameter;
 
     @JsonProperty
-    Integer durationMs;
-
-    @JsonProperty
-    Integer ticks;
-
-    @JsonProperty
     Boolean includeCaster;
 
-    public CircleAoeSkill(
+    public AbstractAoeSkill(
             String name, String description, Map<String, Double> derived,
             int cooldown, int castTime, boolean allowsMovement, boolean canInterrupt,
             int maxRange, int travelSpeed, Map<String, Integer> requirements,
             int diameter, int durationMs, int ticks, boolean includeCaster) {
 
-        super(name, description, derived, cooldown, castTime, allowsMovement, canInterrupt, maxRange, travelSpeed, requirements);
+        super(name, description, derived, cooldown, castTime, allowsMovement, canInterrupt, maxRange, travelSpeed,
+                requirements, durationMs, ticks);
         this.diameter = diameter;
-        this.durationMs = durationMs;
-        this.ticks = ticks;
         this.includeCaster = includeCaster;
     }
 
@@ -51,7 +45,5 @@ public abstract class CircleAoeSkill extends ChannelledSkill implements AoeSkill
             return allIds;
         });
     }
-
-
 
 }

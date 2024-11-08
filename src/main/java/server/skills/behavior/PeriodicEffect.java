@@ -1,9 +1,11 @@
 package server.skills.behavior;
 
-import server.common.dto.Location;
+import server.combat.model.CombatData;
 
 public interface PeriodicEffect {
 
-    void applyEffectAtInterval();
+    void applyEffectAtInterval(CombatData combatData);
+
+    void applyEffect(CombatData combatData);
 
 }

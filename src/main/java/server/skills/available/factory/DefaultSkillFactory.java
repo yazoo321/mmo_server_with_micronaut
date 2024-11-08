@@ -11,6 +11,7 @@ import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.restoration.heals.BasicHeal;
+import server.skills.available.restoration.heals.HealingRain;
 import server.skills.model.Skill;
 import server.socket.service.ClientUpdatesService;
 import server.socket.service.WebsocketClientUpdatesService;
@@ -34,6 +35,7 @@ public class DefaultSkillFactory implements SkillFactory {
     public DefaultSkillFactory() {
         skillTypes.put("fireball", Fireball.class);
         skillTypes.put("basic heal", BasicHeal.class);
+        skillTypes.put("healing rain", HealingRain.class);
     }
 
     @Override

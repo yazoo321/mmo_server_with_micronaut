@@ -3,27 +3,28 @@ package server.skills.available.restoration.heals;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
-import server.skills.active.aoe.circle.CircleAoeSkill;
-import server.skills.active.channelled.ChannelledSkill;
-import server.skills.behavior.AoeSkill;
+import server.common.dto.Location;
+import server.skills.active.aoe.TickingAoeSkill;
 import server.skills.model.SkillTarget;
 
 import java.util.Map;
 
 @Getter
-@JsonTypeName("Aura of Tranquility")
+@JsonTypeName("Healing rain")
 @EqualsAndHashCode(callSuper = false)
-public class AuraOfTranquility extends CircleAoeSkill {
+@Slf4j
+public class HealingRain extends TickingAoeSkill {
 
-    public AuraOfTranquility() {
+    public HealingRain() {
         super(
-                "Aura of Tranquility",
+                "Healing rain",
                 "Channel an aura of tranquility which periodically heals actors nearby",
-                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), -100.0),
+                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), -20.0),
                 1000,
                 3000,
                 false,
@@ -40,6 +41,16 @@ public class AuraOfTranquility extends CircleAoeSkill {
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
+        // do nothing
+    }
+
+    @Override
+    public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
+        return true;
+    }
+
+    @Override
+    public void applyEffect(CombatData combatData) {
         Stats actorStats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
         Map<String, Double> actorDerived = actorStats.getDerivedStats();
 
@@ -50,17 +61,16 @@ public class AuraOfTranquility extends CircleAoeSkill {
 
         Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.POSITIVE, healAmt);
 
-        String target = skillTarget.getTargetId();
-
-        Stats targetStats = statsService.getStatsFor(target).blockingGet();
-
-        Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());
-
-        checkDeath(stats, combatData.getActorId());
-    }
-
-    @Override
-    public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
-        return true;
+        actorMotionRepository.fetchActorMotion(combatData.getActorId())
+                .doOnSuccess(motion -> getAffectedActors(new Location(motion), combatData.getActorId())
+                        .doOnSuccess(actors -> actors.stream().parallel().forEach(actor -> {
+                            Stats targetStats = statsService.getStatsFor(actor).blockingGet();
+                            log.info("Applying Healing rain to: {}, will take: {}", actor, damageMap);
+                            Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());
+                            checkDeath(stats, combatData.getActorId());
+                        }))
+                        .subscribe())
+                .doOnError(err -> log.error(err.getMessage()))
+                .subscribe();
     }
 }
