@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import server.attribute.stats.model.Stats;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
@@ -15,6 +17,12 @@ import server.skills.model.SkillTarget;
 
 public abstract class ActiveSkill extends Skill implements InstantSkill, TravelSkill {
 
+    @JsonProperty
+    protected Integer durationMs;
+
+    @JsonProperty
+    protected Integer ticks;
+
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public ActiveSkill(
@@ -24,8 +32,12 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
             Integer cooldown,
             Integer maxRange,
             Integer travelSpeed,
-            Map<String, Integer> requirements) {
+            Map<String, Integer> requirements,
+            int durationMs,
+            int ticks) {
         super(name, description, derived, maxRange, requirements, cooldown, travelSpeed);
+        this.durationMs = durationMs;
+        this.ticks = ticks;
     }
 
     @Override

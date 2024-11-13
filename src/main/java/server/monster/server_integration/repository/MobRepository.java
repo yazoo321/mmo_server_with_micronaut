@@ -68,8 +68,8 @@ public class MobRepository {
                 .toList();
     }
 
-    public Single<List<Monster>> getMobsNearby(Location location) {
-        return MongoDbQueryHelper.nearbyMobMotionFinder(mobMotionMongoCollection, location, 20_000);
+    public Single<List<Monster>> getMobsNearby(Location location, int threshold) {
+        return MongoDbQueryHelper.nearbyMobMotionFinder(mobMotionMongoCollection, location, threshold);
     }
 
     public Single<DeleteResult> deleteMobsNotUpdatedWithin(Instant time) {

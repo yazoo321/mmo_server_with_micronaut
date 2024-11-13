@@ -34,7 +34,7 @@ public class SynchroniseMobService {
         }
 
         mobInstanceService
-                .getMobsNearby(new Location(motion))
+                .getMobsNearby(new Location(motion), 20_000)
                 .doOnSuccess(
                         mobList -> {
                             if (mobList == null || mobList.isEmpty()) {

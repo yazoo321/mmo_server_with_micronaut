@@ -7,6 +7,8 @@ import jakarta.inject.Singleton;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
@@ -22,13 +24,15 @@ public class StatusService {
     @Inject UpdateProducer updateProducer;
 
     public Single<ActorStatus> getActorStatus(String actorId) {
-        return statusRepository.getActorStatuses(actorId);
+        log.info("fetching actor status: {}", actorId);
+        return statusRepository.getActorStatuses(actorId)
+                .map(this::removeExpiredStatuses);
     }
 
-    public void removeExpiredStatuses(ActorStatus actorStatus) {
+    public ActorStatus removeExpiredStatuses(ActorStatus actorStatus) {
         Set<Status> removed = actorStatus.removeOldStatuses();
         if (removed.isEmpty()) {
-            return;
+            return actorStatus;
         }
 
         actorStatus.getActorStatuses().removeAll(removed);
@@ -37,9 +41,29 @@ public class StatusService {
         ActorStatus update = new ActorStatus(actorStatus.getActorId(), removed, false, actorStatus.aggregateStatusEffects());
         // notify the user about removed statuses
         updateProducer.updateStatus(update);
+
+        return actorStatus;
     }
 
-    public void addStatusToActor(ActorStatus actorStatus, Set<Status> statuses, String actorId) {
+    public void removeStatusFromActor(ActorStatus actorStatus, Set<Status> statuses) {
+        Set<String> statusIds = statuses.stream().map(Status::getId).collect(Collectors.toSet());
+        actorStatus.setActorStatuses(
+                actorStatus.getActorStatuses().stream().filter(s -> statusIds.contains(s.getId()))
+                        .collect(Collectors.toSet()));
+        actorStatus.aggregateStatusEffects();
+
+
+        statusRepository
+                .updateStatus(actorStatus.getActorId(), actorStatus)
+                .doOnError(err -> log.error(err.getMessage()))
+                .subscribe();
+
+        ActorStatus update = new ActorStatus(actorStatus.getActorId(), statuses, false, null);
+        update.setStatusEffects(actorStatus.getStatusEffects());
+        updateProducer.updateStatus(update);
+    }
+
+    public void addStatusToActor(ActorStatus actorStatus, Set<Status> statuses) {
         actorStatus.getActorStatuses().addAll(statuses);
         actorStatus.aggregateStatusEffects();
 
@@ -48,8 +72,8 @@ public class StatusService {
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
 
-        ActorStatus update = new ActorStatus(actorId, statuses, true, null);
-        update.aggregateStatusEffects();
+        ActorStatus update = new ActorStatus(actorStatus.getActorId(), statuses, true, null);
+        update.setStatusEffects(actorStatus.getStatusEffects());
         updateProducer.updateStatus(update);
     }
 

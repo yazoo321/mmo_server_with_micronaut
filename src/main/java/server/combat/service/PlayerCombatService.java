@@ -8,10 +8,7 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
@@ -38,19 +35,31 @@ public class PlayerCombatService extends CombatService {
         if (combatRequest == null) {
             return;
         }
-        CombatData combatData =
-                sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
-        combatData.setTargets(combatRequest.getTargets());
 
-        if (sessionsInCombat.contains(SessionParamHelper.getActorId(session))) {
-            sessionParamHelper.setSharedActorCombatData(SessionParamHelper.getActorId(session), combatData);
-            // this can mean a change of target, we want to update the combat data but not to start another attack loop
-            return;
+        String actorId = SessionParamHelper.getActorId(session);
+        if (combatRequest.getTargets() == null || combatRequest.getTargets().size() != 1) {
+            log.warn("Only support 1 combat target");
+            combatRequest.setTargets(new HashSet<>(Set.of(combatRequest.getTargets().iterator().next())));
         }
-        sessionsInCombat.add(SessionParamHelper.getActorId(session));
-        sessionParamHelper.setSharedActorCombatData(
-                SessionParamHelper.getActorId(session), combatData);
-        attackLoop(session, combatData.getActorId());
+        canEngageCombat(actorId, combatRequest.getTargets().iterator().next())
+                .doOnSuccess(canEngage -> {
+                    if (!canEngage) {
+                        return;
+                    }
+                    CombatData combatData =
+                            sessionParamHelper.getSharedActorCombatData(actorId);
+                    combatData.setTargets(combatRequest.getTargets());
+
+                    if (sessionsInCombat.contains(SessionParamHelper.getActorId(session))) {
+                        sessionParamHelper.setSharedActorCombatData(SessionParamHelper.getActorId(session), combatData);
+                        // this can mean a change of target, we want to update the combat data but not to start another attack loop
+                        return;
+                    }
+                    sessionsInCombat.add(SessionParamHelper.getActorId(session));
+                    sessionParamHelper.setSharedActorCombatData(
+                            SessionParamHelper.getActorId(session), combatData);
+                    attackLoop(session, combatData.getActorId());
+                }).subscribe();
     }
 
     public void requestStopAttack(String actorId) {

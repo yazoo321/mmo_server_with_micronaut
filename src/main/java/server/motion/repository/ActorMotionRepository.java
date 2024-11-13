@@ -11,8 +11,12 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
+import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.common.uuid.UUIDHelper;
 import server.monster.server_integration.model.Monster;
@@ -25,8 +29,6 @@ import server.motion.dto.PlayerMotion;
 public class ActorMotionRepository {
 
     private static final String ACTOR_MOTION_CACHE = "actor-motion-cache";
-
-//    private Map<String, Motion> motionMap = new ConcurrentHashMap<>();
 
     private Set<String> syncActorMotion = new ConcurrentSet<>();
 
@@ -60,14 +62,11 @@ public class ActorMotionRepository {
             return null;
         }
         if (!syncActorMotion.contains(actorId)) {
-//        if (!motionMap.containsKey(actorId)) {
             // sync it now if its fresh
             handleUpdate(actorId, motion, true);
         }
 
         syncActorMotion.add(actorId);
-
-//        motionMap.put(actorId, motion);
 
         return motion;
     }
@@ -80,7 +79,7 @@ public class ActorMotionRepository {
                 .subscribe();
     }
 
-    @Scheduled(fixedDelay = "30s", initialDelay = "1s")
+    @Scheduled(fixedDelay = "1s", initialDelay = "1s")
     public void syncMotionWithRepo() {
         // we pull motion information from the cache and we update the cache as first resort
         // TODO: Convert to batch process
@@ -92,11 +91,6 @@ public class ActorMotionRepository {
                     .doOnError(err -> log.error(err.getMessage()))
                     .subscribe();
         }
-//        for (String id : motionMap.keySet()) {
-//            Motion motion = motionMap.get(id);
-//            log.info("Saving motion for {}, {}", id, motion);
-//            handleUpdate(id, motion);
-//        }
     }
 
     private void handleUpdate(String actorId, Motion motion, boolean online) {
@@ -117,5 +111,16 @@ public class ActorMotionRepository {
                     .doOnError(err -> log.error(err.getMessage()))
                     .subscribe();
         }
+    }
+
+    public Single<List<String>> getNearbyPlayers(Location location, int threshold) {
+        Motion motion = Motion.fromLocation(location);
+        PlayerMotion fake = new PlayerMotion(null, motion, null, null);
+        return playerMotionRepository.getPlayersNearby(fake, threshold)
+                .map(playerMotions -> playerMotions.stream().map(PlayerMotion::getActorId).toList());
+    }
+
+    public Single<List<String>> getNearbyMobs(Location location, int threshold) {
+        return mobRepository.getMobsNearby(location, threshold).map(m -> m.stream().map(Monster::getActorId).toList());
     }
 }
