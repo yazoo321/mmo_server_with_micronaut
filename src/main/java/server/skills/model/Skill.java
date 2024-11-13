@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.Random;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.StatsService;
+import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.combat.service.CombatService;
@@ -57,6 +59,7 @@ public abstract class Skill {
     @Setter protected SessionParamHelper sessionParamHelper;
     @Setter protected ActorMotionRepository actorMotionRepository;
     @Setter protected StatsService statsService;
+    @Setter protected StatusService statusService;
     @Setter protected CombatService combatService;
 
     public String getName() {

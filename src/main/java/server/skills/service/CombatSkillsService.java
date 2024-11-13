@@ -14,6 +14,10 @@ import server.combat.model.CombatRequest;
 import server.combat.service.CombatService;
 import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
+import server.skills.available.destruction.nature.EclipseBurst;
+import server.skills.available.destruction.nature.MoonsVengeance;
+import server.skills.available.destruction.nature.SunSmite;
+import server.skills.available.destruction.nature.VineGrab;
 import server.skills.available.factory.DefaultSkillFactory;
 import server.skills.available.restoration.heals.BasicHeal;
 import server.skills.available.restoration.heals.HealingRain;
@@ -72,7 +76,8 @@ public class CombatSkillsService {
     public void getActorAvailableSkills(String actorId, WebSocketSession session) {
         ActorSkills actorSkills = new ActorSkills();
         actorSkills.setActorId(actorId);
-        actorSkills.setSkills(List.of(new Fireball(), new BasicHeal(), new HealingRain()));
+        actorSkills.setSkills(List.of(new Fireball(), new BasicHeal(), new HealingRain(), new VineGrab(),
+                new EclipseBurst(), new MoonsVengeance(), new SunSmite()));
         SocketResponse socketResponse = new SocketResponse();
         socketResponse.setActorSkills(actorSkills);
         socketResponse.setMessageType(MessageType.UPDATE_ACTOR_SKILLS.getType());

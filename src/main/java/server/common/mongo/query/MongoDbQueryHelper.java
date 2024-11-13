@@ -19,12 +19,12 @@ public class MongoDbQueryHelper {
         Bson mapEq = Filters.eq("location.map", location.getMap());
         Bson xWithinRange =
                 Filters.and(
-                        Filters.gt("location.x", (location.getX() - threshold)),
-                        Filters.lt("location.x", (location.getX() + threshold)));
+                        Filters.gte("location.x", (location.getX() - threshold)),
+                        Filters.lte("location.x", (location.getX() + threshold)));
         Bson yWithinRange =
                 Filters.and(
-                        Filters.gt("location.y", (location.getY() - threshold)),
-                        Filters.lt("location.y", (location.getY() + threshold)));
+                        Filters.gte("location.y", (location.getY() - threshold)),
+                        Filters.lte("location.y", (location.getY() + threshold)));
 
         return Flowable.fromPublisher(collection.find(and(mapEq, xWithinRange, yWithinRange)))
                 .toList();
@@ -39,12 +39,12 @@ public class MongoDbQueryHelper {
         Bson mapEq = Filters.eq("motion.map", motion.getMap());
         Bson xWithinRange =
                 Filters.and(
-                        Filters.gt("motion.x", (motion.getX() - threshold)),
-                        Filters.lt("motion.x", (motion.getX() + threshold)));
+                        Filters.gte("motion.x", (motion.getX() - threshold)),
+                        Filters.lte("motion.x", (motion.getX() + threshold)));
         Bson yWithinRange =
                 Filters.and(
-                        Filters.gt("motion.y", (motion.getY() - threshold)),
-                        Filters.lt("motion.y", (motion.getY() + threshold)));
+                        Filters.gte("motion.y", (motion.getY() - threshold)),
+                        Filters.lte("motion.y", (motion.getY() + threshold)));
 
         // TODO: consider just fetching player names and returning them
         return Flowable.fromPublisher(
@@ -64,12 +64,12 @@ public class MongoDbQueryHelper {
         Bson mapEq = Filters.eq("motion.map", location.getMap());
         Bson xWithinRange =
                 Filters.and(
-                        Filters.gt("motion.x", (location.getX() - threshold)),
-                        Filters.lt("motion.x", (location.getX() + threshold)));
+                        Filters.gte("motion.x", (location.getX() - threshold)),
+                        Filters.lte("motion.x", (location.getX() + threshold)));
         Bson yWithinRange =
                 Filters.and(
-                        Filters.gt("motion.y", (location.getY() - threshold)),
-                        Filters.lt("motion.y", (location.getY() + threshold)));
+                        Filters.gte("motion.y", (location.getY() - threshold)),
+                        Filters.lte("motion.y", (location.getY() + threshold)));
 
         return Flowable.fromPublisher(collection.find(and(mapEq, xWithinRange, yWithinRange)))
                 .toList();

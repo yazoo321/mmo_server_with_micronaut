@@ -32,8 +32,8 @@ public class MobInstanceService {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public Single<List<Monster>> getMobsNearby(Location location) {
-        return mobRepository.getMobsNearby(location);
+    public Single<List<Monster>> getMobsNearby(Location location, int threshold) {
+        return mobRepository.getMobsNearby(location, threshold);
     }
 
     public Single<List<Monster>> getMobsByIds(Set<String> actorIds) {
@@ -77,7 +77,7 @@ public class MobInstanceService {
         // we will set state to death and wait for animations etc
         statusService.removeAllStatuses(mobId)
                 .doOnSuccess(statuses -> {
-                    statusService.addStatusToActor(statuses, Set.of(new Dead()), mobId);
+                    statusService.addStatusToActor(statuses, Set.of(new Dead()));
                     statusService
                             .deleteActorStatus(mobId)
                             .doOnError(err -> log.error(err.getMessage()))

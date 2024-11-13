@@ -167,7 +167,7 @@ public class CombatService {
         if (stats.isPlayer()) {
             statusService.removeAllStatuses(stats.getActorId())
                     .doOnSuccess(status ->
-                            statusService.addStatusToActor(status, Set.of(new Dead()), stats.getActorId()))
+                            statusService.addStatusToActor(status, Set.of(new Dead())))
                     .doOnError(er -> log.error(er.getMessage()))
                     .subscribe();
 

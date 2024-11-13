@@ -43,6 +43,7 @@ public class SynchroniseSessionService {
 //            log.info("evaluateNearbyPlayers: active sessions: {}", actorIdSessions);
 //        }
 
+        log.info("Running evaluateNearbyPlayers");
         sessions.values().parallelStream()
                 .forEach(
                         session -> {
@@ -60,9 +61,11 @@ public class SynchroniseSessionService {
                                         SessionParamHelper.getActorId(session));
                                 return;
                             }
-
+                            log.info("handle sync players");
                             synchronisePlayerService.handleSynchronisePlayers(motion, session);
+                            log.info("handle sync mobs");
                             synchroniseMobService.handleSynchroniseMobs(motion, session);
+                            log.info("handle sync item drops");
                             synchroniseDroppedItemsService.handleSynchroniseDroppedItems(
                                     motion, session);
                         });

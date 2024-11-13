@@ -79,7 +79,7 @@ public class ActorMotionRepository {
                 .subscribe();
     }
 
-    @Scheduled(fixedDelay = "30s", initialDelay = "1s")
+    @Scheduled(fixedDelay = "1s", initialDelay = "1s")
     public void syncMotionWithRepo() {
         // we pull motion information from the cache and we update the cache as first resort
         // TODO: Convert to batch process
@@ -121,6 +121,6 @@ public class ActorMotionRepository {
     }
 
     public Single<List<String>> getNearbyMobs(Location location, int threshold) {
-        return mobRepository.getMobsNearby(location).map(m -> m.stream().map(Monster::getMobId).toList());
+        return mobRepository.getMobsNearby(location, threshold).map(m -> m.stream().map(Monster::getActorId).toList());
     }
 }

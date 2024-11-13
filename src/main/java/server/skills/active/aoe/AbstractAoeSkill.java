@@ -40,7 +40,7 @@ public abstract class AbstractAoeSkill extends ChannelledSkill implements AoeSki
             allIds.addAll(playerIds);
 
             if (!includeCaster) {
-                allIds = allIds.stream().filter(s -> s.equalsIgnoreCase(casterId)).toList();
+                allIds = allIds.stream().filter(s -> !s.equalsIgnoreCase(casterId)).toList();
             }
             return allIds;
         });

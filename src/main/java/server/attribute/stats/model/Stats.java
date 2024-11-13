@@ -124,7 +124,7 @@ public class Stats {
         updatedDerived.put(StatsTypes.MP_REGEN.getType(), 1.0 + (intelligence / 5));
 
         // evaluate base derived stats when there's no items equipped
-        updatedDerived.put(StatsTypes.WEAPON_DAMAGE.getType(), 10.0 + (strength / 4));
+        updatedDerived.put(StatsTypes.WEAPON_DAMAGE.getType(), 10.0 + (strength / 12));
         updatedDerived.put(StatsTypes.MAIN_HAND_ATTACK_SPEED.getType(), 2.0);
         // add other effects, such as item and statuses (buffs etc)
         Map<String, Double> otherEffects = mergeStats(itemEffects, statusEffects);

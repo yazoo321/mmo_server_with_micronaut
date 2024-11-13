@@ -32,7 +32,7 @@ public class HealingRain extends TickingAoeSkill {
                 500,
                 0,
                 Map.of(),
-                1000,
+                600,
                 3000,
                 10,
                 true
@@ -50,7 +50,7 @@ public class HealingRain extends TickingAoeSkill {
     }
 
     @Override
-    public void applyEffect(CombatData combatData) {
+    public void applyEffect(CombatData combatData, SkillTarget skillTarget) {
         Stats actorStats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
         Map<String, Double> actorDerived = actorStats.getDerivedStats();
 
@@ -70,7 +70,7 @@ public class HealingRain extends TickingAoeSkill {
                             checkDeath(stats, combatData.getActorId());
                         }))
                         .subscribe())
-                .doOnError(err -> log.error(err.getMessage()))
+                .doOnError(err -> log.error("Healing rain encountered error: {}",err.getMessage()))
                 .subscribe();
     }
 }

@@ -7,8 +7,10 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import server.attribute.status.types.StatusTypes;
 
+@Slf4j
 @Data
 @Serdeable
 @ReflectiveAccess
@@ -24,9 +26,14 @@ public class ActorStatus {
 
     public Set<Status> removeOldStatuses() {
         Set<Status> removedStatuses = new HashSet<>();
-        actorStatuses.removeIf(
+        if (this.actorStatuses == null) {
+            this.actorStatuses = new HashSet<>();
+        }
+
+        log.info("running remove old statuses on: {}", this.actorStatuses);
+        this.actorStatuses.removeIf(
                 status -> {
-                    if (status.getExpiration().isBefore(Instant.now())) {
+                    if (status.getExpiration() != null && status.getExpiration().isBefore(Instant.now())) {
                         removedStatuses.add(status);
                         return true;
                     } else return false;

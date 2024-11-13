@@ -106,7 +106,7 @@ public class MobRepositoryTest {
         mobRepository.insertMobInstance(mob3).blockingGet();
 
         List<Monster> mobsNearby =
-                mobRepository.getMobsNearby(new Location(TEST_MAP, 0, 0, 0)).blockingGet();
+                mobRepository.getMobsNearby(new Location(TEST_MAP, 0, 0, 0), 20_000).blockingGet();
 
         assertThat(mobsNearby).hasSize(2).containsExactlyInAnyOrder(mob1, mob2);
     }

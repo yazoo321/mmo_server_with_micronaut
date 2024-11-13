@@ -63,7 +63,7 @@ public class StatusServiceTest {
     @MethodSource("inputs")
     @DisplayName("Test addStatusToActor")
     void testAddStatusToActor(TestCase testCase) {
-        statusService.addStatusToActor(testCase.initialStatus, Set.of(new Dead()), testCase.actorId);
+        statusService.addStatusToActor(testCase.initialStatus, Set.of(new Dead()));
 
         await().pollDelay(300, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(2, ChronoUnit.SECONDS))
