@@ -11,14 +11,20 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
+import server.attribute.status.model.ActorStatus;
+import server.attribute.status.model.Status;
 import server.attribute.status.model.derived.Dead;
 import server.attribute.status.service.StatusService;
+import server.attribute.status.types.StatusTypes;
 import server.common.dto.Location;
 import server.common.dto.Motion;
+import server.items.service.ItemService;
 import server.monster.server_integration.model.Monster;
 import server.monster.server_integration.repository.MobRepository;
 import server.motion.dto.MotionResult;
+import server.motion.repository.ActorMotionRepository;
 
 @Slf4j
 @Service
@@ -26,9 +32,15 @@ public class MobInstanceService {
 
     @Inject MobRepository mobRepository;
 
+    @Inject
+    ActorMotionRepository actorMotionRepository;
+
     @Inject StatsService statsService;
 
     @Inject StatusService statusService;
+
+    @Inject
+    ItemService itemService;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
@@ -73,7 +85,13 @@ public class MobInstanceService {
         return MotionResult.builder().monster(monster).build();
     }
 
-    public void handleMobDeath(String mobId) {
+    public void handleMobDeath(Stats mobStats) {
+        String mobId = mobStats.getActorId();
+
+        actorMotionRepository.fetchActorMotion(mobId)
+                .doOnError(err -> log.error(err.getMessage()))
+                .doOnSuccess(motion -> itemService.handleItemDropsForMob(mobStats, motion)).subscribe();
+
         // we will set state to death and wait for animations etc
         statusService.removeAllStatuses(mobId)
                 .doOnSuccess(statuses -> {

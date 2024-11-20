@@ -1,5 +1,6 @@
 package server.items.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
@@ -57,6 +58,8 @@ public abstract class Item {
             String itemName,
             String category,
             Map<String, Double> itemEffects,
+            Map<String, Integer> requirements,
+            int quality,
             Stacking stacking,
             Integer value,
             ItemConfig itemConfig) {
@@ -65,6 +68,8 @@ public abstract class Item {
         this.itemName = itemName;
         this.category = category;
         this.itemEffects = itemEffects;
+        this.requirements = requirements;
+        this.quality = quality;
         this.stacking = stacking;
         this.value = value;
         this.itemConfig = itemConfig;
@@ -74,9 +79,14 @@ public abstract class Item {
     String itemName;
     String category;
     Map<String, Double> itemEffects;
+    Map<String, Integer> requirements;
+    Integer quality;
     Stacking stacking;
     Integer value;
     ItemConfig itemConfig;
+
+    @JsonIgnore
+    Integer dropChance;
 
     public abstract EquippedItems createEquippedItem(String actorId, ItemInstance itemInstance);
 }

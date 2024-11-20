@@ -62,7 +62,7 @@ public class HealingRain extends TickingAoeSkill {
         Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.POSITIVE, healAmt);
 
         actorMotionRepository.fetchActorMotion(combatData.getActorId())
-                .doOnSuccess(motion -> getAffectedActors(new Location(motion), combatData.getActorId())
+                .doOnSuccess(motion -> getAffectedPlayers(new Location(motion), combatData.getActorId())
                         .doOnSuccess(actors -> actors.stream().parallel().forEach(actor -> {
                             Stats targetStats = statsService.getStatsFor(actor).blockingGet();
                             log.info("Applying Healing rain to: {}, will take: {}", actor, damageMap);
