@@ -22,6 +22,10 @@ micronaut:
       expire-after-write: 60s # Local cache expiration
       maximum-size: 1000
       cache-type: caffeine
+    itemCache:
+      expire-after-write: 360s
+      maximum-size: 1000
+      cache-type: caffeine
 
 jackson:
   serialization:

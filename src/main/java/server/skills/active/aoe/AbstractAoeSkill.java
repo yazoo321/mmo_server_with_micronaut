@@ -46,4 +46,24 @@ public abstract class AbstractAoeSkill extends ChannelledSkill implements AoeSki
         });
     }
 
+    public Single<List<String>> getAffectedMobs(Location location, String casterId) {
+        return actorMotionRepository.getNearbyMobs(location, diameter)
+                .map(ids -> {
+                    if (!includeCaster) {
+                        ids = ids.stream().filter(s -> !s.equalsIgnoreCase(casterId)).toList();
+                    }
+                    return ids;
+                });
+    }
+
+    public Single<List<String>> getAffectedPlayers(Location location, String casterId) {
+        return actorMotionRepository.getNearbyPlayers(location, diameter)
+                .map(ids -> {
+                    if (!includeCaster) {
+                        ids = ids.stream().filter(s -> !s.equalsIgnoreCase(casterId)).toList();
+                    }
+                    return ids;
+                });
+    }
+
 }

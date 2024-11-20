@@ -22,6 +22,8 @@ public class Consumable extends Item {
             String itemId,
             String itemName,
             Map<String, Double> itemEffects,
+            Map<String, Integer> requirements,
+            Integer quality,
             Stacking stacking,
             Integer value,
             ItemConfig config) {
@@ -30,6 +32,8 @@ public class Consumable extends Item {
                 itemName,
                 ItemType.CONSUMABLE.getType(),
                 itemEffects,
+                requirements,
+                quality,
                 stacking,
                 value,
                 config);

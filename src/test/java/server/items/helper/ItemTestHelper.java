@@ -45,6 +45,12 @@ public class ItemTestHelper {
 
     @Inject InventoryRepository inventoryRepository;
 
+    private static Map<String, Integer> defaultRequirements = Map.of(
+            StatsTypes.STR.getType(), 15,
+            StatsTypes.INT.getType(), 15,
+            StatsTypes.DEX.getType(), 15,
+            StatsTypes.STA.getType(), 15);
+
     public ItemTestHelper(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
         this.mongoClient = mongoClient;
@@ -173,6 +179,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "sharp sword",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -182,6 +190,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "leather helm",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -191,6 +201,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "leather armour",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -200,6 +212,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "leather belt",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -209,6 +223,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "iron bracers",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -218,6 +234,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "green cape",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -227,6 +245,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "leather gloves",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -236,6 +256,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "leather pants",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -245,6 +267,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "leather shoulder pads",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -254,6 +278,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "leather shoulder pads",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -263,6 +289,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "leather boots",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -272,6 +300,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "gold ring",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);
@@ -281,6 +311,8 @@ public class ItemTestHelper {
                         UUID.randomUUID().toString(),
                         "bronze shield",
                         itemEffects,
+                        defaultRequirements,
+                        1,
                         stacOpts,
                         1000,
                         itemConfig);

@@ -23,10 +23,12 @@ public class Cape extends Item {
             String itemId,
             String itemName,
             Map<String, Double> itemEffects,
+            Map<String, Integer> requirements,
+            Integer quality,
             Stacking stacking,
             Integer value,
             ItemConfig config) {
-        super(itemId, itemName, ItemType.CAPE.getType(), itemEffects, stacking, value, config);
+        super(itemId, itemName, ItemType.CAPE.getType(), itemEffects,requirements, quality, stacking, value, config);
     }
 
     @Override

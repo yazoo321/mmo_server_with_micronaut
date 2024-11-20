@@ -51,7 +51,7 @@ public class MonsterServerListener {
 
     @Topic("remove-mobs-from-game")
     public void receiveRemoveMobsFromGame(String actorId) {
-        mobInstanceService.handleMobDeath(actorId);
+//        TODO: when server is shutting down, clear mobs from game
     }
 
     @Topic("mob-motion-update")

@@ -7,6 +7,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.common.dto.Location;
@@ -25,6 +27,11 @@ public class ItemServiceTest {
 
     @BeforeEach
     void cleanDb() {
+        itemTestHelper.deleteAllItemData();
+    }
+
+    @AfterEach
+    void cleanAll() {
         itemTestHelper.deleteAllItemData();
     }
 

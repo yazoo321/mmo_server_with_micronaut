@@ -15,8 +15,10 @@ import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
 import server.attribute.stats.types.StatsTypes;
+import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.derived.Dead;
 import server.attribute.status.service.StatusService;
+import server.attribute.status.types.StatusTypes;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.common.dto.Motion;
@@ -159,6 +161,14 @@ public class CombatService {
             return;
         }
 
+        // TODO: make async
+        ActorStatus statuses = statusService.getActorStatus(stats.getActorId()).blockingGet();
+        statuses.aggregateStatusEffects();
+        if (statuses.getStatusEffects().contains(StatusTypes.DEAD.getType())) {
+            log.info("actor already dead");
+            return;
+        }
+
         if (killerStats.isPlayer()) {
             playerLevelStatsService.handleAddXp(stats, killerStats);
         }
@@ -172,7 +182,7 @@ public class CombatService {
                     .subscribe();
 
         } else {
-            mobInstanceService.handleMobDeath(stats.getActorId());
+            mobInstanceService.handleMobDeath(stats);
             sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);
 
             notifyClientsToRemoveMobs(stats.getActorId());
