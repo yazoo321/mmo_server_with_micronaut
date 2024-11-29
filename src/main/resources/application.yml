@@ -89,6 +89,7 @@ mongo-database:
   actor-skills: "actorSkills"
   actionbar: "actionbar"
   actorAllegiance: "actorAllegiance"
+  actorThreat: "actorThreat"
 
 redisson:
   single-server-config:
@@ -133,6 +134,9 @@ redis:
     actor-allegiance-cache:
       maximumSize: 1000
       value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
-
+    actor-threat-cache:
+      maximumSize: 1000
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+      expire-after-write: 360s
 feature-flags:
   enableUdp: true

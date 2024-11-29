@@ -34,6 +34,13 @@ public class WebsocketClientUpdatesService extends ClientUpdatesService {
                 .subscribe(socketResponseSubscriber);
     }
 
+    public void sendUpdateToListeningMob(SocketResponse message, String mobId) {
+        broadcaster
+                .broadcast(message, sessionIsServerAndListensToMob(mobId))
+                .subscribe(socketResponseSubscriber);
+
+    }
+
     public void sendUpdateToListening(SocketResponse message, String actorId) {
         // this is to send message to both, players and mobs, but excluding self.
         broadcaster

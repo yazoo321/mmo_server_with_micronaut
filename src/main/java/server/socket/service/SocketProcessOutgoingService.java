@@ -13,6 +13,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import server.actionbar.service.ActionbarService;
+import server.combat.service.ActorThreatService;
 import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
 import server.motion.dto.PlayerMotion;
@@ -57,6 +58,9 @@ public class SocketProcessOutgoingService {
 
     @Inject UdpSessionCache sessionCache;
 
+    @Inject
+    ActorThreatService threatService;
+
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
 
     Map<String, Consumer<SocketMessage>> udpFunctionMap;
@@ -96,6 +100,8 @@ public class SocketProcessOutgoingService {
         this.functionMap.put(MessageType.ADD_STAT.getType(), this::handleAddStat);
         this.functionMap.put(MessageType.MOVE_ITEM.getType(), this::handleMoveItem);
         this.functionMap.put(MessageType.RESPAWN_PLAYER.getType(), this::handleRespawnPlayer);
+        this.functionMap.put(MessageType.ADD_THREAT.getType(), this::handleAddThreat);
+        this.functionMap.put(MessageType.RESET_THREAT.type, this::handleResetThreat);
 
         this.udpFunctionMap =
                 new HashMap<>(
@@ -257,6 +263,24 @@ public class SocketProcessOutgoingService {
 
     private void handleUpdateActionBar(SocketMessage socketMessage, WebSocketSession session) {
         actionbarService.updateActionbarItem(socketMessage.getActorActionbar());
+    }
+
+    private void handleAddThreat(SocketMessage socketMessage, WebSocketSession session) {
+        if (!SessionParamHelper.getIsServer(session)) {
+            return;
+        }
+        threatService.addActorThreat(socketMessage.getActorId(), socketMessage.getCustomData(), 100)
+                .doOnError(err -> log.error(err.getMessage()))
+                .subscribe();
+    }
+
+    private void handleResetThreat(SocketMessage socketMessage, WebSocketSession session) {
+        if (!SessionParamHelper.getIsServer(session)) {
+            return;
+        }
+        threatService.resetActorThreat(socketMessage.getActorId())
+                .doOnError(err -> log.error(err.getMessage()))
+                .subscribe();
     }
 
     private void handleCharacterRespawn(SocketMessage socketMessage, WebSocketSession session) {

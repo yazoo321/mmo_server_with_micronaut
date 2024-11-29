@@ -8,12 +8,15 @@ import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
+import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.derived.Dead;
@@ -60,6 +63,9 @@ public class CombatService {
     @Inject
     ActorHostilityService actorHostilityService;
 
+    @Inject
+    ActorThreatService actorThreatService;
+
     Single<Boolean> canEngageCombat(String actorId, String targetId) {
         if (!UUIDHelper.isPlayer(targetId)) {
             // for now if the target is a mob, we can engage
@@ -67,6 +73,14 @@ public class CombatService {
         }
 
         return actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).map(hostility -> hostility < 5);
+    }
+
+    void handleThreat(Map<DamageTypes, Double> damageMap, String actorTakingDamage, String sourceActor) {
+        int totalDamage = damageMap.values().stream()
+                .mapToInt(Double::intValue) // Convert each Double to an int
+                .sum();
+        // in future, threat can be modified. will be controlled in stats
+        actorThreatService.addActorThreat(actorTakingDamage, sourceActor, totalDamage).subscribe();
     }
 
     boolean validatePositionLocation(
@@ -175,11 +189,16 @@ public class CombatService {
 
 
         if (stats.isPlayer()) {
+            if (!killerStats.isPlayer()) {
+                actorThreatService.removeActorThreat(killerStats.getActorId(), List.of(stats.getActorId()))
+                        .delaySubscription(200, TimeUnit.MILLISECONDS).subscribe();
+            }
             statusService.removeAllStatuses(stats.getActorId())
                     .doOnSuccess(status ->
                             statusService.addStatusToActor(status, Set.of(new Dead())))
                     .doOnError(er -> log.error(er.getMessage()))
                     .subscribe();
+
 
         } else {
             mobInstanceService.handleMobDeath(stats);

@@ -27,6 +27,7 @@ public enum SocketResponseType {
     SKILL_ON_CD("SKILL_ON_CD"),
     UPDATE_ACTIONBAR("UPDATE_ACTIONBAR"),
 
+    THREAT_UPDATE("THREAT_UPDATE"),
     FORCE_UPDATE_MOTION("FORCE_UPDATE_MOTION");
 
     public final String type;

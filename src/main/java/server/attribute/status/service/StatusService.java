@@ -36,7 +36,7 @@ public class StatusService {
         }
 
         actorStatus.getActorStatuses().removeAll(removed);
-        statusRepository.updateStatus(actorStatus.getActorId(), actorStatus);
+        statusRepository.updateStatus(actorStatus.getActorId(), actorStatus).subscribe();
 
         ActorStatus update = new ActorStatus(actorStatus.getActorId(), removed, false, actorStatus.aggregateStatusEffects());
         // notify the user about removed statuses

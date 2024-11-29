@@ -18,6 +18,7 @@ import server.attribute.status.model.Status;
 import server.attribute.status.model.derived.Dead;
 import server.attribute.status.service.StatusService;
 import server.attribute.status.types.StatusTypes;
+import server.combat.service.ActorThreatService;
 import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.items.service.ItemService;
@@ -38,6 +39,9 @@ public class MobInstanceService {
     @Inject StatsService statsService;
 
     @Inject StatusService statusService;
+
+    @Inject
+    ActorThreatService actorThreatService;
 
     @Inject
     ItemService itemService;
@@ -87,6 +91,10 @@ public class MobInstanceService {
 
     public void handleMobDeath(Stats mobStats) {
         String mobId = mobStats.getActorId();
+
+        actorThreatService.resetActorThreat(mobId)
+                .delaySubscription(2_000, TimeUnit.MILLISECONDS)
+                .subscribe();
 
         actorMotionRepository.fetchActorMotion(mobId)
                 .doOnError(err -> log.error(err.getMessage()))
