@@ -21,4 +21,5 @@ public class MongoConfiguration {
     private String actorSkills;
     private String actionbar;
     private String actorAllegiance;
+    private String actorThreat;
 }

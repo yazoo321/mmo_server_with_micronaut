@@ -52,3 +52,4 @@ mongo-database:
   actor-status: "actorStatus"
   actor-skills: "actorSkills"
   actionbar: "actionbar"
+  actorThreat: "actorThreat"

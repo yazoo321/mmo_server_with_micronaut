@@ -111,6 +111,20 @@ public class ClientUpdatesService {
         return s -> sessionIsPlayerAndListensToActor(s, playerOrMob);
     }
 
+    Predicate<WebSocketSession> sessionIsServerAndListensToMob(String mobId) {
+        return s -> sessionIsServerAndListensToMob(s, mobId);
+    }
+
+    private boolean sessionIsServerAndListensToMob(WebSocketSession s, String mobId) {
+        if (!SessionParamHelper.getIsServer(s)) {
+            return false;
+        }
+
+        Set<String> actorIds = SessionParamHelper.getTrackingMobs(s);
+
+        return actorIds.contains(mobId);
+    }
+
     private boolean sessionIsPlayerAndListensToActor(WebSocketSession s, String actorId) {
         if (SessionParamHelper.getIsServer(s)) {
             return false;

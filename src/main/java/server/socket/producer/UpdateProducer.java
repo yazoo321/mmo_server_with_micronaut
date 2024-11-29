@@ -6,6 +6,7 @@ import io.micronaut.configuration.kafka.annotation.Topic;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
+import server.combat.model.ThreatUpdate;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.ItemInstanceIds;
 import server.items.model.DroppedItem;
@@ -47,4 +48,7 @@ public interface UpdateProducer {
 
     @Topic("update-actor-status")
     void updateStatus(ActorStatus actorStatus);
+
+    @Topic("update-threat-levels")
+    void updateThreatLevels(ThreatUpdate threatUpdate);
 }

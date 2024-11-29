@@ -13,6 +13,7 @@ import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatRequest;
+import server.combat.model.ThreatUpdate;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
@@ -56,6 +57,8 @@ public class SocketResponse {
     ActorSkills actorSkills;
 
     List<ActorActionbar> actionbarList;
+
+    ThreatUpdate threatUpdate;
 
     public static SocketResponse messageWithType(SocketResponseType type) {
         return SocketResponse.builder().messageType(type.getType()).build();

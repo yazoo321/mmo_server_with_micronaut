@@ -29,6 +29,9 @@ public enum MessageType {
 
     MOVE_ITEM("MOVE_ITEM"),
 
+    ADD_THREAT("ADD_THREAT"),
+    RESET_THREAT("RESET_THREAT"),
+
     RESPAWN_PLAYER("RESPAWN_PLAYER");
 
     public final String type;
