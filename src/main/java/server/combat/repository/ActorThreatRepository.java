@@ -63,20 +63,6 @@ public class ActorThreatRepository {
                 .map(res -> actorThreat);
     }
 
-//    @CachePut(value = ACTOR_THREAT_CACHE, parameters = "actorId")
-//    public Single<ActorThreat> addThreatToActor(String actorId, String targetId, Integer threat) {
-//        Bson filter = Filters.eq("actorId", actorId);
-//        Bson update = Updates.inc("actorThreat." + targetId, threat); // Increment threat
-//        UpdateOptions options = new UpdateOptions().upsert(true);
-//
-//        return Single.fromPublisher(actorThreatCollection.updateOne(filter, update, options))
-//                .map(result -> {
-//
-//
-//
-//                });
-//    }
-
     @CachePut(value = ACTOR_THREAT_CACHE, parameters = "actorId")
     public Single<ActorThreat> addThreatToActor(String actorId, String targetId, Integer threat) {
         // Create filter to find the document
