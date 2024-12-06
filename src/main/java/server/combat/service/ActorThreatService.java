@@ -32,7 +32,7 @@ public class ActorThreatService {
 
     public Single<ActorThreat> addActorThreat(String actorId, String targetId, Integer threat) {
         // TODO: CHANGE ME
-
+        log.info("Adding actor threat: {}", actorId);
         return statusService.getActorStatus(targetId)
                         .flatMap(status -> {
                             if (status.isDead()) {
@@ -65,6 +65,11 @@ public class ActorThreatService {
                         }
                     });
 
+                    if (threatLevels.isEmpty()) {
+                        actorThreatRepository.resetActorThreat(actorId).subscribe();
+                        trackedActorThreat.remove(actorId);
+                    }
+
                     if (removed.isEmpty()) {
                         return Single.just(threatMap); // Return the existing threatMap wrapped in a Single
                     }
@@ -80,6 +85,7 @@ public class ActorThreatService {
     }
 
     public Single<DeleteResult> resetActorThreat(String actorId) {
+        log.info("resetting actor threat: {}", actorId);
         trackedActorThreat.remove(actorId);
         return actorThreatRepository.fetchActorThreat(actorId)
                 .doOnError(err -> log.error(err.getMessage()))
@@ -108,6 +114,10 @@ public class ActorThreatService {
 
     @Scheduled(fixedDelay = "2s")
     void handleThreatDecay() {
+        if (trackedActorThreat.isEmpty()) {
+            return;
+        }
+        log.info("Threat decay for: {}", trackedActorThreat);
         actorThreatRepository.fetchActorThreat(trackedActorThreat)
                 .map(actorThreats -> {
                     actorThreats.forEach(actorThreat -> {

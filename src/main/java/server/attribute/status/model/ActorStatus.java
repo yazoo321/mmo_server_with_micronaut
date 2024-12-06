@@ -30,7 +30,7 @@ public class ActorStatus {
             this.actorStatuses = new HashSet<>();
         }
 
-        log.info("running remove old statuses on: {}", this.actorStatuses);
+//        log.info("running remove old statuses on: {}", this.actorStatuses);
         this.actorStatuses.removeIf(
                 status -> {
                     if (status.getExpiration() != null && status.getExpiration().isBefore(Instant.now())) {

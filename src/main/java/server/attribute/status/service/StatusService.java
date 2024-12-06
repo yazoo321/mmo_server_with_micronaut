@@ -24,7 +24,7 @@ public class StatusService {
     @Inject UpdateProducer updateProducer;
 
     public Single<ActorStatus> getActorStatus(String actorId) {
-        log.info("fetching actor status: {}", actorId);
+//        log.info("fetching actor status: {}", actorId);
         return statusRepository.getActorStatuses(actorId)
                 .map(this::removeExpiredStatuses);
     }

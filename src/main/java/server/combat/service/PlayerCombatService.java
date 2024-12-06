@@ -137,8 +137,6 @@ public class PlayerCombatService extends CombatService {
             // Create a damage map (currently only physical damage)
             Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
 
-            handleThreat(damageMap, target.getActorId(), actorId);
-
             target = statsService.takeDamage(target, damageMap, actorId);
             if (isMainHand) {
                 combatData.setMainHandLastAttack(Instant.now());

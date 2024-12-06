@@ -14,6 +14,8 @@ import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
+import server.combat.service.ActorThreatService;
+import server.common.uuid.UUIDHelper;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
 
@@ -26,6 +28,9 @@ public class StatsService {
     @Inject UpdateProducer updateProducer;
 
     @Inject SessionParamHelper sessionParamHelper;
+
+    @Inject
+    ActorThreatService threatService;
 
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();
@@ -157,6 +162,7 @@ public class StatsService {
 
         updateProducer.updateDamage(damageSource);
 
+        handleThreat(damageMap, stats.getActorId(), sourceActor);
         return stats;
     }
 
@@ -248,5 +254,17 @@ public class StatsService {
     void evaluateDerivedStats(Stats stats) {
         Map<String, Double> updated = stats.recalculateDerivedStats();
         handleDifference(updated, stats);
+    }
+
+    void handleThreat(Map<DamageTypes, Double> damageMap, String actorTakingDamage, String sourceActor) {
+        if (!UUIDHelper.isPlayer(sourceActor)) {
+            return;
+        }
+
+        int totalDamage = damageMap.values().stream()
+                .mapToInt(Double::intValue) // Convert each Double to an int
+                .sum();
+        // in future, threat can be modified. will be controlled in stats
+        threatService.addActorThreat(actorTakingDamage, sourceActor, totalDamage).subscribe();
     }
 }

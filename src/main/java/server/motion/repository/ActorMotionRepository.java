@@ -83,7 +83,7 @@ public class ActorMotionRepository {
     public void syncMotionWithRepo() {
         // we pull motion information from the cache and we update the cache as first resort
         // TODO: Convert to batch process
-        log.info("Running syncMotionWithRepo scheduler");
+//        log.info("Running syncMotionWithRepo scheduler");
         for (String id : syncActorMotion) {
             // fetch from cache:
             fetchActorMotion(id)
@@ -103,7 +103,7 @@ public class ActorMotionRepository {
             playerMotionRepository
                     .updateMotion(actorId, new PlayerMotion(actorId, motion, online, Instant.now()))
                     .doOnError(err -> log.error(err.getMessage()))
-                    .doOnSuccess(done -> log.info("Updated! {}", done))
+//                    .doOnSuccess(done -> log.info("Updated player motion {}", done))
                     .subscribe();
         } else {
             mobRepository

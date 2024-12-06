@@ -75,14 +75,6 @@ public class CombatService {
         return actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).map(hostility -> hostility < 5);
     }
 
-    void handleThreat(Map<DamageTypes, Double> damageMap, String actorTakingDamage, String sourceActor) {
-        int totalDamage = damageMap.values().stream()
-                .mapToInt(Double::intValue) // Convert each Double to an int
-                .sum();
-        // in future, threat can be modified. will be controlled in stats
-        actorThreatService.addActorThreat(actorTakingDamage, sourceActor, totalDamage).subscribe();
-    }
-
     boolean validatePositionLocation(
             CombatData combatData,
             Motion attackerMotion,
