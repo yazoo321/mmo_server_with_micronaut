@@ -32,12 +32,22 @@ public class StatusTestHelper {
 
     public void resetStatuses(List<String> actors) {
         Bson filter = in("actorId", actors);
-        Single.fromPublisher(statusCollection.updateMany(
-                filter,
-                Updates.combine(
-                        Updates.set("actorStatuses", Set.of()),
-                Updates.set("statusEffects",  Set.of())
-        ))).blockingSubscribe();
+        Single.fromPublisher(statusCollection.deleteMany(
+                filter
+                )).blockingSubscribe();
+//        Single.fromPublisher(statusCollection.updateMany(
+//                filter,
+//                Updates.combine(
+//                        Updates.set("actorStatuses", Set.of()),
+//                        Updates.set("statusEffects",  Set.of())
+//                ))).blockingSubscribe();
+//        Bson filter = in("actorId", actors);
+//        Single.fromPublisher(statusCollection.updateMany(
+//                filter,
+//                Updates.combine(
+//                        Updates.set("actorStatuses", Set.of()),
+//                Updates.set("statusEffects",  Set.of())
+//        ))).blockingSubscribe();
     }
 
     private void prepareCollections() {

@@ -3,6 +3,12 @@ package server.skills.available.destruction.nature;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
@@ -10,19 +16,10 @@ import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
-import server.attribute.status.model.derived.Bleeding;
 import server.attribute.status.model.derived.Stunned;
 import server.combat.model.CombatData;
-import server.combat.model.CombatState;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
-
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Serdeable
 @JsonTypeName("Vine grab")
@@ -31,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 public class VineGrab extends ChannelledSkill {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
 
     public VineGrab() {
         super(
@@ -44,7 +40,9 @@ public class VineGrab extends ChannelledSkill {
                 true,
                 1000,
                 500,
-                Map.of(), 0, 0);
+                Map.of(),
+                0,
+                0);
     }
 
     @Override
@@ -55,24 +53,30 @@ public class VineGrab extends ChannelledSkill {
         Single<Stats> singleTargetStats = statsService.getStatsFor(target);
         Single<ActorStatus> singleTargetStatus = statusService.getActorStatus(target);
 
+        Single.zip(
+                        singleActorStats,
+                        singleTargetStats,
+                        singleTargetStatus,
+                        (actorStats, targetStats, targetStatus) -> {
+                            Map<String, Double> actorDerived = actorStats.getDerivedStats();
+                            Double mgcAmp =
+                                    actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
 
-        Single.zip(singleActorStats, singleTargetStats, singleTargetStatus, (actorStats, targetStats, targetStatus) -> {
-            Map<String, Double> actorDerived = actorStats.getDerivedStats();
-            Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
+                            Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
+                            dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
 
-            Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-            dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
+                            Map<DamageTypes, Double> damageMap =
+                                    Map.of(DamageTypes.PHYSICAL, dmgAmt);
 
-            Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.PHYSICAL, dmgAmt);
+                            Stats stats =
+                                    statsService.takeDamage(
+                                            targetStats, damageMap, combatData.getActorId());
 
-            Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());
-
-            checkDeath(stats, combatData.getActorId());
-            applyStunEffect(combatData, targetStatus);
-            return true;
-        }).subscribe();
-
-
+                            checkDeath(stats, combatData.getActorId());
+                            applyStunEffect(combatData, targetStatus);
+                            return true;
+                        })
+                .subscribe();
     }
 
     @Override
@@ -81,7 +85,8 @@ public class VineGrab extends ChannelledSkill {
     }
 
     private void applyStunEffect(CombatData combatData, ActorStatus targetStatus) {
-        Status tangled = new Stunned(Instant.now().plusSeconds((long) 2.0), combatData.getActorId());
+        Status tangled =
+                new Stunned(Instant.now().plusSeconds((long) 2.0), combatData.getActorId());
         statusService.addStatusToActor(targetStatus, Set.of(tangled));
 
         scheduler.schedule(

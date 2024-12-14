@@ -29,8 +29,7 @@ public class StatsService {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    ActorThreatService threatService;
+    @Inject ActorThreatService threatService;
 
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();
@@ -83,7 +82,7 @@ public class StatsService {
                 .putAll(
                         new HashMap<>(
                                 Map.of(
-                                        StatsTypes.CURRENT_HP.getType(), 100.0,
+                                        StatsTypes.CURRENT_HP.getType(), 200.0,
                                         StatsTypes.CURRENT_MP.getType(), 50.0)));
 
         playerStats.recalculateDerivedStats();
@@ -120,20 +119,21 @@ public class StatsService {
 
     public void resetHPAndMP(String actorId, Double hpPercent, Double mpPercent) {
         getStatsFor(actorId)
-                .doOnSuccess(stats -> {
-                    Map<String, Double> updated = stats.recalculateDerivedStats();
+                .doOnSuccess(
+                        stats -> {
+                            Map<String, Double> updated = stats.recalculateDerivedStats();
 
-                    Double updatedHp = stats.getDerived(StatsTypes.MAX_HP) * hpPercent;
-                    Double updatedMp = stats.getDerived(StatsTypes.MAX_MP) * mpPercent;
+                            Double updatedHp = stats.getDerived(StatsTypes.MAX_HP) * hpPercent;
+                            Double updatedMp = stats.getDerived(StatsTypes.MAX_MP) * mpPercent;
 
-                    stats.setDerived(StatsTypes.CURRENT_HP, updatedHp);
-                    stats.setDerived(StatsTypes.CURRENT_MP, updatedMp);
+                            stats.setDerived(StatsTypes.CURRENT_HP, updatedHp);
+                            stats.setDerived(StatsTypes.CURRENT_MP, updatedMp);
 
-                    updated.put(StatsTypes.CURRENT_HP.getType(), updatedHp);
-                    updated.put(StatsTypes.CURRENT_MP.getType(), updatedMp);
+                            updated.put(StatsTypes.CURRENT_HP.getType(), updatedHp);
+                            updated.put(StatsTypes.CURRENT_MP.getType(), updatedMp);
 
-                    handleDifference(updated, stats);
-                })
+                            handleDifference(updated, stats);
+                        })
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
     }
@@ -144,8 +144,7 @@ public class StatsService {
         Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
 
         Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
-        currentHp = Math.min(stats.getDerived(StatsTypes.MAX_HP),
-                currentHp - totalDamage);
+        currentHp = Math.min(stats.getDerived(StatsTypes.MAX_HP), currentHp - totalDamage);
 
         setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
 
@@ -176,6 +175,13 @@ public class StatsService {
     private void setAndHandleDifference(Stats stats, Double val, StatsTypes evalType) {
         stats.getDerivedStats().put(evalType.getType(), val);
         Map<String, Double> updated = Map.of(evalType.getType(), val);
+        handleDifference(updated, stats);
+    }
+
+    public void sumAndHandleDifference(Stats stats, Double val, String evalType) {
+        Double updateVal = stats.getDerivedStats().getOrDefault(evalType, 0.0) + val;
+        stats.getDerivedStats().put(evalType, updateVal);
+        Map<String, Double> updated = Map.of(evalType, updateVal);
         handleDifference(updated, stats);
     }
 
@@ -256,14 +262,16 @@ public class StatsService {
         handleDifference(updated, stats);
     }
 
-    void handleThreat(Map<DamageTypes, Double> damageMap, String actorTakingDamage, String sourceActor) {
+    void handleThreat(
+            Map<DamageTypes, Double> damageMap, String actorTakingDamage, String sourceActor) {
         if (!UUIDHelper.isPlayer(sourceActor)) {
             return;
         }
 
-        int totalDamage = damageMap.values().stream()
-                .mapToInt(Double::intValue) // Convert each Double to an int
-                .sum();
+        int totalDamage =
+                damageMap.values().stream()
+                        .mapToInt(Double::intValue) // Convert each Double to an int
+                        .sum();
         // in future, threat can be modified. will be controlled in stats
         threatService.addActorThreat(actorTakingDamage, sourceActor, totalDamage).subscribe();
     }
