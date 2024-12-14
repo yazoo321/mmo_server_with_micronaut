@@ -18,10 +18,10 @@ import server.attribute.status.types.StatusTypes;
 @NoArgsConstructor
 public class ActorStatus {
 
-    String actorId;
-    Set<Status> actorStatuses;
-    boolean add;
-    Set<String> statusEffects;
+    private String actorId;
+    private Set<Status> actorStatuses;
+    private boolean add;
+    private Set<String> statusEffects;
 
 
     public Set<Status> removeOldStatuses() {
@@ -34,6 +34,8 @@ public class ActorStatus {
         this.actorStatuses.removeIf(
                 status -> {
                     if (status.getExpiration() != null && status.getExpiration().isBefore(Instant.now())) {
+                        long diff = status.getExpiration().toEpochMilli() - Instant.now().toEpochMilli();
+//      Instant.now().toEpochMilli() - actorStatus.getActorStatuses().iterator().next().getExpiration().toEpochMilli()
                         removedStatuses.add(status);
                         return true;
                     } else return false;

@@ -1,24 +1,40 @@
 package server.attribute.status.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import io.reactivex.rxjava3.core.Single;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import server.attribute.stats.model.Stats;
+import server.attribute.stats.service.StatsService;
 import server.attribute.status.model.derived.*;
+import server.attribute.status.service.StatusService;
 
 @Data
-@Serdeable
+@Introspected
+@NoArgsConstructor
+@BsonDiscriminator
 @ReflectiveAccess
+@Serdeable
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "category")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Bleeding.class, name = "BLEEDING"),
+    @JsonSubTypes.Type(value = Burning.class, name = "BURNING"),
     @JsonSubTypes.Type(value = Dead.class, name = "DEAD"),
     @JsonSubTypes.Type(value = Silenced.class, name = "SILENCED"),
     @JsonSubTypes.Type(value = Stunned.class, name = "STUNNED"),
@@ -34,4 +50,47 @@ public class Status {
     Boolean canStack;
     String origin;
     String category;
+
+    @JsonIgnore
+    public boolean requiresDamageApply() {
+        return false;
+    }
+
+    @JsonIgnore
+    public Single<Boolean> apply(
+            String actorId, StatsService statsService, StatusService statusService) {
+        // requires override
+
+        return Single.just(false);
+    }
+
+    @JsonIgnore
+    protected Single<Boolean> baseApply(
+            String actorId,
+            StatsService statsService,
+            StatusService statusService,
+            BiConsumer<StatsService, Stats> applier) {
+        // first check if the status is present
+        Single<ActorStatus> actorStatuses = statusService.getActorStatus(actorId);
+        Single<Stats> actorStats = statsService.getStatsFor(actorId);
+
+        return Single.zip(
+                actorStatuses,
+                actorStats,
+                (statuses, stats) -> {
+                    if (statuses.getActorStatuses() == null || statuses.getActorStatuses().isEmpty()) {
+                        return false;
+                    }
+
+                    boolean found = statuses.getActorStatuses().stream().map(Status::getId)
+                            .collect(Collectors.toSet()).contains(this.getId());
+
+                    if (!found) {
+                        return false;
+                    }
+
+                    applier.accept(statsService, stats);
+                    return true;
+                });
+    }
 }
