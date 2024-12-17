@@ -3,12 +3,17 @@ package server.skills.available.destruction.fire;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.Map;
+import java.util.function.Consumer;
+
+import io.reactivex.rxjava3.core.Single;
 import lombok.EqualsAndHashCode;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
+import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
+import server.skills.model.SkillDependencies;
 import server.skills.model.SkillTarget;
 
 @Serdeable
@@ -32,21 +37,46 @@ public class Fireball extends ChannelledSkill {
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Stats actorStats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
-        Map<String, Double> actorDerived = actorStats.getDerivedStats();
-        Double healAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
+        prepareApply(combatData, skillTarget, applyFireball());
 
-        Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        dmgAmt = dmgAmt * healAmp * (1 + rand.nextDouble(0.15));
 
-        Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.FIRE, dmgAmt);
+    }
 
-        String target = skillTarget.getTargetId();
-        Stats targetStats = statsService.getStatsFor(target).blockingGet();
+    private Consumer<SkillDependencies> applyFireball() {
+        return (data) -> {
+            Stats actorStats = data.getActorStats();
+            Stats targetStats = data.getTargetStats();
+            ActorStatus actorStatus = data.getActorStatus();
+            ActorStatus targetStatus = data.getTargetStatus();
 
-        Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());
+            if (!actorStatus.canCast()) {
 
-        checkDeath(stats, combatData.getActorId());
+            }
+
+            Map<String, Double> actorDerived = actorStats.getDerivedStats();
+            Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
+            Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
+            dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
+
+            Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.FIRE, dmgAmt);
+
+            targetStats = statsService.takeDamage(targetStats, damageMap, actorStats.getActorId());
+
+            checkDeath(targetStats, actorStats.getActorId());
+        };
+    }
+
+    private void prepareApply(CombatData combatData, SkillTarget skillTarget, Consumer<SkillDependencies> skillConsumer) {
+        Single<Stats> actorStatsSingle = statsService.getStatsFor(combatData.getActorId());
+        Single<Stats> targetStatsSingle = statsService.getStatsFor(skillTarget.getTargetId());
+        Single<ActorStatus> actorStatusSingle = statusService.getActorStatus(combatData.getActorId());
+        Single<ActorStatus> targetStatusSingle = statusService.getActorStatus(skillTarget.getTargetId());
+
+        Single.zip(actorStatsSingle, targetStatsSingle, actorStatusSingle, targetStatusSingle,
+                (actorStats, targetStats, actorStatus, targetStatus) -> {
+            skillConsumer.accept(new SkillDependencies(actorStats, targetStats, actorStatus, targetStatus));
+            return true;
+        }).subscribe();
     }
 
     @Override

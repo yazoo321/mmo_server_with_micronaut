@@ -2,7 +2,9 @@ package server.attribute.status.service;
 
 import static org.awaitility.Awaitility.await;
 
+import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 
 import java.io.IOException;
@@ -12,15 +14,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.*;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.stats.types.StatsTypes;
@@ -29,25 +32,55 @@ import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.model.derived.Burning;
 import server.attribute.status.model.derived.Dead;
+import server.session.SessionParamHelper;
+import server.socket.session.FakeSession;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class StatusServiceTest {
 
-    @Inject StatusTestHelper statusTestHelper;
-
-    @Inject StatusService statusService;
-
-    @Inject StatsService statsService;
-
-    private static final String TEST_ACTOR = "actor1";
+    @BeforeAll
+    void reset() {
+        configureRun();
+    }
 
     @BeforeEach
-    void reset() {
+    void resetEach() {
+        configureRun();
+    }
+
+    private void configureRun() {
         statusTestHelper.resetStatuses(List.of(TEST_ACTOR));
         statsService.deleteStatsFor(TEST_ACTOR).blockingSubscribe();
         statsService.initializePlayerStats(TEST_ACTOR).blockingSubscribe();
+
+//        MockitoAnnotations.openMocks(this);
+        // TODO: Fix this mock!
+//        Publisher mockSubscriber = Mockito.mock(Publisher.class);
+//        ConcurrentMap<String, WebSocketSession> testSessionData = new ConcurrentHashMap<>();
+//        testSessionData.put(TEST_ACTOR, session);
+//        Mockito.when(sessionParamHelper.getLiveSessions()).thenReturn(testSessionData);
     }
+
+    @Inject StatusTestHelper statusTestHelper;
+
+    @Inject StatsService statsService;
+
+//    @MockBean(SessionParamHelper.class)
+//    public SessionParamHelper sessionParamHelper() {
+//        return Mockito.mock(SessionParamHelper.class);
+//    }
+//
+//    @Mock
+//    SessionParamHelper sessionParamHelper;
+//
+//    @Mock FakeSession session;
+
+    @Inject
+    StatusService statusService;
+
+    private static final String TEST_ACTOR = "actor1";
+
 
     // Test case class for parameterized testing
     static class TestCase {
@@ -95,7 +128,7 @@ public class StatusServiceTest {
         //        Instant expiration, String sourceId, Double damage
         Instant expiration = Instant.now().plusMillis(950);
         String source = "actor2";
-        Double damage = 40.0;
+        double damage = 40.0;
         Status burning = new Burning(expiration, source, damage);
 
         Stats initialStats = statsService.getStatsFor(TEST_ACTOR).blockingGet();

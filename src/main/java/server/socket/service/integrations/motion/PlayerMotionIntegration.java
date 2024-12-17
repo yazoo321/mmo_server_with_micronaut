@@ -65,7 +65,4 @@ public class PlayerMotionIntegration {
                 .subscribe();
     }
 
-    public void setPlayerOnline() {
-
-    }
 }

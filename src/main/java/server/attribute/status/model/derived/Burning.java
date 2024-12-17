@@ -67,6 +67,7 @@ public class Burning extends Status {
     @Override
     public Single<Boolean> apply(
             String actorId, StatsService statsService, StatusService statusService) {
+        log.info("Burning class applying effect");
         return baseApply(actorId, statsService, statusService, applyBurn());
     }
 

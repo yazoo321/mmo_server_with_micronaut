@@ -30,6 +30,8 @@ import server.socket.service.integrations.items.ItemSocketIntegration;
 import server.socket.service.integrations.motion.PlayerMotionIntegration;
 import server.socket.service.integrations.status.StatusSocketIntegration;
 
+import javax.annotation.PostConstruct;
+
 @Slf4j
 @Singleton
 public class SocketProcessOutgoingService {
@@ -59,6 +61,9 @@ public class SocketProcessOutgoingService {
     @Inject UdpSessionCache sessionCache;
 
     @Inject
+    SessionParamHelper sessionParamHelper;
+
+    @Inject
     ActorThreatService threatService;
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
@@ -69,6 +74,11 @@ public class SocketProcessOutgoingService {
 
     public ConcurrentMap<String, WebSocketSession> getLiveSessions() {
         return actorSessions;
+    }
+
+    @PostConstruct
+    void syncUp() {
+        sessionParamHelper.setLiveSessions(getLiveSessions());
     }
 
     public void removeActorSession(String actorId) {

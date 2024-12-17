@@ -15,6 +15,7 @@ import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.combat.service.ActorThreatService;
+import server.combat.service.CombatService;
 import server.common.uuid.UUIDHelper;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;

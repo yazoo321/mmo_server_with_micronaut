@@ -7,15 +7,10 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import server.combat.model.ActorThreat;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @MicronautTest
 class ActorThreatRepositoryIntegrationTest {

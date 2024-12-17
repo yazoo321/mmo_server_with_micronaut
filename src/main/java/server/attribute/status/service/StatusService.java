@@ -1,6 +1,8 @@
 package server.attribute.status.service;
 
 import com.mongodb.client.result.DeleteResult;
+import io.micronaut.scheduling.annotation.Scheduled;
+import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -16,7 +18,9 @@ import server.attribute.stats.service.StatsService;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.repository.StatusRepository;
+import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
+import server.socket.service.SocketProcessOutgoingService;
 
 @Singleton
 @Slf4j
@@ -28,10 +32,14 @@ public class StatusService {
 
     @Inject StatsService statsService;
 
+    @Inject
+    SessionParamHelper sessionParamHelper;
+
+    ConcurrentSet<String> syncActorStatuses = new ConcurrentSet<>();
+
     public Single<ActorStatus> getActorStatus(String actorId) {
         //        log.info("fetching actor status: {}", actorId);
-        return statusRepository.getActorStatuses(actorId)
-                .map(this::removeExpiredStatuses);
+        return statusRepository.getActorStatuses(actorId);
     }
 
     public ActorStatus removeExpiredStatuses(ActorStatus actorStatus) {
@@ -82,9 +90,7 @@ public class StatusService {
                 .doOnError(err -> log.error(err.getMessage()))
                 .blockingSubscribe();
 
-        // TODO: this could be a thread bottleneck, consider changing for more efficient thread use,
-        // e.g. local queue?
-        statuses.forEach(status -> applyStatusTimedEffect(actorStatus.getActorId(), status));
+//        statuses.forEach(status -> applyStatusTimedEffect(actorStatus.getActorId(), status));
 
         ActorStatus update = new ActorStatus(actorStatus.getActorId(), statuses, true, null);
         update.setStatusEffects(actorStatus.getStatusEffects());
@@ -117,53 +123,83 @@ public class StatusService {
         return statusRepository.deleteActorStatuses(actorId);
     }
 
-    public void initializeStatus(String actorId) {
-        statusRepository
+    public Single<ActorStatus> initializeStatus(String actorId) {
+        return statusRepository
                 .updateStatus(actorId, new ActorStatus(actorId, Set.of(), false, Set.of()))
-                .doOnError(err -> log.error(err.getMessage()))
-                .subscribe();
+                .doOnError(err -> log.error(err.getMessage()));
     }
 
-    private void applyStatusTimedEffect(String actorId, Status status) {
-        Instant expiration = status.getExpiration();
-        boolean requiresApply = status.requiresDamageApply();
+//    private void applyStatusTimedEffect(String actorId, Status status) {
+//        Instant expiration = status.getExpiration();
+//        boolean requiresApply = status.requiresDamageApply();
+//
+//        if (expiration == null || !requiresApply) {
+//            return;
+//        }
+//
+//        // add additional padding for expected delays
+//        long diff = (expiration.toEpochMilli() - Instant.now().toEpochMilli()) + 30;
+//        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+//
+//        // TODO: dynamic timing for status effects, default for MVP, 300ms
+//        ScheduledFuture<?> statusApplier =
+//                scheduler.scheduleAtFixedRate(
+//                        () ->
+//                                status.apply(actorId, statsService, this)
+//                                        .doOnSuccess(
+//                                                res -> {
+//                                                    if (!res) {
+//                                                        scheduler.shutdownNow();
+//                                                    }
+//                                                })
+//                                        .doOnError(
+//                                                err ->
+//                                                        log.error(
+//                                                                "Error applying status effect: {}",
+//                                                                err.getMessage()))
+//                                        .subscribe(),
+//                        0,
+//                        300,
+//                        TimeUnit.MILLISECONDS);
+//
+//        // TODO: not reliable, later we will have status effects which should modify this
+//        ScheduledFuture<?> statusTermination =
+//                scheduler.schedule(
+//                        () -> {
+//                            statusApplier.cancel(true);
+//                        },
+//                        diff,
+//                        TimeUnit.MILLISECONDS);
+//    }
 
-        if (expiration == null || !requiresApply) {
-            return;
-        }
+    @Scheduled(fixedDelay = "300ms")
+    public void processStatusesForActivePlayers() {
 
-        // add additional padding for expected delays
-        long diff = (expiration.toEpochMilli() - Instant.now().toEpochMilli()) + 30;
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        sessionParamHelper.getLiveSessions().forEach((k,v) -> {
+            if (SessionParamHelper.getIsServer(v)) {
+                syncActorStatuses.addAll(SessionParamHelper.getTrackingMobs(v));
+            } else {
+                syncActorStatuses.add(k);
+            }
+        });
+//        syncActorStatuses.addAll(sessionParamHelper.getLiveSessions().keySet());
+//        syncActorStatuses.add("actor1"); // TODO: delete, this is for a test
 
-        // TODO: dynamic timing for status effects, default for MVP, 300ms
-        ScheduledFuture<?> statusApplier =
-                scheduler.scheduleAtFixedRate(
-                        () ->
-                                status.apply(actorId, statsService, this)
-                                        .doOnSuccess(
-                                                res -> {
-                                                    if (!res) {
-                                                        scheduler.shutdownNow();
-                                                    }
-                                                })
-                                        .doOnError(
-                                                err ->
-                                                        log.error(
-                                                                "Error applying status effect: {}",
-                                                                err.getMessage()))
-                                        .subscribe(),
-                        0,
-                        300,
-                        TimeUnit.MILLISECONDS);
+        // due to cache system, more difficult to parallelize
+        // TODO: Try to parallelize this?
+        syncActorStatuses.parallelStream().forEach(actor ->
+                getActorStatus(actor)
+                        .map(this::removeExpiredStatuses)
+                        .doOnError(err -> log.error("Error applying status effects, err: {}", err.getMessage()))
+                        .doOnSuccess(actorStatus -> {
+                            if (actorStatus.getActorStatuses() == null || actorStatus.getActorStatuses().isEmpty()) {
+                            return;
+                        }
+                        // TODO: return single .map of this with one subscribe?
+                        actorStatus.getActorStatuses().parallelStream()
+                                .forEach(status -> status.apply(actor, statsService, this).subscribe());
 
-        // TODO: not reliable, later we will have status effects which should modify this
-        ScheduledFuture<?> statusTermination =
-                scheduler.schedule(
-                        () -> {
-                            statusApplier.cancel(true);
-                        },
-                        diff,
-                        TimeUnit.MILLISECONDS);
+                }).subscribe());
+
     }
 }

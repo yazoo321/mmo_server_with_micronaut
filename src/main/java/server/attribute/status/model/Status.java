@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
@@ -23,6 +24,7 @@ import server.attribute.status.model.derived.*;
 import server.attribute.status.service.StatusService;
 
 @Data
+@Slf4j
 @Introspected
 @NoArgsConstructor
 @BsonDiscriminator
@@ -79,6 +81,7 @@ public class Status {
                 actorStats,
                 (statuses, stats) -> {
                     if (statuses.getActorStatuses() == null || statuses.getActorStatuses().isEmpty()) {
+                        log.info("actor statuses are null or empty, base apply skipping on {}", this.getCategory());
                         return false;
                     }
 
@@ -86,6 +89,7 @@ public class Status {
                             .collect(Collectors.toSet()).contains(this.getId());
 
                     if (!found) {
+                        log.info("status missing from actor statuses, base apply skipping on {}", this.getCategory());
                         return false;
                     }
 
