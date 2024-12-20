@@ -6,16 +6,14 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
+import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
-import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.combat.service.ActorThreatService;
-import server.combat.service.CombatService;
 import server.common.uuid.UUIDHelper;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
@@ -98,7 +96,8 @@ public class StatsService {
     }
 
     public Single<Stats> getStatsFor(String actorId) {
-        return repository.fetchActorStats(actorId);
+        return repository.fetchActorStats(actorId)
+                .doOnError(err -> log.error("Failed to get stats for {}, {}", actorId, err.getMessage()));
     }
 
     public Single<DeleteResult> deleteStatsFor(String actorId) {
@@ -139,30 +138,32 @@ public class StatsService {
                 .subscribe();
     }
 
-    public Stats takeDamage(Stats stats, Map<DamageTypes, Double> damageMap, String sourceActor) {
+    public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
         // TODO: send stat update once, send map of damage
-
+        // TODO: process damage reduction from sourceStats
         Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
 
         Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
         currentHp = Math.min(stats.getDerived(StatsTypes.MAX_HP), currentHp - totalDamage);
 
         setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
-
-        Map<String, Double> damageMapString =
-                damageMap.entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey().getType(), Map.Entry::getValue));
+//
+//        Map<String, Double> damageMapString =
+//                damageMap.entrySet().stream()
+//                        .collect(Collectors.toMap(e -> e.getKey().getType(), Map.Entry::getValue));
 
         DamageSource damageSource =
                 DamageSource.builder()
-                        .damageMap(damageMapString)
+                        .damageMap(damageMap)
                         .actorId(stats.getActorId())
-                        .sourceActorId(sourceActor)
+                        .sourceActorId(sourceStats.getActorId())
                         .build();
 
-        updateProducer.updateDamage(damageSource);
+        log.info("Updating damage, {}, {}, {}", damageSource, stats, sourceStats);
 
-        handleThreat(damageMap, stats.getActorId(), sourceActor);
+        updateProducer.updateDamage(new DamageUpdateMessage(damageSource, stats, sourceStats));
+
+        handleThreat(damageMap, stats.getActorId(), sourceStats.getActorId());
         return stats;
     }
 
@@ -264,7 +265,7 @@ public class StatsService {
     }
 
     void handleThreat(
-            Map<DamageTypes, Double> damageMap, String actorTakingDamage, String sourceActor) {
+            Map<String, Double> damageMap, String actorTakingDamage, String sourceActor) {
         if (!UUIDHelper.isPlayer(sourceActor)) {
             return;
         }

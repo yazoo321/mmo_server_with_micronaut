@@ -21,7 +21,7 @@ import server.common.configuration.MongoConfiguration;
 
 @Slf4j
 @Singleton
-@CacheConfig("actor-stats-cache,actor-aggregated-statuses,actor-aggregated-derived")
+@CacheConfig("actor-status-cache,actor-aggregated-statuses,actor-aggregated-derived")
 public class StatusRepository {
 
     MongoConfiguration configuration;
@@ -52,7 +52,7 @@ public class StatusRepository {
     }
 
     @CacheInvalidate(
-            value = {ACTOR_AGGREGATED_STATUSES, ACTOR_STATUS_CACHE, ACTOR_STATUS_CACHE},
+            value = {ACTOR_STATUS_CACHE, ACTOR_STATUS_CACHE, ACTOR_AGGREGATED_STATUSES},
             parameters = {"actorId"},
             async = true)
     //    TODO: merge parameter for actorStatus for cache
@@ -78,7 +78,7 @@ public class StatusRepository {
     }
 
     @CacheInvalidate(
-            value = {ACTOR_STATUS_CACHE, ACTOR_AGGREGATED_STATUSES, ACTOR_AGGREGATED_DERIVED},
+            value = {ACTOR_STATUS_CACHE, ACTOR_STATUS_CACHE, ACTOR_AGGREGATED_STATUSES},
             parameters = {"actorId"},
             async = true)
     public Single<DeleteResult> deleteActorStatuses(String actorId) {

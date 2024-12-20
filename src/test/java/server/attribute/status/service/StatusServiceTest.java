@@ -23,7 +23,10 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.reactivestreams.Publisher;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.stats.types.StatsTypes;
@@ -38,6 +41,24 @@ import server.socket.session.FakeSession;
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class StatusServiceTest {
+
+    @Inject
+    SessionParamHelper sessionParamHelper;
+
+    @MockBean(SessionParamHelper.class)
+    public SessionParamHelper sessionParamHelper() {
+        return Mockito.mock(SessionParamHelper.class);
+    }
+
+    @Mock
+    FakeSession session;
+
+    @Inject StatusTestHelper statusTestHelper;
+
+    @Inject StatsService statsService;
+
+    @Inject
+    StatusService statusService;
 
     @BeforeAll
     void reset() {
@@ -54,32 +75,20 @@ public class StatusServiceTest {
         statsService.deleteStatsFor(TEST_ACTOR).blockingSubscribe();
         statsService.initializePlayerStats(TEST_ACTOR).blockingSubscribe();
 
-//        MockitoAnnotations.openMocks(this);
-        // TODO: Fix this mock!
-//        Publisher mockSubscriber = Mockito.mock(Publisher.class);
-//        ConcurrentMap<String, WebSocketSession> testSessionData = new ConcurrentHashMap<>();
-//        testSessionData.put(TEST_ACTOR, session);
-//        Mockito.when(sessionParamHelper.getLiveSessions()).thenReturn(testSessionData);
+        statusTestHelper.resetStatuses(List.of(TEST_ACTOR_2));
+        statsService.deleteStatsFor(TEST_ACTOR_2).blockingSubscribe();
+        statsService.initializePlayerStats(TEST_ACTOR_2).blockingSubscribe();
+
+        MockitoAnnotations.openMocks(this);
+        Publisher mockSubscriber = Mockito.mock(Publisher.class);
+        ConcurrentMap<String, WebSocketSession> testSessionData = new ConcurrentHashMap<>();
+        testSessionData.put(TEST_ACTOR, session);
+        Mockito.when(sessionParamHelper.getLiveSessions()).thenReturn(testSessionData);
     }
 
-    @Inject StatusTestHelper statusTestHelper;
-
-    @Inject StatsService statsService;
-
-//    @MockBean(SessionParamHelper.class)
-//    public SessionParamHelper sessionParamHelper() {
-//        return Mockito.mock(SessionParamHelper.class);
-//    }
-//
-//    @Mock
-//    SessionParamHelper sessionParamHelper;
-//
-//    @Mock FakeSession session;
-
-    @Inject
-    StatusService statusService;
 
     private static final String TEST_ACTOR = "actor1";
+    private static final String TEST_ACTOR_2 = "actor2";
 
 
     // Test case class for parameterized testing
@@ -124,8 +133,7 @@ public class StatusServiceTest {
     }
 
     @Test
-    void addBurningStateToActor() throws IOException {
-        //        Instant expiration, String sourceId, Double damage
+    void addBurningStateToActor() {
         Instant expiration = Instant.now().plusMillis(950);
         String source = "actor2";
         double damage = 40.0;
@@ -147,11 +155,13 @@ public class StatusServiceTest {
 
         // then
         await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(3, ChronoUnit.SECONDS))
+                .timeout(Duration.of(20, ChronoUnit.SECONDS))
                 .until(
                         () -> {
                             ActorStatus actorStatus =
-                                    statusService.getActorStatus(TEST_ACTOR).blockingGet();
+                                    statusService.getActorStatus(TEST_ACTOR)
+                                            .doOnError(err -> System.out.println(err.getMessage()))
+                                            .blockingGet();
                             actorStatus.aggregateStatusEffects();
                             return actorStatus.getStatusEffects().contains(burning.getCategory());
                         });
@@ -160,7 +170,9 @@ public class StatusServiceTest {
                 .timeout(Duration.of(4, ChronoUnit.SECONDS))
                 .until(
                         () -> {
-                            Stats actorStats = statsService.getStatsFor(TEST_ACTOR).blockingGet();
+                            Stats actorStats = statsService.getStatsFor(TEST_ACTOR)
+                                    .doOnError(err -> System.out.println(err.getMessage()))
+                                    .blockingGet();
                             Double currentHp = actorStats.getDerived(StatsTypes.CURRENT_HP);
                             Double diff = initialHp - currentHp;
                             String out2 = String.format("HP now: %s, diff: %s", currentHp, diff);

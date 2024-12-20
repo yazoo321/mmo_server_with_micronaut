@@ -37,6 +37,7 @@ public class PlayerMotionUpdateListener {
         statusService.getActorStatus(playerMotion.getActorId())
                 .doOnSuccess(actorStatus -> {
                     if (!actorStatus.canMove()) {
+
                         log.warn("Actor tried to move whilst dead, {}", playerMotion.getActorId());
                         return;
                     }

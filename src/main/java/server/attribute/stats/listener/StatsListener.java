@@ -7,21 +7,26 @@ import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
+import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
+import server.attribute.stats.service.StatsService;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "mmo-server",
+        groupId = "stats-listener",
         offsetReset = OffsetReset.EARLIEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "stats_client")
+        clientId = "stats-listener")
 public class StatsListener {
 
     @Inject
     WebsocketClientUpdatesService clientUpdatesService;
+
+    @Inject
+    StatsService statsService;
 
     @Topic("update-actor-stats")
     public void receiveUpdatePlayerAttributes(Stats stats) {
@@ -34,15 +39,24 @@ public class StatsListener {
         clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, stats.getActorId());
     }
 
-    @Topic("damage-updates")
-    public void receiveDamageUpdates(DamageSource damageSource) {
+    @Topic("processed-damage-updates")
+    public void receiveDamageUpdates(DamageUpdateMessage damageUpdateMessage) {
+        log.info("Received processed-damage-updates message: {}", damageUpdateMessage);
         SocketResponse socketResponse =
                 SocketResponse.builder()
                         .messageType(SocketResponseType.DAMAGE_UPDATE.getType())
-                        .damageSource(damageSource)
+                        .damageSource(damageUpdateMessage.getDamageSource())
                         .build();
 
         clientUpdatesService.sendUpdateToListeningIncludingSelf(
-                socketResponse, damageSource.getActorId());
+                socketResponse, damageUpdateMessage.getOriginStats().getActorId());
     }
+
+    @Topic("request-take-damage")
+    public void requestTakeDamage(DamageUpdateMessage damageUpdateMessage) {
+        log.info("request to take damage received! {}", damageUpdateMessage);
+        statsService.takeDamage(damageUpdateMessage.getTargetStats(),
+                damageUpdateMessage.getDamageSource().getDamageMap(), damageUpdateMessage.getOriginStats());
+    }
+
 }

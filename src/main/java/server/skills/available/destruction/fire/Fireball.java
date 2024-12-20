@@ -38,8 +38,6 @@ public class Fireball extends ChannelledSkill {
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
         prepareApply(combatData, skillTarget, applyFireball());
-
-
     }
 
     private Consumer<SkillDependencies> applyFireball() {
@@ -58,11 +56,10 @@ public class Fireball extends ChannelledSkill {
             Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
             dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
 
-            Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.FIRE, dmgAmt);
+            Map<String, Double> damageMap = Map.of(DamageTypes.FIRE.getType(), dmgAmt);
 
-            targetStats = statsService.takeDamage(targetStats, damageMap, actorStats.getActorId());
+            targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
 
-            checkDeath(targetStats, actorStats.getActorId());
         };
     }
 

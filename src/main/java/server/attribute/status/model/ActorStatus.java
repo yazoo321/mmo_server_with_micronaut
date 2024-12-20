@@ -90,13 +90,13 @@ public class ActorStatus {
 
     public boolean canMove() {
         aggregateStatusEffects();
-        return this.statusEffects.contains(CANNOT_ACT.getType()) ||
-                this.statusEffects.contains(CANNOT_MOVE.getType());
+        return !(this.statusEffects.contains(CANNOT_ACT.getType()) ||
+                this.statusEffects.contains(CANNOT_MOVE.getType()));
     }
 
     public boolean canCast() {
         aggregateStatusEffects();
-        return this.statusEffects.contains(CANNOT_ACT.getType()) ||
-                this.statusEffects.contains(CANNOT_CAST.getType());
+        return !(this.statusEffects.contains(CANNOT_ACT.getType()) ||
+                this.statusEffects.contains(CANNOT_CAST.getType()));
     }
 }

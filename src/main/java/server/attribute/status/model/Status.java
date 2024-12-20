@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -21,7 +22,9 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.model.derived.*;
+import server.attribute.status.producer.StatusProducer;
 import server.attribute.status.service.StatusService;
+import server.skills.model.SkillDependencies;
 
 @Data
 @Slf4j
@@ -54,13 +57,16 @@ public class Status {
     String category;
 
     @JsonIgnore
+    protected StatusProducer statusProducer;
+
+    @JsonIgnore
     public boolean requiresDamageApply() {
         return false;
     }
 
     @JsonIgnore
     public Single<Boolean> apply(
-            String actorId, StatsService statsService, StatusService statusService) {
+            String actorId, StatsService statsService, StatusService statusService, StatusProducer statusProducer) {
         // requires override
 
         return Single.just(false);
@@ -71,15 +77,19 @@ public class Status {
             String actorId,
             StatsService statsService,
             StatusService statusService,
-            BiConsumer<StatsService, Stats> applier) {
+            Consumer<SkillDependencies> applier,
+            StatusProducer statusProducer) {
         // first check if the status is present
         Single<ActorStatus> actorStatuses = statusService.getActorStatus(actorId);
-        Single<Stats> actorStats = statsService.getStatsFor(actorId);
+        Single<Stats> targetStatsSingle = statsService.getStatsFor(actorId);
+        Single<Stats> originStatsSingle = statsService.getStatsFor(this.getOrigin());
+        this.statusProducer = statusProducer;
 
         return Single.zip(
                 actorStatuses,
-                actorStats,
-                (statuses, stats) -> {
+                targetStatsSingle,
+                originStatsSingle,
+                (statuses, targetStats, originStats) -> {
                     if (statuses.getActorStatuses() == null || statuses.getActorStatuses().isEmpty()) {
                         log.info("actor statuses are null or empty, base apply skipping on {}", this.getCategory());
                         return false;
@@ -93,7 +103,8 @@ public class Status {
                         return false;
                     }
 
-                    applier.accept(statsService, stats);
+                    applier.accept(new SkillDependencies(originStats, targetStats, null, statuses));
+
                     return true;
                 });
     }

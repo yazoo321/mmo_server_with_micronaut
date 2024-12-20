@@ -73,6 +73,7 @@ public class PlayerCharacterService {
         try {
             statsService.initializePlayerStats(newCharacter.getName()).blockingSubscribe();
             statusService.initializeStatus(newCharacter.getName()).blockingSubscribe();
+            log.info("status for actor initialized");
             // call relevant services to initialise data
             inventoryService
                     .createInventoryForNewCharacter(newCharacter.getName())
@@ -109,7 +110,9 @@ public class PlayerCharacterService {
         playerMotionService.deletePlayerMotion(actorId).blockingSubscribe();
         playerCharacterRepository.deleteByActorId(actorId);
         statsService.deleteStatsFor(actorId).blockingSubscribe();
+        log.info("Deleting actor statuses: {}", actorId);
         statusService.deleteActorStatus(actorId).blockingSubscribe();
+        log.info("actor statuses deleted");
         actionbarService.deleteActorActionbar(actorId).blockingSubscribe();
         equipItemService.deleteCharacterEquippedItems(actorId).blockingSubscribe();
     }

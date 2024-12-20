@@ -11,12 +11,10 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DamageSource {
+public class DamageUpdateMessage {
 
-    private String actorId;
-    private String sourceActorId;
-    private String sourceSkillId;
-    private String sourceStatusId;
-    Map<String, Double> damageMap;
+    private DamageSource damageSource;
+    private Stats targetStats;
+    private Stats originStats;
 
 }

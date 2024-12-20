@@ -65,14 +65,11 @@ public class VineGrab extends ChannelledSkill {
                             Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
                             dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
 
-                            Map<DamageTypes, Double> damageMap =
-                                    Map.of(DamageTypes.PHYSICAL, dmgAmt);
+                            Map<String, Double> damageMap =
+                                    Map.of(DamageTypes.PHYSICAL.getType(), dmgAmt);
 
-                            Stats stats =
-                                    statsService.takeDamage(
-                                            targetStats, damageMap, combatData.getActorId());
+                            targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
 
-                            checkDeath(stats, combatData.getActorId());
                             applyStunEffect(combatData, targetStatus);
                             return true;
                         })

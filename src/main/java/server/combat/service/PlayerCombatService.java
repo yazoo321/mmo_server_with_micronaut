@@ -135,9 +135,9 @@ public class PlayerCombatService extends CombatService {
             combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", false);
 
             // Create a damage map (currently only physical damage)
-            Map<DamageTypes, Double> damageMap = calculateDamageMap(weapon, derivedStats);
+            Map<String, Double> damageMap = calculateDamageMap(weapon, derivedStats);
 
-            target = statsService.takeDamage(target, damageMap, actorId);
+            target = statsService.takeDamage(target, damageMap, actorStats);
             if (isMainHand) {
                 combatData.setMainHandLastAttack(Instant.now());
             } else {
@@ -145,7 +145,7 @@ public class PlayerCombatService extends CombatService {
             }
 
             if (target.getDerived(StatsTypes.CURRENT_HP) <= 0.0) {
-                handleActorDeath(target, actorStats);
+//                handleActorDeath(target, actorStats);
                 combatData.getTargets().remove(target.getActorId());
             }
 
@@ -214,7 +214,7 @@ public class PlayerCombatService extends CombatService {
         return validAttackStates.contains(state);
     }
 
-    private Map<DamageTypes, Double> calculateDamageMap(
+    private Map<String, Double> calculateDamageMap(
             EquippedItems weapon, Map<String, Double> derivedStats) {
         // Calculate damage based on weapon and stats
         Map<String, Double> itemEffects = weapon.getItemInstance().getItem().getItemEffects();
@@ -224,7 +224,7 @@ public class PlayerCombatService extends CombatService {
         double totalDamage = Math.floor(damage * amp * (1 + rand.nextDouble(0.15)));
 
         // Create a damage map (currently only physical damage)
-        return Map.of(DamageTypes.PHYSICAL, totalDamage);
+        return Map.of(DamageTypes.PHYSICAL.getType(), totalDamage);
     }
 
     private Double getAttackTimeDelay(Double baseAttackSpeed, Double characterAttackSpeed) {

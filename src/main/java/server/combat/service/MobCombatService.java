@@ -95,8 +95,8 @@ public class MobCombatService extends CombatService {
             combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", false);
 
             // Create a damage map (currently only physical damage)
-            Map<DamageTypes, Double> damageMap = calculateDamageMap(derivedStats);
-            target = statsService.takeDamage(target, damageMap, actorId);
+            Map<String, Double> damageMap = calculateDamageMap(derivedStats);
+            target = statsService.takeDamage(target, damageMap, actorStats);
             if (isMainHand) {
                 combatData.setMainHandLastAttack(Instant.now());
             } else {
@@ -168,13 +168,13 @@ public class MobCombatService extends CombatService {
         requestSessionsToSwingWeapon(null, actorId);
     }
 
-    private Map<DamageTypes, Double> calculateDamageMap(Map<String, Double> derivedStats) {
+    private Map<String, Double> calculateDamageMap(Map<String, Double> derivedStats) {
         double damage = derivedStats.get(WEAPON_DAMAGE.getType());
         double amp = derivedStats.get(PHY_AMP.getType());
         double totalDamage = damage * amp * (1 + rand.nextDouble(0.15));
 
         // Create a damage map (currently only physical damage)
-        return Map.of(DamageTypes.PHYSICAL, totalDamage);
+        return Map.of(DamageTypes.PHYSICAL.getType(), totalDamage);
     }
 
     private Double getAttackTimeDelay(Double baseAttackSpeed, Double characterAttackSpeed) {
