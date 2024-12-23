@@ -80,10 +80,10 @@ public class StatusServiceTest {
         statsService.initializePlayerStats(TEST_ACTOR_2).blockingSubscribe();
 
         MockitoAnnotations.openMocks(this);
-        Publisher mockSubscriber = Mockito.mock(Publisher.class);
-        ConcurrentMap<String, WebSocketSession> testSessionData = new ConcurrentHashMap<>();
-        testSessionData.put(TEST_ACTOR, session);
-        Mockito.when(sessionParamHelper.getLiveSessions()).thenReturn(testSessionData);
+//        Publisher mockSubscriber = Mockito.mock(Publisher.class);
+//        ConcurrentMap<String, WebSocketSession> testSessionData = new ConcurrentHashMap<>();
+//        testSessionData.put(TEST_ACTOR, session);
+//        Mockito.when(sessionParamHelper.getLiveSessions()).thenReturn(testSessionData);
     }
 
 
@@ -134,7 +134,7 @@ public class StatusServiceTest {
 
     @Test
     void addBurningStateToActor() {
-        Instant expiration = Instant.now().plusMillis(950);
+        Instant expiration = Instant.now().plusMillis(2000);
         String source = "actor2";
         double damage = 40.0;
         Status burning = new Burning(expiration, source, damage);
@@ -153,9 +153,14 @@ public class StatusServiceTest {
         // when
         statusService.addStatusToActor(initialStatus, Set.of(burning));
 
+//        Publisher mockSubscriber = Mockito.mock(Publisher.class);
+        ConcurrentMap<String, WebSocketSession> testSessionData = new ConcurrentHashMap<>();
+        testSessionData.put(TEST_ACTOR, session);
+        Mockito.when(sessionParamHelper.getLiveSessions()).thenReturn(testSessionData);
+
         // then
-        await().pollDelay(300, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(20, ChronoUnit.SECONDS))
+        await().ignoreExceptions().pollDelay(100, TimeUnit.MILLISECONDS)
+                .timeout(Duration.of(3, ChronoUnit.SECONDS))
                 .until(
                         () -> {
                             ActorStatus actorStatus =
@@ -166,8 +171,10 @@ public class StatusServiceTest {
                             return actorStatus.getStatusEffects().contains(burning.getCategory());
                         });
 
-        await().pollDelay(200, TimeUnit.MILLISECONDS)
-                .timeout(Duration.of(4, ChronoUnit.SECONDS))
+        System.out.println("Burning status detected, checking damage");
+
+        await().pollDelay(200, TimeUnit.MILLISECONDS).ignoreExceptions()
+                .timeout(Duration.of(3, ChronoUnit.SECONDS))
                 .until(
                         () -> {
                             Stats actorStats = statsService.getStatsFor(TEST_ACTOR)

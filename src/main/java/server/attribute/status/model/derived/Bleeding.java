@@ -59,9 +59,7 @@ public class Bleeding extends Status {
                 damageSource.setSourceActorId(dependencies.getActorStats().getActorId());
                 damageSource.setSourceStatusId(this.getId());
 
-                this.statusProducer.requestTakeDamage(
-                        new DamageUpdateMessage(
-                                damageSource, dependencies.getTargetStats(), dependencies.getActorStats()));
+                this.statusProducer.requestTakeDamage(damageSource);
 
             } catch (Exception e) {
                 log.error("Error applying bleed effect, check the value maps");
@@ -72,7 +70,7 @@ public class Bleeding extends Status {
 
     @Override
     public Single<Boolean> apply(
-            String actorId, StatsService statsService, StatusService statusService, StatusProducer statusProducer) {
-        return baseApply(actorId, statsService, statusService, applyBleed(), statusProducer);
+            String actorId, StatusService statusService, StatusProducer statusProducer) {
+        return baseApply(actorId, statusService, applyBleed(), statusProducer);
     }
 }

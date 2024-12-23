@@ -37,7 +37,6 @@ public class PlayerMotionUpdateListener {
         statusService.getActorStatus(playerMotion.getActorId())
                 .doOnSuccess(actorStatus -> {
                     if (!actorStatus.canMove()) {
-
                         log.warn("Actor tried to move whilst dead, {}", playerMotion.getActorId());
                         return;
                     }
@@ -46,7 +45,7 @@ public class PlayerMotionUpdateListener {
                             playerMotion.getActorId(), playerMotion.getMotion());
                     playerMotionService.relayPlayerMotion(playerMotion);
                 })
-                .doOnError(err -> log.error(err.getMessage()))
+                .doOnError(err -> log.error("Error processing player motion update: {}", err.getMessage()))
                 .subscribe();
 
     }

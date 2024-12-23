@@ -138,6 +138,15 @@ public class StatsService {
                 .subscribe();
     }
 
+    public void takeDamage(String actorId, Map<String, Double> damageMap, String sourceActorId) {
+        Single<Stats> targetActor = getStatsFor(actorId);
+        Single<Stats> sourceActor = getStatsFor(sourceActorId);
+
+        Single.zip(targetActor, sourceActor, (targetStats, sourceStats) -> {
+            return takeDamage(targetStats, damageMap, sourceStats);
+        }).subscribe();
+    }
+
     public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
         // TODO: send stat update once, send map of damage
         // TODO: process damage reduction from sourceStats
@@ -275,6 +284,10 @@ public class StatsService {
                         .mapToInt(Double::intValue) // Convert each Double to an int
                         .sum();
         // in future, threat can be modified. will be controlled in stats
-        threatService.addActorThreat(actorTakingDamage, sourceActor, totalDamage).subscribe();
+        threatService.addActorThreat(actorTakingDamage, sourceActor, totalDamage)
+                .doOnError(err -> log.error("Failed to handle threat updates on stats updates, {}", err.getMessage()))
+                .onErrorComplete()
+                .subscribe();
+
     }
 }

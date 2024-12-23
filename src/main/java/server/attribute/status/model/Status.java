@@ -66,7 +66,7 @@ public class Status {
 
     @JsonIgnore
     public Single<Boolean> apply(
-            String actorId, StatsService statsService, StatusService statusService, StatusProducer statusProducer) {
+            String actorId, StatusService statusService, StatusProducer statusProducer) {
         // requires override
 
         return Single.just(false);
@@ -75,21 +75,16 @@ public class Status {
     @JsonIgnore
     protected Single<Boolean> baseApply(
             String actorId,
-            StatsService statsService,
             StatusService statusService,
             Consumer<SkillDependencies> applier,
             StatusProducer statusProducer) {
         // first check if the status is present
         Single<ActorStatus> actorStatuses = statusService.getActorStatus(actorId);
-        Single<Stats> targetStatsSingle = statsService.getStatsFor(actorId);
-        Single<Stats> originStatsSingle = statsService.getStatsFor(this.getOrigin());
         this.statusProducer = statusProducer;
 
-        return Single.zip(
-                actorStatuses,
-                targetStatsSingle,
-                originStatsSingle,
-                (statuses, targetStats, originStats) -> {
+        return actorStatuses
+                .doOnError(err -> log.error("Failed to get actor statuses in apply: {}", err.getMessage()))
+                .map(statuses -> {
                     if (statuses.getActorStatuses() == null || statuses.getActorStatuses().isEmpty()) {
                         log.info("actor statuses are null or empty, base apply skipping on {}", this.getCategory());
                         return false;
@@ -103,9 +98,34 @@ public class Status {
                         return false;
                     }
 
-                    applier.accept(new SkillDependencies(originStats, targetStats, null, statuses));
+                    applier.accept(SkillDependencies.builder()
+                                    .actorId(actorId)
+                                    .targetActorId(this.getOrigin())
+                            .build());
 
                     return true;
+
                 });
+
+//        return Single.zip(
+//                actorStatuses,
+//                (statuses, targetStats, originStats) -> {
+//                    if (statuses.getActorStatuses() == null || statuses.getActorStatuses().isEmpty()) {
+//                        log.info("actor statuses are null or empty, base apply skipping on {}", this.getCategory());
+//                        return false;
+//                    }
+//
+//                    boolean found = statuses.getActorStatuses().stream().map(Status::getId)
+//                            .collect(Collectors.toSet()).contains(this.getId());
+//
+//                    if (!found) {
+//                        log.info("status missing from actor statuses, base apply skipping on {}", this.getCategory());
+//                        return false;
+//                    }
+//
+//                    applier.accept(new SkillDependencies(originStats, targetStats, null, statuses));
+//
+//                    return true;
+//                });
     }
 }

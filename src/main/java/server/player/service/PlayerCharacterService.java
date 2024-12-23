@@ -73,7 +73,7 @@ public class PlayerCharacterService {
         try {
             statsService.initializePlayerStats(newCharacter.getName()).blockingSubscribe();
             statusService.initializeStatus(newCharacter.getName()).blockingSubscribe();
-            log.info("status for actor initialized");
+            log.info("status for actor initialized: {}", createCharacterRequest.getName());
             // call relevant services to initialise data
             inventoryService
                     .createInventoryForNewCharacter(newCharacter.getName())

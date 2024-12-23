@@ -176,7 +176,7 @@ public class SocketProcessOutgoingService {
             }
         }
 
-//        log.info("sending player motion update");
+        log.info("sending player motion update");
         updateProducer.sendPlayerMotionUpdate(message.getPlayerMotion());
     }
 
@@ -280,7 +280,8 @@ public class SocketProcessOutgoingService {
             return;
         }
         threatService.addActorThreat(socketMessage.getActorId(), socketMessage.getCustomData(), 100)
-                .doOnError(err -> log.error(err.getMessage()))
+                .doOnError(err -> log.error("Failed to add threat in socket process outgoing service, {}",
+                        err.getMessage()))
                 .subscribe();
     }
 

@@ -48,7 +48,8 @@ public class StatusRepository {
             value = ACTOR_STATUS_CACHE,
             parameters = {"actorId"})
     public Single<ActorStatus> getActorStatuses(String actorId) {
-        return Single.fromPublisher(actorStatusCollection.find(eq("actorId", actorId)));
+        return Single.fromPublisher(actorStatusCollection.find(eq("actorId", actorId)))
+                .doOnError(err -> log.error("Failed to fetch actor statuses, {}", err.getMessage()));
     }
 
     @CacheInvalidate(
@@ -57,6 +58,7 @@ public class StatusRepository {
             async = true)
     //    TODO: merge parameter for actorStatus for cache
     public Single<ActorStatus> updateStatus(String actorId, ActorStatus actorStatus) {
+        log.info("Updating actor statuses for: {}, {}", actorId, actorStatus);
         Bson filter = Filters.eq("actorId", actorStatus.getActorId());
         ReplaceOptions options = new ReplaceOptions().upsert(true);
         return Single.fromPublisher(actorStatusCollection.replaceOne(filter, actorStatus, options))
@@ -83,6 +85,7 @@ public class StatusRepository {
             async = true)
     public Single<DeleteResult> deleteActorStatuses(String actorId) {
         // TODO: should be deleteOne, but sometimes tests flake
+        log.info("Deleting actor statuses: {}", actorId);
         return Single.fromPublisher(actorStatusCollection.deleteMany(eq("actorId", actorId)));
     }
 }

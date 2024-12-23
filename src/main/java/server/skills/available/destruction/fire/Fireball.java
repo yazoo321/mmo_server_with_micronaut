@@ -71,7 +71,12 @@ public class Fireball extends ChannelledSkill {
 
         Single.zip(actorStatsSingle, targetStatsSingle, actorStatusSingle, targetStatusSingle,
                 (actorStats, targetStats, actorStatus, targetStatus) -> {
-            skillConsumer.accept(new SkillDependencies(actorStats, targetStats, actorStatus, targetStatus));
+            SkillDependencies dependencies = SkillDependencies.builder()
+                    .actorStats(actorStats)
+                            .targetStats(targetStats)
+                                    .actorStatus(actorStatus)
+                                            .targetStatus(targetStatus).build();
+            skillConsumer.accept(dependencies);
             return true;
         }).subscribe();
     }

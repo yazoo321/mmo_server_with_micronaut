@@ -6,6 +6,8 @@ import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +49,8 @@ public class StatusService {
             return actorStatus;
         }
 
+        log.info("current timestamp: {}", Instant.now());
+        log.info("Removing old statuses: {}", removed);
         actorStatus.getActorStatuses().removeAll(removed);
         statusRepository.updateStatus(actorStatus.getActorId(), actorStatus).subscribe();
 
@@ -130,7 +134,13 @@ public class StatusService {
 
     @Scheduled(fixedDelay = "300ms")
     public void processStatusesForActivePlayers() {
+        if (sessionParamHelper.getLiveSessions() == null) {
+            // this can/should only occur in tests with incomplete mocks
+            return;
+        }
+
         sessionParamHelper.getLiveSessions().forEach((k,v) -> {
+//            log.info("processing the status for active player: {}", k);
             if (SessionParamHelper.getIsServer(v)) {
                 syncActorStatuses.addAll(SessionParamHelper.getTrackingMobs(v));
             } else {
@@ -144,6 +154,7 @@ public class StatusService {
                 getActorStatus(actor)
                         .map(this::removeExpiredStatuses)
                         .doOnError(err -> log.error("Error applying status effects, err: {}", err.getMessage()))
+                        .onErrorComplete()
                         .doOnSuccess(actorStatus -> {
                             if (actorStatus.getActorStatuses() == null || actorStatus.getActorStatuses().isEmpty()) {
                                 return;
@@ -151,7 +162,7 @@ public class StatusService {
                             // TODO: return single .map of this with one subscribe?
                             actorStatus.getActorStatuses().parallelStream().forEach(s -> {
                                 if (s.requiresDamageApply()) {
-                                    s.apply(actor, statsService, this, statusProducer)
+                                    s.apply(actor, this, statusProducer)
                                             .doOnError(err ->
                                                     log.error("error in scheduled status applier for status: {}, error: {}",
                                                             s, err.getMessage()))

@@ -62,14 +62,13 @@ public class Burning extends Status {
                 damageMap.put(dmgType, this.getDerivedEffects().get(dmgType));
                 DamageSource damageSource = new DamageSource();
                 damageSource.setDamageMap(damageMap);
-                damageSource.setSourceActorId(dependencies.getActorStats().getActorId());
+                damageSource.setActorId(dependencies.getActorId());
+                damageSource.setSourceActorId(this.getOrigin());
                 damageSource.setSourceStatusId(this.getId());
 
                 log.info("requesting producer to take damage! {}", damageMap);
 
-                this.statusProducer.requestTakeDamage(
-                        new DamageUpdateMessage(
-                                damageSource, dependencies.getTargetStats(), dependencies.getActorStats()));
+                this.statusProducer.requestTakeDamage(damageSource);
             } catch (Exception e) {
                 log.error("Error applying burn effect, check the value maps");
                 throw e;
@@ -79,9 +78,9 @@ public class Burning extends Status {
 
     @Override
     public Single<Boolean> apply(
-            String actorId, StatsService statsService, StatusService statusService, StatusProducer statusProducer) {
+            String actorId, StatusService statusService, StatusProducer statusProducer) {
         log.info("Burning class applying effect");
-        return baseApply(actorId, statsService, statusService, applyBurn(), statusProducer);
+        return baseApply(actorId, statusService, applyBurn(), statusProducer);
     }
 
 }

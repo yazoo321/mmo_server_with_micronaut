@@ -53,10 +53,10 @@ public class StatsListener {
     }
 
     @Topic("request-take-damage")
-    public void requestTakeDamage(DamageUpdateMessage damageUpdateMessage) {
-        log.info("request to take damage received! {}", damageUpdateMessage);
-        statsService.takeDamage(damageUpdateMessage.getTargetStats(),
-                damageUpdateMessage.getDamageSource().getDamageMap(), damageUpdateMessage.getOriginStats());
+    public void requestTakeDamage(DamageSource damageSource) {
+        log.info("request to take damage received! {}", damageSource);
+        statsService.takeDamage(
+                damageSource.getActorId(), damageSource.getDamageMap(), damageSource.getSourceActorId());
     }
 
 }
