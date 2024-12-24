@@ -64,7 +64,7 @@ public class MobInstanceService {
         mob.setMotion(motion);
 
         statsService.initializeMobStats(mobId);
-        statusService.initializeStatus(mobId);
+        statusService.initializeStatus(mobId).subscribe();
 
         return mobRepository.insertMobInstance(mob);
 

@@ -57,11 +57,10 @@ public class SunSmite extends ChannelledSkill {
             Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
             dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
 
-            Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.MAGIC, dmgAmt);
+            Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
 
-            Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());
+            targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
 
-            checkDeath(stats, combatData.getActorId());
             return true;
         }).subscribe();
 

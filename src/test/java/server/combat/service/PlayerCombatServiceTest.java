@@ -77,6 +77,11 @@ class PlayerCombatServiceTest {
         MockitoAnnotations.openMocks(this);
         Publisher mockSubscriber = Mockito.mock(Publisher.class);
         Mockito.when(session.send(Mockito.any())).thenReturn(mockSubscriber);
+
+        List<String> actorsToClean = List.of(CHARACTER_1, MOB_1);
+
+        actorsToClean.forEach(actor -> statusService.deleteActorStatus(actor).blockingSubscribe());
+        actorsToClean.forEach(actor -> statusService.initializeStatus(actor).blockingSubscribe());
     }
 
     @AfterEach

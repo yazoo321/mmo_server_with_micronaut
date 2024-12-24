@@ -42,7 +42,7 @@ public class MonsterServerListener {
                 .doOnSuccess(
                         mob -> {
                             statsService.initializeMobStats(monster.getActorId());
-                            statusService.initializeStatus(monster.getActorId());
+                            statusService.initializeStatus(monster.getActorId()).subscribe();
                         })
                 .doOnError(error -> log.error("Error on creating mob, {}", error.getMessage()))
                 .subscribe();

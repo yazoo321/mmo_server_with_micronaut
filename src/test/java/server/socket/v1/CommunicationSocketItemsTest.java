@@ -4,6 +4,7 @@ import static org.awaitility.Awaitility.await;
 
 import io.micronaut.context.annotation.Property;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
@@ -86,7 +87,8 @@ public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
         Assertions.assertThat(client1DroppedItem.getDroppedItems().size()).isEqualTo(1);
         Assertions.assertThat(client1DroppedItem.getDroppedItems())
                 .usingRecursiveComparison()
-                .ignoringFields("droppedAt") // actuals are chopping a portion of this data
+                .ignoringFieldsOfTypes(Instant.class)
+//                .ignoringFields("droppedAt") // actuals are chopping a portion of this data
                 .isEqualTo(client2DroppedItem.getDroppedItems());
 
         List<String> instanceIds = client1DroppedItem.getDroppedItems().keySet().stream().toList();

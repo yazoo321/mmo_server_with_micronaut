@@ -5,7 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.status.model.ActorStatus;
-import server.attribute.status.service.StatusService;
+import server.attribute.status.repository.StatusRepository;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
@@ -18,10 +18,11 @@ public class StatusSocketIntegration {
     SocketResponseSubscriber socketResponseSubscriber;
 
     @Inject
-    StatusService statusService;
+    StatusRepository statusRepository;
 
     public void handleFetchActorStatus(String actorId, WebSocketSession session) {
-        statusService.getActorStatus(actorId)
+        // Fetching using repository to avoid circular dependency
+        statusRepository.getActorStatuses(actorId)
                 .doOnSuccess(status -> {
                     status.setAdd(true);
                     sendStatus(status, session);

@@ -71,7 +71,7 @@ public class MoonsVengeance extends TickingAoeSkill {
         Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
         dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
 
-        Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.MAGIC, dmgAmt);
+        Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
 
         actorMotionRepository.fetchActorMotion(skillTarget.getTargetId())
                 .doOnSuccess(motion -> getAffectedActors(new Location(motion), combatData.getActorId())
@@ -79,8 +79,7 @@ public class MoonsVengeance extends TickingAoeSkill {
                             actors.stream().parallel().forEach(actor -> {
                                 Stats targetStats = statsService.getStatsFor(actor).blockingGet();
                                 log.info("Applying moons vengeance to: {}, will take: {}", actor, damageMap);
-                                Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());
-                                checkDeath(stats, combatData.getActorId());
+                                targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
                             });
                         })
                         .subscribe())

@@ -40,15 +40,14 @@ public class BasicHeal extends ChannelledSkill {
         Double healAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
         healAmt = healAmt * healAmp * (1 + rand.nextDouble(0.15));
 
-        Map<DamageTypes, Double> damageMap = Map.of(DamageTypes.POSITIVE, healAmt);
+        Map<String, Double> damageMap = Map.of(DamageTypes.POSITIVE.getType(), healAmt);
 
         String target = skillTarget.getTargetId();
 
         Stats targetStats = statsService.getStatsFor(target).blockingGet();
 
-        Stats stats = statsService.takeDamage(targetStats, damageMap, combatData.getActorId());
+        targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
 
-        checkDeath(stats, combatData.getActorId());
     }
 
     @Override

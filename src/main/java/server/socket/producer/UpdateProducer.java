@@ -4,6 +4,7 @@ import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
 
 import server.attribute.stats.model.DamageSource;
+import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
 import server.combat.model.ThreatUpdate;
@@ -43,8 +44,8 @@ public interface UpdateProducer {
     @Topic("update-actor-stats")
     void updateStats(Stats stats);
 
-    @Topic("damage-updates")
-    void updateDamage(DamageSource damageSource);
+    @Topic("processed-damage-updates")
+    void updateDamage(DamageUpdateMessage damageUpdateMessage);
 
     @Topic("update-actor-status")
     void updateStatus(ActorStatus actorStatus);

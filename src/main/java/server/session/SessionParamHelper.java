@@ -8,6 +8,10 @@ import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.repository.ActorStatsRepository;
@@ -22,18 +26,27 @@ import server.session.model.CacheKey;
 import server.socket.model.UdpAddressHolder;
 
 @Singleton
-@NonNull @Slf4j
+@Slf4j
+@NoArgsConstructor
 public class SessionParamHelper {
 
     private final ObjectMapper objectMapper =
             new ObjectMapper().registerModule(new JavaTimeModule());
 
-    RedisCommands<String, Motion> motionCache;
     RedisCommands<String, CombatData> combatDataCache;
 
+    public ConcurrentMap<String, WebSocketSession> liveSessions = new ConcurrentHashMap<>();
+
     public SessionParamHelper(RedisClient redisClient) {
-        motionCache = redisClient.connect(new JacksonCodecMotion(objectMapper)).sync();
         combatDataCache = redisClient.connect(new JacksonCodecCombatData(objectMapper)).sync();
+    }
+
+    public void setLiveSessions(ConcurrentMap<String, WebSocketSession> liveSessions) {
+        this.liveSessions = liveSessions;
+    }
+
+    public ConcurrentMap<String, WebSocketSession> getLiveSessions() {
+        return liveSessions;
     }
 
     public static void setAddress(WebSocketSession session, String address) {

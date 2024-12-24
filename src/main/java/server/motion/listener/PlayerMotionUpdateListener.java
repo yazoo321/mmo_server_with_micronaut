@@ -45,7 +45,7 @@ public class PlayerMotionUpdateListener {
                             playerMotion.getActorId(), playerMotion.getMotion());
                     playerMotionService.relayPlayerMotion(playerMotion);
                 })
-                .doOnError(err -> log.error(err.getMessage()))
+                .doOnError(err -> log.error("Error processing player motion update: {}", err.getMessage()))
                 .subscribe();
 
     }
