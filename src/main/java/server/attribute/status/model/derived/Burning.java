@@ -9,15 +9,16 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.stats.types.DamageTypes;
-import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.producer.StatusProducer;
 import server.attribute.status.service.StatusService;
@@ -25,20 +26,23 @@ import server.attribute.status.types.StatusTypes;
 import server.skills.model.SkillDependencies;
 
 @Data
-@Slf4j
 @Serdeable
-@JsonTypeName("BLEEDING")
+@NoArgsConstructor
+@JsonTypeName("BURNING")
 @EqualsAndHashCode(callSuper = false)
-public class Bleeding extends Status {
+@Slf4j
+public class Burning extends Status {
 
-    public Bleeding(Instant expiration, String sourceId, Double damage) {
+    public Burning(Instant expiration, String sourceId, Double damage) {
+        log.info("Creating burning status effect, {}, {}, {}", expiration, sourceId, damage);
         this.setId(UUID.randomUUID().toString());
-        this.setDerivedEffects(new HashMap<>(Map.of(DamageTypes.PHYSICAL.getType(), damage)));
-        this.setStatusEffects(new HashSet<>());
+        this.setDerivedEffects(new HashMap<>());
+        this.getDerivedEffects().put(DamageTypes.FIRE.getType(), damage);
+        this.setStatusEffects(new HashSet<>(Set.of(StatusTypes.BURNING.getType())));
         this.setExpiration(expiration);
         this.setCanStack(true);
         this.setOrigin(sourceId);
-        this.setCategory(StatusTypes.BLEEDING.getType());
+        this.setCategory(StatusTypes.BURNING.getType());
     }
 
     @Override
@@ -47,22 +51,26 @@ public class Bleeding extends Status {
     }
 
     @JsonIgnore
-    private Consumer<SkillDependencies> applyBleed() {
+    private Consumer<SkillDependencies> applyBurn() {
+        log.info("I want to apply burn!");
         return (dependencies) -> {
             try {
+                log.info("Applying burn!");
                 Map<String, Double> damageMap = new HashMap<>();
-                String dmgType = DamageTypes.PHYSICAL.getType();
+                String dmgType = DamageTypes.FIRE.getType();
 
                 damageMap.put(dmgType, this.getDerivedEffects().get(dmgType));
                 DamageSource damageSource = new DamageSource();
                 damageSource.setDamageMap(damageMap);
-                damageSource.setSourceActorId(dependencies.getActorStats().getActorId());
+                damageSource.setActorId(dependencies.getActorId());
+                damageSource.setSourceActorId(this.getOrigin());
                 damageSource.setSourceStatusId(this.getId());
 
-                this.statusProducer.requestTakeDamage(damageSource);
+                log.info("requesting producer to take damage! {}", damageMap);
 
+                this.statusProducer.requestTakeDamage(damageSource);
             } catch (Exception e) {
-                log.error("Error applying bleed effect, check the value maps");
+                log.error("Error applying burn effect, check the value maps");
                 throw e;
             }
         };
@@ -71,6 +79,8 @@ public class Bleeding extends Status {
     @Override
     public Single<Boolean> apply(
             String actorId, StatusService statusService, StatusProducer statusProducer) {
-        return baseApply(actorId, statusService, applyBleed(), statusProducer);
+        log.info("Burning class applying effect");
+        return baseApply(actorId, statusService, applyBurn(), statusProducer);
     }
+
 }

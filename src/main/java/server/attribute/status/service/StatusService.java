@@ -1,18 +1,22 @@
 package server.attribute.status.service;
 
 import com.mongodb.client.result.DeleteResult;
+import io.micronaut.scheduling.annotation.Scheduled;
+import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-import java.util.Map;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.service.StatsService;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
+import server.attribute.status.producer.StatusProducer;
 import server.attribute.status.repository.StatusRepository;
+import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
 
 @Singleton
@@ -23,10 +27,20 @@ public class StatusService {
 
     @Inject UpdateProducer updateProducer;
 
+    @Inject StatsService statsService;
+
+    @Inject
+    SessionParamHelper sessionParamHelper;
+
+    @Inject
+    StatusProducer statusProducer;
+
+    ConcurrentSet<String> syncActorStatuses = new ConcurrentSet<>();
+
     public Single<ActorStatus> getActorStatus(String actorId) {
-//        log.info("fetching actor status: {}", actorId);
+        //        log.info("fetching actor status: {}", actorId);
         return statusRepository.getActorStatuses(actorId)
-                .map(this::removeExpiredStatuses);
+                .doOnError(err -> log.error("Failed to get actor statuses for ID: {}, {}", actorId, err.getMessage()));
     }
 
     public ActorStatus removeExpiredStatuses(ActorStatus actorStatus) {
@@ -35,10 +49,17 @@ public class StatusService {
             return actorStatus;
         }
 
+        log.info("current timestamp: {}", Instant.now());
+        log.info("Removing old statuses: {}", removed);
         actorStatus.getActorStatuses().removeAll(removed);
         statusRepository.updateStatus(actorStatus.getActorId(), actorStatus).subscribe();
 
-        ActorStatus update = new ActorStatus(actorStatus.getActorId(), removed, false, actorStatus.aggregateStatusEffects());
+        ActorStatus update =
+                new ActorStatus(
+                        actorStatus.getActorId(),
+                        removed,
+                        false,
+                        actorStatus.aggregateStatusEffects());
         // notify the user about removed statuses
         updateProducer.updateStatus(update);
 
@@ -48,10 +69,10 @@ public class StatusService {
     public void removeStatusFromActor(ActorStatus actorStatus, Set<Status> statuses) {
         Set<String> statusIds = statuses.stream().map(Status::getId).collect(Collectors.toSet());
         actorStatus.setActorStatuses(
-                actorStatus.getActorStatuses().stream().filter(s -> statusIds.contains(s.getId()))
+                actorStatus.getActorStatuses().stream()
+                        .filter(s -> statusIds.contains(s.getId()))
                         .collect(Collectors.toSet()));
         actorStatus.aggregateStatusEffects();
-
 
         statusRepository
                 .updateStatus(actorStatus.getActorId(), actorStatus)
@@ -64,13 +85,14 @@ public class StatusService {
     }
 
     public void addStatusToActor(ActorStatus actorStatus, Set<Status> statuses) {
+        log.info("Adding statuses to actor: {}", statuses);
         actorStatus.getActorStatuses().addAll(statuses);
         actorStatus.aggregateStatusEffects();
 
         statusRepository
                 .updateStatus(actorStatus.getActorId(), actorStatus)
                 .doOnError(err -> log.error(err.getMessage()))
-                .subscribe();
+                .blockingSubscribe();
 
         ActorStatus update = new ActorStatus(actorStatus.getActorId(), statuses, true, null);
         update.setStatusEffects(actorStatus.getStatusEffects());
@@ -80,31 +102,73 @@ public class StatusService {
     public Single<ActorStatus> removeAllStatuses(String actorId) {
         return statusRepository
                 .getActorStatuses(actorId)
-                .flatMap(status -> {
-                    ActorStatus update = new ActorStatus(actorId, status.getActorStatuses(), false, Set.of());
+                .flatMap(
+                        status -> {
+                            ActorStatus update =
+                                    new ActorStatus(
+                                            actorId, status.getActorStatuses(), false, Set.of());
 
-                    updateProducer.updateStatus(update);
+                            updateProducer.updateStatus(update);
 
-                    status.getActorStatuses().clear();
-                    status.aggregateStatusEffects();
+                            status.getActorStatuses().clear();
+                            status.aggregateStatusEffects();
 
-                    return statusRepository
-                            .updateStatus(actorId, status)
-                            .doOnError(err -> log.error(err.getMessage()));
-                })
-                .doOnError(er -> log.error("Failed to handle respawn statuses: {}", er.getMessage()));
-
+                            return statusRepository
+                                    .updateStatus(actorId, status)
+                                    .doOnError(err -> log.error(err.getMessage()));
+                        })
+                .doOnError(
+                        er -> log.error("Failed to handle respawn statuses: {}", er.getMessage()));
     }
 
     public Single<DeleteResult> deleteActorStatus(String actorId) {
         return statusRepository.deleteActorStatuses(actorId);
     }
 
-    public void initializeStatus(String actorId) {
-        statusRepository
+    public Single<ActorStatus> initializeStatus(String actorId) {
+        log.info("Initialising status for actor: {}", actorId);
+        return statusRepository
                 .updateStatus(actorId, new ActorStatus(actorId, Set.of(), false, Set.of()))
-                .doOnError(err -> log.error(err.getMessage()))
-                .subscribe();
+                .doOnError(err -> log.error(err.getMessage()));
     }
 
+    @Scheduled(fixedDelay = "300ms")
+    public void processStatusesForActivePlayers() {
+        if (sessionParamHelper.getLiveSessions() == null) {
+            // this can/should only occur in tests with incomplete mocks
+            return;
+        }
+
+        sessionParamHelper.getLiveSessions().forEach((k,v) -> {
+//            log.info("processing the status for active player: {}", k);
+            if (SessionParamHelper.getIsServer(v)) {
+                syncActorStatuses.addAll(SessionParamHelper.getTrackingMobs(v));
+            } else {
+                syncActorStatuses.add(k);
+            }
+        });
+
+        // due to cache system, more difficult to parallelize
+        // TODO: Try to parallelize this?
+        syncActorStatuses.parallelStream().forEach(actor ->
+                getActorStatus(actor)
+                        .map(this::removeExpiredStatuses)
+                        .doOnError(err -> log.error("Error applying status effects, err: {}", err.getMessage()))
+                        .onErrorComplete()
+                        .doOnSuccess(actorStatus -> {
+                            if (actorStatus.getActorStatuses() == null || actorStatus.getActorStatuses().isEmpty()) {
+                                return;
+                            }
+                            // TODO: return single .map of this with one subscribe?
+                            actorStatus.getActorStatuses().parallelStream().forEach(s -> {
+                                if (s.requiresDamageApply()) {
+                                    s.apply(actor, this, statusProducer)
+                                            .doOnError(err ->
+                                                    log.error("error in scheduled status applier for status: {}, error: {}",
+                                                            s, err.getMessage()))
+                                            .subscribe();
+                                }
+                            });
+                        }).subscribe());
+    }
 }

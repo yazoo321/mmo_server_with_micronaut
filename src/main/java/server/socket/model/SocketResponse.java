@@ -60,7 +60,15 @@ public class SocketResponse {
 
     ThreatUpdate threatUpdate;
 
+    String customData;
+
     public static SocketResponse messageWithType(SocketResponseType type) {
         return SocketResponse.builder().messageType(type.getType()).build();
+    }
+
+    public static SocketResponse messageWithTypeAndCustomPayload(SocketResponseType type, String msg) {
+        SocketResponse resp = messageWithType(type);
+        resp.setCustomData(msg);
+        return resp;
     }
 }

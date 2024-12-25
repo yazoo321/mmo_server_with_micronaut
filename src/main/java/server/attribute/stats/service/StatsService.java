@@ -6,12 +6,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
+import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
-import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.combat.service.ActorThreatService;
@@ -29,8 +28,7 @@ public class StatsService {
 
     @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    ActorThreatService threatService;
+    @Inject ActorThreatService threatService;
 
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();
@@ -83,7 +81,7 @@ public class StatsService {
                 .putAll(
                         new HashMap<>(
                                 Map.of(
-                                        StatsTypes.CURRENT_HP.getType(), 100.0,
+                                        StatsTypes.CURRENT_HP.getType(), 200.0,
                                         StatsTypes.CURRENT_MP.getType(), 50.0)));
 
         playerStats.recalculateDerivedStats();
@@ -98,7 +96,8 @@ public class StatsService {
     }
 
     public Single<Stats> getStatsFor(String actorId) {
-        return repository.fetchActorStats(actorId);
+        return repository.fetchActorStats(actorId)
+                .doOnError(err -> log.error("Failed to get stats for {}, {}", actorId, err.getMessage()));
     }
 
     public Single<DeleteResult> deleteStatsFor(String actorId) {
@@ -120,49 +119,56 @@ public class StatsService {
 
     public void resetHPAndMP(String actorId, Double hpPercent, Double mpPercent) {
         getStatsFor(actorId)
-                .doOnSuccess(stats -> {
-                    Map<String, Double> updated = stats.recalculateDerivedStats();
+                .doOnSuccess(
+                        stats -> {
+                            Map<String, Double> updated = stats.recalculateDerivedStats();
 
-                    Double updatedHp = stats.getDerived(StatsTypes.MAX_HP) * hpPercent;
-                    Double updatedMp = stats.getDerived(StatsTypes.MAX_MP) * mpPercent;
+                            Double updatedHp = stats.getDerived(StatsTypes.MAX_HP) * hpPercent;
+                            Double updatedMp = stats.getDerived(StatsTypes.MAX_MP) * mpPercent;
 
-                    stats.setDerived(StatsTypes.CURRENT_HP, updatedHp);
-                    stats.setDerived(StatsTypes.CURRENT_MP, updatedMp);
+                            stats.setDerived(StatsTypes.CURRENT_HP, updatedHp);
+                            stats.setDerived(StatsTypes.CURRENT_MP, updatedMp);
 
-                    updated.put(StatsTypes.CURRENT_HP.getType(), updatedHp);
-                    updated.put(StatsTypes.CURRENT_MP.getType(), updatedMp);
+                            updated.put(StatsTypes.CURRENT_HP.getType(), updatedHp);
+                            updated.put(StatsTypes.CURRENT_MP.getType(), updatedMp);
 
-                    handleDifference(updated, stats);
-                })
+                            handleDifference(updated, stats);
+                        })
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
     }
 
-    public Stats takeDamage(Stats stats, Map<DamageTypes, Double> damageMap, String sourceActor) {
-        // TODO: send stat update once, send map of damage
+    public void takeDamage(String actorId, Map<String, Double> damageMap, String sourceActorId) {
+        Single<Stats> targetActor = getStatsFor(actorId);
+        Single<Stats> sourceActor = getStatsFor(sourceActorId);
 
+        Single.zip(targetActor, sourceActor, (targetStats, sourceStats) -> {
+            return takeDamage(targetStats, damageMap, sourceStats);
+        }).subscribe();
+    }
+
+    public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
+        // TODO: send stat update once, send map of damage
+        // TODO: process damage reduction from sourceStats
         Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
 
         Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
-        currentHp = Math.min(stats.getDerived(StatsTypes.MAX_HP),
-                currentHp - totalDamage);
+        currentHp = Math.min(stats.getDerived(StatsTypes.MAX_HP), currentHp - totalDamage);
 
         setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
 
-        Map<String, Double> damageMapString =
-                damageMap.entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey().getType(), Map.Entry::getValue));
-
         DamageSource damageSource =
                 DamageSource.builder()
-                        .damageMap(damageMapString)
+                        .damageMap(damageMap)
                         .actorId(stats.getActorId())
-                        .sourceActorId(sourceActor)
+                        .sourceActorId(sourceStats.getActorId())
                         .build();
 
-        updateProducer.updateDamage(damageSource);
+        log.info("Updating damage, {}, {}, {}", damageSource, stats, sourceStats);
 
-        handleThreat(damageMap, stats.getActorId(), sourceActor);
+        updateProducer.updateDamage(new DamageUpdateMessage(damageSource, stats, sourceStats));
+
+        handleThreat(damageMap, stats.getActorId(), sourceStats.getActorId());
         return stats;
     }
 
@@ -176,6 +182,13 @@ public class StatsService {
     private void setAndHandleDifference(Stats stats, Double val, StatsTypes evalType) {
         stats.getDerivedStats().put(evalType.getType(), val);
         Map<String, Double> updated = Map.of(evalType.getType(), val);
+        handleDifference(updated, stats);
+    }
+
+    public void sumAndHandleDifference(Stats stats, Double val, String evalType) {
+        Double updateVal = stats.getDerivedStats().getOrDefault(evalType, 0.0) + val;
+        stats.getDerivedStats().put(evalType, updateVal);
+        Map<String, Double> updated = Map.of(evalType, updateVal);
         handleDifference(updated, stats);
     }
 
@@ -256,15 +269,23 @@ public class StatsService {
         handleDifference(updated, stats);
     }
 
-    void handleThreat(Map<DamageTypes, Double> damageMap, String actorTakingDamage, String sourceActor) {
-        if (!UUIDHelper.isPlayer(sourceActor)) {
+    void handleThreat(
+            Map<String, Double> damageMap, String actorTakingDamage, String sourceActor) {
+        if (!UUIDHelper.isPlayer(sourceActor) && !UUIDHelper.isPlayer(actorTakingDamage)) {
             return;
         }
 
-        int totalDamage = damageMap.values().stream()
-                .mapToInt(Double::intValue) // Convert each Double to an int
-                .sum();
+        log.info("Adding threat to actor: {}, from actor: {}", actorTakingDamage, sourceActor);
+
+        int totalDamage =
+                damageMap.values().stream()
+                        .mapToInt(Double::intValue) // Convert each Double to an int
+                        .sum();
         // in future, threat can be modified. will be controlled in stats
-        threatService.addActorThreat(actorTakingDamage, sourceActor, totalDamage).subscribe();
+        threatService.addActorThreat(actorTakingDamage, sourceActor, totalDamage)
+                .doOnError(err -> log.error("Failed to handle threat updates on stats updates, {}", err.getMessage()))
+                .onErrorComplete()
+                .subscribe();
+
     }
 }

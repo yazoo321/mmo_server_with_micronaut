@@ -27,7 +27,6 @@ import server.player.service.PlayerCharacterService;
 import server.socket.model.SocketMessage;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.MessageType;
-import server.socket.producer.UpdateProducer;
 import server.util.PlayerMotionUtil;
 import server.util.websocket.TestWebSocketClient;
 
@@ -42,8 +41,6 @@ public class CommunicationSocketTestBase {
     @Inject protected EmbeddedServer embeddedServer;
 
     @Inject protected PlayerMotionUtil playerMotionUtil;
-
-    @Inject UpdateProducer updateProducer;
 
     @Inject PlayerCharacterService playerCharacterService;
 

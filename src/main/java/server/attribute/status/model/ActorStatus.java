@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.status.types.StatusTypes;
 
+import static server.attribute.status.types.StatusTypes.*;
+
 @Slf4j
 @Data
 @Serdeable
@@ -18,10 +20,10 @@ import server.attribute.status.types.StatusTypes;
 @NoArgsConstructor
 public class ActorStatus {
 
-    String actorId;
-    Set<Status> actorStatuses;
-    boolean add;
-    Set<String> statusEffects;
+    private String actorId;
+    private Set<Status> actorStatuses;
+    private boolean add;
+    private Set<String> statusEffects;
 
 
     public Set<Status> removeOldStatuses() {
@@ -34,6 +36,7 @@ public class ActorStatus {
         this.actorStatuses.removeIf(
                 status -> {
                     if (status.getExpiration() != null && status.getExpiration().isBefore(Instant.now())) {
+//                        long diff = status.getExpiration().toEpochMilli() - Instant.now().toEpochMilli();
                         removedStatuses.add(status);
                         return true;
                     } else return false;
@@ -43,11 +46,16 @@ public class ActorStatus {
     }
 
     public Set<String> aggregateStatusEffects() {
-        Set<String> statusEffects = new HashSet<>();
-        actorStatuses.forEach(status -> statusEffects.addAll(status.getStatusEffects()));
-        this.statusEffects = statusEffects;
+        Set<String> updatedEffects = new HashSet<>();
+        if (actorStatuses == null) {
+            log.info("actor statuses unexpectedly null in aggregate status effects, setting to empty, for actor: {}",
+                    this.actorId);
+            this.actorStatuses = new HashSet<>();
+        }
+        actorStatuses.forEach(status -> updatedEffects.addAll(status.getStatusEffects()));
+        this.statusEffects = updatedEffects;
 
-        return statusEffects;
+        return getStatusEffects();
     }
 
     public Map<String, Double> aggregateDerived() {
@@ -81,9 +89,14 @@ public class ActorStatus {
     }
 
     public boolean canMove() {
-        boolean canMove = true;
-        canMove = canMove && !isDead();
+        aggregateStatusEffects();
+        return !(this.statusEffects.contains(CANNOT_ACT.getType()) ||
+                this.statusEffects.contains(CANNOT_MOVE.getType()));
+    }
 
-        return canMove;
+    public boolean canCast() {
+        aggregateStatusEffects();
+        return !(this.statusEffects.contains(CANNOT_ACT.getType()) ||
+                this.statusEffects.contains(CANNOT_CAST.getType()));
     }
 }
