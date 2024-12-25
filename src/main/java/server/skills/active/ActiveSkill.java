@@ -92,7 +92,4 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                 TimeUnit.MILLISECONDS);
     }
 
-//    protected void checkDeath(Stats stats, Stats killerStats) {
-//        combatService.handleActorDeath(stats, killerStats);
-//    }
 }

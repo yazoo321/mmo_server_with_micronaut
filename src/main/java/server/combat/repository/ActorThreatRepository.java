@@ -89,29 +89,48 @@ public class ActorThreatRepository {
                 });
     }
 
-    public Single<List<ActorThreat>> updateActorThreat(List<ActorThreat> actorThreats) {
-        if (actorThreats == null || actorThreats.isEmpty()) {
-            return Single.just(Collections.emptyList());
+    @CachePut(value = ACTOR_THREAT_CACHE, parameters = "actorId")
+    public Single<ActorThreat> updateActorThreat(String actorId, ActorThreat actorThreat) {
+        if (actorThreat == null) {
+            return Single.just(new ActorThreat());
         }
 
-        return Flowable.fromIterable(actorThreats) // Convert list to a Flowable to process each ActorThreat
-                .flatMapSingle(actorThreat -> {
-                    String actorId = actorThreat.getActorId(); // Assuming ActorThreat has a getActorId() method
-                    Bson filter = Filters.eq("actorId", actorId);
-                    ReplaceOptions options = new ReplaceOptions().upsert(true);
+        Bson filter = Filters.eq("actorId", actorId);
+        ReplaceOptions options = new ReplaceOptions().upsert(true);
 
-                    // Upsert each ActorThreat and cache it
-                    return Single.fromPublisher(actorThreatCollection.replaceOne(filter, actorThreat, options))
-                            .map(res -> actorThreat) // Return the ActorThreat after successful upsert
-                            .doOnSuccess(updated -> cacheActorThreat(actorId, updated)) // Update the cache
-                            .doOnError(err -> log.error("Failed to update ActorThreat for actorId: " + actorId, err));
-                })
-                .toList(); // Collect all the results into a Single<List<ActorThreat>>
+        if (actorThreat.getActorThreat().isEmpty()) {
+            return Single.fromPublisher(actorThreatCollection.deleteOne(filter)).map(res -> actorThreat);
+        }
+
+        return Single.fromPublisher(actorThreatCollection.replaceOne(filter, actorThreat, options))
+                .map(res -> actorThreat);
     }
+
+    // TODO: Fix this batch request, it was not updating as expected
+//    public Single<List<ActorThreat>> updateActorThreat(List<ActorThreat> actorThreats) {
+//        if (actorThreats == null || actorThreats.isEmpty()) {
+//            return Single.just(Collections.emptyList());
+//        }
+//
+//        return Flowable.fromIterable(actorThreats) // Convert list to a Flowable to process each ActorThreat
+//                .flatMapSingle(actorThreat -> {
+//                    String actorId = actorThreat.getActorId(); // Assuming ActorThreat has a getActorId() method
+//                    Bson filter = Filters.eq("actorId", actorId);
+//                    ReplaceOptions options = new ReplaceOptions().upsert(true);
+//
+//                    // Upsert each ActorThreat and cache it
+//                    return Single.fromPublisher(actorThreatCollection.replaceOne(filter, actorThreat, options))
+//                            .map(res -> actorThreat) // Return the ActorThreat after successful upsert
+//                            .doOnSuccess(updated -> cacheActorThreat(actorId, updated)) // Update the cache
+//                            .doOnError(err -> log.error("Failed to update ActorThreat for actorId: " + actorId, err));
+//                })
+//                .toList(); // Collect all the results into a Single<List<ActorThreat>>
+//    }
 
     @CachePut(value = ACTOR_THREAT_CACHE, parameters = "actorId")
     void cacheActorThreat(String actorId, ActorThreat actorThreat) {
         // This method exists solely for the @CachePut annotation to trigger cache updates.
+        log.info("caching: {}, with: {}", actorId, actorThreat);
     }
 
     public Single<List<ActorThreat>> fetchActorThreat(Set<String> actorIds) {

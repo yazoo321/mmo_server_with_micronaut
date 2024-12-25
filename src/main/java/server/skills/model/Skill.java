@@ -25,6 +25,7 @@ import server.socket.model.types.SkillMessageType;
 import server.socket.service.ClientUpdatesService;
 import server.socket.service.WebsocketClientUpdatesService;
 
+@Slf4j
 @Serdeable
 @ReflectiveAccess
 @NoArgsConstructor

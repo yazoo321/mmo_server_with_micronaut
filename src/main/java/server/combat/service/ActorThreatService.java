@@ -134,23 +134,32 @@ public class ActorThreatService {
         log.info("Threat decay for: {}", trackedActorThreat);
         actorThreatRepository
                 .fetchActorThreat(trackedActorThreat)
-                .map(
+                .doOnSuccess(
                         actorThreats -> {
                             actorThreats.forEach(
                                     actorThreat -> {
                                         List<String> threatsToRemove = new ArrayList<>();
                                         Map<String, Integer> threatMap =
                                                 actorThreat.getActorThreat();
-                                        threatMap.forEach(
-                                                (k, v) -> {
-                                                    int updatedThreat = v << 2;
-                                                    if (updatedThreat < 6) {
-                                                        threatsToRemove.add(k);
-                                                        threatMap.remove(k);
-                                                    } else {
-                                                        threatMap.put(k, updatedThreat);
-                                                    }
-                                                });
+
+                                        log.info("threat map: {}", threatMap);
+
+                                        for(Iterator<Map.Entry<String, Integer>> it = threatMap.entrySet().iterator(); it.hasNext(); ) {
+                                            Map.Entry<String, Integer> entry = it.next();
+
+                                            String k = entry.getKey();
+                                            Integer v = entry.getValue();
+
+                                            int updatedThreat = v >> 1;
+                                            if (updatedThreat < 6) {
+                                                threatsToRemove.add(k);
+                                                it.remove();
+                                            } else {
+                                                entry.setValue(updatedThreat);
+                                            }
+                                        }
+
+
                                         if (!threatsToRemove.isEmpty()) {
                                             removeActorThreat(
                                                     actorThreat.getActorId(), threatsToRemove);
@@ -160,9 +169,15 @@ public class ActorThreatService {
                                         update.setAddThreat(threatMap);
                                         update.setActorId(actorThreat.getActorId());
                                         sendThreatUpdates(update);
-                                    });
 
-                            return actorThreatRepository.updateActorThreat(actorThreats);
+                                        if (threatMap.isEmpty()) {
+                                            trackedActorThreat.remove(actorThreat.getActorId());
+                                        }
+                                    });
+                           // TODO: make this in a batch, this had an issue, perhaps linked with caching
+                            actorThreats.forEach(at -> actorThreatRepository.updateActorThreat(at.getActorId(), at)
+                                    .doOnError(err -> log.error("error updating threat: {}", err.getMessage()))
+                                    .subscribe());
                         })
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();

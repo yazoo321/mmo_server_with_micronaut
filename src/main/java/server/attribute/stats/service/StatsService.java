@@ -156,10 +156,6 @@ public class StatsService {
         currentHp = Math.min(stats.getDerived(StatsTypes.MAX_HP), currentHp - totalDamage);
 
         setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
-//
-//        Map<String, Double> damageMapString =
-//                damageMap.entrySet().stream()
-//                        .collect(Collectors.toMap(e -> e.getKey().getType(), Map.Entry::getValue));
 
         DamageSource damageSource =
                 DamageSource.builder()
@@ -275,9 +271,11 @@ public class StatsService {
 
     void handleThreat(
             Map<String, Double> damageMap, String actorTakingDamage, String sourceActor) {
-        if (!UUIDHelper.isPlayer(sourceActor)) {
+        if (!UUIDHelper.isPlayer(sourceActor) && !UUIDHelper.isPlayer(actorTakingDamage)) {
             return;
         }
+
+        log.info("Adding threat to actor: {}, from actor: {}", actorTakingDamage, sourceActor);
 
         int totalDamage =
                 damageMap.values().stream()

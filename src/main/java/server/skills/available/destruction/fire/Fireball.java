@@ -2,20 +2,27 @@ package server.skills.available.destruction.fire;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+
+import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import io.reactivex.rxjava3.core.Single;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.ActorStatus;
+import server.attribute.status.model.Status;
+import server.attribute.status.model.derived.Burning;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillDependencies;
 import server.skills.model.SkillTarget;
 
+@Slf4j
 @Serdeable
 @JsonTypeName("Fireball")
 @EqualsAndHashCode(callSuper = false)
@@ -48,7 +55,8 @@ public class Fireball extends ChannelledSkill {
             ActorStatus targetStatus = data.getTargetStatus();
 
             if (!actorStatus.canCast()) {
-
+                log.info("Skipping cast fireball as actor cannot cast at this time");
+                return;
             }
 
             Map<String, Double> actorDerived = actorStats.getDerivedStats();
@@ -60,6 +68,13 @@ public class Fireball extends ChannelledSkill {
 
             targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
 
+            // add burning effect
+
+            Instant duration = Instant.now().plusMillis(1500);
+            Double tickDamage = dmgAmt / 7;
+            Status burn = new Burning(duration, actorStats.getActorId(), tickDamage);
+
+            statusService.addStatusToActor(targetStatus, Set.of(burn));
         };
     }
 

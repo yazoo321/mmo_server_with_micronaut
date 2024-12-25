@@ -106,26 +106,5 @@ public class Status {
                     return true;
 
                 });
-
-//        return Single.zip(
-//                actorStatuses,
-//                (statuses, targetStats, originStats) -> {
-//                    if (statuses.getActorStatuses() == null || statuses.getActorStatuses().isEmpty()) {
-//                        log.info("actor statuses are null or empty, base apply skipping on {}", this.getCategory());
-//                        return false;
-//                    }
-//
-//                    boolean found = statuses.getActorStatuses().stream().map(Status::getId)
-//                            .collect(Collectors.toSet()).contains(this.getId());
-//
-//                    if (!found) {
-//                        log.info("status missing from actor statuses, base apply skipping on {}", this.getCategory());
-//                        return false;
-//                    }
-//
-//                    applier.accept(new SkillDependencies(originStats, targetStats, null, statuses));
-//
-//                    return true;
-//                });
     }
 }
