@@ -6,7 +6,6 @@ import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,18 +28,22 @@ public class StatusService {
 
     @Inject StatsService statsService;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    StatusProducer statusProducer;
+    @Inject StatusProducer statusProducer;
 
     ConcurrentSet<String> syncActorStatuses = new ConcurrentSet<>();
 
     public Single<ActorStatus> getActorStatus(String actorId) {
         //        log.info("fetching actor status: {}", actorId);
-        return statusRepository.getActorStatuses(actorId)
-                .doOnError(err -> log.error("Failed to get actor statuses for ID: {}, {}", actorId, err.getMessage()));
+        return statusRepository
+                .getActorStatuses(actorId)
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "Failed to get actor statuses for ID: {}, {}",
+                                        actorId,
+                                        err.getMessage()));
     }
 
     public ActorStatus removeExpiredStatuses(ActorStatus actorStatus) {
@@ -139,36 +142,71 @@ public class StatusService {
             return;
         }
 
-        sessionParamHelper.getLiveSessions().forEach((k,v) -> {
-//            log.info("processing the status for active player: {}", k);
-            if (SessionParamHelper.getIsServer(v)) {
-                syncActorStatuses.addAll(SessionParamHelper.getTrackingMobs(v));
-            } else {
-                syncActorStatuses.add(k);
-            }
-        });
+        sessionParamHelper
+                .getLiveSessions()
+                .forEach(
+                        (k, v) -> {
+                            //            log.info("processing the status for active player: {}",
+                            // k);
+                            if (SessionParamHelper.getIsServer(v)) {
+                                syncActorStatuses.addAll(SessionParamHelper.getTrackingMobs(v));
+                            } else {
+                                syncActorStatuses.add(k);
+                            }
+                        });
 
         // due to cache system, more difficult to parallelize
         // TODO: Try to parallelize this?
-        syncActorStatuses.parallelStream().forEach(actor ->
-                getActorStatus(actor)
-                        .map(this::removeExpiredStatuses)
-                        .doOnError(err -> log.error("Error applying status effects, err: {}", err.getMessage()))
-                        .onErrorComplete()
-                        .doOnSuccess(actorStatus -> {
-                            if (actorStatus.getActorStatuses() == null || actorStatus.getActorStatuses().isEmpty()) {
-                                return;
-                            }
-                            // TODO: return single .map of this with one subscribe?
-                            actorStatus.getActorStatuses().parallelStream().forEach(s -> {
-                                if (s.requiresDamageApply()) {
-                                    s.apply(actor, this, statusProducer)
-                                            .doOnError(err ->
-                                                    log.error("error in scheduled status applier for status: {}, error: {}",
-                                                            s, err.getMessage()))
-                                            .subscribe();
-                                }
-                            });
-                        }).subscribe());
+        syncActorStatuses.parallelStream()
+                .forEach(
+                        actor -> {
+                            syncActorStatuses.remove(actor);
+                            getActorStatus(actor)
+                                    .map(this::removeExpiredStatuses)
+                                    .doOnError(
+                                            err ->
+                                                    log.error(
+                                                            "Error applying status effects, err:"
+                                                                    + " {}",
+                                                            err.getMessage()))
+                                    .onErrorComplete()
+                                    .doOnSuccess(
+                                            actorStatus -> {
+                                                if (actorStatus.getActorStatuses() == null
+                                                        || actorStatus
+                                                                .getActorStatuses()
+                                                                .isEmpty()) {
+                                                    return;
+                                                }
+                                                // TODO: return single .map of this with one
+                                                // subscribe?
+                                                actorStatus.getActorStatuses().parallelStream()
+                                                        .forEach(
+                                                                s -> {
+                                                                    if (s.requiresDamageApply()) {
+                                                                        s.apply(
+                                                                                        actor,
+                                                                                        this,
+                                                                                        statusProducer)
+                                                                                .doOnError(
+                                                                                        err ->
+                                                                                                log
+                                                                                                        .error(
+                                                                                                                "error"
+                                                                                                                    + " in scheduled"
+                                                                                                                    + " status"
+                                                                                                                    + " applier"
+                                                                                                                    + " for status:"
+                                                                                                                    + " {}, error:"
+                                                                                                                    + " {}",
+                                                                                                                s,
+                                                                                                                err
+                                                                                                                        .getMessage()))
+                                                                                .subscribe();
+                                                                    }
+                                                                });
+                                            })
+                                    .subscribe();
+                        });
     }
 }
