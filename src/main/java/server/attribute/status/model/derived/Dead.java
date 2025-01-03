@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import server.attribute.status.model.Status;

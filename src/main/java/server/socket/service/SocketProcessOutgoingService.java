@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import server.actionbar.service.ActionbarService;
 import server.combat.service.ActorThreatService;
@@ -30,8 +31,6 @@ import server.socket.service.integrations.items.ItemSocketIntegration;
 import server.socket.service.integrations.motion.PlayerMotionIntegration;
 import server.socket.service.integrations.status.StatusSocketIntegration;
 
-import javax.annotation.PostConstruct;
-
 @Slf4j
 @Singleton
 public class SocketProcessOutgoingService {
@@ -44,11 +43,9 @@ public class SocketProcessOutgoingService {
 
     @Inject StatsSocketIntegration attributeSocketIntegration;
 
-    @Inject
-    StatusSocketIntegration statusSocketIntegration;
+    @Inject StatusSocketIntegration statusSocketIntegration;
 
-    @Inject
-    PlayerMotionIntegration playerMotionIntegration;
+    @Inject PlayerMotionIntegration playerMotionIntegration;
 
     @Inject PlayerCombatService playerCombatService;
 
@@ -60,11 +57,9 @@ public class SocketProcessOutgoingService {
 
     @Inject UdpSessionCache sessionCache;
 
-    @Inject
-    SessionParamHelper sessionParamHelper;
+    @Inject SessionParamHelper sessionParamHelper;
 
-    @Inject
-    ActorThreatService threatService;
+    @Inject ActorThreatService threatService;
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
 
@@ -127,7 +122,8 @@ public class SocketProcessOutgoingService {
             throw new InvalidParameterException("message type missing");
         }
 
-        if (functionMap.containsKey(updateType)) {functionMap.get(updateType).accept(socketMessage, session);
+        if (functionMap.containsKey(updateType)) {
+            functionMap.get(updateType).accept(socketMessage, session);
         } else {
             log.error("Did not recognise update type, {}", updateType);
         }
@@ -176,7 +172,7 @@ public class SocketProcessOutgoingService {
             }
         }
 
-//        log.info("sending player motion update");
+        log.info("sending player motion update");
         updateProducer.sendPlayerMotionUpdate(message.getPlayerMotion());
     }
 
@@ -279,9 +275,14 @@ public class SocketProcessOutgoingService {
         if (!SessionParamHelper.getIsServer(session)) {
             return;
         }
-        threatService.addActorThreat(socketMessage.getActorId(), socketMessage.getCustomData(), 100)
-                .doOnError(err -> log.error("Failed to add threat in socket process outgoing service, {}",
-                        err.getMessage()))
+        threatService
+                .addActorThreat(socketMessage.getActorId(), socketMessage.getCustomData(), 100)
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "Failed to add threat in socket process outgoing service,"
+                                                + " {}",
+                                        err.getMessage()))
                 .subscribe();
     }
 
@@ -289,14 +290,18 @@ public class SocketProcessOutgoingService {
         if (!SessionParamHelper.getIsServer(session)) {
             return;
         }
-        threatService.resetActorThreat(socketMessage.getActorId())
-                .doOnError(err -> log.error(err.getMessage()))
+        threatService
+                .resetActorThreat(socketMessage.getActorId())
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "Failed to reset threat from socket request, {}",
+                                        err.getMessage()))
+                .onErrorComplete()
                 .subscribe();
     }
 
-    private void handleCharacterRespawn(SocketMessage socketMessage, WebSocketSession session) {
-
-    }
+    private void handleCharacterRespawn(SocketMessage socketMessage, WebSocketSession session) {}
 
     private void setSessionId(SocketMessage message, WebSocketSession session) {
         String serverName =

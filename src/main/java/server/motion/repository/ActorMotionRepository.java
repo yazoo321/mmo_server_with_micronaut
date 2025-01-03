@@ -9,12 +9,9 @@ import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Location;
 import server.common.dto.Motion;
@@ -46,12 +43,13 @@ public class ActorMotionRepository {
             return playerMotionRepository
                     .fetchPlayerMotion(actorId)
                     .map(PlayerMotion::getMotion)
-                    .doOnError(err -> log.error(err.getMessage()));
+                    .doOnError(
+                            err -> log.error("Failed to get player motion, {}", err.getMessage()));
         } else {
             return mobRepository
                     .findMobInstance(actorId)
                     .map(Monster::getMotion)
-                    .doOnError(err -> log.error(err.getMessage()));
+                    .doOnError(err -> log.error("Failed to get mob motion, {}", err.getMessage()));
         }
     }
 
@@ -75,7 +73,12 @@ public class ActorMotionRepository {
     public void handleDisconnect(String actorId) {
         fetchActorMotion(actorId)
                 .doOnSuccess(motion -> handleUpdate(actorId, motion, false))
-                .doOnError(err -> log.error(err.getMessage()))
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "failed to disconnect actor {}, {}",
+                                        actorId,
+                                        err.getMessage()))
                 .subscribe();
     }
 
@@ -83,12 +86,17 @@ public class ActorMotionRepository {
     public void syncMotionWithRepo() {
         // we pull motion information from the cache and we update the cache as first resort
         // TODO: Convert to batch process
-//        log.info("Running syncMotionWithRepo scheduler");
+        //        log.info("Running syncMotionWithRepo scheduler");
         for (String id : syncActorMotion) {
             // fetch from cache:
             fetchActorMotion(id)
                     .doOnSuccess(motion -> handleUpdate(id, motion, true))
-                    .doOnError(err -> log.error(err.getMessage()))
+                    .doOnError(
+                            err ->
+                                    log.error(
+                                            "failed to sync actor: {}, motion with repo: {}",
+                                            id,
+                                            err.getMessage()))
                     .subscribe();
         }
     }
@@ -102,13 +110,24 @@ public class ActorMotionRepository {
         if (UUIDHelper.isPlayer(actorId)) {
             playerMotionRepository
                     .updateMotion(actorId, new PlayerMotion(actorId, motion, online, Instant.now()))
-                    .doOnError(err -> log.error(err.getMessage()))
-//                    .doOnSuccess(done -> log.info("Updated player motion {}", done))
+                    .doOnError(
+                            err ->
+                                    log.error(
+                                            "failed to update motion for: {}, {}",
+                                            actorId,
+                                            err.getMessage()))
+                    //                    .doOnSuccess(done -> log.info("Updated player motion {}",
+                    // done))
                     .subscribe();
         } else {
             mobRepository
                     .updateMotionOnly(actorId, motion)
-                    .doOnError(err -> log.error(err.getMessage()))
+                    .doOnError(
+                            err ->
+                                    log.error(
+                                            "failed to update mob motion: {}, {}",
+                                            actorId,
+                                            err.getMessage()))
                     .subscribe();
         }
     }
@@ -116,11 +135,16 @@ public class ActorMotionRepository {
     public Single<List<String>> getNearbyPlayers(Location location, int threshold) {
         Motion motion = Motion.fromLocation(location);
         PlayerMotion fake = new PlayerMotion(null, motion, null, null);
-        return playerMotionRepository.getPlayersNearby(fake, threshold)
-                .map(playerMotions -> playerMotions.stream().map(PlayerMotion::getActorId).toList());
+        return playerMotionRepository
+                .getPlayersNearby(fake, threshold)
+                .map(
+                        playerMotions ->
+                                playerMotions.stream().map(PlayerMotion::getActorId).toList());
     }
 
     public Single<List<String>> getNearbyMobs(Location location, int threshold) {
-        return mobRepository.getMobsNearby(location, threshold).map(m -> m.stream().map(Monster::getActorId).toList());
+        return mobRepository
+                .getMobsNearby(location, threshold)
+                .map(m -> m.stream().map(Monster::getActorId).toList());
     }
 }

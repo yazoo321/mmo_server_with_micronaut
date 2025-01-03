@@ -170,8 +170,11 @@ public class ClientUpdatesService {
 
     private boolean sessionIsTheActor(WebSocketSession s, String playerOrMob) {
         String actorId = SessionParamHelper.getActorId(s);
-        String serverName = SessionParamHelper.getServerName(s);
+        Set<String> serverActors =
+                SessionParamHelper.getIsServer(s)
+                        ? SessionParamHelper.getTrackingMobs(s)
+                        : new HashSet<>();
 
-        return actorId.equalsIgnoreCase(playerOrMob) || serverName.equalsIgnoreCase(playerOrMob);
+        return actorId.equalsIgnoreCase(playerOrMob) || serverActors.contains(playerOrMob);
     }
 }

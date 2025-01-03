@@ -92,7 +92,7 @@ dependencies {
 	implementation "io.micronaut.mongodb:micronaut-mongo-reactive:5.4.0"
 
 	// Kafka
-	implementation("io.micronaut.kafka:micronaut-kafka:5.6.0")
+	implementation("io.micronaut.kafka:micronaut-kafka:5.7.0")
 
 	// Serializer
 	runtimeOnly 'io.micronaut:micronaut-jackson-databind:4.6.3'

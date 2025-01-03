@@ -7,14 +7,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import server.attribute.status.model.Status;
 import server.attribute.status.types.StatusTypes;
 
 @Data
 @Serdeable
+@NoArgsConstructor
 @JsonTypeName("STUNNED")
 @EqualsAndHashCode(callSuper = false)
 public class Stunned extends Status {

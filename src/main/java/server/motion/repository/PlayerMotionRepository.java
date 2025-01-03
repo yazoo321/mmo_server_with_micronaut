@@ -103,7 +103,7 @@ public class PlayerMotionRepository {
 
     public Flowable<UpdateResult> checkAndUpdateUserOnline() {
         // Duplicate functionality of Character service
-        Instant logoutTime = Instant.now().minusSeconds(300);
+        Instant logoutTime = Instant.now().minusSeconds(360);
 
         // if is online and not updated in the last 20 seconds, set to logged out.
         return Flowable.fromPublisher(

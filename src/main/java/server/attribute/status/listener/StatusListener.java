@@ -9,19 +9,17 @@ import lombok.extern.slf4j.Slf4j;
 import server.attribute.status.model.ActorStatus;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
-import server.socket.service.ClientUpdatesService;
 import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "mmo-server",
+        groupId = "status-listener",
         offsetReset = OffsetReset.EARLIEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "status_client")
+        clientId = "status-listener")
 public class StatusListener {
 
-    @Inject
-    WebsocketClientUpdatesService clientUpdatesService;
+    @Inject WebsocketClientUpdatesService clientUpdatesService;
 
     @Topic("update-actor-status")
     public void receiveUpdateActorStatus(ActorStatus actorStatus) {
