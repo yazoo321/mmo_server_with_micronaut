@@ -13,7 +13,7 @@ import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 
-@KafkaClient(id = "general-update-producer", executor = TaskExecutors.BLOCKING)
+@KafkaClient(id = "general-update-producer")
 public interface UpdateProducer {
 
     @Topic("mob-motion-update")

@@ -34,11 +34,6 @@ public class InternalCombatListener {
                 damageUpdateMessage.getTargetStats(), damageUpdateMessage.getOriginStats());
     }
 
-//    @Topic("threat-level")
-//    public void receiveUpdateActorThreat(String threatUpdate) {
-//        log.info("received threat update: {}", threatUpdate);
-//    }
-
     @Topic("update-threat-levels")
     public void receiveUpdateActorThreat(ThreatUpdate threatUpdate) {
         log.info("Received actor threat update in kafka, passing to clients");
@@ -51,10 +46,6 @@ public class InternalCombatListener {
         clientUpdatesService.sendUpdateToListeningMob(socketResponse, threatUpdate.getActorId());
     }
 
-//    @Topic("update-threat-levels")
-//    public void receivedStringUpdateThreatLevels(String threatUpdate) {
-//        log.info("Received actor threat update in kafka, passing to clients, {}", threatUpdate);
-//    }
 
 
 }

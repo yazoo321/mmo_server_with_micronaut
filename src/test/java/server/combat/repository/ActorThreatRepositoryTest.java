@@ -2,22 +2,19 @@ package server.combat.repository;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import server.combat.model.ActorThreat;
 
-import java.util.Map;
-
 @MicronautTest
 class ActorThreatRepositoryIntegrationTest {
 
-    @Inject
-    private ActorThreatRepository repository;
+    @Inject private ActorThreatRepository repository;
 
     private static String actorId1 = "testActor1";
     private static String actorId2 = "testActor2";
-
 
     @AfterEach
     void setUp() {
@@ -61,6 +58,4 @@ class ActorThreatRepositoryIntegrationTest {
 
         Assertions.assertThat(actorThreat).usingRecursiveComparison().isEqualTo(expected);
     }
-
-
 }

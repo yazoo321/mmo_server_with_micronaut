@@ -124,10 +124,8 @@ public class ActorThreatService {
     }
 
     private void sendThreatUpdates(ThreatUpdate threatUpdate) {
-
         log.info("sending threat update! {}", threatUpdate);
         updateProducer.updateThreatLevels(threatUpdate);
-//        updateProducer.updateThreatLevels(threatUpdate.toString());
     }
 
     @Scheduled(fixedDelay = "2s")

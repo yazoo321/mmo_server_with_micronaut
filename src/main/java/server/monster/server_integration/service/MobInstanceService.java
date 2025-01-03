@@ -96,7 +96,8 @@ public class MobInstanceService {
         // we will set state to death and wait for animations etc
         statusService
                 .removeAllStatuses(mobId)
-                .doOnSuccess(statuses -> statusService.addStatusToActor(statuses, Set.of(new Dead())))
+                .doOnSuccess(
+                        statuses -> statusService.addStatusToActor(statuses, Set.of(new Dead())))
                 .subscribe();
 
         statusService
@@ -107,23 +108,31 @@ public class MobInstanceService {
 
         statsService
                 .deleteStatsFor(mobId)
-                .doOnError(err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
+                .doOnError(
+                        err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
                 .delaySubscription(DEATH_DELETE_TIME, TimeUnit.MILLISECONDS)
                 .subscribe();
 
         log.info("Will delete mob, current timestamp: {}", Instant.now());
         Single.fromCallable(
-                        () -> mobRepository
-                                .deleteMobInstance(mobId)
-                                .doOnError(err -> log.error(
-                                        "Failed to delete mob instance, {}", err.getMessage()))
-                                .subscribe()
-                        )
+                        () ->
+                                mobRepository
+                                        .deleteMobInstance(mobId)
+                                        .doOnError(
+                                                err ->
+                                                        log.error(
+                                                                "Failed to delete mob instance, {}",
+                                                                err.getMessage()))
+                                        .subscribe())
                 .delaySubscription(10_000, TimeUnit.MILLISECONDS)
                 .doOnError(err -> log.error("error on handling mob death, {}", err.getMessage()))
                 .subscribe();
 
-        Single.fromCallable(() -> {updateProducer.removeMobsFromGame(mobId); return 1;})
+        Single.fromCallable(
+                        () -> {
+                            updateProducer.removeMobsFromGame(mobId);
+                            return 1;
+                        })
                 .delaySubscription((DEATH_DELETE_TIME - 500), TimeUnit.MILLISECONDS)
                 .subscribe();
 
