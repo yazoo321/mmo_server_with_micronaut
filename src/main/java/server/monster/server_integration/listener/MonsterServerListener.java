@@ -5,6 +5,7 @@ import io.micronaut.configuration.kafka.annotation.OffsetReset;
 import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
@@ -13,15 +14,16 @@ import server.monster.server_integration.producer.MonsterServerProducer;
 import server.monster.server_integration.service.MobInstanceService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
-
-import java.util.List;
+import server.socket.model.SocketResponse;
+import server.socket.model.SocketResponseType;
+import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "mmo-server",
+        groupId = "mob-listener",
         offsetReset = OffsetReset.EARLIEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "mob_repo_client")
+        clientId = "mob-listener")
 public class MonsterServerListener {
 
     @Inject MonsterServerProducer monsterServerProducer;
@@ -34,6 +36,8 @@ public class MonsterServerListener {
     @Inject SessionParamHelper sessionParamHelper;
 
     @Inject ActorMotionRepository actorMotionRepository;
+
+    @Inject WebsocketClientUpdatesService clientUpdatesService;
 
     @Topic("create-mob")
     public void receiveCreateMob(Monster monster) {
@@ -48,10 +52,25 @@ public class MonsterServerListener {
                 .subscribe();
     }
 
-
     @Topic("remove-mobs-from-game")
     public void receiveRemoveMobsFromGame(String actorId) {
-//        TODO: when server is shutting down, clear mobs from game
+        notifyClientsToRemoveMobs(actorId);
+
+        sessionParamHelper
+                .getLiveSessions()
+                .forEach(
+                        (actor, session) ->
+                                SessionParamHelper.getTrackingMobs(session).remove(actorId));
+    }
+
+    private void notifyClientsToRemoveMobs(String actorId) {
+        // needs to be delayed
+        SocketResponse socketResponse =
+                SocketResponse.builder()
+                        .messageType(SocketResponseType.REMOVE_MOBS.getType())
+                        .lostMobs(Set.of(actorId))
+                        .build();
+        clientUpdatesService.sendUpdateToListeningIncludingServer(socketResponse, actorId);
     }
 
     @Topic("mob-motion-update")

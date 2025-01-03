@@ -6,7 +6,6 @@ import static com.mongodb.client.model.Filters.in;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Flowable;
@@ -60,6 +59,8 @@ public class MobRepository {
     }
 
     public Single<DeleteResult> deleteMobInstance(String actorId) {
+        log.info("Deleting mob instance {}, time now: {}", actorId, Instant.now());
+
         return Single.fromPublisher(mobMotionMongoCollection.deleteOne(eq("actorId", actorId)));
     }
 
@@ -69,7 +70,8 @@ public class MobRepository {
     }
 
     public Single<List<Monster>> getMobsNearby(Location location, int threshold) {
-        return MongoDbQueryHelper.nearbyMobMotionFinder(mobMotionMongoCollection, location, threshold);
+        return MongoDbQueryHelper.nearbyMobMotionFinder(
+                mobMotionMongoCollection, location, threshold);
     }
 
     public Single<DeleteResult> deleteMobsNotUpdatedWithin(Instant time) {

@@ -101,7 +101,8 @@ public class ActorThreatService {
         trackedActorThreat.remove(actorId);
         return actorThreatRepository
                 .fetchActorThreat(actorId)
-                .doOnError(err -> log.error(err.getMessage()))
+                .doOnError(err -> log.error("Failed to reset actor threat, {}", err.getMessage()))
+                .onErrorReturnItem(new ActorThreat())
                 .flatMap(
                         threatMap -> {
                             Map<String, Integer> threatLevels = threatMap.getActorThreat();
@@ -123,7 +124,10 @@ public class ActorThreatService {
     }
 
     private void sendThreatUpdates(ThreatUpdate threatUpdate) {
+
+        log.info("sending threat update! {}", threatUpdate);
         updateProducer.updateThreatLevels(threatUpdate);
+//        updateProducer.updateThreatLevels(threatUpdate.toString());
     }
 
     @Scheduled(fixedDelay = "2s")
@@ -144,7 +148,9 @@ public class ActorThreatService {
 
                                         log.info("threat map: {}", threatMap);
 
-                                        for(Iterator<Map.Entry<String, Integer>> it = threatMap.entrySet().iterator(); it.hasNext(); ) {
+                                        for (Iterator<Map.Entry<String, Integer>> it =
+                                                        threatMap.entrySet().iterator();
+                                                it.hasNext(); ) {
                                             Map.Entry<String, Integer> entry = it.next();
 
                                             String k = entry.getKey();
@@ -158,7 +164,6 @@ public class ActorThreatService {
                                                 entry.setValue(updatedThreat);
                                             }
                                         }
-
 
                                         if (!threatsToRemove.isEmpty()) {
                                             removeActorThreat(
@@ -174,10 +179,19 @@ public class ActorThreatService {
                                             trackedActorThreat.remove(actorThreat.getActorId());
                                         }
                                     });
-                           // TODO: make this in a batch, this had an issue, perhaps linked with caching
-                            actorThreats.forEach(at -> actorThreatRepository.updateActorThreat(at.getActorId(), at)
-                                    .doOnError(err -> log.error("error updating threat: {}", err.getMessage()))
-                                    .subscribe());
+                            // TODO: make this in a batch, this had an issue, perhaps linked with
+                            // caching
+                            actorThreats.forEach(
+                                    at ->
+                                            actorThreatRepository
+                                                    .updateActorThreat(at.getActorId(), at)
+                                                    .doOnError(
+                                                            err ->
+                                                                    log.error(
+                                                                            "error updating threat:"
+                                                                                    + " {}",
+                                                                            err.getMessage()))
+                                                    .subscribe());
                         })
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();

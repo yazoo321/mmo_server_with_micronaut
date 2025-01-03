@@ -1,9 +1,6 @@
 package server.combat.repository;
 
-import com.mongodb.client.model.Filters;
-import com.mongodb.reactivestreams.client.MongoCollection;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;

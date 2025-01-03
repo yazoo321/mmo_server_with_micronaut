@@ -2,8 +2,7 @@ package server.socket.producer;
 
 import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
-
-import server.attribute.stats.model.DamageSource;
+import io.micronaut.scheduling.TaskExecutors;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
@@ -14,7 +13,7 @@ import server.items.model.DroppedItem;
 import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 
-@KafkaClient(id = "general-update-producer")
+@KafkaClient(id = "general-update-producer", executor = TaskExecutors.BLOCKING)
 public interface UpdateProducer {
 
     @Topic("mob-motion-update")
@@ -52,4 +51,7 @@ public interface UpdateProducer {
 
     @Topic("update-threat-levels")
     void updateThreatLevels(ThreatUpdate threatUpdate);
+
+    @Topic("update-threat-levels")
+    void updateThreatLevels(String threatUpdate);
 }

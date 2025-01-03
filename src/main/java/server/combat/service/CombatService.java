@@ -8,7 +8,6 @@ import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -46,24 +45,19 @@ public class CombatService {
 
     @Inject StatsService statsService;
 
-    @Inject
-    StatusService statusService;
+    @Inject StatusService statusService;
 
-    @Inject
-    WebsocketClientUpdatesService clientUpdatesService;
+    @Inject WebsocketClientUpdatesService clientUpdatesService;
 
     @Inject ActorMotionRepository actorMotionRepository;
 
     @Inject EquipItemService equipItemService;
 
-    @Inject
-    PlayerLevelStatsService playerLevelStatsService;
+    @Inject PlayerLevelStatsService playerLevelStatsService;
 
-    @Inject
-    ActorHostilityService actorHostilityService;
+    @Inject ActorHostilityService actorHostilityService;
 
-    @Inject
-    ActorThreatService actorThreatService;
+    @Inject ActorThreatService actorThreatService;
 
     Single<Boolean> canEngageCombat(String actorId, String targetId) {
         if (!UUIDHelper.isPlayer(targetId)) {
@@ -71,7 +65,9 @@ public class CombatService {
             return Single.just(true);
         }
 
-        return actorHostilityService.evaluateActorHostilityStatus(actorId, targetId).map(hostility -> hostility < 5);
+        return actorHostilityService
+                .evaluateActorHostilityStatus(actorId, targetId)
+                .map(hostility -> hostility < 5);
     }
 
     boolean validatePositionLocation(
@@ -155,7 +151,8 @@ public class CombatService {
             return;
         }
 
-        statsService.getStatsFor(actorId)
+        statsService
+                .getStatsFor(actorId)
                 .doOnError(err -> log.error("Failed to get stats, {}", err.getMessage()))
                 .doOnSuccess(actorStats -> handleActorDeath(targetStats, actorStats))
                 .subscribe();
@@ -178,34 +175,23 @@ public class CombatService {
             playerLevelStatsService.handleAddXp(stats, killerStats);
         }
 
-
         if (stats.isPlayer()) {
             if (!killerStats.isPlayer()) {
-                actorThreatService.removeActorThreat(killerStats.getActorId(), List.of(stats.getActorId()))
-                        .delaySubscription(200, TimeUnit.MILLISECONDS).subscribe();
+                actorThreatService
+                        .removeActorThreat(killerStats.getActorId(), List.of(stats.getActorId()))
+                        .delaySubscription(200, TimeUnit.MILLISECONDS)
+                        .subscribe();
             }
-            statusService.removeAllStatuses(stats.getActorId())
-                    .doOnSuccess(status ->
-                            statusService.addStatusToActor(status, Set.of(new Dead())))
+            statusService
+                    .removeAllStatuses(stats.getActorId())
+                    .doOnSuccess(
+                            status -> statusService.addStatusToActor(status, Set.of(new Dead())))
                     .doOnError(er -> log.error(er.getMessage()))
                     .subscribe();
-
 
         } else {
             mobInstanceService.handleMobDeath(stats);
             sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);
-
-            notifyClientsToRemoveMobs(stats.getActorId());
         }
-    }
-
-    private void notifyClientsToRemoveMobs(String actorId) {
-        // needs to be delayed
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.REMOVE_MOBS.getType())
-                        .lostMobs(Set.of(actorId))
-                        .build();
-        clientUpdatesService.sendUpdateToListeningIncludingServer(socketResponse, actorId);
     }
 }

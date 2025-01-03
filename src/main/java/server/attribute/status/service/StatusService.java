@@ -10,7 +10,6 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.service.StatsService;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.producer.StatusProducer;
@@ -25,8 +24,6 @@ public class StatusService {
     @Inject StatusRepository statusRepository;
 
     @Inject UpdateProducer updateProducer;
-
-    @Inject StatsService statsService;
 
     @Inject SessionParamHelper sessionParamHelper;
 
@@ -88,6 +85,12 @@ public class StatusService {
     }
 
     public void addStatusToActor(ActorStatus actorStatus, Set<Status> statuses) {
+        actorStatus.aggregateStatusEffects();
+        if (actorStatus.getStatusEffects().contains("DEAD")) {
+            log.info("Skipping adding statuses: {} as the actor is dead", statuses);
+            return;
+        }
+
         log.info("Adding statuses to actor: {}", statuses);
         actorStatus.getActorStatuses().addAll(statuses);
         actorStatus.aggregateStatusEffects();
@@ -146,8 +149,6 @@ public class StatusService {
                 .getLiveSessions()
                 .forEach(
                         (k, v) -> {
-                            //            log.info("processing the status for active player: {}",
-                            // k);
                             if (SessionParamHelper.getIsServer(v)) {
                                 syncActorStatuses.addAll(SessionParamHelper.getTrackingMobs(v));
                             } else {

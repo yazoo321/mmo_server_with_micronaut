@@ -6,18 +6,13 @@ import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
 import java.time.Instant;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
-import server.attribute.stats.model.DamageUpdateMessage;
-import server.attribute.stats.model.Stats;
-import server.attribute.stats.service.StatsService;
 import server.attribute.stats.types.DamageTypes;
-import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.producer.StatusProducer;
 import server.attribute.status.service.StatusService;
@@ -27,6 +22,7 @@ import server.skills.model.SkillDependencies;
 @Data
 @Slf4j
 @Serdeable
+@NoArgsConstructor
 @JsonTypeName("BLEEDING")
 @EqualsAndHashCode(callSuper = false)
 public class Bleeding extends Status {

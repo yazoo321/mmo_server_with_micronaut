@@ -56,10 +56,17 @@ kafka:
         servers: kafka-broker:9092
       session:
         timeout:
-          ms: 300000
+          ms: 30000
       auto:
         offset:
           reset: earliest
+      threadPool:
+        coreSize: 10
+        maxSize: 50
+        queueSize: 500
+      heartbeat:
+        interval:
+          ms: 10000
 
 mongodb:
   #  Set username/password as env vars

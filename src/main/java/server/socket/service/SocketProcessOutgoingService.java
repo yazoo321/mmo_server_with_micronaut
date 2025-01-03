@@ -176,7 +176,7 @@ public class SocketProcessOutgoingService {
             }
         }
 
-//        log.info("sending player motion update");
+        log.info("sending player motion update");
         updateProducer.sendPlayerMotionUpdate(message.getPlayerMotion());
     }
 
@@ -290,7 +290,8 @@ public class SocketProcessOutgoingService {
             return;
         }
         threatService.resetActorThreat(socketMessage.getActorId())
-                .doOnError(err -> log.error(err.getMessage()))
+                .doOnError(err -> log.error("Failed to reset threat from socket request, {}", err.getMessage()))
+                .onErrorComplete()
                 .subscribe();
     }
 

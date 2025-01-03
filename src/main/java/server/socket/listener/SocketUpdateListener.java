@@ -23,10 +23,10 @@ import server.utils.FeatureFlag;
 
 @Slf4j
 @KafkaListener(
-        groupId = "mmo-server",
+        groupId = "socket-listener",
         offsetReset = OffsetReset.EARLIEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "socket_listener")
+        clientId = "socket-listener")
 public class SocketUpdateListener {
 
     @Inject WebsocketClientUpdatesService websocketClientUpdatesService;
