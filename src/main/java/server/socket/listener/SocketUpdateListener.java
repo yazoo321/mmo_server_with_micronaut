@@ -24,7 +24,7 @@ import server.utils.FeatureFlag;
 @Slf4j
 @KafkaListener(
         groupId = "socket-listener",
-        offsetReset = OffsetReset.EARLIEST,
+        offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
         clientId = "socket-listener")
 public class SocketUpdateListener {

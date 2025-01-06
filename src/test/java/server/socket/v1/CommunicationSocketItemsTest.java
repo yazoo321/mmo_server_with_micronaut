@@ -30,7 +30,12 @@ import server.util.websocket.TestWebSocketClient;
 public class CommunicationSocketItemsTest extends CommunicationSocketTestBase {
 
     @Test
-    void testWhenPlayerDropsItemItIsDropped() {
+    void testWhenPlayerDropsItemItIsDropped() throws InterruptedException {
+        // Wait for kafka to fully initialise
+        // TODO: can change this to check dynamically when topics are ready, through something like:
+        //  ListTopicsResult topics = adminClient.listTopics();
+        Thread.sleep(1000);
+
         TestWebSocketClient playerClient1 = initiateSocketAsPlayer(CHARACTER_1);
         TestWebSocketClient playerClient2 = initiateSocketAsPlayer(CHARACTER_2);
 

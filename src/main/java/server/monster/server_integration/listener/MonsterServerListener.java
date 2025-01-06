@@ -21,7 +21,7 @@ import server.socket.service.WebsocketClientUpdatesService;
 @Slf4j
 @KafkaListener(
         groupId = "mob-listener",
-        offsetReset = OffsetReset.EARLIEST,
+        offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
         clientId = "mob-listener")
 public class MonsterServerListener {

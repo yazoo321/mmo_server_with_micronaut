@@ -14,7 +14,7 @@ import server.motion.service.PlayerMotionService;
 @Slf4j
 @KafkaListener(
         groupId = "player-motion-listener-group",
-        offsetReset = OffsetReset.EARLIEST,
+        offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
         clientId = "player-motion-listener-client")
 public class PlayerMotionUpdateListener {
@@ -28,8 +28,8 @@ public class PlayerMotionUpdateListener {
     @Topic("player-motion-update")
     public void receive(PlayerMotion playerMotion) {
         // TODO: validate
-        log.info("received player motion in player-motion-update");
-        log.info("{}", playerMotion);
+//        log.info("received player motion in player-motion-update");
+//        log.info("{}", playerMotion);
 
         // consider random sampling
         statusService

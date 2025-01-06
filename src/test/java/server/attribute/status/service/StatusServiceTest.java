@@ -133,7 +133,12 @@ public class StatusServiceTest {
     }
 
     @Test
-    void addBurningStateToActor() {
+    void addBurningStateToActor() throws InterruptedException {
+        // Wait for kafka to fully initialise
+        // TODO: can change this to check dynamically when topics are ready, through something like:
+        //  ListTopicsResult topics = adminClient.listTopics();
+        Thread.sleep(1000);
+
         Instant expiration = Instant.now().plusMillis(2000);
         String source = "actor2";
         double damage = 40.0;

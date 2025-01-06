@@ -48,8 +48,8 @@ public class ActorStatus {
     public Set<String> aggregateStatusEffects() {
         Set<String> updatedEffects = new HashSet<>();
         if (actorStatuses == null) {
-            log.info("actor statuses unexpectedly null in aggregate status effects, setting to empty, for actor: {}",
-                    this.actorId);
+//            log.info("actor statuses unexpectedly null in aggregate status effects, setting to empty, for actor: {}",
+//                    this.actorId);
             this.actorStatuses = new HashSet<>();
         }
         actorStatuses.forEach(status -> updatedEffects.addAll(status.getStatusEffects()));

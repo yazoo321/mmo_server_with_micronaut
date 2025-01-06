@@ -17,7 +17,7 @@ import server.socket.service.WebsocketClientUpdatesService;
 @Slf4j
 @KafkaListener(
         groupId = "stats-listener",
-        offsetReset = OffsetReset.EARLIEST,
+        offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
         clientId = "stats-listener")
 public class StatsListener {

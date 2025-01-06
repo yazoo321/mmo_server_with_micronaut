@@ -121,7 +121,6 @@ public class ItemService {
         int chance = rand.nextInt(100);
 
         int reqChance = 100 / (iteration + 1);
-
         if (chance > reqChance) {
             Item item = selectItemToDrop(itemQueue);
             if (item == null) {
