@@ -1,0 +1,345 @@
+{
+    "items": [
+        {
+            "itemId": "23000",
+            "itemName": "Footmans armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 34.0,
+               "MAG_DEF": 15.0,
+               "MAX_HP": 100.0,
+               "MAX_MP": 30
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23001",
+            "itemName": "Death knights armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 34.0,
+               "MAG_DEF": 15.0,
+               "MAX_HP": 150.0,
+               "MAX_MP": 30,
+               "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23002",
+            "itemName": "Fire mage armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 150.0,
+               "MAX_MP": 80,
+               "MAG_AMP": 0.4
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23003",
+            "itemName": "Wizards armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 150.0,
+               "MAX_MP": 80,
+               "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23004",
+            "itemName": "Shadow mage armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 120.0,
+               "MAX_MP": 80,
+               "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23005",
+            "itemName": "Rangers armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 120.0,
+               "MAX_MP": 80,
+               "MAG_AMP": 0.2,
+               "PHY_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23006",
+            "itemName": "Warriors armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 120.0,
+               "MAX_MP": 80,
+               "PHY_AMP": 0.4
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23007",
+            "itemName": "Clerics armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 120.0,
+               "MAX_MP": 80,
+               "MAG_AMP": 0.3,
+               "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23008",
+            "itemName": "Crusaders armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 220.0,
+               "MAX_MP": 80,
+               "MAG_AMP": 0.1,
+               "PHY_AMP": 0.4
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23009",
+            "itemName": "Demonic armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 220.0,
+               "MAX_MP": 150,
+               "MAG_AMP": 0.3,
+               "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23010",
+            "itemName": "Dungeon knights armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 200.0,
+               "MAX_MP": 100,
+               "MAG_AMP": 0.3,
+               "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "23011",
+            "itemName": "Necromancers armour",
+            "category": "CHEST",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 30.0,
+               "MAX_HP": 200.0,
+               "MAX_MP": 200,
+               "MAG_AMP": 0.4,
+               "PHY_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        }
+    ]
+}

@@ -1,0 +1,345 @@
+{
+    "items": [
+        {
+            "itemId": "21000",
+            "itemName": "Footmans gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21001",
+            "itemName": "Death knights gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21002",
+            "itemName": "Fire mage gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21003",
+            "itemName": "Wizards gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21004",
+            "itemName": "Shadow mage gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21005",
+            "itemName": "Rangers gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21006",
+            "itemName": "Warriors gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 100.0,
+                "MAX_MP": 10,
+                "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21007",
+            "itemName": "Clerics gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "PHY_AMP": 0.2,
+                "MAG_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21008",
+            "itemName": "Crusaders gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "PHY_AMP": 0.3,
+                "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21009",
+            "itemName": "Demonic gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "PHY_AMP": 0.3,
+                "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21010",
+            "itemName": "Dungeon knights gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "PHY_AMP": 0.3,
+                "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "21011",
+            "itemName": "Necromancers gloves",
+            "category": "GLOVES",
+            "itemEffects": {
+                "DEF": 14.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 10,
+                "PHY_AMP": 0.1,
+                "MAG_AMP": 0.4
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        }
+    ]
+}

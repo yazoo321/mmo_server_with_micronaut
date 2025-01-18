@@ -1,0 +1,347 @@
+{
+    "items": [
+        {
+            "itemId": "24000",
+            "itemName": "Footmans leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 50.0,
+               "MAX_MP": 10,
+               "PHY_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24001",
+            "itemName": "Death knights leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 70.0,
+               "MAX_MP": 20,
+               "PHY_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24002",
+            "itemName": "Fire mage leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 40.0,
+               "MAX_MP": 50,
+               "MAG_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24003",
+            "itemName": "Wizards leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 40,
+               "MAG_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24004",
+            "itemName": "Shadow mage leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 50.0,
+               "MAX_MP": 50,
+               "MAG_AMP": 0.2,
+               "PHY_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24005",
+            "itemName": "Rangers leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 50.0,
+               "MAX_MP": 50,
+               "MAG_AMP": 0.2,
+               "PHY_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24006",
+            "itemName": "Warriors leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 50.0,
+               "MAX_MP": 50,
+               "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24007",
+            "itemName": "Clerics leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 80.0,
+               "MAX_MP": 60,
+               "PHY_AMP": 0.2,
+               "MAG_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24008",
+            "itemName": "Crusaders leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 80.0,
+               "MAX_MP": 60,
+               "PHY_AMP": 0.4,
+               "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24009",
+            "itemName": "Demonic leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 80.0,
+               "MAX_MP": 60,
+               "PHY_AMP": 0.4,
+               "MAG_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24010",
+            "itemName": "Dungeon knights leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 80.0,
+               "MAX_MP": 60,
+               "PHY_AMP": 0.3,
+               "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "24011",
+            "itemName": "Necromancers leggings",
+            "category": "LEGS",
+            "itemEffects": {
+               "DEF": 24.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 80.0,
+               "MAX_MP": 60,
+               "PHY_AMP": 0.2,
+               "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        }
+    ]
+}

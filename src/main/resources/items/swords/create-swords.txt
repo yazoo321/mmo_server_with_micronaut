@@ -2,15 +2,22 @@
     "items": [
         {
             "itemId": "15000",
-            "itemName": "Sunsword of Vallen",
+            "itemName": "Footmans sword",
             "category": "WEAPON",
             "itemEffects": {
-               "BASE_ATTACK_SPEED": 2.3,
+               "BASE_ATTACK_SPEED": 2.0,
                "WEAPON_DAMAGE": 60,
                "MAX_HP": 100,
                "ATTACK_SPEED": 30,
                "PHY_AMP": 0.3
             },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -26,9 +33,19 @@
             "itemName": "Iron butcher sword",
             "category": "WEAPON",
             "itemEffects": {
-               "BASE_ATTACK_SPEED": 2.3,
-               "WEAPON_DAMAGE": 60
+               "BASE_ATTACK_SPEED": 2.7,
+               "WEAPON_DAMAGE": 80,
+               "MAX_HP": 100,
+               "ATTACK_SPEED": 40,
+               "PHY_AMP": 0.4
             },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -41,12 +58,22 @@
         },
         {
             "itemId": "15002",
-            "itemName": "Guards cleaver",
+            "itemName": "Fels cleaver",
             "category": "WEAPON",
             "itemEffects": {
-               "BASE_ATTACK_SPEED": 2.3,
-               "WEAPON_DAMAGE": 60
+               "BASE_ATTACK_SPEED": 2.1,
+               "WEAPON_DAMAGE": 50,
+               "MAX_HP": 100,
+               "ATTACK_SPEED": 30,
+               "PHY_AMP": 0.3
             },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -62,9 +89,19 @@
             "itemName": "Fallen champions sword",
             "category": "WEAPON",
             "itemEffects": {
-               "BASE_ATTACK_SPEED": 2.3,
-               "WEAPON_DAMAGE": 60
+               "BASE_ATTACK_SPEED": 2.9,
+               "WEAPON_DAMAGE": 90,
+               "MAX_HP": 100,
+               "ATTACK_SPEED": 60,
+               "PHY_AMP": 0.3
             },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
             "value": 2000,
             "stacking": {
                 "canStack": false,
@@ -77,12 +114,22 @@
         },
         {
             "itemId": "15004",
-            "itemName": "Giants cleaver",
+            "itemName": "Ember touched sword",
             "category": "WEAPON",
             "itemEffects": {
-               "BASE_ATTACK_SPEED": 2.3,
-               "WEAPON_DAMAGE": 60
+               "BASE_ATTACK_SPEED": 2.1,
+               "WEAPON_DAMAGE": 60,
+               "MAX_HP": 70,
+               "ATTACK_SPEED": 30,
+               "PHY_AMP": 0.3
             },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
             "value": 2000,
             "stacking": {
                 "canStack": false,

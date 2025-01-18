@@ -1,0 +1,344 @@
+{
+    "items": [
+        {
+            "itemId": "22000",
+            "itemName": "Footmans cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 20,
+               "PHY_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22001",
+            "itemName": "Death knights cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 20,
+               "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22002",
+            "itemName": "Fire mages cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 20,
+               "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22003",
+            "itemName": "Wizards cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 20,
+               "MAG_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22004",
+            "itemName": "Shadow mage cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 20,
+               "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22005",
+            "itemName": "Rangers cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 20,
+               "MAG_AMP": 0.1,
+               "PHY_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22006",
+            "itemName": "Warriors cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 20,
+               "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22007",
+            "itemName": "Clerics cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 20,
+               "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22008",
+            "itemName": "Crusaders cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 60.0,
+               "MAX_MP": 30,
+               "PHY_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22009",
+            "itemName": "Demonic cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 60.0,
+               "MAX_MP": 30,
+               "PHY_AMP": 0.2,
+               "MAG_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22010",
+            "itemName": "Dungeon knights cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 60.0,
+               "MAX_MP": 30,
+               "PHY_AMP": 0.2,
+               "MAG_AMP": 0.2
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "22011",
+            "itemName": "Necromancers cape",
+            "category": "CAPE",
+            "itemEffects": {
+               "DEF": 7.0,
+               "MAG_DEF": 5.0,
+               "MAX_HP": 60.0,
+               "MAX_MP": 30,
+               "PHY_AMP": 0.1,
+               "MAG_AMP": 0.3
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        }
+    ]
+}

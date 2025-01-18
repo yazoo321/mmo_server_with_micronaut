@@ -1,0 +1,346 @@
+{
+    "items": [
+        {
+            "itemId": "27000",
+            "itemName": "Footmans helmet",
+            "category": "HELM",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 15.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 15,
+               "PHY_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27001",
+            "itemName": "Death knights helmet",
+            "category": "HELM",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 15.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 15,
+               "PHY_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27002",
+            "itemName": "Fire mages helmet",
+            "category": "HELM",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 15.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 50.0,
+               "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27003",
+            "itemName": "Wizards helmet",
+            "category": "HELM",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 15.0,
+               "MAX_HP": 20.0,
+               "MAX_MP": 40.0,
+               "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27004",
+            "itemName": "Shadow mages helmet",
+            "category": "HELM",
+            "itemEffects": {
+               "DEF": 15.0,
+               "MAG_DEF": 15.0,
+               "MAX_HP": 30.0,
+               "MAX_MP": 40.0,
+               "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27005",
+            "itemName": "Rangers helmet",
+            "category": "HELM",
+            "itemEffects": {
+                "DEF": 15.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 50.0,
+                "MAG_AMP": 0.1,
+                "PHY_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27006",
+            "itemName": "Warriors helmet",
+            "category": "HELM",
+            "itemEffects": {
+                "DEF": 15.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 50.0,
+                "MAX_MP": 50.0,
+                "PHY_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27007",
+            "itemName": "Clerics helmet",
+            "category": "HELM",
+            "itemEffects": {
+                "DEF": 15.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 60.0,
+                "MAX_MP": 40.0,
+                "PHY_AMP": 0.1,
+                "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27008",
+            "itemName": "Crusaders helmet",
+            "category": "HELM",
+            "itemEffects": {
+                "DEF": 15.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 70.0,
+                "MAX_MP": 30.0,
+                "PHY_AMP": 0.1,
+                "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27009",
+            "itemName": "Demonic helmet",
+            "category": "HELM",
+            "itemEffects": {
+                "DEF": 15.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 80.0,
+                "MAX_MP": 40.0,
+                "PHY_AMP": 0.1,
+                "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27010",
+            "itemName": "Dungeon knights helmet",
+            "category": "HELM",
+            "itemEffects": {
+                "DEF": 15.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 80.0,
+                "MAX_MP": 30.0,
+                "PHY_AMP": 0.1,
+                "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        },
+        {
+            "itemId": "27011",
+            "itemName": "Necromancers helmet",
+            "category": "HELM",
+            "itemEffects": {
+                "DEF": 15.0,
+                "MAG_DEF": 15.0,
+                "MAX_HP": 70.0,
+                "MAX_MP": 50.0,
+                "PHY_AMP": 0.1,
+                "MAG_AMP": 0.1
+            },
+            "requirements": {
+                "STR": 15,
+                "DEX": 15,
+                "INT": 15,
+                "STA": 15
+            },
+            "quality": 1,
+            "value": 2000,
+            "stacking": {
+                "canStack": false,
+                "maxStacks": 1
+            },
+            "itemConfig": {
+                "icon": "TBD",
+                "mesh": "TBD"
+            }
+        }
+    ]
+}
