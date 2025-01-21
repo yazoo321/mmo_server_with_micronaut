@@ -18,6 +18,8 @@ import server.combat.service.ActorThreatService;
 import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
 import server.motion.dto.PlayerMotion;
+import server.playfab.model.PlayFabAuthResponse;
+import server.playfab.service.PlayfabService;
 import server.session.SessionParamHelper;
 import server.session.cache.UdpSessionCache;
 import server.skills.service.CombatSkillsService;
@@ -60,6 +62,10 @@ public class SocketProcessOutgoingService {
     @Inject SessionParamHelper sessionParamHelper;
 
     @Inject ActorThreatService threatService;
+
+    @Inject
+    PlayfabService playfabService;
+
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
 
@@ -304,14 +310,45 @@ public class SocketProcessOutgoingService {
     private void handleCharacterRespawn(SocketMessage socketMessage, WebSocketSession session) {}
 
     private void setSessionId(SocketMessage message, WebSocketSession session) {
+        // custom data is used to send the port; re-using actorId field to get all auth info
+        String data = message.getActorId();
+        if (data == null || data.isEmpty()) {
+            log.error("custom data on set session id is empty!");
+            session.close();
+            throw new InvalidParameterException("Session ID not set correctly");
+        }
+        String[] parts = data.split("-:-");
+        if (parts.length < 3) {
+            log.error("session params not set correctly");
+            session.close();
+            throw new InvalidParameterException("Session ID not set correctly");
+        }
+
+        String token = parts[0];
+        String playFabId = parts[1];
+        String actorId = parts[2];
+
+        try {
+            PlayFabAuthResponse resp = playfabService.validateSessionTicket(token);
+            if (!resp.getPlayFabId().equals(playFabId)) {
+                log.error("Authentication with playfab not successful");
+                session.close();
+            } else {
+                log.info("Successfully authenticated with Playfab, account id: {}", playFabId);
+            }
+        } catch (Exception e) {
+            log.error("Caught unhandled exception while validating session");
+            session.close();
+        }
+
         String serverName =
                 message.getServerName() == null || message.getServerName().isBlank()
                         ? null
                         : message.getServerName();
-        String actorId =
-                message.getActorId() == null || message.getActorId().isBlank()
-                        ? null
-                        : message.getActorId();
+//        String actorId =
+//                message.getActorId() == null || message.getActorId().isBlank()
+//                        ? null
+//                        : message.getActorId();
 
         SessionParamHelper.setServerName(session, serverName);
         SessionParamHelper.setActorId(session, actorId);
