@@ -108,6 +108,10 @@ dependencies {
 	// redis
 	implementation("io.micronaut.redis:micronaut-redis-lettuce:6.6.0")
 
+	// playfab
+	implementation 'com.playfab:client-sdk:0.65.180316'
+
+
 	// test
 	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.0'
 	testImplementation 'org.assertj:assertj-core:3.26.3'
