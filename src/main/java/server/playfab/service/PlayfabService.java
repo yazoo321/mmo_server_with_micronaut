@@ -18,8 +18,6 @@ public class PlayfabService {
 
     private static final String DEVELOPER_SECRET_KEY = System.getenv("PLAYFAB_SECRET_KEY");
     private static final String TITLE_ID = System.getenv("TITLE_ID");
-//    private static final String DEVELOPER_SECRET_KEY = "Y57A5QYISBY3F5KMNCHKP6ESB91U4R83IED1M1Z8O9B7UEWWXS";
-//    private static final String TITLE_ID = "A63F0";
 
 
     public PlayFabAuthResponse validateSessionTicket(String sessionTicket) throws Exception {
