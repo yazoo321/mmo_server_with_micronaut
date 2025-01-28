@@ -38,6 +38,8 @@ public enum StatsTypes {
     DEF("DEF"),
     MAG_DEF("MAG_DEF"),
 
+    DODGE("DODGE"),
+
     ATTACK_SPEED("ATTACK_SPEED"),
     CAST_SPEED("CAST_SPEED"),
 
@@ -52,6 +54,8 @@ public enum StatsTypes {
 
     PHY_REDUCTION("PHY_REDUCTION"),
     MGC_REDUCTION("MGC_REDUCTION"),
+
+    MOVE_SPEED("MOVE_SPEED"),
 
     // Mob specific stats
     MAIN_HAND_ATTACK_SPEED("MAIN_HAND_ATTACK_SPEED"),

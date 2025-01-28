@@ -32,11 +32,9 @@ public class ActorStatus {
             this.actorStatuses = new HashSet<>();
         }
 
-//        log.info("running remove old statuses on: {}", this.actorStatuses);
         this.actorStatuses.removeIf(
                 status -> {
                     if (status.getExpiration() != null && status.getExpiration().isBefore(Instant.now())) {
-//                        long diff = status.getExpiration().toEpochMilli() - Instant.now().toEpochMilli();
                         removedStatuses.add(status);
                         return true;
                     } else return false;
@@ -48,8 +46,6 @@ public class ActorStatus {
     public Set<String> aggregateStatusEffects() {
         Set<String> updatedEffects = new HashSet<>();
         if (actorStatuses == null) {
-//            log.info("actor statuses unexpectedly null in aggregate status effects, setting to empty, for actor: {}",
-//                    this.actorId);
             this.actorStatuses = new HashSet<>();
         }
         actorStatuses.forEach(status -> updatedEffects.addAll(status.getStatusEffects()));
