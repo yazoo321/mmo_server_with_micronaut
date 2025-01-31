@@ -2,6 +2,9 @@ package server.skills.available.destruction.nature;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
@@ -12,10 +15,6 @@ import server.common.dto.Location;
 import server.skills.active.aoe.TickingAoeSkill;
 import server.skills.model.SkillTarget;
 
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 @Serdeable
 @JsonTypeName("Moons vengeance")
 @EqualsAndHashCode(callSuper = false)
@@ -23,7 +22,6 @@ import java.util.concurrent.ScheduledExecutorService;
 public class MoonsVengeance extends TickingAoeSkill {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
 
     public MoonsVengeance() {
         super(
@@ -36,16 +34,15 @@ public class MoonsVengeance extends TickingAoeSkill {
                 true,
                 1000,
                 500,
-                Map.of(), 600, 2500,
-                4, false
-                );
+                Map.of(),
+                600,
+                2500,
+                4,
+                false);
     }
-
 
     @Override
-    public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-
-    }
+    public void endSkill(CombatData combatData, SkillTarget skillTarget) {}
 
     @Override
     public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
@@ -64,16 +61,39 @@ public class MoonsVengeance extends TickingAoeSkill {
 
         Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
 
-        actorMotionRepository.fetchActorMotion(skillTarget.getTargetId())
-                .doOnSuccess(motion -> getAffectedActors(new Location(motion), combatData.getActorId())
-                        .doOnSuccess(actors -> {
-                            actors.stream().parallel().forEach(actor -> {
-                                Stats targetStats = statsService.getStatsFor(actor).blockingGet();
-                                log.info("Applying moons vengeance to: {}, will take: {}", actor, damageMap);
-                                targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
-                            });
-                        })
-                        .subscribe())
+        actorMotionRepository
+                .fetchActorMotion(skillTarget.getTargetId())
+                .doOnSuccess(
+                        motion ->
+                                getAffectedActors(new Location(motion), combatData.getActorId())
+                                        .doOnSuccess(
+                                                actors -> {
+                                                    actors.stream()
+                                                            .parallel()
+                                                            .forEach(
+                                                                    actor -> {
+                                                                        Stats targetStats =
+                                                                                statsService
+                                                                                        .getStatsFor(
+                                                                                                actor)
+                                                                                        .blockingGet();
+                                                                        log.info(
+                                                                                "Applying moons"
+                                                                                    + " vengeance"
+                                                                                    + " to: {},"
+                                                                                    + " will take:"
+                                                                                    + " {}",
+                                                                                actor,
+                                                                                damageMap);
+                                                                        targetStats =
+                                                                                statsService
+                                                                                        .takeDamage(
+                                                                                                targetStats,
+                                                                                                damageMap,
+                                                                                                actorStats);
+                                                                    });
+                                                })
+                                        .subscribe())
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
     }

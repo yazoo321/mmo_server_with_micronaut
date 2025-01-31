@@ -11,6 +11,7 @@ import java.util.Set;
 
 import lombok.Builder;
 import lombok.Data;
+import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.types.StatsTypes;
 import server.common.uuid.UUIDHelper;
 
@@ -24,8 +25,8 @@ public class Stats {
     @Serdeable.Serializable private Map<String, Integer> baseStats;
     @Serdeable.Serializable private Map<String, Double> derivedStats;
     @Serdeable.Serializable private Map<String, Double> itemEffects;
-    @Serdeable.Serializable private Map<String, Double> statusEffects;
-
+    @Serdeable.Serializable private Map<String, AttributeEffects> statusEffects;
+    @Serdeable.Serializable private Map<String, AttributeEffects> talentEffects;
     @Serdeable.Serializable private Integer attributePoints;
 
     public Map<String, Double> getDerivedStats() {
@@ -41,13 +42,15 @@ public class Stats {
             Map<String, Integer> baseStats,
             Map<String, Double> derivedStats,
             Map<String, Double> itemEffects,
-            Map<String, Double> statusEffects,
+            Map<String, AttributeEffects> statusEffects,
+            Map<String, AttributeEffects> talentEffects,
             Integer attributePoints) {
         this.actorId = actorId;
         this.baseStats = baseStats == null ? new HashMap<>() : baseStats;
         this.derivedStats = derivedStats == null ? new HashMap<>() : derivedStats;
         this.itemEffects = itemEffects == null ? new HashMap<>() : itemEffects;
         this.statusEffects = statusEffects == null ? new HashMap<>() : statusEffects;
+        this.talentEffects = talentEffects == null ? new HashMap<>() : talentEffects;
         this.attributePoints = attributePoints == null ? 0 : attributePoints;
     }
 
@@ -56,6 +59,7 @@ public class Stats {
         derivedStats = new HashMap<>();
         itemEffects = new HashMap<>();
         statusEffects = new HashMap<>();
+        talentEffects = new HashMap<>();
     }
 
     public int getBaseStat(StatsTypes stat) {
@@ -127,10 +131,15 @@ public class Stats {
         updatedDerived.put(StatsTypes.WEAPON_DAMAGE.getType(), 10.0 + (strength / 12));
         updatedDerived.put(StatsTypes.MAIN_HAND_ATTACK_SPEED.getType(), 2.0);
         // add other effects, such as item and statuses (buffs etc)
-        Map<String, Double> otherEffects = mergeStats(itemEffects, statusEffects);
+        Map<String, Double> otherEffects = mergeSummingStats(itemEffects, statusEffects);
+        otherEffects = mergeSummingStats(otherEffects, talentEffects);
+
         updatedDerived = mergeStats(updatedDerived, otherEffects);
 
+        // handle multipliers from statuses and talents
 
+        updatedDerived = applyMultipliers(updatedDerived, talentEffects);
+        updatedDerived = applyMultipliers(updatedDerived, statusEffects);
 
         // evaluate if new entries are different to old ones
         MapDifference<String, Double> diff = Maps.difference(derivedStats, updatedDerived);
@@ -150,6 +159,23 @@ public class Stats {
             Map<String, Double> left, Map<String, Double> right) {
         Map<String, Double> copy = new HashMap<>(left);
         right.forEach((k, v) -> copy.merge(k, v, Double::sum));
+
+        return copy;
+    }
+
+    public static Map<String, Double> mergeSummingStats(
+            Map<String, Double> left, Map<String, AttributeEffects> right) {
+        Map<String, Double> copy = new HashMap<>(left);
+        right.forEach((k, v) -> copy.merge(k, v.getAdditiveModifier(), Double::sum));
+
+        return copy;
+    }
+
+    public static Map<String, Double> applyMultipliers(
+            Map<String, Double> left, Map<String, AttributeEffects> right) {
+        Map<String, Double> copy = new HashMap<>(left);
+        right.forEach((k, v) -> copy.merge(k, v.getAdditiveModifier(),
+                (a, b) -> a * b));
 
         return copy;
     }

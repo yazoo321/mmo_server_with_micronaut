@@ -22,7 +22,9 @@ public enum StatusTypes {
 //    Damaging statuses
     BLEEDING("BLEEDING"),
     BURNING("BURNING"),
-    FROSTED("FROSTED");
+    FROSTED("FROSTED"),
+
+    MOVE_SLOW("MOVE_SLOW");
 
     public final String type;
 }

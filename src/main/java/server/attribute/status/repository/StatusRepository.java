@@ -12,7 +12,6 @@ import io.micronaut.cache.annotation.CacheInvalidate;
 import io.micronaut.cache.annotation.Cacheable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
-import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.conversions.Bson;
@@ -49,7 +48,8 @@ public class StatusRepository {
             parameters = {"actorId"})
     public Single<ActorStatus> getActorStatuses(String actorId) {
         return Single.fromPublisher(actorStatusCollection.find(eq("actorId", actorId)))
-                .doOnError(err -> log.error("Failed to fetch actor statuses, {}", err.getMessage()));
+                .doOnError(
+                        err -> log.error("Failed to fetch actor statuses, {}", err.getMessage()));
     }
 
     @CacheInvalidate(
@@ -70,13 +70,6 @@ public class StatusRepository {
             parameters = {"actorId"})
     public Single<Set<String>> getAggregatedStatuses(String actorId) {
         return getActorStatuses(actorId).map(ActorStatus::aggregateStatusEffects);
-    }
-
-    @Cacheable(
-            value = ACTOR_AGGREGATED_DERIVED,
-            parameters = {"actorId"})
-    public Single<Map<String, Double>> getAggregatedDerived(String actorId) {
-        return getActorStatuses(actorId).map(ActorStatus::aggregateDerived);
     }
 
     @CacheInvalidate(

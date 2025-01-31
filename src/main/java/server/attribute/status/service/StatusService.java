@@ -185,7 +185,7 @@ public class StatusService {
                                                         .forEach(
                                                                 s -> {
                                                                     if (s.requiresDamageApply()) {
-                                                                        s.apply(
+                                                                        s.applyDamageEffect(
                                                                                         actor,
                                                                                         this,
                                                                                         statusProducer)

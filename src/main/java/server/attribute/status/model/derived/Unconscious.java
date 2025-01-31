@@ -19,7 +19,7 @@ public class Unconscious extends Status {
 
     public Unconscious() {
         this.setId(UUID.randomUUID().toString());
-        this.setDerivedEffects(new HashMap<>());
+        this.setAttributeEffects(new HashMap<>());
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(null);
         this.setCanStack(false);

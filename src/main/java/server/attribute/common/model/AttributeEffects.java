@@ -1,12 +1,13 @@
 package server.attribute.common.model;
 
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.Objects;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class AttributeEffects {
     // should be used by talent and status effects
 
@@ -17,5 +18,7 @@ public class AttributeEffects {
     public Double getMultiplyModifier() {
         return Objects.requireNonNullElse(multiplyModifier, 1.0);
     }
-
+    public Double getAdditiveModifier() {
+        return Objects.requireNonNullElse(additiveModifier, 0.0);
+    }
 }

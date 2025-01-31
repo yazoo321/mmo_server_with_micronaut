@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,6 @@ import server.attribute.common.model.AttributeEffects;
 import server.attribute.common.model.AttributeRequirements;
 import server.attribute.stats.model.Stats;
 import server.attribute.talents.available.melee.fighter.weaponmaster.tier1.SharpenedBlades;
-
-import java.util.List;
 
 @Slf4j
 @Serdeable
@@ -24,10 +23,10 @@ import java.util.List;
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "name")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = SharpenedBlades.class, name = "Sharpened blades"),
+    @JsonSubTypes.Type(value = SharpenedBlades.class, name = "Sharpened blades"),
 })
 public class Talent {
-    
+
     protected String name;
     protected String description;
     protected String talentType;
@@ -40,7 +39,6 @@ public class Talent {
     public void applyEffect(Stats actorStats, Stats targetStats) {
         return;
     }
-
 }
 
 //    public Talent(String name,

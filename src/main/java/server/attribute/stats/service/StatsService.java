@@ -264,7 +264,7 @@ public class StatsService {
         }
     }
 
-    void evaluateDerivedStats(Stats stats) {
+    public void evaluateDerivedStats(Stats stats) {
         Map<String, Double> updated = stats.recalculateDerivedStats();
         handleDifference(updated, stats);
     }

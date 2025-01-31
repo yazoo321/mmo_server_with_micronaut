@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.status.model.Status;
@@ -29,7 +30,10 @@ public class Bleeding extends Status {
 
     public Bleeding(Instant expiration, String sourceId, Double damage) {
         this.setId(UUID.randomUUID().toString());
-        this.setDerivedEffects(new HashMap<>(Map.of(DamageTypes.PHYSICAL.getType(), damage)));
+        this.setAttributeEffects(
+                Map.of(
+                        DamageTypes.PHYSICAL.getType(),
+                        new AttributeEffects(DamageTypes.PHYSICAL.getType(), damage, 1.0)));
         this.setStatusEffects(new HashSet<>());
         this.setExpiration(expiration);
         this.setCanStack(true);
@@ -48,8 +52,11 @@ public class Bleeding extends Status {
             try {
                 Map<String, Double> damageMap = new HashMap<>();
                 String dmgType = DamageTypes.PHYSICAL.getType();
-
-                damageMap.put(dmgType, this.getDerivedEffects().get(dmgType));
+                AttributeEffects attributeEffect = this.getAttributeEffects().get(dmgType);
+                Double dmg =
+                        attributeEffect.getAdditiveModifier()
+                                * attributeEffect.getMultiplyModifier();
+                damageMap.put(dmgType, dmg);
                 DamageSource damageSource = new DamageSource();
                 damageSource.setDamageMap(damageMap);
                 damageSource.setSourceActorId(dependencies.getActorStats().getActorId());
@@ -65,8 +72,8 @@ public class Bleeding extends Status {
     }
 
     @Override
-    public Single<Boolean> apply(
+    public Single<Boolean> applyDamageEffect(
             String actorId, StatusService statusService, StatusProducer statusProducer) {
-        return baseApply(actorId, statusService, applyBleed(), statusProducer);
+        return baseApplyDamageEffect(actorId, statusService, applyBleed(), statusProducer);
     }
 }

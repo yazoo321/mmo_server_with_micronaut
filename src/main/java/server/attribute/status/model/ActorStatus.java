@@ -1,5 +1,7 @@
 package server.attribute.status.model;
 
+import static server.attribute.status.types.StatusTypes.*;
+
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.time.Instant;
@@ -9,8 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.status.types.StatusTypes;
-
-import static server.attribute.status.types.StatusTypes.*;
 
 @Slf4j
 @Data
@@ -25,7 +25,6 @@ public class ActorStatus {
     private boolean add;
     private Set<String> statusEffects;
 
-
     public Set<Status> removeOldStatuses() {
         Set<Status> removedStatuses = new HashSet<>();
         if (this.actorStatuses == null) {
@@ -34,7 +33,8 @@ public class ActorStatus {
 
         this.actorStatuses.removeIf(
                 status -> {
-                    if (status.getExpiration() != null && status.getExpiration().isBefore(Instant.now())) {
+                    if (status.getExpiration() != null
+                            && status.getExpiration().isBefore(Instant.now())) {
                         removedStatuses.add(status);
                         return true;
                     } else return false;
@@ -52,18 +52,6 @@ public class ActorStatus {
         this.statusEffects = updatedEffects;
 
         return getStatusEffects();
-    }
-
-    public Map<String, Double> aggregateDerived() {
-        Map<String, Double> derived = new HashMap<>();
-
-        actorStatuses.forEach(
-                status ->
-                        status.getDerivedEffects()
-                                .forEach(
-                                        (k, v) -> derived.merge(k, v, Double::sum)));
-
-        return derived;
     }
 
     public Set<Status> getActorStatuses() {
@@ -86,13 +74,13 @@ public class ActorStatus {
 
     public boolean canMove() {
         aggregateStatusEffects();
-        return !(this.statusEffects.contains(CANNOT_ACT.getType()) ||
-                this.statusEffects.contains(CANNOT_MOVE.getType()));
+        return !(this.statusEffects.contains(CANNOT_ACT.getType())
+                || this.statusEffects.contains(CANNOT_MOVE.getType()));
     }
 
     public boolean canCast() {
         aggregateStatusEffects();
-        return !(this.statusEffects.contains(CANNOT_ACT.getType()) ||
-                this.statusEffects.contains(CANNOT_CAST.getType()));
+        return !(this.statusEffects.contains(CANNOT_ACT.getType())
+                || this.statusEffects.contains(CANNOT_CAST.getType()));
     }
 }

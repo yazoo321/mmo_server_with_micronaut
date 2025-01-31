@@ -22,7 +22,7 @@ public class Stunned extends Status {
 
     public Stunned(Instant expiration, String sourceId) {
         this.setId(UUID.randomUUID().toString());
-        this.setDerivedEffects(new HashMap<>());
+        this.setAttributeEffects(new HashMap<>());
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(expiration);
         this.setCanStack(false);

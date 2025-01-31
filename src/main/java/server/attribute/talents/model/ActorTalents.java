@@ -1,9 +1,7 @@
 package server.attribute.talents.model;
 
-
-import lombok.Data;
-
 import java.util.Map;
+import lombok.Data;
 
 @Data
 public class ActorTalents {
