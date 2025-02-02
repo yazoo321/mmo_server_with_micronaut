@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.common.model.AttributeApplyType;
 import server.attribute.common.model.AttributeEffects;
 import server.attribute.common.model.AttributeRequirements;
 import server.attribute.stats.model.types.ClassTypes;
@@ -26,6 +27,7 @@ public class SharpenedBlades extends Talent {
         this.treeName = "Weaponmaster";
         this.talentType = TalentType.PASSIVE.getType();
         this.tier = 1;
+        this.applyType = AttributeApplyType.DERIVED_STATS.getType();
 
         AttributeEffects attributeEffect =
                 new AttributeEffects(StatsTypes.PHY_CRIT.getType(), 2.0, null);

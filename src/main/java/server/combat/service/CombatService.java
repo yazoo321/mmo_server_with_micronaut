@@ -5,12 +5,6 @@ import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.PlayerLevelStatsService;
@@ -22,6 +16,7 @@ import server.attribute.status.service.StatusService;
 import server.attribute.status.types.StatusTypes;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
+import server.combat.repository.CombatDataCache;
 import server.common.dto.Motion;
 import server.common.uuid.UUIDHelper;
 import server.faction.service.ActorHostilityService;
@@ -32,6 +27,13 @@ import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -58,6 +60,9 @@ public class CombatService {
     @Inject ActorHostilityService actorHostilityService;
 
     @Inject ActorThreatService actorThreatService;
+
+    @Inject
+    CombatDataCache combatDataCache;
 
     Single<Boolean> canEngageCombat(String actorId, String targetId) {
         if (!UUIDHelper.isPlayer(targetId)) {
@@ -103,7 +108,7 @@ public class CombatService {
                                     - combatData.getLastHelperNotification().getEpochSecond()
                             > 3) {
                 combatData.setLastHelperNotification(Instant.now());
-                sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
+                combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
 
                 if (!inRange) {
                     clientUpdatesService.sendToSelf(
@@ -146,18 +151,6 @@ public class CombatService {
         clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, actorId);
     }
 
-    public void handleActorDeath(Stats targetStats, String actorId) {
-        if (targetStats.getDerived(StatsTypes.CURRENT_HP) > 0.0) {
-            return;
-        }
-
-        statsService
-                .getStatsFor(actorId)
-                .doOnError(err -> log.error("Failed to get stats, {}", err.getMessage()))
-                .doOnSuccess(actorStats -> handleActorDeath(targetStats, actorStats))
-                .subscribe();
-    }
-
     public void handleActorDeath(Stats stats, Stats killerStats) {
         if (stats.getDerived(StatsTypes.CURRENT_HP) > 0.0) {
             return;
@@ -191,7 +184,7 @@ public class CombatService {
 
         } else {
             mobInstanceService.handleMobDeath(stats);
-            sessionParamHelper.setSharedActorCombatData(stats.getActorId(), null);
+            combatDataCache.deleteCombatData(stats.getActorId());
         }
     }
 }

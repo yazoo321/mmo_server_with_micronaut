@@ -130,6 +130,8 @@ java {
 	targetCompatibility = JavaVersion.toVersion("23")
 }
 
+// If having issues with mac + intellij, open it from terminal using: `open -a 'Intellij IDEA CE'`
+// https://github.com/palantir/gradle-docker/issues/162
 dockerCompose {
 	useComposeFiles = ['./docker-compose.yml']
 	stopContainers = false

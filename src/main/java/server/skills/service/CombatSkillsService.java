@@ -4,14 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import server.actionbar.service.ActionbarService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
-import server.combat.service.CombatService;
+import server.combat.repository.CombatDataCache;
 import server.session.SessionParamHelper;
 import server.skills.available.destruction.fire.Fireball;
 import server.skills.available.destruction.nature.EclipseBurst;
@@ -28,6 +24,10 @@ import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.types.MessageType;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @Singleton
 public class CombatSkillsService {
@@ -42,11 +42,11 @@ public class CombatSkillsService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
+    @Inject
+    CombatDataCache combatDataCache;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
-    @Inject CombatService combatService;
-
-    @Inject ActionbarService actionbarService;
 
     public CombatSkillsService() {
         objectMapper.registerSubtypes(Fireball.class, BasicHeal.class);
@@ -54,8 +54,8 @@ public class CombatSkillsService {
 
     public void tryApplySkill(CombatRequest combatRequest, WebSocketSession session) {
         validateActorId(session, combatRequest);
-        CombatData combatData =
-                sessionParamHelper.getSharedActorCombatData(combatRequest.getActorId());
+
+        CombatData combatData = combatDataCache.fetchCombatData(combatRequest.getActorId());
         String skillName = combatRequest.getSkillId();
         Skill skill = skillFactory.createSkill(skillName.toLowerCase());
 
@@ -65,7 +65,7 @@ public class CombatSkillsService {
 
         Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
         activatedSkills.put(skillName, Instant.now());
-        sessionParamHelper.setSharedActorCombatData(combatRequest.getActorId(), combatData);
+        combatDataCache.cacheCombatData(combatRequest.getActorId(), combatData);
         try {
             skill.startSkill(combatData, combatRequest.getSkillTarget(), session);
         } catch (Exception e) {

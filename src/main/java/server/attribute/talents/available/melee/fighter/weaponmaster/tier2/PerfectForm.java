@@ -1,9 +1,7 @@
-package server.attribute.talents.available.melee.fighter.weaponmaster.tier1;
+package server.attribute.talents.available.melee.fighter.weaponmaster.tier2;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.List;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
@@ -14,15 +12,18 @@ import server.attribute.stats.types.StatsTypes;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @Serdeable
-@JsonTypeName("Heavy strikes")
+@JsonTypeName("Perfect form")
 @EqualsAndHashCode(callSuper = false)
-public class HeavyStrikes extends Talent {
+public class PerfectForm extends Talent {
 
-    public HeavyStrikes() {
-        this.name = "Heavy strikes";
-        this.description = "Increases your physical damage.";
+    public PerfectForm() {
+        this.name = "Perfect form";
+        this.description = "Increases attack speed by 4% per rank";
         this.levels = 5;
         this.treeName = "Weaponmaster";
         this.talentType = TalentType.PASSIVE.getType();
@@ -30,7 +31,7 @@ public class HeavyStrikes extends Talent {
         this.applyType = AttributeApplyType.DERIVED_STATS.getType();
 
         AttributeEffects attributeEffect =
-                new AttributeEffects(StatsTypes.PHY_AMP.getType(), 0.02, null);
+                new AttributeEffects(StatsTypes.ATTACK_SPEED.getType(), 4.0, null);
 
         this.attributeEffects = List.of(attributeEffect);
 

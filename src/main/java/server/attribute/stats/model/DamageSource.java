@@ -17,6 +17,7 @@ public class DamageSource {
     private String sourceActorId;
     private String sourceSkillId;
     private String sourceStatusId;
-    Map<String, Double> damageMap;
+    private Map<String, Double> damageMap;
+    private String avoidType;
 
 }

@@ -4,19 +4,25 @@ import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.common.model.AttributeApplyType;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
+import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
+import server.attribute.talents.service.TalentService;
 import server.combat.model.CombatData;
+import server.combat.repository.CombatDataCache;
 import server.combat.service.ActorThreatService;
 import server.common.uuid.UUIDHelper;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 @Slf4j
 @Singleton
@@ -29,6 +35,13 @@ public class StatsService {
     @Inject SessionParamHelper sessionParamHelper;
 
     @Inject ActorThreatService threatService;
+
+    @Inject TalentService talentService;
+
+    @Inject
+    CombatDataCache combatDataCache;
+
+    Random rand = new Random();
 
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();
@@ -59,7 +72,7 @@ public class StatsService {
 
         repository.updateStats(mobStats.getActorId(), mobStats).blockingSubscribe();
         CombatData combatData = new CombatData(actorId);
-        sessionParamHelper.setSharedActorCombatData(actorId, combatData);
+        combatDataCache.cacheCombatData(actorId, combatData);
     }
 
     public Single<Stats> initializePlayerStats(String actorId) {
@@ -96,8 +109,14 @@ public class StatsService {
     }
 
     public Single<Stats> getStatsFor(String actorId) {
-        return repository.fetchActorStats(actorId)
-                .doOnError(err -> log.error("Failed to get stats for {}, {}", actorId, err.getMessage()));
+        return repository
+                .fetchActorStats(actorId)
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "Failed to get stats for {}, {}",
+                                        actorId,
+                                        err.getMessage()));
     }
 
     public Single<DeleteResult> deleteStatsFor(String actorId) {
@@ -142,15 +161,69 @@ public class StatsService {
         Single<Stats> targetActor = getStatsFor(actorId);
         Single<Stats> sourceActor = getStatsFor(sourceActorId);
 
-        Single.zip(targetActor, sourceActor, (targetStats, sourceStats) -> {
-            return takeDamage(targetStats, damageMap, sourceStats);
-        }).subscribe();
+        Single.zip(
+                        targetActor,
+                        sourceActor,
+                        (targetStats, sourceStats) -> {
+                            return takeDamage(targetStats, damageMap, sourceStats);
+                        })
+                .subscribe();
+    }
+
+    private void handleTalentApplyOnApplyType(
+            Stats sourceActor, Stats targetStats, AttributeApplyType type) {
+        talentService
+                .getActorTalentsOfApplyType(sourceActor.getActorId(), type.getType())
+                .doOnSuccess(
+                        talentMap ->
+                                talentMap.forEach(
+                                        (talent, level) ->
+                                                talent.applyEffect(
+                                                        level,
+                                                        talentService,
+                                                        sourceActor,
+                                                        targetStats)))
+                .subscribe();
     }
 
     public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
         // TODO: send stat update once, send map of damage
         // TODO: process damage reduction from sourceStats
+
+        if (damageMap.containsKey(DamageTypes.PHYSICAL.getType())) {
+            // this is a physical attack, check dodge chance
+            double dodgeChance = stats.getDerived(StatsTypes.DODGE);
+            double chance = rand.nextDouble(100.0);
+
+            if (chance <= dodgeChance) {
+                // dodged the attack
+                DamageSource damageSource = DamageSource.builder()
+                                .sourceActorId(sourceStats.getActorId())
+                                        .actorId(stats.getActorId())
+                                                .avoidType("DODGE")
+                        .damageMap(new HashMap<>()).build();
+                updateProducer.updateDamage(new DamageUpdateMessage(damageSource, stats, sourceStats));
+
+                handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_DODGE_APPLY);
+                handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_DODGE_CONSUME);
+                return stats;
+            }
+        }
+
+        handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_HIT_APPLY);
+        handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_HIT_CONSUME);
+
         Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
+
+        // apply damage reductions
+
+        if (totalDamage <= 0) {
+            // no damage taken, ignore, or send 'blocked', or similar
+            return stats;
+        }
+
+        handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_DMG_APPLY);
+        handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_DMG_CONSUME);
 
         Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
         currentHp = Math.min(stats.getDerived(StatsTypes.MAX_HP), currentHp - totalDamage);
@@ -269,8 +342,7 @@ public class StatsService {
         handleDifference(updated, stats);
     }
 
-    void handleThreat(
-            Map<String, Double> damageMap, String actorTakingDamage, String sourceActor) {
+    void handleThreat(Map<String, Double> damageMap, String actorTakingDamage, String sourceActor) {
         if (!UUIDHelper.isPlayer(sourceActor) && !UUIDHelper.isPlayer(actorTakingDamage)) {
             return;
         }
@@ -282,10 +354,14 @@ public class StatsService {
                         .mapToInt(Double::intValue) // Convert each Double to an int
                         .sum();
         // in future, threat can be modified. will be controlled in stats
-        threatService.addActorThreat(actorTakingDamage, sourceActor, totalDamage)
-                .doOnError(err -> log.error("Failed to handle threat updates on stats updates, {}", err.getMessage()))
+        threatService
+                .addActorThreat(actorTakingDamage, sourceActor, totalDamage)
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "Failed to handle threat updates on stats updates, {}",
+                                        err.getMessage()))
                 .onErrorComplete()
                 .subscribe();
-
     }
 }

@@ -84,6 +84,12 @@ public class StatusService {
         updateProducer.updateStatus(update);
     }
 
+    public void addStatusToActor(String actorId, Set<Status> statuses) {
+        getActorStatus(actorId)
+                .doOnSuccess(actorStatus -> addStatusToActor(actorStatus, statuses))
+                .subscribe();
+    }
+
     public void addStatusToActor(ActorStatus actorStatus, Set<Status> statuses) {
         actorStatus.aggregateStatusEffects();
         if (actorStatus.getStatusEffects().contains("DEAD")) {

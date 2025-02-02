@@ -18,6 +18,7 @@ public class AttributeEffects {
     public Double getMultiplyModifier() {
         return Objects.requireNonNullElse(multiplyModifier, 1.0);
     }
+
     public Double getAdditiveModifier() {
         return Objects.requireNonNullElse(additiveModifier, 0.0);
     }

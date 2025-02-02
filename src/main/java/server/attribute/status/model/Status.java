@@ -40,7 +40,7 @@ import server.skills.model.SkillDependencies;
     @JsonSubTypes.Type(value = Silenced.class, name = "SILENCED"),
     @JsonSubTypes.Type(value = Stunned.class, name = "STUNNED"),
     @JsonSubTypes.Type(value = Unconscious.class, name = "UNCONCIOUS"),
-    @JsonSubTypes.Type(value = MoveSlow.class, name = "MOVE_SLOW"),
+    @JsonSubTypes.Type(value = MoveMod.class, name = "MOVE_SLOW"),
 })
 public class Status {
 
@@ -125,5 +125,4 @@ public class Status {
         // requires override
         return false;
     }
-
 }

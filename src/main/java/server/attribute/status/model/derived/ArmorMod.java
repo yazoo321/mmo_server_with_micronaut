@@ -18,22 +18,26 @@ import java.util.*;
 @NoArgsConstructor
 @JsonTypeName("MOVE_SLOW")
 @EqualsAndHashCode(callSuper = false)
-public class MoveSlow extends Status {
+public class ArmorMod extends Status {
 
-    public MoveSlow(Instant expiration, String sourceId, Double moveSpeedMultiplier) {
+    public ArmorMod(Instant expiration, String sourceId, Double armorMultiplier) {
         this.setId(UUID.randomUUID().toString());
-        this.setAttributeEffects(new HashMap<>(Map.of(
-                StatsTypes.MOVE_SPEED.getType(),
-                new AttributeEffects(StatsTypes.MOVE_SPEED.getType(), 0.0, moveSpeedMultiplier)
-        )));
+        this.setAttributeEffects(
+                new HashMap<>(
+                        Map.of(
+                                StatsTypes.DEF.getType(),
+                                new AttributeEffects(
+                                        StatsTypes.DEF.getType(),
+                                        0.0,
+                                        armorMultiplier))));
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(expiration);
         this.setCanStack(false);
         this.setOrigin(sourceId);
-        this.setCategory(StatusTypes.MOVE_SLOW.getType());
+        this.setCategory(StatusTypes.ARMOR_MOD.getType());
     }
 
     public Set<String> defaultStatusEffects() {
-        return new HashSet<>(Set.of(StatusTypes.MOVE_SLOW.getType()));
+        return new HashSet<>(Set.of(StatusTypes.ARMOR_MOD.getType()));
     }
 }

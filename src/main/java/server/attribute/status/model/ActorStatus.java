@@ -83,4 +83,10 @@ public class ActorStatus {
         return !(this.statusEffects.contains(CANNOT_ACT.getType())
                 || this.statusEffects.contains(CANNOT_CAST.getType()));
     }
+
+    public boolean canAttack() {
+        aggregateStatusEffects();
+        return !(this.statusEffects.contains(CANNOT_ACT.getType())
+                || this.statusEffects.contains(CANNOT_ATTACK.getType()));
+    }
 }

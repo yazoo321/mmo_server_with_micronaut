@@ -7,6 +7,7 @@ import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.status.model.ActorStatus;
+import server.attribute.status.service.StatusService;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
@@ -21,6 +22,8 @@ public class StatusListener {
 
     @Inject WebsocketClientUpdatesService clientUpdatesService;
 
+    @Inject StatusService statusService;
+
     @Topic("update-actor-status")
     public void receiveUpdateActorStatus(ActorStatus actorStatus) {
         SocketResponse socketResponse =
@@ -31,5 +34,11 @@ public class StatusListener {
 
         clientUpdatesService.sendUpdateToListeningIncludingSelf(
                 socketResponse, actorStatus.getActorId());
+    }
+
+    @Topic("request-add-actor-status")
+    public void requestAddActorStatus(ActorStatus actorStatus) {
+        // should only populate: String actorId; Set<Status> actorStatuses;
+        statusService.addStatusToActor(actorStatus.getActorId(), actorStatus.getActorStatuses());
     }
 }

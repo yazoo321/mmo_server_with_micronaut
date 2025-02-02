@@ -5,15 +5,14 @@ import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import lombok.Builder;
 import lombok.Data;
 import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.types.StatsTypes;
 import server.common.uuid.UUIDHelper;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder
@@ -127,6 +126,11 @@ public class Stats {
         updatedDerived.put(StatsTypes.HP_REGEN.getType(), 1.0 + (stamina / 5));
         updatedDerived.put(StatsTypes.MP_REGEN.getType(), 1.0 + (intelligence / 5));
 
+        updatedDerived.put(StatsTypes.DODGE.getType(), 5.0 + (dexterity / 10 ));
+
+        // stats don't update the move speed, but other items and effects can
+        updatedDerived.put(StatsTypes.MOVE_SPEED.getType(), 360.0);
+
         // evaluate base derived stats when there's no items equipped
         updatedDerived.put(StatsTypes.WEAPON_DAMAGE.getType(), 10.0 + (strength / 12));
         updatedDerived.put(StatsTypes.MAIN_HAND_ATTACK_SPEED.getType(), 2.0);
@@ -174,8 +178,7 @@ public class Stats {
     public static Map<String, Double> applyMultipliers(
             Map<String, Double> left, Map<String, AttributeEffects> right) {
         Map<String, Double> copy = new HashMap<>(left);
-        right.forEach((k, v) -> copy.merge(k, v.getAdditiveModifier(),
-                (a, b) -> a * b));
+        right.forEach((k, v) -> copy.merge(k, v.getAdditiveModifier(), (a, b) -> a * b));
 
         return copy;
     }

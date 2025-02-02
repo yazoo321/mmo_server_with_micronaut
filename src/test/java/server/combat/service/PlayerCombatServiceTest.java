@@ -1,14 +1,8 @@
 package server.combat.service;
 
-import static org.awaitility.Awaitility.await;
-
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +17,7 @@ import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
+import server.combat.repository.CombatDataCache;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.service.EquipItemService;
@@ -39,6 +34,13 @@ import server.socket.model.SocketResponseSubscriber;
 import server.socket.session.FakeSession;
 import server.util.PlayerMotionUtil;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
+
 @MicronautTest
 class PlayerCombatServiceTest {
 
@@ -47,6 +49,8 @@ class PlayerCombatServiceTest {
     @Inject private StatusService statusService;
 
     @Inject private SessionParamHelper sessionParamHelper;
+
+    @Inject private CombatDataCache combatDataCache;
 
     @Spy private FakeSession session;
 
@@ -105,8 +109,8 @@ class PlayerCombatServiceTest {
                 .initializePlayerStats(CHARACTER_1)
                 .doOnError(err -> System.out.println(err.getMessage()))
                 .blockingSubscribe();
-        CombatData combatData = sessionParamHelper.getSharedActorCombatData(CHARACTER_1);
-        sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
+        CombatData combatData = combatDataCache.fetchCombatData(CHARACTER_1);
+        combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
         Motion playerMotion = playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         SessionParamHelper.setActorId(session, CHARACTER_1);
 
@@ -132,8 +136,8 @@ class PlayerCombatServiceTest {
 
         // Then
         // check the attack loop has begun
-        combatData =
-                sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
+
+        combatData = combatDataCache.fetchCombatData(SessionParamHelper.getActorId(session));
         Set<String> targets = combatData.getTargets();
         Assertions.assertThat(targets.size()).isEqualTo(1);
 

@@ -1,53 +1,29 @@
 package server.session;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.sync.RedisCommands;
 import io.micronaut.websocket.WebSocketSession;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.repository.ActorStatsRepository;
-import server.combat.model.CombatData;
-import server.common.configuration.redis.JacksonCodecCombatData;
-import server.common.configuration.redis.JacksonCodecMotion;
 import server.common.dto.Motion;
 import server.common.uuid.UUIDHelper;
 import server.motion.model.SessionParams;
 import server.session.model.CacheDomains;
-import server.session.model.CacheKey;
-import server.socket.model.UdpAddressHolder;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Singleton
 @Slf4j
 @NoArgsConstructor
 public class SessionParamHelper {
 
-    private final ObjectMapper objectMapper =
-            new ObjectMapper().registerModule(new JavaTimeModule());
-
-    RedisCommands<String, CombatData> combatDataCache;
-
+    @Getter
+    @Setter
     public ConcurrentMap<String, WebSocketSession> liveSessions = new ConcurrentHashMap<>();
-
-    public SessionParamHelper(RedisClient redisClient) {
-        combatDataCache = redisClient.connect(new JacksonCodecCombatData(objectMapper)).sync();
-    }
-
-    public void setLiveSessions(ConcurrentMap<String, WebSocketSession> liveSessions) {
-        this.liveSessions = liveSessions;
-    }
-
-    public ConcurrentMap<String, WebSocketSession> getLiveSessions() {
-        return liveSessions;
-    }
 
     public static void setAddress(WebSocketSession session, String address) {
         session.put(CacheDomains.CLIENT_ADDRESS.getDomain(), address);
@@ -55,21 +31,6 @@ public class SessionParamHelper {
 
     public static String getAddress(WebSocketSession session) {
         return (String) session.asMap().get(CacheDomains.CLIENT_ADDRESS.getDomain());
-    }
-
-
-    public void setSharedActorCombatData(String actorId, CombatData combatData) {
-        combatDataCache.set(CacheKey.of(CacheDomains.COMBAT_DATA, actorId), combatData);
-    }
-
-    public CombatData getSharedActorCombatData(String actorId) {
-        CombatData combatData = combatDataCache.get(CacheKey.of(CacheDomains.COMBAT_DATA, actorId));
-        if (combatData == null) {
-            combatData = new CombatData(actorId);
-            setSharedActorCombatData(actorId, combatData);
-        }
-
-        return combatData;
     }
 
     public static Motion getMotion(WebSocketSession session) {
