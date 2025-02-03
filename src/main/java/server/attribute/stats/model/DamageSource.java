@@ -18,6 +18,6 @@ public class DamageSource {
     private String sourceSkillId;
     private String sourceStatusId;
     private Map<String, Double> damageMap;
-    private String avoidType;
+    private String additionalData;
 
 }

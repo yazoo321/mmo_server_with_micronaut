@@ -6,14 +6,11 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
-import server.attribute.stats.types.StatsTypes;
-import server.attribute.status.model.ActorStatus;
-import server.attribute.status.model.derived.Dead;
 import server.attribute.status.service.StatusService;
-import server.attribute.status.types.StatusTypes;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.combat.repository.CombatDataCache;
@@ -151,40 +148,25 @@ public class CombatService {
         clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, actorId);
     }
 
-    public void handleActorDeath(Stats stats, Stats killerStats) {
-        if (stats.getDerived(StatsTypes.CURRENT_HP) > 0.0) {
-            return;
-        }
+    public void handleActorDeath(DamageUpdateMessage damageUpdateMessage) {
+        Stats originStats = damageUpdateMessage.getOriginStats();
+        Stats targetStats = damageUpdateMessage.getTargetStats();
 
-        // TODO: make async
-        ActorStatus statuses = statusService.getActorStatus(stats.getActorId()).blockingGet();
-        statuses.aggregateStatusEffects();
-        if (statuses.getStatusEffects().contains(StatusTypes.DEAD.getType())) {
-            log.info("actor already dead");
-            return;
-        }
-
-        if (killerStats.isPlayer()) {
-            playerLevelStatsService.handleAddXp(stats, killerStats);
-        }
-
-        if (stats.isPlayer()) {
-            if (!killerStats.isPlayer()) {
-                actorThreatService
-                        .removeActorThreat(killerStats.getActorId(), List.of(stats.getActorId()))
-                        .delaySubscription(200, TimeUnit.MILLISECONDS)
-                        .subscribe();
-            }
-            statusService
-                    .removeAllStatuses(stats.getActorId())
-                    .doOnSuccess(
-                            status -> statusService.addStatusToActor(status, Set.of(new Dead())))
-                    .doOnError(er -> log.error(er.getMessage()))
+        if (!targetStats.isPlayer()) {
+            actorThreatService
+                    .resetActorThreat(originStats.getActorId())
+                    .delaySubscription(10_000, TimeUnit.MILLISECONDS)
                     .subscribe();
-
-        } else {
-            mobInstanceService.handleMobDeath(stats);
-            combatDataCache.deleteCombatData(stats.getActorId());
         }
+
+        if (!originStats.isPlayer()) {
+            actorThreatService
+                    .removeActorThreat(originStats.getActorId(), List.of(targetStats.getActorId()))
+                    .delaySubscription(200, TimeUnit.MILLISECONDS)
+                    .subscribe();
+        }
+
+        combatDataCache.deleteCombatData(targetStats.getActorId());
+
     }
 }

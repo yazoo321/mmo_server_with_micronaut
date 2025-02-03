@@ -2,16 +2,10 @@ package server.monster.server_integration.service;
 
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
-import server.attribute.status.model.derived.Dead;
 import server.attribute.status.service.StatusService;
 import server.combat.service.ActorThreatService;
 import server.common.dto.Location;
@@ -22,6 +16,12 @@ import server.monster.server_integration.repository.MobRepository;
 import server.motion.dto.MotionResult;
 import server.motion.repository.ActorMotionRepository;
 import server.socket.producer.UpdateProducer;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -93,37 +93,14 @@ public class MobInstanceService {
                 .doOnSuccess(motion -> itemService.handleItemDropsForMob(mobStats, motion))
                 .subscribe();
 
-        // we will set state to death and wait for animations etc
-        statusService
-                .removeAllStatuses(mobId)
-                .doOnSuccess(
-                        statuses -> statusService.addStatusToActor(statuses, Set.of(new Dead())))
-                .subscribe();
-
-        statusService
-                .deleteActorStatus(mobId)
-                .doOnError(err -> log.error(err.getMessage()))
-                .delaySubscription(DEATH_DELETE_TIME, TimeUnit.MILLISECONDS)
-                .subscribe();
-
-        statsService
-                .deleteStatsFor(mobId)
-                .doOnError(
-                        err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
-                .delaySubscription(DEATH_DELETE_TIME, TimeUnit.MILLISECONDS)
-                .subscribe();
 
         log.info("Will delete mob, current timestamp: {}", Instant.now());
-        Single.fromCallable(
-                        () ->
-                                mobRepository
-                                        .deleteMobInstance(mobId)
-                                        .doOnError(
-                                                err ->
-                                                        log.error(
-                                                                "Failed to delete mob instance, {}",
-                                                                err.getMessage()))
-                                        .subscribe())
+        Single.fromCallable(() -> mobRepository
+                        .deleteMobInstance(mobId)
+                        .doOnError(err -> log.error(
+                                "Failed to delete mob instance, {}",
+                                err.getMessage()))
+                        .subscribe())
                 .delaySubscription(10_000, TimeUnit.MILLISECONDS)
                 .doOnError(err -> log.error("error on handling mob death, {}", err.getMessage()))
                 .subscribe();
@@ -133,7 +110,7 @@ public class MobInstanceService {
                             updateProducer.removeMobsFromGame(mobId);
                             return 1;
                         })
-                .delaySubscription((DEATH_DELETE_TIME - 500), TimeUnit.MILLISECONDS)
+                .delaySubscription((DEATH_DELETE_TIME - 50), TimeUnit.MILLISECONDS)
                 .subscribe();
 
         actorThreatService

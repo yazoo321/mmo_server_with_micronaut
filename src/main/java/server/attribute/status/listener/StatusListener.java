@@ -6,6 +6,7 @@ import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.service.StatusService;
 import server.socket.model.SocketResponse;
@@ -40,5 +41,10 @@ public class StatusListener {
     public void requestAddActorStatus(ActorStatus actorStatus) {
         // should only populate: String actorId; Set<Status> actorStatuses;
         statusService.addStatusToActor(actorStatus.getActorId(), actorStatus.getActorStatuses());
+    }
+
+    @Topic("notify-actor-death")
+    void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {
+
     }
 }

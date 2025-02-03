@@ -1,4 +1,4 @@
-package server.combat;
+package server.combat.listener;
 
 import io.micronaut.configuration.kafka.annotation.KafkaListener;
 import io.micronaut.configuration.kafka.annotation.OffsetReset;
@@ -28,10 +28,14 @@ public class InternalCombatListener {
     WebsocketClientUpdatesService clientUpdatesService;
 
 
-    @Topic("processed-damage-updates")
-    public void receiveDamageUpdates(DamageUpdateMessage damageUpdateMessage) {
-        combatService.handleActorDeath(
-                damageUpdateMessage.getTargetStats(), damageUpdateMessage.getOriginStats());
+//    @Topic("processed-damage-updates")
+//    public void receiveDamageUpdates(DamageUpdateMessage damageUpdateMessage) {
+//
+//    }
+
+    @Topic("notify-actor-death")
+    void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {
+        combatService.handleActorDeath(damageUpdateMessage);
     }
 
     @Topic("update-threat-levels")

@@ -6,16 +6,20 @@ import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.time.Instant;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
+import server.attribute.status.model.derived.Dead;
 import server.attribute.status.producer.StatusProducer;
 import server.attribute.status.repository.StatusRepository;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
+
+import java.time.Instant;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Singleton
 @Slf4j
@@ -142,6 +146,20 @@ public class StatusService {
         return statusRepository
                 .updateStatus(actorId, new ActorStatus(actorId, Set.of(), false, Set.of()))
                 .doOnError(err -> log.error(err.getMessage()));
+    }
+
+    public void handleActorDeath(Stats actorStats) {
+        removeAllStatuses(actorStats.getActorId())
+            .doOnSuccess(statuses -> addStatusToActor(statuses, Set.of(new Dead())))
+            .subscribe();
+
+        if (!actorStats.isPlayer()) {
+            deleteActorStatus(actorStats.getActorId())
+                    .doOnError(err -> log.error(err.getMessage()))
+                    .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                    .subscribe();
+        }
+
     }
 
     @Scheduled(fixedDelay = "300ms")

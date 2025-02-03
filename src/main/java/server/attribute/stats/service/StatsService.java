@@ -10,6 +10,7 @@ import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.repository.ActorStatsRepository;
+import server.attribute.stats.types.DamageAdditionalData;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.talents.service.TalentService;
@@ -23,6 +24,8 @@ import server.socket.producer.UpdateProducer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Singleton
@@ -41,7 +44,15 @@ public class StatsService {
     @Inject
     CombatDataCache combatDataCache;
 
-    Random rand = new Random();
+    private final Random rand = new Random();
+
+    public static final Set<String> PHYSICAL_ATTACK_TYPES = Set.of(
+            DamageTypes.PHYSICAL.getType(),
+            DamageTypes.BLUDGEONING.getType(),
+            DamageTypes.PIERCING.getType(),
+            DamageTypes.SLASHING.getType(),
+            DamageTypes.BLEEDING.getType()
+    );
 
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();
@@ -186,10 +197,7 @@ public class StatsService {
                 .subscribe();
     }
 
-    public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
-        // TODO: send stat update once, send map of damage
-        // TODO: process damage reduction from sourceStats
-
+    private boolean handleDodge(Map<String, Double> damageMap, Stats stats, Stats sourceStats) {
         if (damageMap.containsKey(DamageTypes.PHYSICAL.getType())) {
             // this is a physical attack, check dodge chance
             double dodgeChance = stats.getDerived(StatsTypes.DODGE);
@@ -198,29 +206,89 @@ public class StatsService {
             if (chance <= dodgeChance) {
                 // dodged the attack
                 DamageSource damageSource = DamageSource.builder()
-                                .sourceActorId(sourceStats.getActorId())
-                                        .actorId(stats.getActorId())
-                                                .avoidType("DODGE")
+                        .sourceActorId(sourceStats.getActorId())
+                        .actorId(stats.getActorId())
+                        .additionalData(DamageAdditionalData.DODGE.getType())
                         .damageMap(new HashMap<>()).build();
                 updateProducer.updateDamage(new DamageUpdateMessage(damageSource, stats, sourceStats));
 
                 handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_DODGE_APPLY);
                 handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_DODGE_CONSUME);
-                return stats;
+                return true;
             }
         }
+        return false;
+    }
+
+    private boolean handleCrit(Map<String, Double> damageMap, Stats stats, Stats sourceStats) {
+        // TODO: specific checks for magic / physical crit chances
+        // e.g. physical, piercing, slashing, bleeding are all physical
+        // magical, frost, fire, etc are magic damage
+        // points to consider, what about imbued ? physical damage with magical elements
+        double phyCritRoll = stats.getDerived(StatsTypes.PHY_CRIT);
+        double mgcCritRoll = stats.getDerived(StatsTypes.MGC_CRIT);
+
+        double phyChance =  rand.nextDouble(100.0);
+        double mgcChance = rand.nextDouble(100.0);
+
+        boolean phyCrit = phyChance <= phyCritRoll;
+        boolean mgcCrit = mgcChance <= mgcCritRoll;
+        if (!(phyCrit || mgcCrit)) {
+            return false;
+        }
+
+        // critical achieved either in magic or physical roll, check if damage contains either
+        Set<Map.Entry<String, Double>> entrySet = damageMap.entrySet();
+        boolean critConsumed = false;
+
+        for (Map.Entry<String, Double> entry : entrySet) {
+            String type = entry.getKey();
+            Double amount = entry.getValue();
+
+            boolean phyType = PHYSICAL_ATTACK_TYPES.contains(type);
+            if (phyCrit && phyType) {
+                entry.setValue(amount * 2);
+                critConsumed = true;
+            } else if (mgcCrit && !phyType) {
+                entry.setValue(amount * 2);
+                critConsumed = true;
+            }
+        }
+
+        if (critConsumed) {
+            handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_CRIT_APPLY);
+            handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_CRIT_CONSUME);
+        }
+
+        return critConsumed;
+    }
+
+    public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
+        // TODO: consider hit chance?
+        if (handleDodge(damageMap, stats, sourceStats)) {
+            return stats;
+        }
+
+        // TODO: handle block event
+        // TODO: handle parry event
+        // TODO: handle energy resist/absorb event
 
         handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_HIT_APPLY);
         handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_HIT_CONSUME);
 
+        boolean isCrit = handleCrit(damageMap, stats, sourceStats);
+
+        // handle damage reduction
         Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
 
-        // apply damage reductions
+        // handle damage reduction
 
-        if (totalDamage <= 0) {
-            // no damage taken, ignore, or send 'blocked', or similar
+        if (totalDamage == 0) {
+            // no damage taken, ignore
             return stats;
         }
+
+        // negative damage is possible, its a healing effect.
 
         handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_DMG_APPLY);
         handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_DMG_CONSUME);
@@ -235,14 +303,41 @@ public class StatsService {
                         .damageMap(damageMap)
                         .actorId(stats.getActorId())
                         .sourceActorId(sourceStats.getActorId())
+                        .additionalData(isCrit ? DamageAdditionalData.CRIT.getType() :
+                                DamageAdditionalData.HIT.getType())
                         .build();
 
         log.info("Updating damage, {}, {}, {}", damageSource, stats, sourceStats);
 
-        updateProducer.updateDamage(new DamageUpdateMessage(damageSource, stats, sourceStats));
+        DamageUpdateMessage update = new DamageUpdateMessage(damageSource, stats, sourceStats);
+        updateProducer.updateDamage(update);
+
+        checkActorDeath(update);
 
         handleThreat(damageMap, stats.getActorId(), sourceStats.getActorId());
         return stats;
+    }
+
+    public void checkActorDeath(DamageUpdateMessage update) {
+        if (!(update.getTargetStats().getDerived(StatsTypes.CURRENT_HP) <= 0)) {
+            return;
+        }
+
+        // status service will need to add 'death' state
+        // player level stats service needs to add xp
+        // require to reset threat level relating to actor (combat service)
+        // if its a mob, mob instance server requires to handle it & drop items - done
+
+        updateProducer.notifyActorDeath(update);
+
+        // could push this to the event listener as well
+        if (!update.getTargetStats().isPlayer()) {
+            deleteStatsFor(update.getTargetStats().getActorId())
+                    .doOnError(
+                            err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
+                    .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                    .subscribe();
+        }
     }
 
     public Stats addHealth(Stats stats, Double amount) {

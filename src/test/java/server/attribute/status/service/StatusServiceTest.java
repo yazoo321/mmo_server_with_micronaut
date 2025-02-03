@@ -1,16 +1,32 @@
 package server.attribute.status.service;
 
-import static org.awaitility.Awaitility.await;
-
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import server.attribute.stats.model.Stats;
+import server.attribute.stats.service.StatsService;
+import server.attribute.stats.types.StatsTypes;
+import server.attribute.status.helpers.StatusTestHelper;
+import server.attribute.status.model.ActorStatus;
+import server.attribute.status.model.Status;
+import server.attribute.status.model.derived.Burning;
+import server.attribute.status.model.derived.Dead;
+import server.attribute.talents.model.ActorTalents;
+import server.attribute.talents.repository.TalentRepository;
+import server.session.SessionParamHelper;
+import server.socket.session.FakeSession;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,23 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.reactivestreams.Publisher;
-import server.attribute.stats.model.Stats;
-import server.attribute.stats.service.StatsService;
-import server.attribute.stats.types.StatsTypes;
-import server.attribute.status.helpers.StatusTestHelper;
-import server.attribute.status.model.ActorStatus;
-import server.attribute.status.model.Status;
-import server.attribute.status.model.derived.Burning;
-import server.attribute.status.model.derived.Dead;
-import server.session.SessionParamHelper;
-import server.socket.session.FakeSession;
+import static org.awaitility.Awaitility.await;
 
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -60,6 +60,9 @@ public class StatusServiceTest {
     @Inject
     StatusService statusService;
 
+    @Inject
+    TalentRepository talentRepository;
+
     @BeforeAll
     void reset() {
         configureRun();
@@ -74,16 +77,15 @@ public class StatusServiceTest {
         statusTestHelper.resetStatuses(List.of(TEST_ACTOR));
         statsService.deleteStatsFor(TEST_ACTOR).blockingSubscribe();
         statsService.initializePlayerStats(TEST_ACTOR).blockingSubscribe();
+        talentRepository.insertActorTalents(TEST_ACTOR, new ActorTalents(TEST_ACTOR, new HashMap<>()));
 
         statusTestHelper.resetStatuses(List.of(TEST_ACTOR_2));
         statsService.deleteStatsFor(TEST_ACTOR_2).blockingSubscribe();
         statsService.initializePlayerStats(TEST_ACTOR_2).blockingSubscribe();
+        talentRepository.insertActorTalents(TEST_ACTOR_2, new ActorTalents(TEST_ACTOR_2, new HashMap<>()));
 
         MockitoAnnotations.openMocks(this);
-//        Publisher mockSubscriber = Mockito.mock(Publisher.class);
-//        ConcurrentMap<String, WebSocketSession> testSessionData = new ConcurrentHashMap<>();
-//        testSessionData.put(TEST_ACTOR, session);
-//        Mockito.when(sessionParamHelper.getLiveSessions()).thenReturn(testSessionData);
+
     }
 
 
@@ -158,7 +160,6 @@ public class StatusServiceTest {
         // when
         statusService.addStatusToActor(initialStatus, Set.of(burning));
 
-//        Publisher mockSubscriber = Mockito.mock(Publisher.class);
         ConcurrentMap<String, WebSocketSession> testSessionData = new ConcurrentHashMap<>();
         testSessionData.put(TEST_ACTOR, session);
         Mockito.when(sessionParamHelper.getLiveSessions()).thenReturn(testSessionData);
