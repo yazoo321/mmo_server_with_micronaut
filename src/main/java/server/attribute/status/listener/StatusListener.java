@@ -45,6 +45,6 @@ public class StatusListener {
 
     @Topic("notify-actor-death")
     void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {
-
+        statusService.handleActorDeath(damageUpdateMessage.getTargetStats());
     }
 }

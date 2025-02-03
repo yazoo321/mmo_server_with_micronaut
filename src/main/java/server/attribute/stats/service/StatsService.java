@@ -168,6 +168,37 @@ public class StatsService {
                 .subscribe();
     }
 
+    public void flatHP_MP_Mod(DamageSource damageSource) {
+        // flat damage will bypass any damage reduction, threats, etc
+        // for HP, should only be used for heal, as will bypass death checks
+
+        if (damageSource.getAdditionalData().equals("PERCENT")) {
+            // this is used within talents to restore HP/Mana for example on kill
+
+            getStatsFor(damageSource.getActorId())
+                    .doOnSuccess(actorStats -> {
+                        if (damageSource.getDamageMap().containsKey("HP")) {
+                            double hpVal = damageSource.getDamageMap().get("HP");
+                            double maxHp = actorStats.getDerived(StatsTypes.MAX_HP);
+
+                            hpVal = maxHp * hpVal;
+
+                            addHealth(actorStats, hpVal);
+                        }
+
+                        if (damageSource.getDamageMap().containsKey("MP")) {
+                            double mpVal = damageSource.getDamageMap().get("MP");
+                            double maxMp = actorStats.getDerived(StatsTypes.MAX_MP);
+
+                            mpVal = maxMp * mpVal;
+
+                            addMana(actorStats, mpVal);
+                        }
+                    })
+                    .subscribe();
+        }
+    }
+
     public void takeDamage(String actorId, Map<String, Double> damageMap, String sourceActorId) {
         Single<Stats> targetActor = getStatsFor(actorId);
         Single<Stats> sourceActor = getStatsFor(sourceActorId);
@@ -338,12 +369,22 @@ public class StatsService {
                     .delaySubscription(10_000, TimeUnit.MILLISECONDS)
                     .subscribe();
         }
+
+        handleTalentApplyOnApplyType(update.getOriginStats(), update.getTargetStats(), AttributeApplyType.ON_DEATH_APPLY);
+        handleTalentApplyOnApplyType(update.getTargetStats(), update.getOriginStats(), AttributeApplyType.ON_DEATH_CONSUME);
     }
 
-    public Stats addHealth(Stats stats, Double amount) {
+    public Stats addHealth(Stats stats, double amount) {
         Double currentHp = stats.getDerived(StatsTypes.CURRENT_HP);
         currentHp += amount;
         setAndHandleDifference(stats, currentHp, StatsTypes.CURRENT_HP);
+        return stats;
+    }
+
+    public Stats addMana(Stats stats, double amount) {
+        Double currentMp = stats.getDerived(StatsTypes.CURRENT_MP);
+        currentMp += amount;
+        setAndHandleDifference(stats, currentMp, StatsTypes.CURRENT_MP);
         return stats;
     }
 

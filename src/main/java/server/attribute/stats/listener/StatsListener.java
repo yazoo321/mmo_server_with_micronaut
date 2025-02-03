@@ -79,6 +79,14 @@ public class StatsListener {
                 damageSource.getSourceActorId());
     }
 
+    @Topic("request-flat-change")
+    public void requestFlatChange(DamageSource damageSource) {
+        log.info("request for flat damage (positive or negative) received! {}", damageSource);
+        // hp should always be positive, mp can be negative
+        statsService.flatHP_MP_Mod(damageSource);
+    }
+
+
     @Topic("update-actor-status")
     public void receive_actor_statuses(ActorStatus actorStatus) {
         log.info("stats service received status update {}", actorStatus);

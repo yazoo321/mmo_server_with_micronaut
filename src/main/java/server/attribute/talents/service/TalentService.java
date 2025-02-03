@@ -2,6 +2,7 @@ package server.attribute.talents.service;
 
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
+import server.attribute.stats.model.DamageSource;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.talents.model.ActorTalents;
 import server.attribute.talents.model.Talent;
@@ -19,6 +20,10 @@ public class TalentService {
 
     public void requestAddStatusToActor(ActorStatus actorStatus) {
         talentProducer.requestAddStatusToActor(actorStatus);
+    }
+
+    public void requestStatChange(DamageSource damageSource) {
+        talentProducer.requestFlatChange(damageSource);
     }
 
     public Single<ActorTalents> getActorTalents(String actorId) {

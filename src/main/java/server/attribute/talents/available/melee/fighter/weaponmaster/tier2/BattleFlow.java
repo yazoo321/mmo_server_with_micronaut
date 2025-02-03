@@ -6,12 +6,14 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
 import server.attribute.common.model.AttributeRequirements;
+import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 import server.attribute.talents.service.TalentService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,5 +44,16 @@ public class BattleFlow extends Talent {
     public void applyEffect(
             Integer level, TalentService talentService, Stats actorStats, Stats targetStats) {
         // TODO: Need to re-work the damage apply and check death functions, break them into multiple services
+        DamageSource damageSource = new DamageSource();
+        damageSource.setActorId(actorStats.getActorId());
+        double increase = 0.03 * level;
+        Map<String, Double> damageMap = new HashMap<>();
+        damageMap.put("HP", increase);
+        damageMap.put("MP", increase);
+
+        damageSource.setDamageMap(damageMap);
+        damageSource.setAdditionalData("PERCENT");
+
+        talentService.requestStatChange(damageSource);
     }
 }
