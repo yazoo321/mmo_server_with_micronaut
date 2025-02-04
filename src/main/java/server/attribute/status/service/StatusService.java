@@ -17,6 +17,8 @@ import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
 
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -94,6 +96,36 @@ public class StatusService {
                 .subscribe();
     }
 
+    private Status findStatusWithShortestExpiry(Set<Status> data) {
+        return data.stream().min(Comparator.comparing(Status::getExpiration)).orElse(null);
+    }
+
+    private void handleStacking(Set<Status> statuses, ActorStatus actorStatus) {
+        Set<Status> existingSet = actorStatus.getActorStatuses();
+        Set<Status> removedSet = new HashSet<>();
+        for (Status status : statuses) {
+            int maxStacks = status.getMaxStacks();
+            String origin = status.getSkillId();
+            Set<Status> inScope = existingSet.stream().filter(s -> s.getSkillId().equals(origin))
+                    .collect(Collectors.toSet());
+
+            if (inScope.size() >= maxStacks) {
+                // remove the one ending soonest; this is not good approach but we can improve later.
+                Status shortest = findStatusWithShortestExpiry(inScope);
+                existingSet.remove(shortest);
+                removedSet.add(shortest);
+            }
+            existingSet.add(status);
+        }
+        actorStatus.aggregateStatusEffects();
+
+        if (!removedSet.isEmpty()) {
+            ActorStatus update = new ActorStatus(actorStatus.getActorId(), removedSet, false,
+                    actorStatus.getStatusEffects());
+            updateProducer.updateStatus(update);
+        }
+    }
+
     public void addStatusToActor(ActorStatus actorStatus, Set<Status> statuses) {
         actorStatus.aggregateStatusEffects();
         if (actorStatus.getStatusEffects().contains("DEAD")) {
@@ -102,8 +134,7 @@ public class StatusService {
         }
 
         log.info("Adding statuses to actor: {}", statuses);
-        actorStatus.getActorStatuses().addAll(statuses);
-        actorStatus.aggregateStatusEffects();
+        handleStacking(statuses, actorStatus);
 
         statusRepository
                 .updateStatus(actorStatus.getActorId(), actorStatus)

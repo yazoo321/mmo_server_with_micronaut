@@ -2,11 +2,15 @@ package server.attribute.status.model.derived;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import server.attribute.status.model.Status;
 import server.attribute.status.types.StatusTypes;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Serdeable
@@ -19,7 +23,7 @@ public class Dead extends Status {
         this.setAttributeEffects(Map.of());
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(null);
-        this.setCanStack(false);
+        this.setMaxStacks(1);
         this.setOrigin(null);
         this.setCategory(StatusTypes.DEAD.getType());
     }

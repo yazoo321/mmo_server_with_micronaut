@@ -59,7 +59,7 @@ public class CripplingBlows extends Talent {
         Instant expire = Instant.now().plusMillis(3000); // lasts for 3 seconds
         String sourceId = actorStats.getActorId();
         Double moveSpeedMultiplier = 0.8; // 20% reduction of speed
-        Status moveSlow = new MoveMod(expire, sourceId, moveSpeedMultiplier);
+        Status moveSlow = new MoveMod(expire, sourceId, moveSpeedMultiplier, 1, this.name);
 
         ActorStatus actorStatus = new ActorStatus();
         actorStatus.setActorId(targetStats.getActorId());

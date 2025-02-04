@@ -20,7 +20,7 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public class ArmorMod extends Status {
 
-    public ArmorMod(Instant expiration, String sourceId, Double armorMultiplier) {
+    public ArmorMod(Instant expiration, String sourceActorId, Double armorMultiplier, Integer maxStacks, String skillId) {
         this.setId(UUID.randomUUID().toString());
         this.setAttributeEffects(
                 new HashMap<>(
@@ -32,8 +32,9 @@ public class ArmorMod extends Status {
                                         armorMultiplier))));
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(expiration);
-        this.setCanStack(false);
-        this.setOrigin(sourceId);
+        this.setMaxStacks(maxStacks);
+        this.setOrigin(sourceActorId);
+        this.setSkillId(skillId);
         this.setCategory(StatusTypes.ARMOR_MOD.getType());
     }
 

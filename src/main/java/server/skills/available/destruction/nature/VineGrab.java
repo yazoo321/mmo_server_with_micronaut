@@ -3,12 +3,6 @@ package server.skills.available.destruction.nature;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
@@ -20,6 +14,13 @@ import server.attribute.status.model.derived.Stunned;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Serdeable
 @JsonTypeName("Vine grab")
@@ -83,7 +84,7 @@ public class VineGrab extends ChannelledSkill {
 
     private void applyStunEffect(CombatData combatData, ActorStatus targetStatus) {
         Status tangled =
-                new Stunned(Instant.now().plusSeconds((long) 2.0), combatData.getActorId());
+                new Stunned(Instant.now().plusSeconds((long) 2.0), combatData.getActorId(), this.getName());
         statusService.addStatusToActor(targetStatus, Set.of(tangled));
 
         scheduler.schedule(

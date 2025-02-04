@@ -2,12 +2,6 @@ package server.skills.available.destruction.fire;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import io.reactivex.rxjava3.core.Single;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +15,11 @@ import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillDependencies;
 import server.skills.model.SkillTarget;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 @Slf4j
 @Serdeable
@@ -72,7 +71,7 @@ public class Fireball extends ChannelledSkill {
 
             Instant duration = Instant.now().plusMillis(1500);
             Double tickDamage = dmgAmt / 7;
-            Status burn = new Burning(duration, actorStats.getActorId(), tickDamage);
+            Status burn = new Burning(duration, actorStats.getActorId(), tickDamage, 1, this.getName());
 
             statusService.addStatusToActor(targetStatus, Set.of(burn));
         };

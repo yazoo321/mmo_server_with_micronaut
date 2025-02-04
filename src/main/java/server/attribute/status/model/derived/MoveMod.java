@@ -20,7 +20,7 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public class MoveMod extends Status {
 
-    public MoveMod(Instant expiration, String sourceId, Double moveSpeedMultiplier) {
+    public MoveMod(Instant expiration, String sourceActorId, Double moveSpeedMultiplier, Integer maxStacks, String skillId) {
         this.setId(UUID.randomUUID().toString());
         this.setAttributeEffects(
                 new HashMap<>(
@@ -32,8 +32,9 @@ public class MoveMod extends Status {
                                         moveSpeedMultiplier))));
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(expiration);
-        this.setCanStack(false);
-        this.setOrigin(sourceId);
+        this.setMaxStacks(maxStacks);
+        this.setSkillId(skillId);
+        this.setOrigin(sourceActorId);
         this.setCategory(StatusTypes.MOVE_MOD.getType());
     }
 

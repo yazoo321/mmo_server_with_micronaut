@@ -144,7 +144,7 @@ public class StatusServiceTest {
         Instant expiration = Instant.now().plusMillis(2000);
         String source = "actor2";
         double damage = 40.0;
-        Status burning = new Burning(expiration, source, damage);
+        Status burning = new Burning(expiration, source, damage, 1, "Fireball");
 
         Stats initialStats = statsService.getStatsFor(TEST_ACTOR).blockingGet();
         Double initialHp = initialStats.getDerived(StatsTypes.CURRENT_HP);

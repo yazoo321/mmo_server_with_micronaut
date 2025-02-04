@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Consumer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,6 +17,13 @@ import server.attribute.status.service.StatusService;
 import server.attribute.status.types.StatusTypes;
 import server.skills.model.SkillDependencies;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
+
 @Data
 @Slf4j
 @Serdeable
@@ -28,7 +32,7 @@ import server.skills.model.SkillDependencies;
 @EqualsAndHashCode(callSuper = false)
 public class Bleeding extends Status {
 
-    public Bleeding(Instant expiration, String sourceId, Double damage) {
+    public Bleeding(Instant expiration, String sourceActorId, Double damage, Integer maxStacks, String skillId) {
         this.setId(UUID.randomUUID().toString());
         this.setAttributeEffects(
                 Map.of(
@@ -36,8 +40,9 @@ public class Bleeding extends Status {
                         new AttributeEffects(DamageTypes.PHYSICAL.getType(), damage, 1.0)));
         this.setStatusEffects(new HashSet<>());
         this.setExpiration(expiration);
-        this.setCanStack(true);
-        this.setOrigin(sourceId);
+        this.setMaxStacks(maxStacks);
+        this.setOrigin(sourceActorId);
+        this.setSkillId(skillId);
         this.setCategory(StatusTypes.BLEEDING.getType());
     }
 
