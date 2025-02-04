@@ -18,6 +18,7 @@ import java.util.*;
 @NoArgsConstructor
 @JsonTypeName("MOVE_SLOW")
 @EqualsAndHashCode(callSuper = false)
+@Deprecated
 public class ArmorMod extends Status {
 
     public ArmorMod(Instant expiration, String sourceActorId, Double armorMultiplier, Integer maxStacks, String skillId) {

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.Status;
-import server.attribute.status.types.StatusTypes;
 
 import java.time.Instant;
 import java.util.*;
@@ -16,30 +15,30 @@ import java.util.*;
 @Data
 @Serdeable
 @NoArgsConstructor
-@JsonTypeName("MOVE_SLOW")
+@JsonTypeName("ATTRIBUTE_MOD")
 @EqualsAndHashCode(callSuper = false)
-@Deprecated
-public class MoveMod extends Status {
+public class AttributeMod extends Status {
 
-    public MoveMod(Instant expiration, String sourceActorId, Double moveSpeedMultiplier, Integer maxStacks, String skillId) {
+    public AttributeMod(Instant expiration, String sourceActorId, StatsTypes attributeRef, Double attributeSum,
+                        Double attributeMultiplier, Integer maxStacks, String skillId) {
         this.setId(UUID.randomUUID().toString());
         this.setAttributeEffects(
                 new HashMap<>(
                         Map.of(
-                                StatsTypes.MOVE_SPEED.getType(),
+                                attributeRef.getType(),
                                 new AttributeEffects(
-                                        StatsTypes.MOVE_SPEED.getType(),
-                                        0.0,
-                                        moveSpeedMultiplier))));
+                                        attributeRef.getType(),
+                                        attributeSum,
+                                        attributeMultiplier))));
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(expiration);
         this.setMaxStacks(maxStacks);
-        this.setSkillId(skillId);
         this.setOrigin(sourceActorId);
-        this.setCategory(StatusTypes.MOVE_MOD.getType());
+        this.setSkillId(skillId);
+        this.setCategory(attributeRef.getType());
     }
 
     public Set<String> defaultStatusEffects() {
-        return new HashSet<>(Set.of(StatusTypes.MOVE_MOD.getType()));
+        return new HashSet<>(Set.of(getCategory()));
     }
 }

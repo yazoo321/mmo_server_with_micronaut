@@ -1,4 +1,4 @@
-package server.attribute.talents.available.melee.fighter.weaponmaster.tier2;
+package server.attribute.talents.available.melee.fighter.weaponmaster.tier4;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
@@ -24,22 +24,21 @@ import java.util.Set;
 
 @Slf4j
 @Serdeable
-@JsonTypeName("Crippling blows")
+@JsonTypeName("Executioners precision")
 @EqualsAndHashCode(callSuper = false)
-public class CripplingBlows extends Talent {
+public class ExecutionersPrecision extends Talent {
 
-    private final Random rand = new Random();
+    private Random rand = new Random();
 
-    public CripplingBlows() {
-        this.name = "Crippling blows";
-        this.description =
-                "Basic attacks have a 20% chance to reduce enemy movement speed by 20% for 3 sec";
-        this.levels = 1;
+    public ExecutionersPrecision() {
+        this.name = "Executioners precision";
+        this.description = " Attacks against low-health enemies (below 30%) will have a 50% chance to increase physical damage by 5% (per rank) for 5 seconds (max 5 ranks).";
+        this.levels = 5;
         this.treeName = "Weaponmaster";
         this.talentType = TalentType.AUGMENT.getType();
-        this.tier = 2;
+        this.tier = 4;
         this.attributeEffects = List.of();
-        this.applyType = AttributeApplyType.ON_DMG_APPLY.getType();
+        this.applyType = AttributeApplyType.ON_HIT_APPLY.getType();
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
         attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
@@ -51,21 +50,27 @@ public class CripplingBlows extends Talent {
     @Override
     public void applyEffect(
             Integer level, TalentService talentService, Stats actorStats, Stats targetStats) {
-        double chance = rand.nextDouble(1.0);
 
-        if (chance > 0.2) {
-            // 20% chance to activate
+        if (targetStats.getDerived(StatsTypes.CURRENT_HP) / targetStats.getDerived(StatsTypes.MAX_HP) > 0.3) {
+            // the target has more than 30% HP
             return;
         }
-        Instant expire = Instant.now().plusMillis(3000); // lasts for 3 seconds
-        String sourceId = actorStats.getActorId();
-        Double moveSpeedMultiplier = 0.8; // 20% reduction of speed
-//        Status moveSlow = new MoveMod(expire, sourceId, moveSpeedMultiplier, 1, this.name);
-        Status moveSlow = new AttributeMod(expire, sourceId, StatsTypes.MOVE_SPEED, 0.0,
-                moveSpeedMultiplier, 1, this.name);
+        double roll = rand.nextDouble(100.0);
+        if (roll > 50) {
+            return;
+        }
+
+        Instant expire = Instant.now().plusMillis(5_000);
+        String sourceActor = actorStats.getActorId();
+
+        Double phyAmpInc = 0.05 * level;
+
+        Status phyAmpStatus = new AttributeMod(expire, sourceActor, StatsTypes.PHY_AMP, phyAmpInc,
+                1.0, 1, this.name);
+
         ActorStatus actorStatus = new ActorStatus();
-        actorStatus.setActorId(targetStats.getActorId());
-        actorStatus.setActorStatuses(Set.of(moveSlow));
+        actorStatus.setActorId(actorStats.getActorId());
+        actorStatus.setActorStatuses(Set.of(phyAmpStatus));
 
         talentService.requestAddStatusToActor(actorStatus);
     }

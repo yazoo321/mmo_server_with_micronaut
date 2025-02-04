@@ -8,9 +8,10 @@ import server.attribute.common.model.AttributeApplyType;
 import server.attribute.common.model.AttributeRequirements;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
+import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
-import server.attribute.status.model.derived.ArmorMod;
+import server.attribute.status.model.derived.AttributeMod;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 import server.attribute.talents.service.TalentService;
@@ -54,8 +55,9 @@ public class SunderingStrikes extends Talent {
         double armorReduction = 0.05 * level;
         armorReduction = 1 - armorReduction;
 
-        Status armorReduce = new ArmorMod(expire, sourceActor, armorReduction, 1, this.name);
-
+//        Status armorReduce = new ArmorMod(expire, sourceActor, armorReduction, 1, this.name);
+        Status armorReduce = new AttributeMod(expire, sourceActor, StatsTypes.DEF, 0.0,
+                armorReduction, 1, this.name);
         ActorStatus actorStatus = new ActorStatus();
         actorStatus.setActorId(targetStats.getActorId());
         actorStatus.setActorStatuses(Set.of(armorReduce));
