@@ -72,7 +72,7 @@ public class CombatService {
                 .map(hostility -> hostility < 5);
     }
 
-    boolean validatePositionLocation(
+    public boolean validatePositionLocation(
             CombatData combatData,
             Motion attackerMotion,
             String target,

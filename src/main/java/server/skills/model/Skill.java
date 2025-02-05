@@ -6,8 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.websocket.WebSocketSession;
-import java.util.Map;
-import java.util.Random;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +17,14 @@ import server.combat.model.CombatRequest;
 import server.combat.service.CombatService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
-import server.skills.available.destruction.fire.Fireball;
-import server.skills.available.restoration.heals.BasicHeal;
+import server.skills.available.cleric.heals.BasicHeal;
+import server.skills.available.mage.fire.Fireball;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.SkillMessageType;
-import server.socket.service.ClientUpdatesService;
 import server.socket.service.WebsocketClientUpdatesService;
+
+import java.util.Map;
+import java.util.Random;
 
 @Slf4j
 @Serdeable
@@ -39,18 +40,25 @@ import server.socket.service.WebsocketClientUpdatesService;
 })
 public abstract class Skill {
 
+    @Getter
     @JsonProperty private String name;
 
+    @Getter
     @JsonProperty private String description;
 
+    @Getter
     @JsonProperty protected Map<String, Double> derived;
 
+    @Getter
     @JsonProperty private Integer maxRange;
 
+    @Getter
     @JsonProperty private Map<String, Integer> requirements;
 
+    @Getter
     @JsonProperty private Integer cooldown;
 
+    @Getter
     @JsonProperty private Integer travelSpeed;
 
     protected WebSocketSession session;
@@ -62,34 +70,6 @@ public abstract class Skill {
     @Setter protected StatsService statsService;
     @Setter protected StatusService statusService;
     @Setter protected CombatService combatService;
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Map<String, Double> getDerived() {
-        return derived;
-    }
-
-    public Integer getMaxRange() {
-        return maxRange;
-    }
-
-    public Map<String, Integer> getRequirements() {
-        return requirements;
-    }
-
-    public Integer getCooldown() {
-        return cooldown;
-    }
-
-    public Integer getTravelSpeed() {
-        return travelSpeed;
-    }
 
     public Skill(
             String name,

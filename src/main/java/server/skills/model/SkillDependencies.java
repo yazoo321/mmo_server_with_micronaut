@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
+import server.combat.model.CombatData;
 
 @Data
 @Builder
@@ -19,4 +20,7 @@ public class SkillDependencies {
 
     ActorStatus actorStatus;
     ActorStatus targetStatus;
+
+    SkillTarget skillTarget;
+    CombatData combatData;
 }

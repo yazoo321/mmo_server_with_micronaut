@@ -1,20 +1,26 @@
 package server.skills.active;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.reactivex.rxjava3.core.Single;
+import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
+import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.skills.behavior.InstantSkill;
 import server.skills.behavior.TravelSkill;
 import server.skills.model.Skill;
+import server.skills.model.SkillDependencies;
 import server.skills.model.SkillTarget;
 
+import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+
+@Slf4j
 public abstract class ActiveSkill extends Skill implements InstantSkill, TravelSkill {
 
     @JsonProperty
@@ -44,20 +50,21 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
     public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
         Map<String, Instant> skillsOnCd = combatData.getActivatedSkills();
 
+        // check if skill is on CD
         if (skillsOnCd.containsKey(this.getName())) {
             if (skillsOnCd
                     .get(this.getName())
                     .plusMillis(this.getCooldown())
                     .isBefore(Instant.now())) {
                 skillsOnCd.remove(this.getName());
-
-                return true;
+            } else {
+                return false;
             }
 
             return false;
-        } else {
-            return true;
         }
+        // validate location
+        return true;
     }
 
     @Override
@@ -90,6 +97,36 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                 () -> this.instantEffect(combatData, skillTarget),
                 (long) time,
                 TimeUnit.MILLISECONDS);
+    }
+
+    protected void prepareApply(CombatData combatData, SkillTarget skillTarget, Consumer<SkillDependencies> skillConsumer) {
+        Single<Stats> actorStatsSingle = statsService.getStatsFor(combatData.getActorId());
+        Single<Stats> targetStatsSingle = statsService.getStatsFor(skillTarget.getTargetId());
+        Single<ActorStatus> actorStatusSingle = statusService.getActorStatus(combatData.getActorId());
+        Single<ActorStatus> targetStatusSingle = statusService.getActorStatus(skillTarget.getTargetId());
+
+        Single.zip(actorStatsSingle, targetStatsSingle, actorStatusSingle, targetStatusSingle,
+                (actorStats, targetStats, actorStatus, targetStatus) -> {
+                    if (actorStatus.isDead() || targetStatus.isDead()) {
+                        log.info("Caster or target is dead, skipping casting of elcipse burst");
+                        return false;
+                    }
+                    if (!actorStatus.canCast()) {
+                        log.info("Skipping cast fireball as actor cannot cast at this time");
+                        return false;
+                    }
+
+                    SkillDependencies dependencies = SkillDependencies.builder()
+                            .actorStats(actorStats)
+                            .targetStats(targetStats)
+                            .actorStatus(actorStatus)
+                            .targetStatus(targetStatus)
+                            .combatData(combatData)
+                            .skillTarget(skillTarget)
+                            .build();
+                    skillConsumer.accept(dependencies);
+                    return true;
+                }).subscribe();
     }
 
 }

@@ -1,4 +1,4 @@
-package server.skills.available.factory;
+package server.skills.factory;
 
 import server.skills.model.Skill;
 

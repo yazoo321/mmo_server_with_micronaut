@@ -1,8 +1,7 @@
-package server.skills.available.destruction.fire;
+package server.skills.available.mage.fire;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-import io.reactivex.rxjava3.core.Single;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
@@ -43,20 +42,15 @@ public class Fireball extends ChannelledSkill {
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        prepareApply(combatData, skillTarget, applyFireball());
+        prepareApply(combatData, skillTarget, applyEffect());
     }
 
-    private Consumer<SkillDependencies> applyFireball() {
+    private Consumer<SkillDependencies> applyEffect() {
         return (data) -> {
             Stats actorStats = data.getActorStats();
             Stats targetStats = data.getTargetStats();
             ActorStatus actorStatus = data.getActorStatus();
             ActorStatus targetStatus = data.getTargetStatus();
-
-            if (!actorStatus.canCast()) {
-                log.info("Skipping cast fireball as actor cannot cast at this time");
-                return;
-            }
 
             Map<String, Double> actorDerived = actorStats.getDerivedStats();
             Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
@@ -65,34 +59,15 @@ public class Fireball extends ChannelledSkill {
 
             Map<String, Double> damageMap = Map.of(DamageTypes.FIRE.getType(), dmgAmt);
 
-            targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
+            statsService.takeDamage(targetStats, damageMap, actorStats);
 
             // add burning effect
-
             Instant duration = Instant.now().plusMillis(1500);
             Double tickDamage = dmgAmt / 7;
             Status burn = new Burning(duration, actorStats.getActorId(), tickDamage, 1, this.getName());
 
             statusService.addStatusToActor(targetStatus, Set.of(burn));
         };
-    }
-
-    private void prepareApply(CombatData combatData, SkillTarget skillTarget, Consumer<SkillDependencies> skillConsumer) {
-        Single<Stats> actorStatsSingle = statsService.getStatsFor(combatData.getActorId());
-        Single<Stats> targetStatsSingle = statsService.getStatsFor(skillTarget.getTargetId());
-        Single<ActorStatus> actorStatusSingle = statusService.getActorStatus(combatData.getActorId());
-        Single<ActorStatus> targetStatusSingle = statusService.getActorStatus(skillTarget.getTargetId());
-
-        Single.zip(actorStatsSingle, targetStatsSingle, actorStatusSingle, targetStatusSingle,
-                (actorStats, targetStats, actorStatus, targetStatus) -> {
-            SkillDependencies dependencies = SkillDependencies.builder()
-                    .actorStats(actorStats)
-                            .targetStats(targetStats)
-                                    .actorStatus(actorStatus)
-                                            .targetStatus(targetStatus).build();
-            skillConsumer.accept(dependencies);
-            return true;
-        }).subscribe();
     }
 
     @Override

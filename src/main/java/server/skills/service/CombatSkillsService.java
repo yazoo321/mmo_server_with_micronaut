@@ -9,14 +9,14 @@ import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.combat.repository.CombatDataCache;
 import server.session.SessionParamHelper;
-import server.skills.available.destruction.fire.Fireball;
-import server.skills.available.destruction.nature.EclipseBurst;
-import server.skills.available.destruction.nature.MoonsVengeance;
-import server.skills.available.destruction.nature.SunSmite;
-import server.skills.available.destruction.nature.VineGrab;
-import server.skills.available.factory.DefaultSkillFactory;
-import server.skills.available.restoration.heals.BasicHeal;
-import server.skills.available.restoration.heals.HealingRain;
+import server.skills.available.mage.fire.Fireball;
+import server.skills.available.mage.nature.EclipseBurst;
+import server.skills.available.mage.nature.MoonsVengeance;
+import server.skills.available.mage.nature.SunSmite;
+import server.skills.available.mage.nature.VineGrab;
+import server.skills.factory.DefaultSkillFactory;
+import server.skills.available.cleric.heals.BasicHeal;
+import server.skills.available.cleric.heals.HealingRain;
 import server.skills.model.ActorSkills;
 import server.skills.model.Skill;
 import server.skills.repository.ActorSkillsRepository;
@@ -60,6 +60,7 @@ public class CombatSkillsService {
         Skill skill = skillFactory.createSkill(skillName.toLowerCase());
 
         if (!skill.canApply(combatData, combatRequest.getSkillTarget())) {
+            log.info("Skill cannot be applied yet");
             return;
         }
 

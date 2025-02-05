@@ -1,4 +1,4 @@
-package server.skills.available.destruction.nature;
+package server.skills.available.mage.nature;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
@@ -9,30 +9,25 @@ import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.ActorStatus;
-import server.attribute.status.model.Status;
-import server.attribute.status.model.derived.Stunned;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
+import server.skills.model.SkillDependencies;
 import server.skills.model.SkillTarget;
 
-import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 @Serdeable
-@JsonTypeName("Sun smite")
+@JsonTypeName("Eclipse burst")
 @EqualsAndHashCode(callSuper = false)
 @Slf4j
-public class SunSmite extends ChannelledSkill {
+public class EclipseBurst extends ChannelledSkill {
 
-    public SunSmite() {
+    public EclipseBurst() {
         super(
-                "Sun smite",
-                "Summon the sun to smite the foe with fire damage",
-                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 100.0),
+                "Eclipse Burst",
+                "Summon the moon to fiercely strike a target with its magic power",
+                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 80.0),
                 0,
                 1000,
                 false,
@@ -42,8 +37,30 @@ public class SunSmite extends ChannelledSkill {
                 Map.of(), 0, 0);
     }
 
+    private Consumer<SkillDependencies> applyEffect() {
+        return (data) -> {
+            Stats actorStats = data.getActorStats();
+            Stats targetStats = data.getTargetStats();
+            ActorStatus actorStatus = data.getActorStatus();
+            ActorStatus targetStatus = data.getTargetStatus();
+
+            Map<String, Double> actorDerived = actorStats.getDerivedStats();
+            Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
+
+            Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
+            dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
+
+            Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
+
+            statsService.takeDamage(targetStats, damageMap, actorStats);
+        };
+    }
+
+
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
+        prepareApply(combatData, skillTarget, applyEffect());
+
         String target = skillTarget.getTargetId();
 
         Single<Stats> singleActorStats = statsService.getStatsFor(combatData.getActorId());
@@ -59,10 +76,11 @@ public class SunSmite extends ChannelledSkill {
 
             Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
 
-            targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
+            statsService.takeDamage(targetStats, damageMap, actorStats);
 
             return true;
         }).subscribe();
+
 
     }
 

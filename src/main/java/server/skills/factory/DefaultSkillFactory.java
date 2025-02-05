@@ -1,25 +1,25 @@
-package server.skills.available.factory;
+package server.skills.factory;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.service.CombatService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
-import server.skills.available.destruction.fire.Fireball;
-import server.skills.available.destruction.nature.EclipseBurst;
-import server.skills.available.destruction.nature.MoonsVengeance;
-import server.skills.available.destruction.nature.SunSmite;
-import server.skills.available.destruction.nature.VineGrab;
-import server.skills.available.restoration.heals.BasicHeal;
-import server.skills.available.restoration.heals.HealingRain;
+import server.skills.available.cleric.heals.BasicHeal;
+import server.skills.available.cleric.heals.HealingRain;
+import server.skills.available.mage.fire.Fireball;
+import server.skills.available.mage.nature.EclipseBurst;
+import server.skills.available.mage.nature.MoonsVengeance;
+import server.skills.available.mage.nature.SunSmite;
+import server.skills.available.mage.nature.VineGrab;
 import server.skills.model.Skill;
-import server.socket.service.ClientUpdatesService;
 import server.socket.service.WebsocketClientUpdatesService;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Singleton
 public class DefaultSkillFactory implements SkillFactory {

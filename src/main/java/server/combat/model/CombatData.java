@@ -2,15 +2,13 @@ package server.combat.model;
 
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.uuid.UUIDHelper;
+
+import java.time.Instant;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -49,6 +47,9 @@ public class CombatData {
         this.activatedSkills = new HashMap<>();
     }
 
+    // TODO: this will require rework;
+    // Consider using PriorityQueue instead
+    // This also does not support multiple skill charges, i.e. skill has 3 charges each one 30s cd
     public Map<String, Instant> getActivatedSkills() {
         return activatedSkills == null ? new HashMap<>() : activatedSkills;
     }

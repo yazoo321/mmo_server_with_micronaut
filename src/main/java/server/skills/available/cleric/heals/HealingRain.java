@@ -1,4 +1,4 @@
-package server.skills.available.restoration.heals;
+package server.skills.available.cleric.heals;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.EqualsAndHashCode;
