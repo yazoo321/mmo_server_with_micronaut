@@ -45,12 +45,9 @@ public class HealingRain extends TickingAoeSkill {
     }
 
     @Override
-    public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
-        return true;
-    }
+    public void applyEffect() {
+        CombatData combatData = skillDependencies.getCombatData();
 
-    @Override
-    public void applyEffect(CombatData combatData, SkillTarget skillTarget) {
         Stats actorStats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
         Map<String, Double> actorDerived = actorStats.getDerivedStats();
 
@@ -66,7 +63,7 @@ public class HealingRain extends TickingAoeSkill {
                         .doOnSuccess(actors -> actors.stream().parallel().forEach(actor -> {
                             Stats targetStats = statsService.getStatsFor(actor).blockingGet();
                             log.info("Applying Healing rain to: {}, will take: {}", actor, damageMap);
-                            targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
+                            statsService.takeDamage(targetStats, damageMap, actorStats);
                         }))
                         .subscribe())
                 .doOnError(err -> log.error("Healing rain encountered error: {}",err.getMessage()))

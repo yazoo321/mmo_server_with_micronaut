@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
+import server.combat.repository.CombatDataCache;
 import server.combat.service.CombatService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
@@ -40,6 +41,9 @@ public class DefaultSkillFactory implements SkillFactory {
 
     @Inject ActorMotionRepository actorMotionRepository;
 
+    @Inject
+    CombatDataCache combatDataCache;
+
     public DefaultSkillFactory() {
         skillTypes.put("fireball", Fireball.class);
         skillTypes.put("basic heal", BasicHeal.class);
@@ -62,6 +66,7 @@ public class DefaultSkillFactory implements SkillFactory {
             skill.setSessionParamHelper(sessionParamHelper);
             skill.setCombatService(combatService);
             skill.setActorMotionRepository(actorMotionRepository);
+            skill.setCombatDataCache(combatDataCache);
 
             return skill;
         } catch (InstantiationException

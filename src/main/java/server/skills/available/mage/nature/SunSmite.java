@@ -36,33 +36,20 @@ public class SunSmite extends ChannelledSkill {
                 Map.of(), 0, 0);
     }
 
-    private Consumer<SkillDependencies> applyEffect() {
-        return (data) -> {
-            Stats actorStats = data.getActorStats();
-            Stats targetStats = data.getTargetStats();
-            ActorStatus actorStatus = data.getActorStatus();
-            ActorStatus targetStatus = data.getTargetStatus();
-
-            Map<String, Double> actorDerived = actorStats.getDerivedStats();
-            Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
-
-            Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-            dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
-
-            Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
-
-            statsService.takeDamage(targetStats, damageMap, actorStats);
-        };
-    }
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        prepareApply(combatData, skillTarget, applyEffect());
-    }
+        Stats actorStats = skillDependencies.getActorStats();
+        Stats targetStats = skillDependencies.getTargetStats();
 
-    @Override
-    public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
-        return true;
-    }
+        Map<String, Double> actorDerived = actorStats.getDerivedStats();
+        Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
+
+        Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
+        dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
+
+        Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
+
+        statsService.takeDamage(targetStats, damageMap, actorStats);    }
 
 }

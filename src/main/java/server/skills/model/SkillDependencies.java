@@ -1,5 +1,6 @@
 package server.skills.model;
 
+import io.micronaut.websocket.WebSocketSession;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,4 +24,6 @@ public class SkillDependencies {
 
     SkillTarget skillTarget;
     CombatData combatData;
+
+    WebSocketSession session;
 }

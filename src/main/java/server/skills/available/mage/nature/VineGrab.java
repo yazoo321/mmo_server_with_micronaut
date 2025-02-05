@@ -12,7 +12,6 @@ import server.attribute.status.model.Status;
 import server.attribute.status.model.derived.Stunned;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
-import server.skills.model.SkillDependencies;
 import server.skills.model.SkillTarget;
 
 import java.time.Instant;
@@ -21,7 +20,6 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 @Serdeable
 @JsonTypeName("Vine grab")
@@ -47,37 +45,27 @@ public class VineGrab extends ChannelledSkill {
                 0);
     }
 
-    private Consumer<SkillDependencies> applyEffect() {
-        return (data) -> {
-            Stats actorStats = data.getActorStats();
-            Stats targetStats = data.getTargetStats();
-            ActorStatus actorStatus = data.getActorStatus();
-            ActorStatus targetStatus = data.getTargetStatus();
-            CombatData combatData = data.getCombatData();
-
-            Map<String, Double> actorDerived = actorStats.getDerivedStats();
-            Double mgcAmp =
-                    actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
-
-            Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-            dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
-
-            Map<String, Double> damageMap =
-                    Map.of(DamageTypes.PHYSICAL.getType(), dmgAmt);
-
-            statsService.takeDamage(targetStats, damageMap, actorStats);
-            applyStunEffect(combatData, targetStatus);
-        };
-    }
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        prepareApply(combatData, skillTarget, applyEffect());
-    }
+        Stats actorStats = skillDependencies.getActorStats();
+        Stats targetStats = skillDependencies.getTargetStats();
+        ActorStatus actorStatus = skillDependencies.getActorStatus();
+        ActorStatus targetStatus = skillDependencies.getTargetStatus();
+        combatData = skillDependencies.getCombatData();
 
-    @Override
-    public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
-        return true;
+        Map<String, Double> actorDerived = actorStats.getDerivedStats();
+        Double mgcAmp =
+                actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
+
+        Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
+        dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
+
+        Map<String, Double> damageMap =
+                Map.of(DamageTypes.PHYSICAL.getType(), dmgAmt);
+
+        statsService.takeDamage(targetStats, damageMap, actorStats);
+        applyStunEffect(combatData, targetStatus);
     }
 
     private void applyStunEffect(CombatData combatData, ActorStatus targetStatus) {

@@ -1,7 +1,6 @@
 package server.skills.available.cleric.heals;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import server.attribute.stats.model.Stats;
@@ -10,6 +9,8 @@ import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
+
+import java.util.Map;
 
 @Getter
 @JsonTypeName("Basic heal")
@@ -30,9 +31,11 @@ public class BasicHeal extends ChannelledSkill {
                 Map.of(), 0 , 0 );
     }
 
+
+
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Stats actorStats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
+        Stats actorStats = skillDependencies.getActorStats();
         Map<String, Double> actorDerived = actorStats.getDerivedStats();
 
         Double healAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
@@ -46,12 +49,7 @@ public class BasicHeal extends ChannelledSkill {
 
         Stats targetStats = statsService.getStatsFor(target).blockingGet();
 
-        targetStats = statsService.takeDamage(targetStats, damageMap, actorStats);
-
+        statsService.takeDamage(targetStats, damageMap, actorStats);
     }
 
-    @Override
-    public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
-        return true;
-    }
 }

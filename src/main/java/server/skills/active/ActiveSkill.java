@@ -1,6 +1,7 @@
 package server.skills.active;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
@@ -18,7 +19,6 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 @Slf4j
 public abstract class ActiveSkill extends Skill implements InstantSkill, TravelSkill {
@@ -47,7 +47,7 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
     }
 
     @Override
-    public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
+    public Single<Boolean> canApply(CombatData combatData, SkillTarget skillTarget) {
         Map<String, Instant> skillsOnCd = combatData.getActivatedSkills();
 
         // check if skill is on CD
@@ -58,13 +58,11 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                     .isBefore(Instant.now())) {
                 skillsOnCd.remove(this.getName());
             } else {
-                return false;
+                return Single.just(false);
             }
-
-            return false;
         }
         // validate location
-        return true;
+        return Single.just(true);
     }
 
     @Override
@@ -99,13 +97,14 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                 TimeUnit.MILLISECONDS);
     }
 
-    protected void prepareApply(CombatData combatData, SkillTarget skillTarget, Consumer<SkillDependencies> skillConsumer) {
+    @Override
+    protected Single<Boolean> prepareApply(CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
         Single<Stats> actorStatsSingle = statsService.getStatsFor(combatData.getActorId());
         Single<Stats> targetStatsSingle = statsService.getStatsFor(skillTarget.getTargetId());
         Single<ActorStatus> actorStatusSingle = statusService.getActorStatus(combatData.getActorId());
         Single<ActorStatus> targetStatusSingle = statusService.getActorStatus(skillTarget.getTargetId());
 
-        Single.zip(actorStatsSingle, targetStatsSingle, actorStatusSingle, targetStatusSingle,
+        return Single.zip(actorStatsSingle, targetStatsSingle, actorStatusSingle, targetStatusSingle,
                 (actorStats, targetStats, actorStatus, targetStatus) -> {
                     if (actorStatus.isDead() || targetStatus.isDead()) {
                         log.info("Caster or target is dead, skipping casting of elcipse burst");
@@ -116,7 +115,8 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                         return false;
                     }
 
-                    SkillDependencies dependencies = SkillDependencies.builder()
+                    this.session = session;
+                    this.skillDependencies = SkillDependencies.builder()
                             .actorStats(actorStats)
                             .targetStats(targetStats)
                             .actorStatus(actorStatus)
@@ -124,9 +124,17 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                             .combatData(combatData)
                             .skillTarget(skillTarget)
                             .build();
-                    skillConsumer.accept(dependencies);
+
+                    activateSkillInCache(combatData);
+
                     return true;
-                }).subscribe();
+                });
+    }
+
+    private void activateSkillInCache(CombatData combatData) {
+        Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
+        activatedSkills.put(this.getName(), Instant.now());
+        combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
     }
 
 }

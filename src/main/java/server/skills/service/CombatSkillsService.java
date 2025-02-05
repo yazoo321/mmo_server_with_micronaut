@@ -59,16 +59,11 @@ public class CombatSkillsService {
         String skillName = combatRequest.getSkillId();
         Skill skill = skillFactory.createSkill(skillName.toLowerCase());
 
-        if (!skill.canApply(combatData, combatRequest.getSkillTarget())) {
-            log.info("Skill cannot be applied yet");
-            return;
-        }
+        skill.tryApply(combatData, combatRequest.getSkillTarget(), session);
 
-        Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
-        activatedSkills.put(skillName, Instant.now());
-        combatDataCache.cacheCombatData(combatRequest.getActorId(), combatData);
+
         try {
-            skill.startSkill(combatData, combatRequest.getSkillTarget(), session);
+//            skill.startSkill(combatData, combatRequest.getSkillTarget(), session);
         } catch (Exception e) {
             log.error("Failed to start skill, {}", e.getMessage());
         }

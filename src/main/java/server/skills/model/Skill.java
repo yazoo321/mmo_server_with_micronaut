@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.websocket.WebSocketSession;
+import io.reactivex.rxjava3.core.Single;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
+import server.combat.repository.CombatDataCache;
 import server.combat.service.CombatService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
@@ -70,6 +72,9 @@ public abstract class Skill {
     @Setter protected StatsService statsService;
     @Setter protected StatusService statusService;
     @Setter protected CombatService combatService;
+    @Setter protected CombatDataCache combatDataCache;
+
+    protected SkillDependencies skillDependencies;
 
     public Skill(
             String name,
@@ -91,12 +96,30 @@ public abstract class Skill {
 
     protected Random rand = new Random();
 
-    public abstract void startSkill(
-            CombatData combatData, SkillTarget skillTarget, WebSocketSession session);
+    public abstract void startSkill();
 
     public abstract void endSkill(CombatData combatData, SkillTarget skillTarget);
 
-    public abstract boolean canApply(CombatData combatData, SkillTarget skillTarget);
+    public abstract Single<Boolean> canApply(CombatData combatData, SkillTarget skillTarget);
+
+    protected abstract Single<Boolean> prepareApply(CombatData combatData, SkillTarget skillTarget, WebSocketSession session);
+
+    public void tryApply(CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
+        canApply(combatData, skillTarget)
+                .doOnSuccess(canApply -> {
+                    if (!canApply) {
+                        log.info("Cannot apply skill at this time");
+                    }
+
+                    prepareApply(combatData, skillTarget, session)
+                            .doOnSuccess(canStart -> {
+                                if (canStart) {
+                                    startSkill();
+                                }
+                            }).subscribe();
+                })
+                .subscribe();
+    }
 
     @Override
     public boolean equals(Object o) {

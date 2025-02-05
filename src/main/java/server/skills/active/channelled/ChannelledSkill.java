@@ -1,12 +1,7 @@
 package server.skills.active.channelled;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.micronaut.websocket.WebSocketSession;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import lombok.Getter;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.combat.model.CombatState;
@@ -15,15 +10,18 @@ import server.skills.model.SkillTarget;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.SkillMessageType;
 
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public abstract class ChannelledSkill extends ActiveSkill {
 
+    @Getter
     @JsonProperty protected final int castTime;
     @JsonProperty protected final boolean allowsMovement;
     @JsonProperty protected final boolean canInterrupt;
-
-    public int getCastTime() {
-        return castTime;
-    }
 
     public boolean getAllowsMovement() {
         return allowsMovement;
@@ -55,15 +53,8 @@ public abstract class ChannelledSkill extends ActiveSkill {
     }
 
     @Override
-    public void startSkill(
-            CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
-        this.session = session;
-        startChanneling(combatData, skillTarget);
-    }
-
-    @Override
-    public void instantEffect(CombatData combatData, SkillTarget skillTarget) {
-        this.endSkill(combatData, skillTarget);
+    public void startSkill() {
+        startChanneling();
     }
 
     public void interruptChannel(CombatData combatData) {
@@ -75,7 +66,10 @@ public abstract class ChannelledSkill extends ActiveSkill {
         notifyStopChannel(combatData.getActorId(), false);
     }
 
-    public void startChanneling(CombatData combatData, SkillTarget skillTarget) {
+    public void startChanneling() {
+        CombatData combatData = skillDependencies.getCombatData();
+        SkillTarget skillTarget = skillDependencies.getSkillTarget();
+
         notifyStartChannel(combatData.getActorId());
         combatData.setCombatState(CombatState.CHANNELING.getType());
 
