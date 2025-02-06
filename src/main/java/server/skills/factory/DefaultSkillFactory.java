@@ -16,6 +16,7 @@ import server.skills.available.mage.nature.MoonsVengeance;
 import server.skills.available.mage.nature.SunSmite;
 import server.skills.available.mage.nature.VineGrab;
 import server.skills.model.Skill;
+import server.skills.producer.SkillProducer;
 import server.socket.service.WebsocketClientUpdatesService;
 
 import java.lang.reflect.InvocationTargetException;
@@ -40,6 +41,9 @@ public class DefaultSkillFactory implements SkillFactory {
     @Inject CombatService combatService;
 
     @Inject ActorMotionRepository actorMotionRepository;
+
+    @Inject
+    SkillProducer skillProducer;
 
     @Inject
     CombatDataCache combatDataCache;
@@ -67,6 +71,7 @@ public class DefaultSkillFactory implements SkillFactory {
             skill.setCombatService(combatService);
             skill.setActorMotionRepository(actorMotionRepository);
             skill.setCombatDataCache(combatDataCache);
+            skill.setSkillProducer(skillProducer);
 
             return skill;
         } catch (InstantiationException

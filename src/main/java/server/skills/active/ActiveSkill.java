@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
+import server.attribute.status.model.Status;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.skills.behavior.InstantSkill;
@@ -16,6 +18,7 @@ import server.skills.model.SkillTarget;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -97,6 +100,9 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                 TimeUnit.MILLISECONDS);
     }
 
+    // TODO: several of these requests are now not required as we use producer to request instead.
+    // e.g. stats services not required
+    // do we need to consider re-design ?
     @Override
     protected Single<Boolean> prepareApply(CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
         Single<Stats> actorStatsSingle = statsService.getStatsFor(combatData.getActorId());
@@ -135,6 +141,24 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
         activatedSkills.put(this.getName(), Instant.now());
         combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
+    }
+
+    protected void requestTakeDamage(String sourceActor, String actorId, Map<String, Double> damageMap) {
+        DamageSource damageSource = DamageSource.builder()
+                .actorId(actorId)
+                .sourceSkillId(this.getName())
+                .sourceActorId(sourceActor)
+                .damageMap(damageMap)
+                .build();
+        skillProducer.requestTakeDamage(damageSource);
+    }
+
+    protected void requestAddStatusEffect(String target, Set<Status> statuses) {
+        ActorStatus actorStatus = new ActorStatus();
+        actorStatus.setActorId(target);
+        actorStatus.setAdd(true);
+        actorStatus.setActorStatuses(statuses);
+        skillProducer.requestAddStatusToActor(actorStatus);
     }
 
 }

@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Singleton
 public class StatsService {
+    // TODO: Service getting quite large, consider splitting
 
     @Inject ActorStatsRepository repository;
 
@@ -294,6 +295,25 @@ public class StatsService {
         return critConsumed;
     }
 
+    public void handleDamageAmp(Map<String, Double> damageMap, Stats stats) {
+        Set<Map.Entry<String, Double>> entrySet = damageMap.entrySet();
+
+        Double phyAmp = stats.getDerived(StatsTypes.PHY_AMP);
+        Double mgcAmp = stats.getDerived(StatsTypes.MAG_AMP);
+        for (Map.Entry<String, Double> entry : entrySet) {
+            String type = entry.getKey();
+            Double amount = entry.getValue();
+
+
+            boolean phyType = PHYSICAL_ATTACK_TYPES.contains(type);
+            if (phyType) {
+                entry.setValue(amount * phyAmp * (1 + rand.nextDouble(0.15)));
+            } else {
+                entry.setValue(amount * mgcAmp * (1 + rand.nextDouble(0.15)));
+            }
+        }
+    }
+
     public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
         // TODO: consider hit chance?
         if (handleDodge(damageMap, stats, sourceStats)) {
@@ -306,6 +326,8 @@ public class StatsService {
 
         handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_HIT_APPLY);
         handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_HIT_CONSUME);
+
+        handleDamageAmp(damageMap, stats);
 
         boolean isCrit = handleCrit(damageMap, stats, sourceStats);
 

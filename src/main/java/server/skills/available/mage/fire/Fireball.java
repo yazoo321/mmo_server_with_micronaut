@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
-import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.model.derived.Burning;
 import server.combat.model.CombatData;
@@ -40,26 +38,20 @@ public class Fireball extends ChannelledSkill {
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Stats actorStats = skillDependencies.getActorStats();
-        Stats targetStats = skillDependencies.getTargetStats();
-        ActorStatus actorStatus = skillDependencies.getActorStatus();
-        ActorStatus targetStatus = skillDependencies.getTargetStatus();
-
-        Map<String, Double> actorDerived = actorStats.getDerivedStats();
-        Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
         Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
-
         Map<String, Double> damageMap = Map.of(DamageTypes.FIRE.getType(), dmgAmt);
 
-        statsService.takeDamage(targetStats, damageMap, actorStats);
+        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), damageMap);
+        addBurningEffect(dmgAmt, combatData, skillTarget);
+    }
 
+    private void addBurningEffect(Double dmgAmt, CombatData combatData, SkillTarget skillTarget) {
         // add burning effect
         Instant duration = Instant.now().plusMillis(1500);
         Double tickDamage = dmgAmt / 7;
-        Status burn = new Burning(duration, actorStats.getActorId(), tickDamage, 1, this.getName());
+        Status burn = new Burning(duration, combatData.getActorId(), tickDamage, 1, this.getName());
 
-        statusService.addStatusToActor(targetStatus, Set.of(burn));
+        requestAddStatusEffect(skillTarget.getTargetId(), Set.of(burn));
     }
 
 }

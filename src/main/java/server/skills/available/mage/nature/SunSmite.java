@@ -4,17 +4,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
-import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
-import server.skills.model.SkillDependencies;
 import server.skills.model.SkillTarget;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 @Serdeable
 @JsonTypeName("Sun smite")
@@ -39,17 +35,9 @@ public class SunSmite extends ChannelledSkill {
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Stats actorStats = skillDependencies.getActorStats();
-        Stats targetStats = skillDependencies.getTargetStats();
-
-        Map<String, Double> actorDerived = actorStats.getDerivedStats();
-        Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
-
         Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
-
         Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
-
-        statsService.takeDamage(targetStats, damageMap, actorStats);    }
+        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), damageMap);
+    }
 
 }

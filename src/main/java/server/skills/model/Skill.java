@@ -21,6 +21,7 @@ import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.skills.available.cleric.heals.BasicHeal;
 import server.skills.available.mage.fire.Fireball;
+import server.skills.producer.SkillProducer;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.SkillMessageType;
 import server.socket.service.WebsocketClientUpdatesService;
@@ -73,6 +74,9 @@ public abstract class Skill {
     @Setter protected StatusService statusService;
     @Setter protected CombatService combatService;
     @Setter protected CombatDataCache combatDataCache;
+
+    @Setter
+    protected SkillProducer skillProducer;
 
     protected SkillDependencies skillDependencies;
 

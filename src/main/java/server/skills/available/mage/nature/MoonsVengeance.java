@@ -5,10 +5,8 @@ import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
-import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatData;
 import server.common.dto.Location;
 import server.skills.active.aoe.TickingAoeSkill;
@@ -57,26 +55,18 @@ public class MoonsVengeance extends TickingAoeSkill {
 
     @Override
     public void applyEffect() {
-        Stats actorStats = skillDependencies.getActorStats();
-        Stats targetStats = skillDependencies.getTargetStats();
-        ActorStatus actorStatus = skillDependencies.getActorStatus();
-        ActorStatus targetStatus = skillDependencies.getTargetStatus();
-
         SkillTarget skillTarget = skillDependencies.getSkillTarget();
         CombatData combatData = skillDependencies.getCombatData();
 
-        Map<String, Double> actorDerived = actorStats.getDerivedStats();
-
-        Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
         Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
 
         Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
 
-        getAffectedActors(skillTarget, combatData)
-                .doOnSuccess(actors -> actors.stream().parallel().forEach(actor ->
-                        statsService.getStatsFor(actor).doOnSuccess(target ->
-                                statsService.takeDamage(target, damageMap, actorStats)).subscribe()))
+        getAffectedActors(skillTarget, combatData).doOnSuccess(
+                targets -> targets.stream().parallel().forEach(target ->
+                        requestTakeDamage(combatData.getActorId(), target, damageMap)))
                 .doOnError(err -> log.error("Error applying moons vengeance, {}", err.getMessage()))
-                .subscribe();    }
+                .subscribe();
+
+    }
 }

@@ -35,18 +35,9 @@ public class EclipseBurst extends ChannelledSkill {
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Stats actorStats = skillDependencies.getActorStats();
-        Stats targetStats = skillDependencies.getTargetStats();
-
-        Map<String, Double> actorDerived = actorStats.getDerivedStats();
-        Double mgcAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
-
         Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
-
         Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
-
-        statsService.takeDamage(targetStats, damageMap, actorStats);
+        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), damageMap);
     }
 
 }

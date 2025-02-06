@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
-import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.attribute.status.model.derived.Stunned;
 import server.combat.model.CombatData;
@@ -19,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Serdeable
 @JsonTypeName("Vine grab")
@@ -48,35 +45,18 @@ public class VineGrab extends ChannelledSkill {
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Stats actorStats = skillDependencies.getActorStats();
-        Stats targetStats = skillDependencies.getTargetStats();
-        ActorStatus actorStatus = skillDependencies.getActorStatus();
-        ActorStatus targetStatus = skillDependencies.getTargetStatus();
         combatData = skillDependencies.getCombatData();
-
-        Map<String, Double> actorDerived = actorStats.getDerivedStats();
-        Double mgcAmp =
-                actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
-
         Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        dmgAmt = dmgAmt * mgcAmp * (1 + rand.nextDouble(0.15));
 
-        Map<String, Double> damageMap =
-                Map.of(DamageTypes.PHYSICAL.getType(), dmgAmt);
+        // TODO: introduce new magic physical type, so it scales with magic amp
+        Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
 
-        statsService.takeDamage(targetStats, damageMap, actorStats);
-        applyStunEffect(combatData, targetStatus);
+        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), damageMap);
+        applyStunEffect(combatData, skillTarget.getTargetId());
     }
 
-    private void applyStunEffect(CombatData combatData, ActorStatus targetStatus) {
-        Status tangled =
-                new Stunned(Instant.now().plusSeconds((long) 2.0), combatData.getActorId(), this.getName());
-        statusService.addStatusToActor(targetStatus, Set.of(tangled));
-
-        // TODO: check if we can remove this, may not be necessary - we can increase resolution of global status checker
-        scheduler.schedule(
-                () -> statusService.removeStatusFromActor(targetStatus, Set.of(tangled)),
-                2000,
-                TimeUnit.MILLISECONDS);
+    private void applyStunEffect(CombatData combatData, String actorId) {
+        Status stun = new Stunned(Instant.now().plusMillis(2000), combatData.getActorId(), this.getName());
+        requestAddStatusEffect(actorId, Set.of(stun));
     }
 }

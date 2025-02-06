@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
@@ -47,23 +46,15 @@ public class HealingRain extends TickingAoeSkill {
     @Override
     public void applyEffect() {
         CombatData combatData = skillDependencies.getCombatData();
-
-        Stats actorStats = statsService.getStatsFor(combatData.getActorId()).blockingGet();
-        Map<String, Double> actorDerived = actorStats.getDerivedStats();
-
-        Double healAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
-
         Double healAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        healAmt = healAmt * healAmp * (1 + rand.nextDouble(0.15));
 
         Map<String, Double> damageMap = Map.of(DamageTypes.POSITIVE.getType(), healAmt);
 
         actorMotionRepository.fetchActorMotion(combatData.getActorId())
                 .doOnSuccess(motion -> getAffectedPlayers(new Location(motion), combatData.getActorId())
                         .doOnSuccess(actors -> actors.stream().parallel().forEach(actor -> {
-                            Stats targetStats = statsService.getStatsFor(actor).blockingGet();
                             log.info("Applying Healing rain to: {}, will take: {}", actor, damageMap);
-                            statsService.takeDamage(targetStats, damageMap, actorStats);
+                            requestTakeDamage(combatData.getActorId(), actor, damageMap);
                         }))
                         .subscribe())
                 .doOnError(err -> log.error("Healing rain encountered error: {}",err.getMessage()))

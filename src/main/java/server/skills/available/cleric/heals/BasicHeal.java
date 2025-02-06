@@ -3,7 +3,6 @@ package server.skills.available.cleric.heals;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
@@ -31,25 +30,11 @@ public class BasicHeal extends ChannelledSkill {
                 Map.of(), 0 , 0 );
     }
 
-
-
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Stats actorStats = skillDependencies.getActorStats();
-        Map<String, Double> actorDerived = actorStats.getDerivedStats();
-
-        Double healAmp = actorDerived.getOrDefault(StatsTypes.MAG_AMP.getType(), 1.0);
-
         Double healAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        healAmt = healAmt * healAmp * (1 + rand.nextDouble(0.15));
-
         Map<String, Double> damageMap = Map.of(DamageTypes.POSITIVE.getType(), healAmt);
-
-        String target = skillTarget.getTargetId();
-
-        Stats targetStats = statsService.getStatsFor(target).blockingGet();
-
-        statsService.takeDamage(targetStats, damageMap, actorStats);
+        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), damageMap);
     }
 
 }
