@@ -2,7 +2,6 @@ package server.socket.producer;
 
 import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
-import io.micronaut.scheduling.TaskExecutors;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
@@ -45,6 +44,9 @@ public interface UpdateProducer {
 
     @Topic("processed-damage-updates")
     void updateDamage(DamageUpdateMessage damageUpdateMessage);
+
+    @Topic("notify-actor-death")
+    void notifyActorDeath(DamageUpdateMessage damageUpdateMessage);
 
     @Topic("update-actor-status")
     void updateStatus(ActorStatus actorStatus);

@@ -6,18 +6,13 @@ import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
 import java.time.Instant;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.model.DamageSource;
-import server.attribute.stats.model.DamageUpdateMessage;
-import server.attribute.stats.model.Stats;
-import server.attribute.stats.service.StatsService;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.status.model.Status;
 import server.attribute.status.producer.StatusProducer;
@@ -33,15 +28,24 @@ import server.skills.model.SkillDependencies;
 @Slf4j
 public class Burning extends Status {
 
-    public Burning(Instant expiration, String sourceId, Double damage) {
-        log.info("Creating burning status effect, {}, {}, {}", expiration, sourceId, damage);
+    public Burning(
+            Instant expiration,
+            String sourceActorId,
+            Double damage,
+            Integer maxStacks,
+            String skillId) {
+        log.info("Creating burning status effect, {}, {}, {}", expiration, sourceActorId, damage);
         this.setId(UUID.randomUUID().toString());
-        this.setDerivedEffects(new HashMap<>());
-        this.getDerivedEffects().put(DamageTypes.FIRE.getType(), damage);
+        this.setAttributeEffects(new HashMap<>());
+        this.getAttributeEffects()
+                .put(
+                        DamageTypes.FIRE.getType(),
+                        new AttributeEffects(DamageTypes.FIRE.getType(), damage, 1.0));
         this.setStatusEffects(new HashSet<>(Set.of(StatusTypes.BURNING.getType())));
         this.setExpiration(expiration);
-        this.setCanStack(true);
-        this.setOrigin(sourceId);
+        this.setMaxStacks(maxStacks);
+        this.setOrigin(sourceActorId);
+        this.setSkillId(skillId);
         this.setCategory(StatusTypes.BURNING.getType());
     }
 
@@ -58,8 +62,11 @@ public class Burning extends Status {
                 log.info("Applying burn!");
                 Map<String, Double> damageMap = new HashMap<>();
                 String dmgType = DamageTypes.FIRE.getType();
-
-                damageMap.put(dmgType, this.getDerivedEffects().get(dmgType));
+                AttributeEffects attributeEffects = this.getAttributeEffects().get(dmgType);
+                Double dmg =
+                        attributeEffects.getAdditiveModifier()
+                                * attributeEffects.getMultiplyModifier();
+                damageMap.put(dmgType, dmg);
                 DamageSource damageSource = new DamageSource();
                 damageSource.setDamageMap(damageMap);
                 damageSource.setActorId(dependencies.getActorId());
@@ -77,10 +84,9 @@ public class Burning extends Status {
     }
 
     @Override
-    public Single<Boolean> apply(
+    public Single<Boolean> applyDamageEffect(
             String actorId, StatusService statusService, StatusProducer statusProducer) {
         log.info("Burning class applying effect");
-        return baseApply(actorId, statusService, applyBurn(), statusProducer);
+        return baseApplyDamageEffect(actorId, statusService, applyBurn(), statusProducer);
     }
-
 }

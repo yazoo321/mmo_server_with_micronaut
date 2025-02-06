@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
-import server.attribute.status.model.derived.Dead;
 import server.attribute.status.service.StatusService;
 import server.combat.service.ActorThreatService;
 import server.common.dto.Location;
@@ -93,26 +92,6 @@ public class MobInstanceService {
                 .doOnSuccess(motion -> itemService.handleItemDropsForMob(mobStats, motion))
                 .subscribe();
 
-        // we will set state to death and wait for animations etc
-        statusService
-                .removeAllStatuses(mobId)
-                .doOnSuccess(
-                        statuses -> statusService.addStatusToActor(statuses, Set.of(new Dead())))
-                .subscribe();
-
-        statusService
-                .deleteActorStatus(mobId)
-                .doOnError(err -> log.error(err.getMessage()))
-                .delaySubscription(DEATH_DELETE_TIME, TimeUnit.MILLISECONDS)
-                .subscribe();
-
-        statsService
-                .deleteStatsFor(mobId)
-                .doOnError(
-                        err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
-                .delaySubscription(DEATH_DELETE_TIME, TimeUnit.MILLISECONDS)
-                .subscribe();
-
         log.info("Will delete mob, current timestamp: {}", Instant.now());
         Single.fromCallable(
                         () ->
@@ -133,7 +112,7 @@ public class MobInstanceService {
                             updateProducer.removeMobsFromGame(mobId);
                             return 1;
                         })
-                .delaySubscription((DEATH_DELETE_TIME - 500), TimeUnit.MILLISECONDS)
+                .delaySubscription((DEATH_DELETE_TIME - 50), TimeUnit.MILLISECONDS)
                 .subscribe();
 
         actorThreatService

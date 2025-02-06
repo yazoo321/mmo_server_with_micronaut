@@ -10,6 +10,7 @@ public enum DamageTypes {
     PIERCING("PIERCING"),
     BLUDGEONING("BLUDGEONING"),
     PHYSICAL("PHYSICAL"),
+    BLEEDING("BLEEDING"),
     MAGIC("MAGIC"),
     FIRE("FIRE"),
     COLD("COLD"),

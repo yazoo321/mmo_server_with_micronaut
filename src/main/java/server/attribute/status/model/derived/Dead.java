@@ -2,8 +2,8 @@ package server.attribute.status.model.derived;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Data;
@@ -19,10 +19,10 @@ public class Dead extends Status {
 
     public Dead() {
         this.setId(UUID.randomUUID().toString());
-        this.setDerivedEffects(new HashMap<>());
+        this.setAttributeEffects(Map.of());
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(null);
-        this.setCanStack(false);
+        this.setMaxStacks(1);
         this.setOrigin(null);
         this.setCategory(StatusTypes.DEAD.getType());
     }

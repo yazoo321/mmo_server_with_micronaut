@@ -2,7 +2,7 @@
 plugins {
 	id "com.github.johnrengelman.shadow" version "8.1.1"
 	id "io.micronaut.application" version "4.4.2"
-	id "com.avast.gradle.docker-compose" version '0.17.7'
+	id "com.avast.gradle.docker-compose" version '0.17.12'
 	id "com.diffplug.spotless" version "6.25.0"
 	id "io.micronaut.openapi" version "4.4.2"
 	id "org.graalvm.buildtools.native" version '0.10.2'
@@ -130,6 +130,8 @@ java {
 	targetCompatibility = JavaVersion.toVersion("23")
 }
 
+// If having issues with mac + intellij, open it from terminal using: `open -a 'Intellij IDEA CE'`
+// https://github.com/palantir/gradle-docker/issues/162
 dockerCompose {
 	useComposeFiles = ['./docker-compose.yml']
 	stopContainers = false

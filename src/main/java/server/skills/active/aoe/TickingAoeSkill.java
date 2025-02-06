@@ -1,43 +1,70 @@
 package server.skills.active.aoe;
 
-import io.micronaut.websocket.WebSocketSession;
-import server.combat.model.CombatData;
-import server.combat.model.CombatState;
-import server.skills.behavior.PeriodicEffect;
-import server.skills.model.SkillTarget;
-
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import server.combat.model.CombatData;
+import server.combat.model.CombatState;
+import server.skills.behavior.PeriodicEffect;
+import server.skills.model.SkillTarget;
 
 public abstract class TickingAoeSkill extends AbstractAoeSkill implements PeriodicEffect {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-
-    public TickingAoeSkill(String name, String description, Map<String, Double> derived, int cooldown, int castTime,
-                           boolean allowsMovement, boolean canInterrupt, int maxRange, int travelSpeed,
-                           Map<String, Integer> requirements, int diameter, int durationMs, int ticks,
-                           boolean includeCaster) {
-        super(name, description, derived, cooldown, castTime, allowsMovement, canInterrupt, maxRange,
-                travelSpeed, requirements, diameter, durationMs, ticks, includeCaster);
+    public TickingAoeSkill(
+            String name,
+            String description,
+            Map<String, Double> derived,
+            int cooldown,
+            int castTime,
+            boolean allowsMovement,
+            boolean canInterrupt,
+            int maxRange,
+            int travelSpeed,
+            Map<String, Integer> requirements,
+            int diameter,
+            int durationMs,
+            int ticks,
+            boolean includeCaster) {
+        super(
+                name,
+                description,
+                derived,
+                cooldown,
+                castTime,
+                allowsMovement,
+                canInterrupt,
+                maxRange,
+                travelSpeed,
+                requirements,
+                diameter,
+                durationMs,
+                ticks,
+                includeCaster);
     }
 
     @Override
-    public void applyEffectAtInterval(CombatData combatData, SkillTarget skillTarget) {
-
-        if (!channelingInProgress(combatData)) {
+    public void applyEffectAtInterval() {
+        if (!channelingInProgress()) {
             return;
         }
 
         int effectTimer = this.durationMs / ticks;
         scheduler.schedule(
                 () -> {
-                    if (channelingInProgress(combatData)) {
-                        applyEffect(combatData, skillTarget);
-                        applyEffectAtInterval(combatData, skillTarget);
+                    if (channelingInProgress()) {
+                        prepareApply()
+                                .doOnSuccess(
+                                        success -> {
+                                            if (success) {
+                                                applyEffect();
+                                                applyEffectAtInterval();
+                                            }
+                                        })
+                                .subscribe();
                     }
                 },
                 effectTimer,
@@ -45,25 +72,27 @@ public abstract class TickingAoeSkill extends AbstractAoeSkill implements Period
     }
 
     @Override
-    public void startSkill(
-            CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
-        this.session = session;
-        startChanneling(combatData, skillTarget);
+    public void startSkill() {
+        startChanneling();
+        CombatData combatData = skillDependencies.getCombatData();
+        SkillTarget skillTarget = skillDependencies.getSkillTarget();
         updateSessionInitiateSkill(combatData.getActorId(), skillTarget);
     }
 
     @Override
-    public void startChanneling(CombatData combatData, SkillTarget skillTarget) {
+    public void startChanneling() {
+        CombatData combatData = skillDependencies.getCombatData();
+
         // slightly different behaviour to Channelling class
         notifyStartChannel(combatData.getActorId());
         combatData.setCombatState(CombatState.CHANNELING.getType());
-        applyEffectAtInterval(combatData, skillTarget);
+        applyEffectAtInterval();
 
         // Schedule a task to periodically check the channeling status
         ScheduledFuture<?> channelingTask =
                 scheduler.scheduleAtFixedRate(
                         () -> {
-                            if (!channelingInProgress(combatData)) {
+                            if (!channelingInProgress()) {
                                 // Channeling interrupted or completed
                                 scheduler.shutdownNow();
                             }
@@ -75,7 +104,7 @@ public abstract class TickingAoeSkill extends AbstractAoeSkill implements Period
         // Schedule a task to execute the skill after the channel time
         scheduler.schedule(
                 () -> {
-                    if (channelingInProgress(combatData)) {
+                    if (channelingInProgress()) {
                         notifyStopChannel(combatData.getActorId(), true);
                     }
                     combatData.setCombatState(CombatState.IDLE.getType());
@@ -84,5 +113,4 @@ public abstract class TickingAoeSkill extends AbstractAoeSkill implements Period
                 this.getCastTime(),
                 TimeUnit.MILLISECONDS);
     }
-
 }

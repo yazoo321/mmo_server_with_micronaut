@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.websocket.WebSocketSession;
-import java.util.Map;
-import java.util.Random;
+import io.reactivex.rxjava3.core.Single;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,15 +15,19 @@ import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
+import server.combat.repository.CombatDataCache;
 import server.combat.service.CombatService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
-import server.skills.available.destruction.fire.Fireball;
-import server.skills.available.restoration.heals.BasicHeal;
+import server.skills.available.cleric.heals.BasicHeal;
+import server.skills.available.mage.fire.Fireball;
+import server.skills.producer.SkillProducer;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.SkillMessageType;
-import server.socket.service.ClientUpdatesService;
 import server.socket.service.WebsocketClientUpdatesService;
+
+import java.util.Map;
+import java.util.Random;
 
 @Slf4j
 @Serdeable
@@ -39,19 +43,19 @@ import server.socket.service.WebsocketClientUpdatesService;
 })
 public abstract class Skill {
 
-    @JsonProperty private String name;
+    @Getter @JsonProperty private String name;
 
-    @JsonProperty private String description;
+    @Getter @JsonProperty private String description;
 
-    @JsonProperty protected Map<String, Double> derived;
+    @Getter @JsonProperty protected Map<String, Double> derived;
 
-    @JsonProperty private Integer maxRange;
+    @Getter @JsonProperty private Integer maxRange;
 
-    @JsonProperty private Map<String, Integer> requirements;
+    @Getter @JsonProperty private Map<String, Integer> requirements;
 
-    @JsonProperty private Integer cooldown;
+    @Getter @JsonProperty private Integer cooldown;
 
-    @JsonProperty private Integer travelSpeed;
+    @Getter @JsonProperty private Integer travelSpeed;
 
     protected WebSocketSession session;
 
@@ -62,33 +66,17 @@ public abstract class Skill {
     @Setter protected StatsService statsService;
     @Setter protected StatusService statusService;
     @Setter protected CombatService combatService;
+    @Setter protected CombatDataCache combatDataCache;
 
-    public String getName() {
-        return name;
-    }
+    @Setter protected SkillProducer skillProducer;
 
-    public String getDescription() {
-        return description;
-    }
+    protected SkillDependencies skillDependencies;
 
-    public Map<String, Double> getDerived() {
-        return derived;
-    }
-
-    public Integer getMaxRange() {
-        return maxRange;
-    }
-
-    public Map<String, Integer> getRequirements() {
-        return requirements;
-    }
-
-    public Integer getCooldown() {
-        return cooldown;
-    }
-
-    public Integer getTravelSpeed() {
-        return travelSpeed;
+    public SkillDependencies getSkillDependencies() {
+        if (skillDependencies == null) {
+            skillDependencies = new SkillDependencies();
+        }
+        return skillDependencies;
     }
 
     public Skill(
@@ -111,12 +99,37 @@ public abstract class Skill {
 
     protected Random rand = new Random();
 
-    public abstract void startSkill(
-            CombatData combatData, SkillTarget skillTarget, WebSocketSession session);
+    public abstract void startSkill();
 
     public abstract void endSkill(CombatData combatData, SkillTarget skillTarget);
 
-    public abstract boolean canApply(CombatData combatData, SkillTarget skillTarget);
+    public abstract Single<Boolean> canApply();
+
+    protected abstract Single<Boolean> prepareApply();
+
+    public void tryApply(CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
+        getSkillDependencies().setSession(session);
+        skillDependencies.setSkillTarget(skillTarget);
+        skillDependencies.setCombatData(combatData);
+
+        canApply()
+                .doOnSuccess(
+                        canApply -> {
+                            if (!canApply) {
+                                log.info("Cannot apply skill at this time");
+                            }
+
+                            prepareApply()
+                                    .doOnSuccess(
+                                            canStart -> {
+                                                if (canStart) {
+                                                    startSkill();
+                                                }
+                                            })
+                                    .subscribe();
+                        })
+                .subscribe();
+    }
 
     @Override
     public boolean equals(Object o) {

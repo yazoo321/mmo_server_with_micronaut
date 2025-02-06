@@ -1,13 +1,18 @@
 package server.skills.active;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.reactivex.rxjava3.core.Single;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
+import server.attribute.status.model.ActorStatus;
+import server.attribute.status.model.Status;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.skills.behavior.InstantSkill;
@@ -15,13 +20,12 @@ import server.skills.behavior.TravelSkill;
 import server.skills.model.Skill;
 import server.skills.model.SkillTarget;
 
+@Slf4j
 public abstract class ActiveSkill extends Skill implements InstantSkill, TravelSkill {
 
-    @JsonProperty
-    protected Integer durationMs;
+    @JsonProperty protected Integer durationMs;
 
-    @JsonProperty
-    protected Integer ticks;
+    @JsonProperty protected Integer ticks;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
@@ -41,23 +45,38 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
     }
 
     @Override
-    public boolean canApply(CombatData combatData, SkillTarget skillTarget) {
+    public Single<Boolean> canApply() {
+        CombatData combatData = skillDependencies.getCombatData();
+        SkillTarget skillTarget = skillDependencies.getSkillTarget();
         Map<String, Instant> skillsOnCd = combatData.getActivatedSkills();
 
+        // check if skill is on CD
         if (skillsOnCd.containsKey(this.getName())) {
             if (skillsOnCd
                     .get(this.getName())
                     .plusMillis(this.getCooldown())
                     .isBefore(Instant.now())) {
                 skillsOnCd.remove(this.getName());
-
-                return true;
+            } else {
+                return Single.just(false);
             }
-
-            return false;
-        } else {
-            return true;
         }
+        // validate location
+        Single<Motion> actorMotion =
+                actorMotionRepository.fetchActorMotion(combatData.getActorId());
+        Single<Motion> targetMotion =
+                actorMotionRepository.fetchActorMotion(skillTarget.getTargetId());
+
+        // consider pre-fetching other data too here, like status if required
+        return Single.zip(
+                actorMotion,
+                targetMotion,
+                (actor, target) -> {
+                    getSkillDependencies().setActorMotion(actor);
+                    getSkillDependencies().setTargetMotion(target);
+                    return combatService.validatePositionLocation(
+                            combatData, actor, target, this.getMaxRange(), session);
+                });
     }
 
     @Override
@@ -72,10 +91,8 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
             return;
         }
 
-        String targetId = skillTarget.getTargetId();
-        Motion targetMotion = actorMotionRepository.fetchActorMotion(targetId).blockingGet();
-        Motion actorMotion =
-                actorMotionRepository.fetchActorMotion(combatData.getActorId()).blockingGet();
+        Motion targetMotion = skillDependencies.getTargetMotion();
+        Motion actorMotion = skillDependencies.getActorMotion();
 
         int x = targetMotion.getX() - actorMotion.getX();
         int y = targetMotion.getY() - actorMotion.getY();
@@ -92,4 +109,70 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                 TimeUnit.MILLISECONDS);
     }
 
+    // TODO: several of these requests are now not required as we use producer to request instead.
+    // e.g. stats services not required
+    // do we need to consider re-design ?
+    @Override
+    protected Single<Boolean> prepareApply() {
+        CombatData combatData = skillDependencies.getCombatData();
+        SkillTarget skillTarget = skillDependencies.getSkillTarget();
+        Single<Stats> actorStatsSingle = statsService.getStatsFor(combatData.getActorId());
+        Single<Stats> targetStatsSingle = statsService.getStatsFor(skillTarget.getTargetId());
+        Single<ActorStatus> actorStatusSingle =
+                statusService.getActorStatus(combatData.getActorId());
+        Single<ActorStatus> targetStatusSingle =
+                statusService.getActorStatus(skillTarget.getTargetId());
+
+        return Single.zip(
+                actorStatsSingle,
+                targetStatsSingle,
+                actorStatusSingle,
+                targetStatusSingle,
+                (actorStats, targetStats, actorStatus, targetStatus) -> {
+                    if (actorStatus.isDead() || targetStatus.isDead()) {
+                        log.info("Caster or target is dead, skipping casting of eclipse burst");
+                        return false;
+                    }
+                    if (!actorStatus.canCast()) {
+                        log.info("Skipping cast fireball as actor cannot cast at this time");
+                        return false;
+                    }
+
+                    this.getSkillDependencies().setActorStats(actorStats);
+                    this.skillDependencies.setTargetStats(targetStats);
+                    this.skillDependencies.setActorStatus(actorStatus);
+                    this.skillDependencies.setTargetStatus(targetStatus);
+                    this.skillDependencies.setCombatData(combatData);
+
+                    activateSkillInCache(combatData);
+
+                    return true;
+                });
+    }
+
+    private void activateSkillInCache(CombatData combatData) {
+        Map<String, Instant> activatedSkills = combatData.getActivatedSkills();
+        activatedSkills.put(this.getName(), Instant.now());
+        combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
+    }
+
+    protected void requestTakeDamage(
+            String sourceActor, String actorId, Map<String, Double> damageMap) {
+        DamageSource damageSource =
+                DamageSource.builder()
+                        .actorId(actorId)
+                        .sourceSkillId(this.getName())
+                        .sourceActorId(sourceActor)
+                        .damageMap(damageMap)
+                        .build();
+        skillProducer.requestTakeDamage(damageSource);
+    }
+
+    protected void requestAddStatusEffect(String target, Set<Status> statuses) {
+        ActorStatus actorStatus = new ActorStatus();
+        actorStatus.setActorId(target);
+        actorStatus.setAdd(true);
+        actorStatus.setActorStatuses(statuses);
+        skillProducer.requestAddStatusToActor(actorStatus);
+    }
 }

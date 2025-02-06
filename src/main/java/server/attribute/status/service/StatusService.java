@@ -7,11 +7,16 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
+import server.attribute.status.model.derived.Dead;
 import server.attribute.status.producer.StatusProducer;
 import server.attribute.status.repository.StatusRepository;
 import server.session.SessionParamHelper;
@@ -84,6 +89,49 @@ public class StatusService {
         updateProducer.updateStatus(update);
     }
 
+    public void addStatusToActor(String actorId, Set<Status> statuses) {
+        getActorStatus(actorId)
+                .doOnSuccess(actorStatus -> addStatusToActor(actorStatus, statuses))
+                .subscribe();
+    }
+
+    private Status findStatusWithShortestExpiry(Set<Status> data) {
+        return data.stream().min(Comparator.comparing(Status::getExpiration)).orElse(null);
+    }
+
+    private void handleStacking(Set<Status> statuses, ActorStatus actorStatus) {
+        Set<Status> existingSet = actorStatus.getActorStatuses();
+        Set<Status> removedSet = new HashSet<>();
+        for (Status status : statuses) {
+            int maxStacks = status.getMaxStacks();
+            String origin = status.getSkillId();
+            Set<Status> inScope =
+                    existingSet.stream()
+                            .filter(s -> s.getSkillId().equals(origin))
+                            .collect(Collectors.toSet());
+
+            if (inScope.size() >= maxStacks) {
+                // remove the one ending soonest; this is not good approach but we can improve
+                // later.
+                Status shortest = findStatusWithShortestExpiry(inScope);
+                existingSet.remove(shortest);
+                removedSet.add(shortest);
+            }
+            existingSet.add(status);
+        }
+        actorStatus.aggregateStatusEffects();
+
+        if (!removedSet.isEmpty()) {
+            ActorStatus update =
+                    new ActorStatus(
+                            actorStatus.getActorId(),
+                            removedSet,
+                            false,
+                            actorStatus.getStatusEffects());
+            updateProducer.updateStatus(update);
+        }
+    }
+
     public void addStatusToActor(ActorStatus actorStatus, Set<Status> statuses) {
         actorStatus.aggregateStatusEffects();
         if (actorStatus.getStatusEffects().contains("DEAD")) {
@@ -92,8 +140,7 @@ public class StatusService {
         }
 
         log.info("Adding statuses to actor: {}", statuses);
-        actorStatus.getActorStatuses().addAll(statuses);
-        actorStatus.aggregateStatusEffects();
+        handleStacking(statuses, actorStatus);
 
         statusRepository
                 .updateStatus(actorStatus.getActorId(), actorStatus)
@@ -136,6 +183,19 @@ public class StatusService {
         return statusRepository
                 .updateStatus(actorId, new ActorStatus(actorId, Set.of(), false, Set.of()))
                 .doOnError(err -> log.error(err.getMessage()));
+    }
+
+    public void handleActorDeath(Stats actorStats) {
+        removeAllStatuses(actorStats.getActorId())
+                .doOnSuccess(statuses -> addStatusToActor(statuses, Set.of(new Dead())))
+                .subscribe();
+
+        if (!actorStats.isPlayer()) {
+            deleteActorStatus(actorStats.getActorId())
+                    .doOnError(err -> log.error(err.getMessage()))
+                    .delaySubscription(10_000, TimeUnit.MILLISECONDS)
+                    .subscribe();
+        }
     }
 
     @Scheduled(fixedDelay = "300ms")
@@ -185,7 +245,7 @@ public class StatusService {
                                                         .forEach(
                                                                 s -> {
                                                                     if (s.requiresDamageApply()) {
-                                                                        s.apply(
+                                                                        s.applyDamageEffect(
                                                                                         actor,
                                                                                         this,
                                                                                         statusProducer)

@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import server.combat.model.CombatData;
-import server.skills.available.destruction.fire.Fireball;
-import server.skills.available.restoration.heals.BasicHeal;
+import server.skills.available.cleric.heals.BasicHeal;
+import server.skills.available.mage.fire.Fireball;
 
 public class JacksonCodecCombatData implements RedisCodec<String, CombatData> {
 

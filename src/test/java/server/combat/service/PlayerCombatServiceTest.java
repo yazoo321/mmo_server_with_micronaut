@@ -23,6 +23,7 @@ import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
+import server.combat.repository.CombatDataCache;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.items.equippable.service.EquipItemService;
@@ -47,6 +48,8 @@ class PlayerCombatServiceTest {
     @Inject private StatusService statusService;
 
     @Inject private SessionParamHelper sessionParamHelper;
+
+    @Inject private CombatDataCache combatDataCache;
 
     @Spy private FakeSession session;
 
@@ -105,8 +108,8 @@ class PlayerCombatServiceTest {
                 .initializePlayerStats(CHARACTER_1)
                 .doOnError(err -> System.out.println(err.getMessage()))
                 .blockingSubscribe();
-        CombatData combatData = sessionParamHelper.getSharedActorCombatData(CHARACTER_1);
-        sessionParamHelper.setSharedActorCombatData(combatData.getActorId(), combatData);
+        CombatData combatData = combatDataCache.fetchCombatData(CHARACTER_1);
+        combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
         Motion playerMotion = playerMotionService.initializePlayerMotion(CHARACTER_1).blockingGet();
         SessionParamHelper.setActorId(session, CHARACTER_1);
 
@@ -132,8 +135,8 @@ class PlayerCombatServiceTest {
 
         // Then
         // check the attack loop has begun
-        combatData =
-                sessionParamHelper.getSharedActorCombatData(SessionParamHelper.getActorId(session));
+
+        combatData = combatDataCache.fetchCombatData(SessionParamHelper.getActorId(session));
         Set<String> targets = combatData.getTargets();
         Assertions.assertThat(targets.size()).isEqualTo(1);
 

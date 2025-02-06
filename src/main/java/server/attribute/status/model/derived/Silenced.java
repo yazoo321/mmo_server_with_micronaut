@@ -20,12 +20,13 @@ import server.attribute.status.types.StatusTypes;
 @EqualsAndHashCode(callSuper = false)
 public class Silenced extends Status {
 
-    public Silenced(Instant expiration, String sourceId) {
+    public Silenced(Instant expiration, String sourceId, String skillId) {
         this.setId(UUID.randomUUID().toString());
-        this.setDerivedEffects(new HashMap<>());
+        this.setAttributeEffects(new HashMap<>());
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(expiration);
-        this.setCanStack(false);
+        this.setMaxStacks(1);
+        this.setSkillId(skillId);
         this.setOrigin(sourceId);
         this.setCategory(StatusTypes.SILENCED.getType());
     }

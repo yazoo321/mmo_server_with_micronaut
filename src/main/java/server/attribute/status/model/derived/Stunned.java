@@ -20,13 +20,14 @@ import server.attribute.status.types.StatusTypes;
 @EqualsAndHashCode(callSuper = false)
 public class Stunned extends Status {
 
-    public Stunned(Instant expiration, String sourceId) {
+    public Stunned(Instant expiration, String sourceActorId, String skillId) {
         this.setId(UUID.randomUUID().toString());
-        this.setDerivedEffects(new HashMap<>());
+        this.setAttributeEffects(new HashMap<>());
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(expiration);
-        this.setCanStack(false);
-        this.setOrigin(sourceId);
+        this.setMaxStacks(1);
+        this.setOrigin(sourceActorId);
+        this.setSkillId(skillId);
         this.setCategory(StatusTypes.STUNNED.getType());
     }
 

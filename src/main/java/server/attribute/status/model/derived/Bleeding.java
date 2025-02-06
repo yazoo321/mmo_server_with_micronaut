@@ -5,12 +5,16 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.status.model.Status;
@@ -27,13 +31,22 @@ import server.skills.model.SkillDependencies;
 @EqualsAndHashCode(callSuper = false)
 public class Bleeding extends Status {
 
-    public Bleeding(Instant expiration, String sourceId, Double damage) {
+    public Bleeding(
+            Instant expiration,
+            String sourceActorId,
+            Double damage,
+            Integer maxStacks,
+            String skillId) {
         this.setId(UUID.randomUUID().toString());
-        this.setDerivedEffects(new HashMap<>(Map.of(DamageTypes.PHYSICAL.getType(), damage)));
+        this.setAttributeEffects(
+                Map.of(
+                        DamageTypes.PHYSICAL.getType(),
+                        new AttributeEffects(DamageTypes.PHYSICAL.getType(), damage, 1.0)));
         this.setStatusEffects(new HashSet<>());
         this.setExpiration(expiration);
-        this.setCanStack(true);
-        this.setOrigin(sourceId);
+        this.setMaxStacks(maxStacks);
+        this.setOrigin(sourceActorId);
+        this.setSkillId(skillId);
         this.setCategory(StatusTypes.BLEEDING.getType());
     }
 
@@ -48,8 +61,11 @@ public class Bleeding extends Status {
             try {
                 Map<String, Double> damageMap = new HashMap<>();
                 String dmgType = DamageTypes.PHYSICAL.getType();
-
-                damageMap.put(dmgType, this.getDerivedEffects().get(dmgType));
+                AttributeEffects attributeEffect = this.getAttributeEffects().get(dmgType);
+                Double dmg =
+                        attributeEffect.getAdditiveModifier()
+                                * attributeEffect.getMultiplyModifier();
+                damageMap.put(dmgType, dmg);
                 DamageSource damageSource = new DamageSource();
                 damageSource.setDamageMap(damageMap);
                 damageSource.setSourceActorId(dependencies.getActorStats().getActorId());
@@ -65,8 +81,8 @@ public class Bleeding extends Status {
     }
 
     @Override
-    public Single<Boolean> apply(
+    public Single<Boolean> applyDamageEffect(
             String actorId, StatusService statusService, StatusProducer statusProducer) {
-        return baseApply(actorId, statusService, applyBleed(), statusProducer);
+        return baseApplyDamageEffect(actorId, statusService, applyBleed(), statusProducer);
     }
 }

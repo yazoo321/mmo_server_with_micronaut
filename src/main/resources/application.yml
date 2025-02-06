@@ -26,6 +26,10 @@ micronaut:
       expire-after-write: 360s
       maximum-size: 1000
       cache-type: caffeine
+    talentLocalCache:
+      expire-after-write: 10s
+      maximum-size: 1000
+      cache-type: caffeine
 
 jackson:
   serialization:
@@ -97,7 +101,7 @@ mongo-database:
   actionbar: "actionbar"
   actorAllegiance: "actorAllegiance"
   actorThreat: "actorThreat"
-
+  actorTalents: "actorTalents"
 redisson:
   single-server-config:
     address: "redis://redis:6379"
@@ -129,6 +133,9 @@ redis:
     actor-status-cache:
       maximumSize: 1000
       value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+    actor-talent-cache:
+      maximumSize: 1000
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
     actor-equip-cache:
       maximumSize: 1000
       value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
@@ -145,5 +152,9 @@ redis:
       maximumSize: 1000
       value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
       expire-after-write: 360s
+    combat-data-cache:
+      maximumSize: 1000
+      expire-after-write: 360s
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
 feature-flags:
   enableUdp: true

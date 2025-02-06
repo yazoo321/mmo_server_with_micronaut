@@ -49,7 +49,8 @@ public class EquipRepository {
                 .map(res -> equippedItems);
     }
 
-    //    @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorId")
+    // TODO: Enable cache; identified issues in testing
+    //        @Cacheable(value = ACTOR_EQUIP_CACHE, parameters = "actorId")
     public Single<List<EquippedItems>> getEquippedItemsForCharacter(String actorId) {
         return Flowable.fromPublisher(equippedItemsCollection.find(eq("actorId", actorId)))
                 .toList();
