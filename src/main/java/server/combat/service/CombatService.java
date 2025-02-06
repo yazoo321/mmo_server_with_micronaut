@@ -72,24 +72,11 @@ public class CombatService {
                 .map(hostility -> hostility < 5);
     }
 
-    public boolean validatePositionLocation(
-            CombatData combatData,
-            Motion attackerMotion,
-            String target,
-            int distanceThreshold,
-            WebSocketSession session) {
-        // TODO: Refactor mob/player motion calls
-        // TODO: Make async
-
-        Motion targetMotion =
-                actorMotionRepository
-                        .fetchActorMotion(target)
-                        .doOnError(err -> log.error(err.getMessage()))
-                        .blockingGet();
+    public boolean validatePositionLocation(CombatData combatData, Motion attackerMotion, Motion targetMotion,
+                                            int distanceThreshold, WebSocketSession session) {
 
         if (targetMotion == null) {
-            combatData.getTargets().remove(target);
-
+            log.error("Target motion is null: this is unexpected, target should be removed from active list");
             return false;
         }
 
@@ -102,8 +89,8 @@ public class CombatService {
             }
             if (combatData.getLastHelperNotification() == null
                     || Instant.now().getEpochSecond()
-                                    - combatData.getLastHelperNotification().getEpochSecond()
-                            > 3) {
+                    - combatData.getLastHelperNotification().getEpochSecond()
+                    > 3) {
                 combatData.setLastHelperNotification(Instant.now());
                 combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
 
@@ -121,6 +108,22 @@ public class CombatService {
         }
 
         return true;
+    }
+
+    public boolean validatePositionLocation(
+            CombatData combatData,
+            Motion attackerMotion,
+            String target,
+            int distanceThreshold,
+            WebSocketSession session) {
+
+        Motion targetMotion =
+                actorMotionRepository
+                        .fetchActorMotion(target)
+                        .doOnError(err -> log.error(err.getMessage()))
+                        .blockingGet();
+
+        return validatePositionLocation(combatData, attackerMotion, targetMotion, distanceThreshold, session);
     }
 
     List<Stats> getTargetStats(Set<String> actors) {

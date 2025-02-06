@@ -1,7 +1,6 @@
 package server.skills.active;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
@@ -13,7 +12,6 @@ import server.common.dto.Motion;
 import server.skills.behavior.InstantSkill;
 import server.skills.behavior.TravelSkill;
 import server.skills.model.Skill;
-import server.skills.model.SkillDependencies;
 import server.skills.model.SkillTarget;
 
 import java.time.Instant;
@@ -50,7 +48,9 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
     }
 
     @Override
-    public Single<Boolean> canApply(CombatData combatData, SkillTarget skillTarget) {
+    public Single<Boolean> canApply() {
+        CombatData combatData = skillDependencies.getCombatData();
+        SkillTarget skillTarget = skillDependencies.getSkillTarget();
         Map<String, Instant> skillsOnCd = combatData.getActivatedSkills();
 
         // check if skill is on CD
@@ -65,7 +65,15 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
             }
         }
         // validate location
-        return Single.just(true);
+        Single<Motion> actorMotion = actorMotionRepository.fetchActorMotion(combatData.getActorId());
+        Single<Motion> targetMotion = actorMotionRepository.fetchActorMotion(skillTarget.getTargetId());
+
+        // consider pre-fetching other data too here, like status if required
+        return Single.zip(actorMotion, targetMotion, (actor, target) -> {
+            getSkillDependencies().setActorMotion(actor);
+            getSkillDependencies().setTargetMotion(target);
+            return combatService.validatePositionLocation(combatData, actor, target, this.getMaxRange(), session);
+        });
     }
 
     @Override
@@ -80,10 +88,8 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
             return;
         }
 
-        String targetId = skillTarget.getTargetId();
-        Motion targetMotion = actorMotionRepository.fetchActorMotion(targetId).blockingGet();
-        Motion actorMotion =
-                actorMotionRepository.fetchActorMotion(combatData.getActorId()).blockingGet();
+        Motion targetMotion = skillDependencies.getTargetMotion();
+        Motion actorMotion = skillDependencies.getActorMotion();
 
         int x = targetMotion.getX() - actorMotion.getX();
         int y = targetMotion.getY() - actorMotion.getY();
@@ -104,7 +110,9 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
     // e.g. stats services not required
     // do we need to consider re-design ?
     @Override
-    protected Single<Boolean> prepareApply(CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
+    protected Single<Boolean> prepareApply() {
+        CombatData combatData = skillDependencies.getCombatData();
+        SkillTarget skillTarget = skillDependencies.getSkillTarget();
         Single<Stats> actorStatsSingle = statsService.getStatsFor(combatData.getActorId());
         Single<Stats> targetStatsSingle = statsService.getStatsFor(skillTarget.getTargetId());
         Single<ActorStatus> actorStatusSingle = statusService.getActorStatus(combatData.getActorId());
@@ -113,7 +121,7 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         return Single.zip(actorStatsSingle, targetStatsSingle, actorStatusSingle, targetStatusSingle,
                 (actorStats, targetStats, actorStatus, targetStatus) -> {
                     if (actorStatus.isDead() || targetStatus.isDead()) {
-                        log.info("Caster or target is dead, skipping casting of elcipse burst");
+                        log.info("Caster or target is dead, skipping casting of eclipse burst");
                         return false;
                     }
                     if (!actorStatus.canCast()) {
@@ -121,15 +129,11 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                         return false;
                     }
 
-                    this.session = session;
-                    this.skillDependencies = SkillDependencies.builder()
-                            .actorStats(actorStats)
-                            .targetStats(targetStats)
-                            .actorStatus(actorStatus)
-                            .targetStatus(targetStatus)
-                            .combatData(combatData)
-                            .skillTarget(skillTarget)
-                            .build();
+                    this.getSkillDependencies().setActorStats(actorStats);
+                    this.skillDependencies.setTargetStats(targetStats);
+                    this.skillDependencies.setActorStatus(actorStatus);
+                    this.skillDependencies.setTargetStatus(targetStatus);
+                    this.skillDependencies.setCombatData(combatData);
 
                     activateSkillInCache(combatData);
 

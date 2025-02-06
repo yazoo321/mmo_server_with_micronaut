@@ -25,18 +25,15 @@ public abstract class TickingAoeSkill extends AbstractAoeSkill implements Period
 
     @Override
     public void applyEffectAtInterval() {
-        CombatData combatData = skillDependencies.getCombatData();
-        SkillTarget skillTarget = skillDependencies.getSkillTarget();
-
-        if (!channelingInProgress(combatData)) {
+        if (!channelingInProgress()) {
             return;
         }
 
         int effectTimer = this.durationMs / ticks;
         scheduler.schedule(
                 () -> {
-                    if (channelingInProgress(combatData)) {
-                        prepareApply(combatData, skillTarget, session)
+                    if (channelingInProgress()) {
+                        prepareApply()
                                 .doOnSuccess(success -> {
                                     if (success) {
                                         applyEffect();
@@ -71,7 +68,7 @@ public abstract class TickingAoeSkill extends AbstractAoeSkill implements Period
         ScheduledFuture<?> channelingTask =
                 scheduler.scheduleAtFixedRate(
                         () -> {
-                            if (!channelingInProgress(combatData)) {
+                            if (!channelingInProgress()) {
                                 // Channeling interrupted or completed
                                 scheduler.shutdownNow();
                             }
@@ -83,7 +80,7 @@ public abstract class TickingAoeSkill extends AbstractAoeSkill implements Period
         // Schedule a task to execute the skill after the channel time
         scheduler.schedule(
                 () -> {
-                    if (channelingInProgress(combatData)) {
+                    if (channelingInProgress()) {
                         notifyStopChannel(combatData.getActorId(), true);
                     }
                     combatData.setCombatState(CombatState.IDLE.getType());

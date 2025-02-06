@@ -52,7 +52,6 @@ public class MoonsVengeance extends TickingAoeSkill {
                 .flatMap(motion -> getAffectedActors(new Location(motion), combatData.getActorId()));
     }
 
-
     @Override
     public void applyEffect() {
         SkillTarget skillTarget = skillDependencies.getSkillTarget();

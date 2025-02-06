@@ -77,7 +77,7 @@ public abstract class ChannelledSkill extends ActiveSkill {
         ScheduledFuture<?> channelingTask =
                 scheduler.scheduleAtFixedRate(
                         () -> {
-                            if (!channelingInProgress(combatData)) {
+                            if (!channelingInProgress()) {
                                 // Channeling interrupted or completed
                                 scheduler.shutdownNow();
                             }
@@ -89,7 +89,7 @@ public abstract class ChannelledSkill extends ActiveSkill {
         // Schedule a task to execute the skill after the channel time
         scheduler.schedule(
                 () -> {
-                    if (channelingInProgress(combatData)) {
+                    if (channelingInProgress()) {
                         notifyStopChannel(combatData.getActorId(), true);
                         updateSessionInitiateSkill(combatData.getActorId(), skillTarget);
                         this.travel(combatData, skillTarget);
@@ -101,7 +101,8 @@ public abstract class ChannelledSkill extends ActiveSkill {
                 TimeUnit.MILLISECONDS);
     }
 
-    protected boolean channelingInProgress(CombatData combatData) {
+    protected boolean channelingInProgress() {
+        CombatData combatData = skillDependencies.getCombatData();
         return combatData.getCombatState().equalsIgnoreCase(CombatState.CHANNELING.getType());
     }
 

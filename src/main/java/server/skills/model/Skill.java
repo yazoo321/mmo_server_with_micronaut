@@ -80,6 +80,13 @@ public abstract class Skill {
 
     protected SkillDependencies skillDependencies;
 
+    public SkillDependencies getSkillDependencies() {
+         if (skillDependencies == null) {
+             skillDependencies = new SkillDependencies();
+         }
+         return skillDependencies;
+    }
+
     public Skill(
             String name,
             String description,
@@ -104,18 +111,22 @@ public abstract class Skill {
 
     public abstract void endSkill(CombatData combatData, SkillTarget skillTarget);
 
-    public abstract Single<Boolean> canApply(CombatData combatData, SkillTarget skillTarget);
+    public abstract Single<Boolean> canApply();
 
-    protected abstract Single<Boolean> prepareApply(CombatData combatData, SkillTarget skillTarget, WebSocketSession session);
+    protected abstract Single<Boolean> prepareApply();
 
     public void tryApply(CombatData combatData, SkillTarget skillTarget, WebSocketSession session) {
-        canApply(combatData, skillTarget)
+        getSkillDependencies().setSession(session);
+        skillDependencies.setSkillTarget(skillTarget);
+        skillDependencies.setCombatData(combatData);
+
+        canApply()
                 .doOnSuccess(canApply -> {
                     if (!canApply) {
                         log.info("Cannot apply skill at this time");
                     }
 
-                    prepareApply(combatData, skillTarget, session)
+                    prepareApply()
                             .doOnSuccess(canStart -> {
                                 if (canStart) {
                                     startSkill();
