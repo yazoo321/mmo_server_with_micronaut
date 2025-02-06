@@ -2,13 +2,11 @@ package server.skills.factory;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.repository.CombatDataCache;
 import server.combat.service.CombatService;
+import server.items.equippable.service.EquipItemService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.skills.available.cleric.heals.BasicHeal;
@@ -22,6 +20,10 @@ import server.skills.model.Skill;
 import server.skills.producer.SkillProducer;
 import server.socket.service.WebsocketClientUpdatesService;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+
 @Singleton
 public class DefaultSkillFactory implements SkillFactory {
 
@@ -34,6 +36,9 @@ public class DefaultSkillFactory implements SkillFactory {
     @Inject StatsService statsService;
 
     @Inject StatusService statusService;
+
+    @Inject
+    EquipItemService equipItemService;
 
     @Inject CombatService combatService;
 
@@ -67,6 +72,7 @@ public class DefaultSkillFactory implements SkillFactory {
             skill.setActorMotionRepository(actorMotionRepository);
             skill.setCombatDataCache(combatDataCache);
             skill.setSkillProducer(skillProducer);
+            skill.setEquipItemService(equipItemService);
 
             return skill;
         } catch (InstantiationException

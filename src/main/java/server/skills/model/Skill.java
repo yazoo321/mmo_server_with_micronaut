@@ -17,6 +17,7 @@ import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.combat.repository.CombatDataCache;
 import server.combat.service.CombatService;
+import server.items.equippable.service.EquipItemService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.skills.available.cleric.heals.BasicHeal;
@@ -67,6 +68,7 @@ public abstract class Skill {
     @Setter protected StatusService statusService;
     @Setter protected CombatService combatService;
     @Setter protected CombatDataCache combatDataCache;
+    @Setter protected EquipItemService equipItemService;
 
     @Setter protected SkillProducer skillProducer;
 

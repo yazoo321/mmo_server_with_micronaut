@@ -2,12 +2,6 @@ package server.skills.active;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.reactivex.rxjava3.core.Single;
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
@@ -15,10 +9,18 @@ import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
+import server.items.equippable.model.EquippedItems;
 import server.skills.behavior.InstantSkill;
 import server.skills.behavior.TravelSkill;
 import server.skills.model.Skill;
 import server.skills.model.SkillTarget;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public abstract class ActiveSkill extends Skill implements InstantSkill, TravelSkill {
@@ -114,6 +116,7 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
     // do we need to consider re-design ?
     @Override
     protected Single<Boolean> prepareApply() {
+        // Actor and Target motion have been added by canApply function.
         CombatData combatData = skillDependencies.getCombatData();
         SkillTarget skillTarget = skillDependencies.getSkillTarget();
         Single<Stats> actorStatsSingle = statsService.getStatsFor(combatData.getActorId());
@@ -123,12 +126,15 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         Single<ActorStatus> targetStatusSingle =
                 statusService.getActorStatus(skillTarget.getTargetId());
 
+        Single<Map<String, EquippedItems>> equipItemsSingle = equipItemService.getEquippedItemsMap(combatData.getActorId());
+        // TODO: should we remove items from the request? the item effects for weapons now merged in stats.
         return Single.zip(
                 actorStatsSingle,
                 targetStatsSingle,
                 actorStatusSingle,
                 targetStatusSingle,
-                (actorStats, targetStats, actorStatus, targetStatus) -> {
+                equipItemsSingle,
+                (actorStats, targetStats, actorStatus, targetStatus, equippedItems) -> {
                     if (actorStatus.isDead() || targetStatus.isDead()) {
                         log.info("Caster or target is dead, skipping casting of eclipse burst");
                         return false;
@@ -143,6 +149,7 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                     this.skillDependencies.setActorStatus(actorStatus);
                     this.skillDependencies.setTargetStatus(targetStatus);
                     this.skillDependencies.setCombatData(combatData);
+                    this.skillDependencies.setEquippedItems(equippedItems);
 
                     activateSkillInCache(combatData);
 
