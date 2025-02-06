@@ -2,13 +2,12 @@ package server.combat.model;
 
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.uuid.UUIDHelper;
-
-import java.time.Instant;
-import java.util.*;
 
 @Data
 @AllArgsConstructor

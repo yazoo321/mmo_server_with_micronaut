@@ -3,6 +3,10 @@ package server.skills.available.mage.nature;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.types.DamageTypes;
@@ -11,11 +15,6 @@ import server.combat.model.CombatData;
 import server.common.dto.Location;
 import server.skills.active.aoe.TickingAoeSkill;
 import server.skills.model.SkillTarget;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 @Serdeable
 @JsonTypeName("Moons vengeance")
@@ -49,7 +48,8 @@ public class MoonsVengeance extends TickingAoeSkill {
     private Single<List<String>> getAffectedActors(SkillTarget skillTarget, CombatData combatData) {
         return actorMotionRepository
                 .fetchActorMotion(skillTarget.getTargetId())
-                .flatMap(motion -> getAffectedActors(new Location(motion), combatData.getActorId()));
+                .flatMap(
+                        motion -> getAffectedActors(new Location(motion), combatData.getActorId()));
     }
 
     @Override
@@ -61,11 +61,18 @@ public class MoonsVengeance extends TickingAoeSkill {
 
         Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
 
-        getAffectedActors(skillTarget, combatData).doOnSuccess(
-                targets -> targets.stream().parallel().forEach(target ->
-                        requestTakeDamage(combatData.getActorId(), target, damageMap)))
+        getAffectedActors(skillTarget, combatData)
+                .doOnSuccess(
+                        targets ->
+                                targets.stream()
+                                        .parallel()
+                                        .forEach(
+                                                target ->
+                                                        requestTakeDamage(
+                                                                combatData.getActorId(),
+                                                                target,
+                                                                damageMap)))
                 .doOnError(err -> log.error("Error applying moons vengeance, {}", err.getMessage()))
                 .subscribe();
-
     }
 }

@@ -43,26 +43,19 @@ import java.util.Random;
 })
 public abstract class Skill {
 
-    @Getter
-    @JsonProperty private String name;
+    @Getter @JsonProperty private String name;
 
-    @Getter
-    @JsonProperty private String description;
+    @Getter @JsonProperty private String description;
 
-    @Getter
-    @JsonProperty protected Map<String, Double> derived;
+    @Getter @JsonProperty protected Map<String, Double> derived;
 
-    @Getter
-    @JsonProperty private Integer maxRange;
+    @Getter @JsonProperty private Integer maxRange;
 
-    @Getter
-    @JsonProperty private Map<String, Integer> requirements;
+    @Getter @JsonProperty private Map<String, Integer> requirements;
 
-    @Getter
-    @JsonProperty private Integer cooldown;
+    @Getter @JsonProperty private Integer cooldown;
 
-    @Getter
-    @JsonProperty private Integer travelSpeed;
+    @Getter @JsonProperty private Integer travelSpeed;
 
     protected WebSocketSession session;
 
@@ -75,16 +68,15 @@ public abstract class Skill {
     @Setter protected CombatService combatService;
     @Setter protected CombatDataCache combatDataCache;
 
-    @Setter
-    protected SkillProducer skillProducer;
+    @Setter protected SkillProducer skillProducer;
 
     protected SkillDependencies skillDependencies;
 
     public SkillDependencies getSkillDependencies() {
-         if (skillDependencies == null) {
-             skillDependencies = new SkillDependencies();
-         }
-         return skillDependencies;
+        if (skillDependencies == null) {
+            skillDependencies = new SkillDependencies();
+        }
+        return skillDependencies;
     }
 
     public Skill(
@@ -121,18 +113,21 @@ public abstract class Skill {
         skillDependencies.setCombatData(combatData);
 
         canApply()
-                .doOnSuccess(canApply -> {
-                    if (!canApply) {
-                        log.info("Cannot apply skill at this time");
-                    }
+                .doOnSuccess(
+                        canApply -> {
+                            if (!canApply) {
+                                log.info("Cannot apply skill at this time");
+                            }
 
-                    prepareApply()
-                            .doOnSuccess(canStart -> {
-                                if (canStart) {
-                                    startSkill();
-                                }
-                            }).subscribe();
-                })
+                            prepareApply()
+                                    .doOnSuccess(
+                                            canStart -> {
+                                                if (canStart) {
+                                                    startSkill();
+                                                }
+                                            })
+                                    .subscribe();
+                        })
                 .subscribe();
     }
 

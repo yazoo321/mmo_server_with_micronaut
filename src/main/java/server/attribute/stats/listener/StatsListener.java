@@ -5,6 +5,8 @@ import io.micronaut.configuration.kafka.annotation.OffsetReset;
 import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.model.DamageSource;
@@ -18,9 +20,6 @@ import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Slf4j
 @KafkaListener(
         groupId = "stats-listener",
@@ -33,8 +32,7 @@ public class StatsListener {
 
     @Inject StatsService statsService;
 
-    @Inject
-    PlayerLevelStatsService playerLevelStatsService;
+    @Inject PlayerLevelStatsService playerLevelStatsService;
 
     @Topic("update-actor-stats")
     public void receiveUpdatePlayerAttributes(Stats stats) {
@@ -65,8 +63,7 @@ public class StatsListener {
     void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {
         if (damageUpdateMessage.getOriginStats().isPlayer()) {
             playerLevelStatsService.handleAddXp(
-                    damageUpdateMessage.getTargetStats(),
-                    damageUpdateMessage.getOriginStats());
+                    damageUpdateMessage.getTargetStats(), damageUpdateMessage.getOriginStats());
         }
     }
 
@@ -85,7 +82,6 @@ public class StatsListener {
         // hp should always be positive, mp can be negative
         statsService.flatHP_MP_Mod(damageSource);
     }
-
 
     @Topic("update-actor-status")
     public void receive_actor_statuses(ActorStatus actorStatus) {

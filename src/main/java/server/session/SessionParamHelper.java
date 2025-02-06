@@ -2,6 +2,10 @@ package server.session;
 
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Singleton;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,18 +15,12 @@ import server.common.uuid.UUIDHelper;
 import server.motion.model.SessionParams;
 import server.session.model.CacheDomains;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 @Singleton
 @Slf4j
 @NoArgsConstructor
 public class SessionParamHelper {
 
-    @Getter
-    @Setter
+    @Getter @Setter
     public ConcurrentMap<String, WebSocketSession> liveSessions = new ConcurrentHashMap<>();
 
     public static void setAddress(WebSocketSession session, String address) {

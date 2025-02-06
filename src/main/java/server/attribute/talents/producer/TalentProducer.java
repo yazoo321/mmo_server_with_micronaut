@@ -13,5 +13,4 @@ public interface TalentProducer {
 
     @Topic("request-flat-change")
     void requestFlatChange(DamageSource damageSource);
-
 }

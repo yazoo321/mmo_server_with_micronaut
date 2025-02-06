@@ -1,6 +1,11 @@
 package server.skills.active.channelled;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
@@ -10,16 +15,9 @@ import server.skills.model.SkillTarget;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.SkillMessageType;
 
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 public abstract class ChannelledSkill extends ActiveSkill {
 
-    @Getter
-    @JsonProperty protected final int castTime;
+    @Getter @JsonProperty protected final int castTime;
     @JsonProperty protected final boolean allowsMovement;
     @JsonProperty protected final boolean canInterrupt;
 
@@ -46,7 +44,16 @@ public abstract class ChannelledSkill extends ActiveSkill {
             Map<String, Integer> requirements,
             int durationMs,
             int ticks) {
-        super(name, description, derived, cooldown, maxRange, travelSpeed, requirements, durationMs, ticks);
+        super(
+                name,
+                description,
+                derived,
+                cooldown,
+                maxRange,
+                travelSpeed,
+                requirements,
+                durationMs,
+                ticks);
         this.castTime = castTime;
         this.allowsMovement = allowsMovement;
         this.canInterrupt = canInterrupt;

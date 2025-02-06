@@ -2,6 +2,11 @@ package server.monster.server_integration.service;
 
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import server.attribute.stats.model.Stats;
@@ -16,12 +21,6 @@ import server.monster.server_integration.repository.MobRepository;
 import server.motion.dto.MotionResult;
 import server.motion.repository.ActorMotionRepository;
 import server.socket.producer.UpdateProducer;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -93,14 +92,17 @@ public class MobInstanceService {
                 .doOnSuccess(motion -> itemService.handleItemDropsForMob(mobStats, motion))
                 .subscribe();
 
-
         log.info("Will delete mob, current timestamp: {}", Instant.now());
-        Single.fromCallable(() -> mobRepository
-                        .deleteMobInstance(mobId)
-                        .doOnError(err -> log.error(
-                                "Failed to delete mob instance, {}",
-                                err.getMessage()))
-                        .subscribe())
+        Single.fromCallable(
+                        () ->
+                                mobRepository
+                                        .deleteMobInstance(mobId)
+                                        .doOnError(
+                                                err ->
+                                                        log.error(
+                                                                "Failed to delete mob instance, {}",
+                                                                err.getMessage()))
+                                        .subscribe())
                 .delaySubscription(10_000, TimeUnit.MILLISECONDS)
                 .doOnError(err -> log.error("error on handling mob death, {}", err.getMessage()))
                 .subscribe();

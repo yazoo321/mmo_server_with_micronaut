@@ -6,5 +6,4 @@ public interface PeriodicEffect {
 
     // apply effect will be called at the interval from above
     void applyEffect();
-
 }

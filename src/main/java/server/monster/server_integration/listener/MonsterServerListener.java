@@ -5,6 +5,7 @@ import io.micronaut.configuration.kafka.annotation.OffsetReset;
 import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.service.StatsService;
@@ -18,8 +19,6 @@ import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
-
-import java.util.Set;
 
 @Slf4j
 @KafkaListener(
@@ -85,11 +84,11 @@ public class MonsterServerListener {
 
     @Topic("notify-actor-death")
     void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {
-       if (!UUIDHelper.isPlayer(damageUpdateMessage.getTargetStats().getActorId())
-              && !UUIDHelper.isPlayer(damageUpdateMessage.getOriginStats().getActorId())) {
-           // the target was a mob and the killer is a player
-           // TODO: item drops will require to be owned by the killer
-           mobInstanceService.handleMobDeath(damageUpdateMessage.getTargetStats());
-       }
+        if (!UUIDHelper.isPlayer(damageUpdateMessage.getTargetStats().getActorId())
+                && !UUIDHelper.isPlayer(damageUpdateMessage.getOriginStats().getActorId())) {
+            // the target was a mob and the killer is a player
+            // TODO: item drops will require to be owned by the killer
+            mobInstanceService.handleMobDeath(damageUpdateMessage.getTargetStats());
+        }
     }
 }

@@ -2,6 +2,11 @@ package server.skills.available.mage.nature;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.types.DamageTypes;
@@ -11,12 +16,6 @@ import server.attribute.status.model.derived.Stunned;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
-
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 @Serdeable
 @JsonTypeName("Vine grab")
@@ -42,7 +41,6 @@ public class VineGrab extends ChannelledSkill {
                 0);
     }
 
-
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
         combatData = skillDependencies.getCombatData();
@@ -56,7 +54,9 @@ public class VineGrab extends ChannelledSkill {
     }
 
     private void applyStunEffect(CombatData combatData, String actorId) {
-        Status stun = new Stunned(Instant.now().plusMillis(2000), combatData.getActorId(), this.getName());
+        Status stun =
+                new Stunned(
+                        Instant.now().plusMillis(2000), combatData.getActorId(), this.getName());
         requestAddStatusEffect(actorId, Set.of(stun));
     }
 }

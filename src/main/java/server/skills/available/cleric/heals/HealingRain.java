@@ -1,6 +1,7 @@
 package server.skills.available.cleric.heals;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +11,6 @@ import server.combat.model.CombatData;
 import server.common.dto.Location;
 import server.skills.active.aoe.TickingAoeSkill;
 import server.skills.model.SkillTarget;
-
-import java.util.Map;
 
 @Getter
 @JsonTypeName("Healing rain")
@@ -34,8 +33,7 @@ public class HealingRain extends TickingAoeSkill {
                 600,
                 3000,
                 10,
-                true
-        );
+                true);
     }
 
     @Override
@@ -50,14 +48,35 @@ public class HealingRain extends TickingAoeSkill {
 
         Map<String, Double> damageMap = Map.of(DamageTypes.POSITIVE.getType(), healAmt);
 
-        actorMotionRepository.fetchActorMotion(combatData.getActorId())
-                .doOnSuccess(motion -> getAffectedPlayers(new Location(motion), combatData.getActorId())
-                        .doOnSuccess(actors -> actors.stream().parallel().forEach(actor -> {
-                            log.info("Applying Healing rain to: {}, will take: {}", actor, damageMap);
-                            requestTakeDamage(combatData.getActorId(), actor, damageMap);
-                        }))
-                        .subscribe())
-                .doOnError(err -> log.error("Healing rain encountered error: {}",err.getMessage()))
+        actorMotionRepository
+                .fetchActorMotion(combatData.getActorId())
+                .doOnSuccess(
+                        motion ->
+                                getAffectedPlayers(new Location(motion), combatData.getActorId())
+                                        .doOnSuccess(
+                                                actors ->
+                                                        actors.stream()
+                                                                .parallel()
+                                                                .forEach(
+                                                                        actor -> {
+                                                                            log.info(
+                                                                                    "Applying"
+                                                                                        + " Healing"
+                                                                                        + " rain"
+                                                                                        + " to: {},"
+                                                                                        + " will"
+                                                                                        + " take:"
+                                                                                        + " {}",
+                                                                                    actor,
+                                                                                    damageMap);
+                                                                            requestTakeDamage(
+                                                                                    combatData
+                                                                                            .getActorId(),
+                                                                                    actor,
+                                                                                    damageMap);
+                                                                        }))
+                                        .subscribe())
+                .doOnError(err -> log.error("Healing rain encountered error: {}", err.getMessage()))
                 .subscribe();
     }
 }

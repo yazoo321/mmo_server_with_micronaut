@@ -2,6 +2,11 @@ package server.attribute.talents.available.melee.fighter.weaponmaster.tier4;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
@@ -16,12 +21,6 @@ import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 import server.attribute.talents.service.TalentService;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 @Slf4j
 @Serdeable
 @JsonTypeName("Executioners precision")
@@ -32,7 +31,9 @@ public class ExecutionersPrecision extends Talent {
 
     public ExecutionersPrecision() {
         this.name = "Executioners precision";
-        this.description = " Attacks against low-health enemies (below 30%) will have a 50% chance to increase physical damage by 5% (per rank) for 5 seconds (max 5 ranks).";
+        this.description =
+                " Attacks against low-health enemies (below 30%) will have a 50% chance to increase"
+                        + " physical damage by 5% (per rank) for 5 seconds (max 5 ranks).";
         this.levels = 5;
         this.treeName = "Weaponmaster";
         this.talentType = TalentType.AUGMENT.getType();
@@ -51,7 +52,9 @@ public class ExecutionersPrecision extends Talent {
     public void applyEffect(
             Integer level, TalentService talentService, Stats actorStats, Stats targetStats) {
 
-        if (targetStats.getDerived(StatsTypes.CURRENT_HP) / targetStats.getDerived(StatsTypes.MAX_HP) > 0.3) {
+        if (targetStats.getDerived(StatsTypes.CURRENT_HP)
+                        / targetStats.getDerived(StatsTypes.MAX_HP)
+                > 0.3) {
             // the target has more than 30% HP
             return;
         }
@@ -65,8 +68,9 @@ public class ExecutionersPrecision extends Talent {
 
         Double phyAmpInc = 0.05 * level;
 
-        Status phyAmpStatus = new AttributeMod(expire, sourceActor, StatsTypes.PHY_AMP, phyAmpInc,
-                1.0, 1, this.name);
+        Status phyAmpStatus =
+                new AttributeMod(
+                        expire, sourceActor, StatsTypes.PHY_AMP, phyAmpInc, 1.0, 1, this.name);
 
         ActorStatus actorStatus = new ActorStatus();
         actorStatus.setActorId(actorStats.getActorId());

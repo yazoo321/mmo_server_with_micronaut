@@ -2,6 +2,9 @@ package server.attribute.talents.available.melee.fighter.weaponmaster.tier2;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
@@ -12,10 +15,6 @@ import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 import server.attribute.talents.service.TalentService;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Serdeable
@@ -43,7 +42,8 @@ public class BattleFlow extends Talent {
     @Override
     public void applyEffect(
             Integer level, TalentService talentService, Stats actorStats, Stats targetStats) {
-        // TODO: Need to re-work the damage apply and check death functions, break them into multiple services
+        // TODO: Need to re-work the damage apply and check death functions, break them into
+        // multiple services
         DamageSource damageSource = new DamageSource();
         damageSource.setActorId(actorStats.getActorId());
         double increase = 0.03 * level;

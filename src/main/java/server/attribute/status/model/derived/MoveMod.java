@@ -2,6 +2,8 @@ package server.attribute.status.model.derived;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -9,9 +11,6 @@ import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.Status;
 import server.attribute.status.types.StatusTypes;
-
-import java.time.Instant;
-import java.util.*;
 
 @Data
 @Serdeable
@@ -21,7 +20,12 @@ import java.util.*;
 @Deprecated
 public class MoveMod extends Status {
 
-    public MoveMod(Instant expiration, String sourceActorId, Double moveSpeedMultiplier, Integer maxStacks, String skillId) {
+    public MoveMod(
+            Instant expiration,
+            String sourceActorId,
+            Double moveSpeedMultiplier,
+            Integer maxStacks,
+            String skillId) {
         this.setId(UUID.randomUUID().toString());
         this.setAttributeEffects(
                 new HashMap<>(

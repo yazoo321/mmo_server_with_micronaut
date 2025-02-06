@@ -2,6 +2,9 @@ package server.skills.factory;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.repository.CombatDataCache;
@@ -19,34 +22,26 @@ import server.skills.model.Skill;
 import server.skills.producer.SkillProducer;
 import server.socket.service.WebsocketClientUpdatesService;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-
 @Singleton
 public class DefaultSkillFactory implements SkillFactory {
 
     Map<String, Class<? extends Skill>> skillTypes = new HashMap<>();
 
-    @Inject
-    WebsocketClientUpdatesService clientUpdatesService;
+    @Inject WebsocketClientUpdatesService clientUpdatesService;
 
     @Inject SessionParamHelper sessionParamHelper;
 
     @Inject StatsService statsService;
 
-    @Inject
-    StatusService statusService;
+    @Inject StatusService statusService;
 
     @Inject CombatService combatService;
 
     @Inject ActorMotionRepository actorMotionRepository;
 
-    @Inject
-    SkillProducer skillProducer;
+    @Inject SkillProducer skillProducer;
 
-    @Inject
-    CombatDataCache combatDataCache;
+    @Inject CombatDataCache combatDataCache;
 
     public DefaultSkillFactory() {
         skillTypes.put("fireball", Fireball.class);

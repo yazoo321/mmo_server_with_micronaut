@@ -4,6 +4,11 @@ import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
 import server.attribute.stats.model.DamageSource;
@@ -21,12 +26,6 @@ import server.common.uuid.UUIDHelper;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 @Slf4j
 @Singleton
 public class StatsService {
@@ -42,18 +41,17 @@ public class StatsService {
 
     @Inject TalentService talentService;
 
-    @Inject
-    CombatDataCache combatDataCache;
+    @Inject CombatDataCache combatDataCache;
 
     private final Random rand = new Random();
 
-    public static final Set<String> PHYSICAL_ATTACK_TYPES = Set.of(
-            DamageTypes.PHYSICAL.getType(),
-            DamageTypes.BLUDGEONING.getType(),
-            DamageTypes.PIERCING.getType(),
-            DamageTypes.SLASHING.getType(),
-            DamageTypes.BLEEDING.getType()
-    );
+    public static final Set<String> PHYSICAL_ATTACK_TYPES =
+            Set.of(
+                    DamageTypes.PHYSICAL.getType(),
+                    DamageTypes.BLUDGEONING.getType(),
+                    DamageTypes.PIERCING.getType(),
+                    DamageTypes.SLASHING.getType(),
+                    DamageTypes.BLEEDING.getType());
 
     public void initializeMobStats(String actorId) {
         Stats mobStats = new Stats();
@@ -177,25 +175,26 @@ public class StatsService {
             // this is used within talents to restore HP/Mana for example on kill
 
             getStatsFor(damageSource.getActorId())
-                    .doOnSuccess(actorStats -> {
-                        if (damageSource.getDamageMap().containsKey("HP")) {
-                            double hpVal = damageSource.getDamageMap().get("HP");
-                            double maxHp = actorStats.getDerived(StatsTypes.MAX_HP);
+                    .doOnSuccess(
+                            actorStats -> {
+                                if (damageSource.getDamageMap().containsKey("HP")) {
+                                    double hpVal = damageSource.getDamageMap().get("HP");
+                                    double maxHp = actorStats.getDerived(StatsTypes.MAX_HP);
 
-                            hpVal = maxHp * hpVal;
+                                    hpVal = maxHp * hpVal;
 
-                            addHealth(actorStats, hpVal);
-                        }
+                                    addHealth(actorStats, hpVal);
+                                }
 
-                        if (damageSource.getDamageMap().containsKey("MP")) {
-                            double mpVal = damageSource.getDamageMap().get("MP");
-                            double maxMp = actorStats.getDerived(StatsTypes.MAX_MP);
+                                if (damageSource.getDamageMap().containsKey("MP")) {
+                                    double mpVal = damageSource.getDamageMap().get("MP");
+                                    double maxMp = actorStats.getDerived(StatsTypes.MAX_MP);
 
-                            mpVal = maxMp * mpVal;
+                                    mpVal = maxMp * mpVal;
 
-                            addMana(actorStats, mpVal);
-                        }
-                    })
+                                    addMana(actorStats, mpVal);
+                                }
+                            })
                     .subscribe();
         }
     }
@@ -237,15 +236,19 @@ public class StatsService {
 
             if (chance <= dodgeChance) {
                 // dodged the attack
-                DamageSource damageSource = DamageSource.builder()
-                        .sourceActorId(sourceStats.getActorId())
-                        .actorId(stats.getActorId())
-                        .additionalData(DamageAdditionalData.DODGE.getType())
-                        .damageMap(new HashMap<>()).build();
-                updateProducer.updateDamage(new DamageUpdateMessage(damageSource, stats, sourceStats));
+                DamageSource damageSource =
+                        DamageSource.builder()
+                                .sourceActorId(sourceStats.getActorId())
+                                .actorId(stats.getActorId())
+                                .additionalData(DamageAdditionalData.DODGE.getType())
+                                .damageMap(new HashMap<>())
+                                .build();
+                updateProducer.updateDamage(
+                        new DamageUpdateMessage(damageSource, stats, sourceStats));
 
                 handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_DODGE_APPLY);
-                handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_DODGE_CONSUME);
+                handleTalentApplyOnApplyType(
+                        stats, sourceStats, AttributeApplyType.ON_DODGE_CONSUME);
                 return true;
             }
         }
@@ -260,7 +263,7 @@ public class StatsService {
         double phyCritRoll = stats.getDerived(StatsTypes.PHY_CRIT);
         double mgcCritRoll = stats.getDerived(StatsTypes.MGC_CRIT);
 
-        double phyChance =  rand.nextDouble(100.0);
+        double phyChance = rand.nextDouble(100.0);
         double mgcChance = rand.nextDouble(100.0);
 
         boolean phyCrit = phyChance <= phyCritRoll;
@@ -303,7 +306,6 @@ public class StatsService {
         for (Map.Entry<String, Double> entry : entrySet) {
             String type = entry.getKey();
             Double amount = entry.getValue();
-
 
             boolean phyType = PHYSICAL_ATTACK_TYPES.contains(type);
             if (phyType) {
@@ -356,8 +358,10 @@ public class StatsService {
                         .damageMap(damageMap)
                         .actorId(stats.getActorId())
                         .sourceActorId(sourceStats.getActorId())
-                        .additionalData(isCrit ? DamageAdditionalData.CRIT.getType() :
-                                DamageAdditionalData.HIT.getType())
+                        .additionalData(
+                                isCrit
+                                        ? DamageAdditionalData.CRIT.getType()
+                                        : DamageAdditionalData.HIT.getType())
                         .build();
 
         log.info("Updating damage, {}, {}, {}", damageSource, stats, sourceStats);
@@ -387,13 +391,22 @@ public class StatsService {
         if (!update.getTargetStats().isPlayer()) {
             deleteStatsFor(update.getTargetStats().getActorId())
                     .doOnError(
-                            err -> log.error("Failed to delete stats on death, {}", err.getMessage()))
+                            err ->
+                                    log.error(
+                                            "Failed to delete stats on death, {}",
+                                            err.getMessage()))
                     .delaySubscription(10_000, TimeUnit.MILLISECONDS)
                     .subscribe();
         }
 
-        handleTalentApplyOnApplyType(update.getOriginStats(), update.getTargetStats(), AttributeApplyType.ON_DEATH_APPLY);
-        handleTalentApplyOnApplyType(update.getTargetStats(), update.getOriginStats(), AttributeApplyType.ON_DEATH_CONSUME);
+        handleTalentApplyOnApplyType(
+                update.getOriginStats(),
+                update.getTargetStats(),
+                AttributeApplyType.ON_DEATH_APPLY);
+        handleTalentApplyOnApplyType(
+                update.getTargetStats(),
+                update.getOriginStats(),
+                AttributeApplyType.ON_DEATH_CONSUME);
     }
 
     public Stats addHealth(Stats stats, double amount) {

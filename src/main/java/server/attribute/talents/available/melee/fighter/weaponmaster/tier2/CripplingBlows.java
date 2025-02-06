@@ -2,6 +2,11 @@ package server.attribute.talents.available.melee.fighter.weaponmaster.tier2;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
@@ -15,12 +20,6 @@ import server.attribute.status.model.derived.AttributeMod;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 import server.attribute.talents.service.TalentService;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 @Slf4j
 @Serdeable
@@ -60,9 +59,17 @@ public class CripplingBlows extends Talent {
         Instant expire = Instant.now().plusMillis(3000); // lasts for 3 seconds
         String sourceId = actorStats.getActorId();
         Double moveSpeedMultiplier = 0.8; // 20% reduction of speed
-//        Status moveSlow = new MoveMod(expire, sourceId, moveSpeedMultiplier, 1, this.name);
-        Status moveSlow = new AttributeMod(expire, sourceId, StatsTypes.MOVE_SPEED, 0.0,
-                moveSpeedMultiplier, 1, this.name);
+        //        Status moveSlow = new MoveMod(expire, sourceId, moveSpeedMultiplier, 1,
+        // this.name);
+        Status moveSlow =
+                new AttributeMod(
+                        expire,
+                        sourceId,
+                        StatsTypes.MOVE_SPEED,
+                        0.0,
+                        moveSpeedMultiplier,
+                        1,
+                        this.name);
         ActorStatus actorStatus = new ActorStatus();
         actorStatus.setActorId(targetStats.getActorId());
         actorStatus.setActorStatuses(Set.of(moveSlow));

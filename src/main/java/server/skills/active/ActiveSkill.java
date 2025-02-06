@@ -2,6 +2,12 @@ package server.skills.active;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.reactivex.rxjava3.core.Single;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
@@ -14,21 +20,12 @@ import server.skills.behavior.TravelSkill;
 import server.skills.model.Skill;
 import server.skills.model.SkillTarget;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 @Slf4j
 public abstract class ActiveSkill extends Skill implements InstantSkill, TravelSkill {
 
-    @JsonProperty
-    protected Integer durationMs;
+    @JsonProperty protected Integer durationMs;
 
-    @JsonProperty
-    protected Integer ticks;
+    @JsonProperty protected Integer ticks;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
@@ -65,15 +62,21 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
             }
         }
         // validate location
-        Single<Motion> actorMotion = actorMotionRepository.fetchActorMotion(combatData.getActorId());
-        Single<Motion> targetMotion = actorMotionRepository.fetchActorMotion(skillTarget.getTargetId());
+        Single<Motion> actorMotion =
+                actorMotionRepository.fetchActorMotion(combatData.getActorId());
+        Single<Motion> targetMotion =
+                actorMotionRepository.fetchActorMotion(skillTarget.getTargetId());
 
         // consider pre-fetching other data too here, like status if required
-        return Single.zip(actorMotion, targetMotion, (actor, target) -> {
-            getSkillDependencies().setActorMotion(actor);
-            getSkillDependencies().setTargetMotion(target);
-            return combatService.validatePositionLocation(combatData, actor, target, this.getMaxRange(), session);
-        });
+        return Single.zip(
+                actorMotion,
+                targetMotion,
+                (actor, target) -> {
+                    getSkillDependencies().setActorMotion(actor);
+                    getSkillDependencies().setTargetMotion(target);
+                    return combatService.validatePositionLocation(
+                            combatData, actor, target, this.getMaxRange(), session);
+                });
     }
 
     @Override
@@ -115,10 +118,16 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         SkillTarget skillTarget = skillDependencies.getSkillTarget();
         Single<Stats> actorStatsSingle = statsService.getStatsFor(combatData.getActorId());
         Single<Stats> targetStatsSingle = statsService.getStatsFor(skillTarget.getTargetId());
-        Single<ActorStatus> actorStatusSingle = statusService.getActorStatus(combatData.getActorId());
-        Single<ActorStatus> targetStatusSingle = statusService.getActorStatus(skillTarget.getTargetId());
+        Single<ActorStatus> actorStatusSingle =
+                statusService.getActorStatus(combatData.getActorId());
+        Single<ActorStatus> targetStatusSingle =
+                statusService.getActorStatus(skillTarget.getTargetId());
 
-        return Single.zip(actorStatsSingle, targetStatsSingle, actorStatusSingle, targetStatusSingle,
+        return Single.zip(
+                actorStatsSingle,
+                targetStatsSingle,
+                actorStatusSingle,
+                targetStatusSingle,
                 (actorStats, targetStats, actorStatus, targetStatus) -> {
                     if (actorStatus.isDead() || targetStatus.isDead()) {
                         log.info("Caster or target is dead, skipping casting of eclipse burst");
@@ -147,13 +156,15 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
     }
 
-    protected void requestTakeDamage(String sourceActor, String actorId, Map<String, Double> damageMap) {
-        DamageSource damageSource = DamageSource.builder()
-                .actorId(actorId)
-                .sourceSkillId(this.getName())
-                .sourceActorId(sourceActor)
-                .damageMap(damageMap)
-                .build();
+    protected void requestTakeDamage(
+            String sourceActor, String actorId, Map<String, Double> damageMap) {
+        DamageSource damageSource =
+                DamageSource.builder()
+                        .actorId(actorId)
+                        .sourceSkillId(this.getName())
+                        .sourceActorId(sourceActor)
+                        .damageMap(damageMap)
+                        .build();
         skillProducer.requestTakeDamage(damageSource);
     }
 
@@ -164,5 +175,4 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         actorStatus.setActorStatuses(statuses);
         skillProducer.requestAddStatusToActor(actorStatus);
     }
-
 }

@@ -8,12 +8,11 @@ import io.micronaut.cache.annotation.Cacheable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.talents.model.ActorTalents;
 import server.attribute.talents.model.Talent;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Singleton
@@ -68,7 +67,9 @@ public class TalentRepository {
     }
 
     @CacheInvalidate(value = TALENT_LOCAL_CACHE, parameters = "actorId")
-    @CacheInvalidate(value = TALENT_LOCAL_CACHE, parameters = {"actorId", "applyType"})
+    @CacheInvalidate(
+            value = TALENT_LOCAL_CACHE,
+            parameters = {"actorId", "applyType"})
     public Single<DeleteResult> deleteActorTalents(String actorId) {
         return talentRepository.deleteActorTalents(actorId);
     }

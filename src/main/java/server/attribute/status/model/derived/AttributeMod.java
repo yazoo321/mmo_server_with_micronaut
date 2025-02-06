@@ -2,15 +2,14 @@ package server.attribute.status.model.derived;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.Status;
-
-import java.time.Instant;
-import java.util.*;
 
 @Data
 @Serdeable
@@ -19,8 +18,14 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = false)
 public class AttributeMod extends Status {
 
-    public AttributeMod(Instant expiration, String sourceActorId, StatsTypes attributeRef, Double attributeSum,
-                        Double attributeMultiplier, Integer maxStacks, String skillId) {
+    public AttributeMod(
+            Instant expiration,
+            String sourceActorId,
+            StatsTypes attributeRef,
+            Double attributeSum,
+            Double attributeMultiplier,
+            Integer maxStacks,
+            String skillId) {
         this.setId(UUID.randomUUID().toString());
         this.setAttributeEffects(
                 new HashMap<>(

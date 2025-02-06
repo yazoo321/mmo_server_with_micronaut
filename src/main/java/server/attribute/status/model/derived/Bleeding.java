@@ -4,6 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,13 +23,6 @@ import server.attribute.status.service.StatusService;
 import server.attribute.status.types.StatusTypes;
 import server.skills.model.SkillDependencies;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Consumer;
-
 @Data
 @Slf4j
 @Serdeable
@@ -32,7 +31,12 @@ import java.util.function.Consumer;
 @EqualsAndHashCode(callSuper = false)
 public class Bleeding extends Status {
 
-    public Bleeding(Instant expiration, String sourceActorId, Double damage, Integer maxStacks, String skillId) {
+    public Bleeding(
+            Instant expiration,
+            String sourceActorId,
+            Double damage,
+            Integer maxStacks,
+            String skillId) {
         this.setId(UUID.randomUUID().toString());
         this.setAttributeEffects(
                 Map.of(

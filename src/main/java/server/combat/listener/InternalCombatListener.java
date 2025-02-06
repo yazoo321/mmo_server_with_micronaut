@@ -24,14 +24,12 @@ public class InternalCombatListener {
 
     @Inject CombatService combatService;
 
-    @Inject
-    WebsocketClientUpdatesService clientUpdatesService;
+    @Inject WebsocketClientUpdatesService clientUpdatesService;
 
-
-//    @Topic("processed-damage-updates")
-//    public void receiveDamageUpdates(DamageUpdateMessage damageUpdateMessage) {
-//
-//    }
+    //    @Topic("processed-damage-updates")
+    //    public void receiveDamageUpdates(DamageUpdateMessage damageUpdateMessage) {
+    //
+    //    }
 
     @Topic("notify-actor-death")
     void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {
@@ -49,7 +47,4 @@ public class InternalCombatListener {
 
         clientUpdatesService.sendUpdateToListeningMob(socketResponse, threatUpdate.getActorId());
     }
-
-
-
 }

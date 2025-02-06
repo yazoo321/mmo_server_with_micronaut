@@ -2,17 +2,16 @@ package server.attribute.status.model.derived;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import server.attribute.status.model.Status;
-import server.attribute.status.types.StatusTypes;
-
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import server.attribute.status.model.Status;
+import server.attribute.status.types.StatusTypes;
 
 @Data
 @Serdeable

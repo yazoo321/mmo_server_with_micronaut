@@ -5,6 +5,12 @@ import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
@@ -24,13 +30,6 @@ import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -58,8 +57,7 @@ public class CombatService {
 
     @Inject ActorThreatService actorThreatService;
 
-    @Inject
-    CombatDataCache combatDataCache;
+    @Inject CombatDataCache combatDataCache;
 
     Single<Boolean> canEngageCombat(String actorId, String targetId) {
         if (!UUIDHelper.isPlayer(targetId)) {
@@ -72,11 +70,17 @@ public class CombatService {
                 .map(hostility -> hostility < 5);
     }
 
-    public boolean validatePositionLocation(CombatData combatData, Motion attackerMotion, Motion targetMotion,
-                                            int distanceThreshold, WebSocketSession session) {
+    public boolean validatePositionLocation(
+            CombatData combatData,
+            Motion attackerMotion,
+            Motion targetMotion,
+            int distanceThreshold,
+            WebSocketSession session) {
 
         if (targetMotion == null) {
-            log.error("Target motion is null: this is unexpected, target should be removed from active list");
+            log.error(
+                    "Target motion is null: this is unexpected, target should be removed from"
+                            + " active list");
             return false;
         }
 
@@ -89,8 +93,8 @@ public class CombatService {
             }
             if (combatData.getLastHelperNotification() == null
                     || Instant.now().getEpochSecond()
-                    - combatData.getLastHelperNotification().getEpochSecond()
-                    > 3) {
+                                    - combatData.getLastHelperNotification().getEpochSecond()
+                            > 3) {
                 combatData.setLastHelperNotification(Instant.now());
                 combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
 
@@ -123,7 +127,8 @@ public class CombatService {
                         .doOnError(err -> log.error(err.getMessage()))
                         .blockingGet();
 
-        return validatePositionLocation(combatData, attackerMotion, targetMotion, distanceThreshold, session);
+        return validatePositionLocation(
+                combatData, attackerMotion, targetMotion, distanceThreshold, session);
     }
 
     List<Stats> getTargetStats(Set<String> actors) {
@@ -170,6 +175,5 @@ public class CombatService {
         }
 
         combatDataCache.deleteCombatData(targetStats.getActorId());
-
     }
 }

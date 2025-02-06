@@ -13,7 +13,7 @@ import server.combat.model.CombatData;
 @CacheConfig("combat-data-cache")
 public class CombatDataCache {
 
-    private final static String COMBAT_CACHE = "combat-data-cache";
+    private static final String COMBAT_CACHE = "combat-data-cache";
 
     @Cacheable(value = COMBAT_CACHE, parameters = "actorId")
     public CombatData fetchCombatData(String actorId) {

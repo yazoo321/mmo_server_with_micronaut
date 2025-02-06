@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Consumer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,10 +20,6 @@ import server.attribute.status.service.StatusService;
 import server.attribute.status.types.StatusTypes;
 import server.skills.model.SkillDependencies;
 
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Consumer;
-
 @Data
 @Serdeable
 @NoArgsConstructor
@@ -29,7 +28,12 @@ import java.util.function.Consumer;
 @Slf4j
 public class Burning extends Status {
 
-    public Burning(Instant expiration, String sourceActorId, Double damage, Integer maxStacks, String skillId) {
+    public Burning(
+            Instant expiration,
+            String sourceActorId,
+            Double damage,
+            Integer maxStacks,
+            String skillId) {
         log.info("Creating burning status effect, {}, {}, {}", expiration, sourceActorId, damage);
         this.setId(UUID.randomUUID().toString());
         this.setAttributeEffects(new HashMap<>());

@@ -1,19 +1,18 @@
 package server.skills.repository;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
+
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import java.util.List;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import server.common.configuration.MongoConfiguration;
 import server.skills.model.ActorSkills;
 import server.skills.model.Skill;
-
-import javax.annotation.PostConstruct;
-import java.util.List;
-
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
 
 @Slf4j
 @Singleton
@@ -39,9 +38,8 @@ public class ActorSkillsRepository {
                         eq("actorId", actorId), set("skills", skills)));
     }
 
-
-   @PostConstruct
-   private void prepareCollections() {
+    @PostConstruct
+    private void prepareCollections() {
         this.actorSkillsCollection =
                 mongoClient
                         .getDatabase(configuration.getDatabaseName())

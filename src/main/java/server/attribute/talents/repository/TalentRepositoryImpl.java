@@ -1,5 +1,7 @@
 package server.attribute.talents.repository;
 
+import static com.mongodb.client.model.Filters.eq;
+
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
@@ -9,6 +11,9 @@ import io.micronaut.cache.annotation.CachePut;
 import io.micronaut.cache.annotation.Cacheable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.talents.model.ActorTalents;
@@ -16,12 +21,6 @@ import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentTree;
 import server.attribute.talents.trees.fighter.weaponmaster.WeaponMasterTree;
 import server.common.configuration.MongoConfiguration;
-
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.mongodb.client.model.Filters.eq;
 
 @Slf4j
 @Singleton
@@ -37,10 +36,8 @@ public class TalentRepositoryImpl {
     MongoClient mongoClient;
     MongoCollection<ActorTalents> actorTalentsCollection;
 
-    @Getter
-    Map<String, Talent> allTalents = new HashMap<>();
-    @Getter
-    Map<String, TalentTree> talentTrees = new HashMap<>();
+    @Getter Map<String, Talent> allTalents = new HashMap<>();
+    @Getter Map<String, TalentTree> talentTrees = new HashMap<>();
 
     public TalentRepositoryImpl(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
@@ -84,8 +81,9 @@ public class TalentRepositoryImpl {
 
     @CachePut(value = TALENT_CACHE, parameters = "actorId", async = true)
     public Single<ActorTalents> insertActorTalents(String actorId, ActorTalents actorTalents) {
-        return Single.fromPublisher(actorTalentsCollection
-                .replaceOne(eq("actorId", actorId), actorTalents)).map(r -> actorTalents);
+        return Single.fromPublisher(
+                        actorTalentsCollection.replaceOne(eq("actorId", actorId), actorTalents))
+                .map(r -> actorTalents);
     }
 
     @CacheInvalidate(value = TALENT_CACHE, parameters = "actorId")

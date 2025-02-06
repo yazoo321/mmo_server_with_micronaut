@@ -2,6 +2,9 @@ package server.skills.available.mage.fire;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.types.DamageTypes;
@@ -11,10 +14,6 @@ import server.attribute.status.model.derived.Burning;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
-
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 @Serdeable
@@ -33,7 +32,9 @@ public class Fireball extends ChannelledSkill {
                 true,
                 1000,
                 500,
-                Map.of(), 0, 0);
+                Map.of(),
+                0,
+                0);
     }
 
     @Override
@@ -53,5 +54,4 @@ public class Fireball extends ChannelledSkill {
 
         requestAddStatusEffect(skillTarget.getTargetId(), Set.of(burn));
     }
-
 }

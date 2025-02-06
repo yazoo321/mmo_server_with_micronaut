@@ -1,9 +1,15 @@
 package server.combat.service;
 
+import static server.attribute.stats.types.StatsTypes.PHY_AMP;
+import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
+
 import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.DamageTypes;
@@ -16,13 +22,6 @@ import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
 import server.session.SessionParamHelper;
 import server.socket.service.ClientUpdatesService;
-
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import static server.attribute.stats.types.StatsTypes.PHY_AMP;
-import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 
 @Slf4j
 @Singleton
@@ -50,8 +49,7 @@ public class PlayerCombatService extends CombatService {
                                 return;
                             }
 
-                            CombatData combatData =
-                                    combatDataCache.fetchCombatData(actorId);
+                            CombatData combatData = combatDataCache.fetchCombatData(actorId);
                             combatData.setTargets(combatRequest.getTargets());
 
                             if (sessionsInCombat.contains(SessionParamHelper.getActorId(session))) {
@@ -186,7 +184,7 @@ public class PlayerCombatService extends CombatService {
                         } else {
                             combatData.setOffhandLastAttack(Instant.now());
                         }
-                        
+
                         combatDataCache.cacheCombatData(actorId, combatData);
                         return 1;
                     }

@@ -1,26 +1,49 @@
 package server.skills.active.aoe;
 
-import server.combat.model.CombatData;
-import server.combat.model.CombatState;
-import server.skills.behavior.PeriodicEffect;
-import server.skills.model.SkillTarget;
-
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import server.combat.model.CombatData;
+import server.combat.model.CombatState;
+import server.skills.behavior.PeriodicEffect;
+import server.skills.model.SkillTarget;
 
 public abstract class TickingAoeSkill extends AbstractAoeSkill implements PeriodicEffect {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public TickingAoeSkill(String name, String description, Map<String, Double> derived, int cooldown, int castTime,
-                           boolean allowsMovement, boolean canInterrupt, int maxRange, int travelSpeed,
-                           Map<String, Integer> requirements, int diameter, int durationMs, int ticks,
-                           boolean includeCaster) {
-        super(name, description, derived, cooldown, castTime, allowsMovement, canInterrupt, maxRange,
-                travelSpeed, requirements, diameter, durationMs, ticks, includeCaster);
+    public TickingAoeSkill(
+            String name,
+            String description,
+            Map<String, Double> derived,
+            int cooldown,
+            int castTime,
+            boolean allowsMovement,
+            boolean canInterrupt,
+            int maxRange,
+            int travelSpeed,
+            Map<String, Integer> requirements,
+            int diameter,
+            int durationMs,
+            int ticks,
+            boolean includeCaster) {
+        super(
+                name,
+                description,
+                derived,
+                cooldown,
+                castTime,
+                allowsMovement,
+                canInterrupt,
+                maxRange,
+                travelSpeed,
+                requirements,
+                diameter,
+                durationMs,
+                ticks,
+                includeCaster);
     }
 
     @Override
@@ -34,12 +57,13 @@ public abstract class TickingAoeSkill extends AbstractAoeSkill implements Period
                 () -> {
                     if (channelingInProgress()) {
                         prepareApply()
-                                .doOnSuccess(success -> {
-                                    if (success) {
-                                        applyEffect();
-                                        applyEffectAtInterval();
-                                    }
-                                })
+                                .doOnSuccess(
+                                        success -> {
+                                            if (success) {
+                                                applyEffect();
+                                                applyEffectAtInterval();
+                                            }
+                                        })
                                 .subscribe();
                     }
                 },
@@ -89,5 +113,4 @@ public abstract class TickingAoeSkill extends AbstractAoeSkill implements Period
                 this.getCastTime(),
                 TimeUnit.MILLISECONDS);
     }
-
 }

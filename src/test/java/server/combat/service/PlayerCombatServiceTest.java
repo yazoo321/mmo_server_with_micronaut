@@ -1,8 +1,14 @@
 package server.combat.service;
 
+import static org.awaitility.Awaitility.await;
+
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,13 +39,6 @@ import server.session.SessionParamHelper;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.session.FakeSession;
 import server.util.PlayerMotionUtil;
-
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
 
 @MicronautTest
 class PlayerCombatServiceTest {

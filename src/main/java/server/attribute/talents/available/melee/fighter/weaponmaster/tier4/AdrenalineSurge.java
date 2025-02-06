@@ -2,6 +2,11 @@ package server.attribute.talents.available.melee.fighter.weaponmaster.tier4;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
@@ -16,12 +21,6 @@ import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 import server.attribute.talents.service.TalentService;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 @Slf4j
 @Serdeable
 @JsonTypeName("Adrenaline surge")
@@ -32,7 +31,9 @@ public class AdrenalineSurge extends Talent {
 
     public AdrenalineSurge() {
         this.name = "Adrenaline surge";
-        this.description = "Taking damage has a chance (10%) to boost attack power by 5% (per rank) for 10 sec. (Max 3 ranks)";
+        this.description =
+                "Taking damage has a chance (10%) to boost attack power by 5% (per rank) for 10"
+                        + " sec. (Max 3 ranks)";
         this.levels = 3;
         this.treeName = "Weaponmaster";
         this.talentType = TalentType.AUGMENT.getType();
@@ -61,8 +62,9 @@ public class AdrenalineSurge extends Talent {
 
         Double phyAmpInc = 0.05 * level;
 
-        Status phyAmpStatus = new AttributeMod(expire, sourceActor, StatsTypes.PHY_AMP, phyAmpInc,
-                1.0, 1, this.name);
+        Status phyAmpStatus =
+                new AttributeMod(
+                        expire, sourceActor, StatsTypes.PHY_AMP, phyAmpInc, 1.0, 1, this.name);
 
         ActorStatus actorStatus = new ActorStatus();
         actorStatus.setActorId(actorStats.getActorId());

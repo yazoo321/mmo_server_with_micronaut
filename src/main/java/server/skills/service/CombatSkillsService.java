@@ -4,29 +4,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.combat.repository.CombatDataCache;
 import server.session.SessionParamHelper;
+import server.skills.available.cleric.heals.BasicHeal;
+import server.skills.available.cleric.heals.HealingRain;
 import server.skills.available.mage.fire.Fireball;
 import server.skills.available.mage.nature.EclipseBurst;
 import server.skills.available.mage.nature.MoonsVengeance;
 import server.skills.available.mage.nature.SunSmite;
 import server.skills.available.mage.nature.VineGrab;
 import server.skills.factory.DefaultSkillFactory;
-import server.skills.available.cleric.heals.BasicHeal;
-import server.skills.available.cleric.heals.HealingRain;
 import server.skills.model.ActorSkills;
 import server.skills.model.Skill;
 import server.skills.repository.ActorSkillsRepository;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.types.MessageType;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Singleton
@@ -42,11 +39,9 @@ public class CombatSkillsService {
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
 
-    @Inject
-    CombatDataCache combatDataCache;
+    @Inject CombatDataCache combatDataCache;
 
     ObjectMapper objectMapper = new ObjectMapper();
-
 
     public CombatSkillsService() {
         objectMapper.registerSubtypes(Fireball.class, BasicHeal.class);
@@ -61,9 +56,8 @@ public class CombatSkillsService {
 
         skill.tryApply(combatData, combatRequest.getSkillTarget(), session);
 
-
         try {
-//            skill.startSkill(combatData, combatRequest.getSkillTarget(), session);
+            //            skill.startSkill(combatData, combatRequest.getSkillTarget(), session);
         } catch (Exception e) {
             log.error("Failed to start skill, {}", e.getMessage());
         }
@@ -72,15 +66,22 @@ public class CombatSkillsService {
     public void getActorAvailableSkills(String actorId, WebSocketSession session) {
         ActorSkills actorSkills = new ActorSkills();
         actorSkills.setActorId(actorId);
-        actorSkills.setSkills(List.of(new Fireball(), new BasicHeal(), new HealingRain(), new VineGrab(),
-                new EclipseBurst(), new MoonsVengeance(), new SunSmite()));
+        actorSkills.setSkills(
+                List.of(
+                        new Fireball(),
+                        new BasicHeal(),
+                        new HealingRain(),
+                        new VineGrab(),
+                        new EclipseBurst(),
+                        new MoonsVengeance(),
+                        new SunSmite()));
         SocketResponse socketResponse = new SocketResponse();
         socketResponse.setActorSkills(actorSkills);
         socketResponse.setMessageType(MessageType.UPDATE_ACTOR_SKILLS.getType());
 
         session.send(socketResponse).subscribe(socketResponseSubscriber);
 
-//        actionbarService.getActorActionbar(session);
+        //        actionbarService.getActorActionbar(session);
 
         // TODO: Make skills either dynamically evaluated, or taken from repo
 

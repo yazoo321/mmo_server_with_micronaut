@@ -2,15 +2,14 @@ package server.attribute.talents.service;
 
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.talents.model.ActorTalents;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.producer.TalentProducer;
 import server.attribute.talents.repository.TalentRepository;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class TalentService {
 

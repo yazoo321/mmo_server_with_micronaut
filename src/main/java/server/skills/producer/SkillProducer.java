@@ -16,5 +16,4 @@ public interface SkillProducer {
 
     @Topic("request-take-damage")
     void requestTakeDamage(DamageSource damageSource);
-
 }
