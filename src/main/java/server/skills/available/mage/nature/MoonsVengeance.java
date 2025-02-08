@@ -3,18 +3,20 @@ package server.skills.available.mage.nature;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.common.dto.Location;
 import server.skills.active.aoe.TickingAoeSkill;
 import server.skills.model.SkillTarget;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Serdeable
 @JsonTypeName("Moons vengeance")
@@ -35,7 +37,7 @@ public class MoonsVengeance extends TickingAoeSkill {
                 true,
                 1000,
                 500,
-                Map.of(),
+                Map.of(ClassTypes.MAGE.getType(), 3),
                 600,
                 2500,
                 4,

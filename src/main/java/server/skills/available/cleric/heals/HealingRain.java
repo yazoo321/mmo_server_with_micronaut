@@ -1,16 +1,18 @@
 package server.skills.available.cleric.heals;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.common.dto.Location;
 import server.skills.active.aoe.TickingAoeSkill;
 import server.skills.model.SkillTarget;
+
+import java.util.Map;
 
 @Getter
 @JsonTypeName("Healing rain")
@@ -29,7 +31,7 @@ public class HealingRain extends TickingAoeSkill {
                 true,
                 500,
                 0,
-                Map.of(),
+                Map.of(ClassTypes.CLERIC.getType(), 3),
                 600,
                 3000,
                 10,

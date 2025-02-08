@@ -1,4 +1,4 @@
-package server.skills.available.mage.nature;
+package server.skills.available.fighter;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
@@ -13,32 +13,34 @@ import server.skills.model.SkillTarget;
 
 import java.util.Map;
 
-@Serdeable
-@JsonTypeName("Eclipse burst")
-@EqualsAndHashCode(callSuper = false)
 @Slf4j
-public class EclipseBurst extends ChannelledSkill {
+@Serdeable
+@JsonTypeName("Heavy strike")
+@EqualsAndHashCode(callSuper = false)
+public class HeavyStrike extends ChannelledSkill {
 
-    public EclipseBurst() {
+    public HeavyStrike() {
         super(
-                "Eclipse Burst",
-                "Summon the moon to fiercely strike a target with its magic power",
-                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 80.0),
-                4_000,
-                1000,
-                false,
+                "Heavy strike",
+                "Instantly strike the target with your main-hand weapon, dealing 150% weapon damage",
+                Map.of(),
+                5000,
+                50,
                 true,
-                1000,
+                true,
                 0,
-                Map.of(ClassTypes.MAGE.getType(), 2),
+                0,
+                Map.of(ClassTypes.FIGHTER.getType(), 1),
                 0,
                 0);
     }
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
+        Double dmg = getSkillDependencies().getActorStats().getDerived(StatsTypes.MAINHAND_WEAPON_DAMAGE);
+        dmg = dmg * 1.5;
+        Map<String, Double> damageMap = Map.of(DamageTypes.PHYSICAL.getType(), dmg);
         requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), damageMap);
     }
+
 }

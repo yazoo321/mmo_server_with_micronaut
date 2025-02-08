@@ -1,14 +1,16 @@
 package server.skills.available.cleric.heals;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
+
+import java.util.Map;
 
 @Getter
 @JsonTypeName("Basic heal")
@@ -26,7 +28,7 @@ public class BasicHeal extends ChannelledSkill {
                 true,
                 500,
                 0,
-                Map.of(),
+                Map.of(ClassTypes.CLERIC.getType(), 1),
                 0,
                 0);
     }

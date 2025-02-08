@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.types.ClassTypes;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.motion.model.MotionMessage;
@@ -29,7 +30,7 @@ public class Blink extends ChannelledSkill {
                 false,
                 1000,
                 0,
-                Map.of(),
+                Map.of(ClassTypes.MAGE.getType(), 5),
                 0,
                 0);
     }
