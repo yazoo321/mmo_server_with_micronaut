@@ -4,11 +4,6 @@ import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
 import server.attribute.stats.model.DamageSource;
@@ -23,8 +18,13 @@ import server.combat.model.CombatData;
 import server.combat.repository.CombatDataCache;
 import server.combat.service.ActorThreatService;
 import server.common.uuid.UUIDHelper;
-import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Singleton
@@ -34,8 +34,6 @@ public class StatsService {
     @Inject ActorStatsRepository repository;
 
     @Inject UpdateProducer updateProducer;
-
-    @Inject SessionParamHelper sessionParamHelper;
 
     @Inject ActorThreatService threatService;
 
@@ -316,6 +314,45 @@ public class StatsService {
         }
     }
 
+    public void handleDamageReduction(Map<String, Double> damageMap, Stats stats) {
+        // TODO: Consider different approaches for handling armour
+        // there should be a decaying factor to the armour, so that you can't just always absorb 100% of damage
+
+        // simple approach is square root, for % dmg reduction
+        // there should also be a flat damage reduction, which we may want to rework,
+        // e.g. heavy armour / shield can provide flat + armour
+
+        Double phyArmour = stats.getDerived(StatsTypes.DEF);
+        double phyReduction = phyArmour > 0 ? (Math.sqrt(phyArmour) / 100) : 0;
+        phyReduction = 1 - phyReduction;
+
+        // base reduction scales off armour
+        double baseReduction = stats.getDerived(StatsTypes.PHY_REDUCTION) + phyReduction;
+
+        Double mgcArmour = stats.getDerived(StatsTypes.MAG_DEF);
+        double mgcReduction = mgcArmour > 0 ? (Math.sqrt(mgcArmour) / 100) : 0;
+        mgcReduction = 1 - mgcReduction;
+
+        Set<Map.Entry<String, Double>> entrySet = damageMap.entrySet();
+
+        for (Map.Entry<String, Double> entry : entrySet) {
+            String type = entry.getKey();
+            Double amount = entry.getValue();
+
+            if (amount < 0) {
+                // this is a heal effect
+                continue;
+            }
+
+            boolean phyType = PHYSICAL_ATTACK_TYPES.contains(type);
+            if (phyType) {
+                entry.setValue(Math.max((amount * phyReduction) - baseReduction, 0));
+            } else {
+                entry.setValue(Math.max(amount * mgcReduction, 0));
+            }
+        }
+    }
+
     public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
         // TODO: consider hit chance?
         if (handleDodge(damageMap, stats, sourceStats)) {
@@ -325,6 +362,9 @@ public class StatsService {
         // TODO: handle block event
         // TODO: handle parry event
         // TODO: handle energy resist/absorb event
+
+        // resistances should scale such that when you go over 100% resistance, the damage will in fact heal you
+        // i.e. if you have 200% resistance, it will heal you for 100% damage
 
         handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_HIT_APPLY);
         handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_HIT_CONSUME);
@@ -337,6 +377,7 @@ public class StatsService {
         Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
 
         // handle damage reduction
+        handleDamageReduction(damageMap, stats);
 
         if (totalDamage == 0) {
             // no damage taken, ignore
