@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.DamageTypes;
-import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.Status;
 import server.attribute.status.model.derived.Stunned;
 import server.combat.model.CombatData;
@@ -29,9 +28,9 @@ public class VineGrab extends ChannelledSkill {
 
     public VineGrab() {
         super(
-                "Vine Grab",
-                "Spawn vines which will grab your opponent and lock them into place",
-                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 30.0),
+                "Vine grab",
+                "Spawn vines which will grab your opponent and lock them into place for 2 seconds",
+                Map.of(DamageTypes.MAGIC.getType(), 30.0),
                 0,
                 1000,
                 false,
@@ -39,26 +38,24 @@ public class VineGrab extends ChannelledSkill {
                 1000,
                 500,
                 Map.of(ClassTypes.MAGE.getType(), 4),
-                0,
+                2_000,
                 0);
     }
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
         combatData = skillDependencies.getCombatData();
-        Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-
         // TODO: introduce new magic physical type, so it scales with magic amp
-        Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
 
-        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), damageMap);
+        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), derived);
         applyStunEffect(combatData, skillTarget.getTargetId());
     }
 
     private void applyStunEffect(CombatData combatData, String actorId) {
+        // TODO: rather than stun, it should set the movement to 0
         Status stun =
                 new Stunned(
-                        Instant.now().plusMillis(2000), combatData.getActorId(), this.getName());
+                        Instant.now().plusMillis(durationMs), combatData.getActorId(), this.getName());
         requestAddStatusEffect(actorId, Set.of(stun));
     }
 }

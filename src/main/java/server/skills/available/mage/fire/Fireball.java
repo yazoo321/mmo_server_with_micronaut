@@ -25,7 +25,7 @@ public class Fireball extends ChannelledSkill {
     public Fireball() {
         super(
                 "Fireball",
-                "Hurl a fireball at a selected target",
+                "Hurl a fireball at a selected target, dealing damage and burning them for 1.5 seconds",
                 Map.of(DamageTypes.FIRE.getType(), 80.0),
                 0,
                 1500,
@@ -34,8 +34,8 @@ public class Fireball extends ChannelledSkill {
                 1000,
                 500,
                 Map.of(ClassTypes.MAGE.getType(), 1),
-                0,
-                0);
+                1500,
+                7);
     }
 
     @Override
@@ -47,8 +47,8 @@ public class Fireball extends ChannelledSkill {
 
     private void addBurningEffect(CombatData combatData, SkillTarget skillTarget) {
         // add burning effect
-        Instant duration = Instant.now().plusMillis(1500);
-        Double tickDamage = derived.get(DamageTypes.FIRE.getType()) / 7;
+        Instant duration = Instant.now().plusMillis(durationMs);
+        Double tickDamage = derived.get(DamageTypes.FIRE.getType()) / ticks;
         Status burn = new Burning(duration, combatData.getActorId(), tickDamage, 1, this.getName());
 
         requestAddStatusEffect(skillTarget.getTargetId(), Set.of(burn));

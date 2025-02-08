@@ -10,6 +10,7 @@ import server.attribute.status.model.Status;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
+import server.motion.model.MotionMessage;
 import server.skills.behavior.InstantSkill;
 import server.skills.behavior.TravelSkill;
 import server.skills.model.Skill;
@@ -51,6 +52,13 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         CombatData combatData = skillDependencies.getCombatData();
         SkillTarget skillTarget = skillDependencies.getSkillTarget();
         Map<String, Instant> skillsOnCd = combatData.getActivatedSkills();
+
+        // check if any skill was cast in the last 500ms (global cd)
+        Instant max = skillsOnCd.values().stream().max(Instant::compareTo).orElse(null);
+
+        if (max != null && max.plusMillis(500).isAfter(Instant.now())) {
+            return Single.just(false);
+        }
 
         // check if skill is on CD
         if (skillsOnCd.containsKey(this.getName())) {
@@ -173,6 +181,14 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
                         .damageMap(damageMap)
                         .build();
         skillProducer.requestTakeDamage(damageSource);
+    }
+
+    protected void requestUpdateActorMotion(String actorId, Motion actorMotion) {
+        MotionMessage motionMessage = new MotionMessage();
+        motionMessage.setActorId(actorId);
+        motionMessage.setMotion(actorMotion);
+        motionMessage.setUpdate(true); // not required
+        skillProducer.requestUpdateMotion(motionMessage);
     }
 
     protected void requestAddStatusEffect(String target, Set<Status> statuses) {

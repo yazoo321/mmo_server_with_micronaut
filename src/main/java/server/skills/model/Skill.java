@@ -21,7 +21,16 @@ import server.items.equippable.service.EquipItemService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.skills.available.cleric.heals.BasicHeal;
+import server.skills.available.cleric.heals.HealingRain;
+import server.skills.available.fighter.HeavyStrike;
+import server.skills.available.fighter.Maim;
+import server.skills.available.fighter.Rupture;
+import server.skills.available.mage.arcane.Blink;
 import server.skills.available.mage.fire.Fireball;
+import server.skills.available.mage.nature.EclipseBurst;
+import server.skills.available.mage.nature.MoonsVengeance;
+import server.skills.available.mage.nature.SunSmite;
+import server.skills.available.mage.nature.VineGrab;
 import server.skills.producer.SkillProducer;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.SkillMessageType;
@@ -39,8 +48,26 @@ import java.util.Random;
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "name")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Fireball.class, name = "Fireball"),
-    @JsonSubTypes.Type(value = BasicHeal.class, name = "Basic heal"),
+        // cleric spells
+        @JsonSubTypes.Type(value = BasicHeal.class, name = "Basic heal"),
+        @JsonSubTypes.Type(value = HealingRain.class, name = "Healing rain"),
+
+        // fighter spells
+        @JsonSubTypes.Type(value = HeavyStrike.class, name = "Heavy strike"),
+        @JsonSubTypes.Type(value = Maim.class, name = "Maim"),
+        @JsonSubTypes.Type(value = Rupture.class, name = "Rupture"),
+
+        // mage: arcane
+        @JsonSubTypes.Type(value = Blink.class, name = "Blink"),
+
+        // mage: fire
+        @JsonSubTypes.Type(value = Fireball.class, name = "Fireball"),
+
+        // mage: nature
+        @JsonSubTypes.Type(value = EclipseBurst.class, name = "Eclipse burst"),
+        @JsonSubTypes.Type(value = MoonsVengeance.class, name = "Moons vengeance"),
+        @JsonSubTypes.Type(value = SunSmite.class, name = "Sun smite"),
+        @JsonSubTypes.Type(value = VineGrab.class, name = "Vine grab"),
 })
 public abstract class Skill {
 

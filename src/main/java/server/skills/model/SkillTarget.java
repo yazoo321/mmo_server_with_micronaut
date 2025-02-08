@@ -3,7 +3,7 @@ package server.skills.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import server.common.dto.Location2D;
+import server.common.dto.Location;
 
 @Data
 @NoArgsConstructor
@@ -13,7 +13,7 @@ public class SkillTarget {
     private String casterId;
 
     private String targetId;
-    private Location2D location;
+    private Location location;
 
     private int radius; // radius can be 0 for single target
 }

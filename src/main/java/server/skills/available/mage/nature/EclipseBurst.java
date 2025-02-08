@@ -21,7 +21,7 @@ public class EclipseBurst extends ChannelledSkill {
 
     public EclipseBurst() {
         super(
-                "Eclipse Burst",
+                "Eclipse burst",
                 "Summon the moon to fiercely strike a target with its magic power",
                 Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 80.0),
                 4_000,

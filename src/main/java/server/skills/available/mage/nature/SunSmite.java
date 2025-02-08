@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.DamageTypes;
-import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
@@ -23,7 +22,7 @@ public class SunSmite extends ChannelledSkill {
         super(
                 "Sun smite",
                 "Summon the sun to smite the foe with fire damage",
-                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 100.0),
+                Map.of(DamageTypes.FIRE.getType(), 100.0),
                 0,
                 1000,
                 false,
@@ -37,8 +36,6 @@ public class SunSmite extends ChannelledSkill {
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        Map<String, Double> damageMap = Map.of(DamageTypes.MAGIC.getType(), dmgAmt);
-        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), damageMap);
+        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), derived);
     }
 }

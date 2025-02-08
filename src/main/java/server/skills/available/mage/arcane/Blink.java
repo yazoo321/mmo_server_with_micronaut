@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.types.ClassTypes;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
-import server.motion.model.MotionMessage;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
 
@@ -45,10 +44,6 @@ public class Blink extends ChannelledSkill {
         actorMotion.setX(actorMotion.getX() + (int) (getMaxRange() * Math.cos(yawRadians)));
         actorMotion.setZ(actorMotion.getZ() + (int) (getMaxRange() * Math.sin(yawRadians)));
 
-        MotionMessage motionMessage = new MotionMessage();
-        motionMessage.setActorId(combatData.getActorId());
-        motionMessage.setMotion(actorMotion);
-        motionMessage.setUpdate(true); // not required
-        skillProducer.requestUpdateMotion(motionMessage);
+        requestUpdateActorMotion(combatData.getActorId(), actorMotion);
     }
 }

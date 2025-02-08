@@ -2,6 +2,7 @@ package server.skills.factory;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.Getter;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.repository.CombatDataCache;
@@ -11,6 +12,9 @@ import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.skills.available.cleric.heals.BasicHeal;
 import server.skills.available.cleric.heals.HealingRain;
+import server.skills.available.fighter.HeavyStrike;
+import server.skills.available.fighter.Maim;
+import server.skills.available.fighter.Rupture;
 import server.skills.available.mage.fire.Fireball;
 import server.skills.available.mage.nature.EclipseBurst;
 import server.skills.available.mage.nature.MoonsVengeance;
@@ -27,6 +31,7 @@ import java.util.Map;
 @Singleton
 public class DefaultSkillFactory implements SkillFactory {
 
+    @Getter
     Map<String, Class<? extends Skill>> skillTypes = new HashMap<>();
 
     @Inject WebsocketClientUpdatesService clientUpdatesService;
@@ -57,6 +62,10 @@ public class DefaultSkillFactory implements SkillFactory {
         skillTypes.put("eclipse burst", EclipseBurst.class);
         skillTypes.put("moons vengeance", MoonsVengeance.class);
         skillTypes.put("sun smite", SunSmite.class);
+
+        skillTypes.put("maim", Maim.class);
+        skillTypes.put("rupture", Rupture.class);
+        skillTypes.put("heavy strike", HeavyStrike.class);
     }
 
     @Override
@@ -82,4 +91,5 @@ public class DefaultSkillFactory implements SkillFactory {
             throw new RuntimeException("Error creating skill instance", e);
         }
     }
+
 }
