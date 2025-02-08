@@ -32,7 +32,7 @@ public class Maim extends ChannelledSkill {
                 50,
                 true,
                 true,
-                0,
+                250,
                 0,
                 Map.of(ClassTypes.FIGHTER.getType(), 1),
                 7_000,
