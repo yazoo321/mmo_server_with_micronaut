@@ -86,5 +86,4 @@ public class PlayerMotionService {
         playerMotionUpdateProducer.sendPlayerMotionResult(playerMotion);
     }
 
-    public void handlePlayerRespawn(String actorId, String customData) {}
 }

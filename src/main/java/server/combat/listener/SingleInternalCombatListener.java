@@ -20,16 +20,12 @@ import server.socket.service.WebsocketClientUpdatesService;
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
         clientId = "internal-combat-listener-client")
-public class InternalCombatListener {
+public class SingleInternalCombatListener {
 
     @Inject CombatService combatService;
 
     @Inject WebsocketClientUpdatesService clientUpdatesService;
 
-    //    @Topic("processed-damage-updates")
-    //    public void receiveDamageUpdates(DamageUpdateMessage damageUpdateMessage) {
-    //
-    //    }
 
     @Topic("notify-actor-death")
     void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {

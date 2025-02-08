@@ -7,16 +7,11 @@ import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.status.service.StatusService;
-import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
 import server.motion.model.MotionMessage;
 import server.motion.repository.ActorMotionRepository;
+import server.motion.service.ActorMotionService;
 import server.motion.service.PlayerMotionService;
-import server.socket.model.SocketResponse;
-import server.socket.model.SocketResponseType;
-
-import java.time.Instant;
-import java.util.Map;
 
 @Slf4j
 @KafkaListener(
@@ -24,9 +19,13 @@ import java.util.Map;
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
         clientId = "player-motion-listener-client")
-public class PlayerMotionUpdateListener {
+// should be processed by a single node
+public class SinglePlayerMotionUpdateListener {
 
     @Inject PlayerMotionService playerMotionService;
+
+    @Inject
+    ActorMotionService actorMotionService;
 
     @Inject ActorMotionRepository actorMotionRepository;
 
@@ -67,19 +66,11 @@ public class PlayerMotionUpdateListener {
         // this should be used by internal skills and similar
         // should not be exposed to the websocket/UDP directly, this should bypass validation
         // should force the update of motion on clients also
+        actorMotionService.relayForceUpdateActorMotion(motionMessage);
+    }
 
-        String actorId = motionMessage.getActorId();
-        Motion update = motionMessage.getMotion();
-
-        // relay the update to clients, this should really be part of a service.
-
-        PlayerMotion updatedPlayerMotion = new PlayerMotion();
-        updatedPlayerMotion.setActorId(actorId);
-        updatedPlayerMotion.setMotion(update);
-        updatedPlayerMotion.setIsOnline(true);
-        updatedPlayerMotion.setUpdatedAt(Instant.now());
-
-        playerMotionService.relayPlayerMotion(updatedPlayerMotion);
-        actorMotionRepository.updateActorMotion(actorId, update);
+    @Topic("force-update-actor-motion-update")
+    void sendForceUpdateActorMotion(MotionMessage motionMessage) {
+        actorMotionService.handleRelayActorMotion(motionMessage);
     }
 }

@@ -1,16 +1,15 @@
 package server.motion.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
-import java.time.Instant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Motion;
 
+import java.time.Instant;
+
 @Data
 @Serdeable
-@JsonInclude()
 @ReflectiveAccess
 @NoArgsConstructor
 public class PlayerMotion {
@@ -24,8 +23,6 @@ public class PlayerMotion {
 
     String actorId;
     Motion motion;
-
     Boolean isOnline;
-
     Instant updatedAt;
 }
