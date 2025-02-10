@@ -8,7 +8,7 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
-import server.attribute.stats.service.StatsService;
+import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.talents.model.ActorTalents;
 import server.attribute.talents.model.Talent;
@@ -32,8 +32,9 @@ public class TalentService {
 
     @Inject TalentRepository talentRepository;
 
+    // TODO: Find a way to remove this dependency.
     @Inject
-    StatsService statsService;
+    ActorStatsRepository statsRepository;
 
     @Inject
     SocketResponseSubscriber socketResponseSubscriber;
@@ -105,7 +106,7 @@ public class TalentService {
     private Single<Map<String, Integer>> fetchAvailableTalents(String actorId) {
         Map<String, Talent> talents = talentRepository.getAllTalents();
 
-        Single<Stats> actorStatsSingle = statsService.getStatsFor(actorId);
+        Single<Stats> actorStatsSingle = statsRepository.fetchActorStats(actorId);
         Single<ActorTalents> actorTalentsSingle = talentRepository.getActorTalents(actorId);
 
         Map<String, Integer> availableTalents = new HashMap<>();
