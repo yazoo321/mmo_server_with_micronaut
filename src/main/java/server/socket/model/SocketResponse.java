@@ -1,9 +1,6 @@
 package server.socket.model;
 
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +9,7 @@ import server.actionbar.model.ActorActionbar;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
+import server.attribute.talents.model.TalentData;
 import server.combat.model.CombatRequest;
 import server.combat.model.ThreatUpdate;
 import server.items.inventory.model.response.GenericInventoryData;
@@ -20,6 +18,10 @@ import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.player.model.Character;
 import server.skills.model.ActorSkills;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @Builder
@@ -61,6 +63,8 @@ public class SocketResponse {
     ThreatUpdate threatUpdate;
 
     String customData;
+
+    TalentData talentData;
 
     public static SocketResponse messageWithType(SocketResponseType type) {
         return SocketResponse.builder().messageType(type.getType()).build();

@@ -5,12 +5,6 @@ import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.model.Stats;
@@ -30,6 +24,13 @@ import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -98,6 +99,8 @@ public class CombatService {
                 combatData.setLastHelperNotification(Instant.now());
                 combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
 
+                // TODO: change this to NOTIFY_ERROR_MESSAGE / NOTIFY_COMBAT_WARN
+                // will require working on the client side
                 if (!inRange) {
                     clientUpdatesService.sendToSelf(
                             session,

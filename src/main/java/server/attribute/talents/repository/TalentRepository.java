@@ -8,11 +8,13 @@ import io.micronaut.cache.annotation.Cacheable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.talents.model.ActorTalents;
 import server.attribute.talents.model.Talent;
+import server.attribute.talents.model.TalentTree;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Singleton
@@ -20,8 +22,6 @@ import server.attribute.talents.model.Talent;
 public class TalentRepository {
 
     private static final String TALENT_LOCAL_CACHE = "talentLocalCache";
-
-    Map<String, Talent> allTalents = new HashMap<>();
 
     // Double layer cache
     // Talent repository is mainly handling the caching of data locally
@@ -38,8 +38,21 @@ public class TalentRepository {
         return talentRepository.insertActorTalents(actorId, actorTalents);
     }
 
+    public Map<String, Talent>  getAllTalents() {
+        return talentRepository.getAllTalents();
+    }
+
     public Talent getTalentByName(String name) {
         return talentRepository.getAllTalents().get(name);
+    }
+
+    public TalentTree getTalentTreeByName(String treeName) {
+        TalentTree tree = talentRepository.getTalentTrees().get(treeName);
+        if (tree == null) {
+            log.error("did not find talent tree requested! {}", treeName);
+        }
+
+        return tree;
     }
 
     @Cacheable(

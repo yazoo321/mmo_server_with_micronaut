@@ -2,9 +2,6 @@ package server.attribute.talents.available.melee.fighter.weaponmaster.tier2;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
@@ -15,6 +12,10 @@ import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 import server.attribute.talents.service.TalentService;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Serdeable
@@ -34,7 +35,7 @@ public class BattleFlow extends Talent {
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
         attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
-        attributeRequirements.setDependencies(Map.of());
+        attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;
     }

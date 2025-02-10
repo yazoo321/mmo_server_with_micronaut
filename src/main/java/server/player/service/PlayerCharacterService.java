@@ -3,14 +3,12 @@ package server.player.service;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.actionbar.service.ActionbarService;
 import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
+import server.attribute.talents.service.TalentService;
 import server.items.equippable.service.EquipItemService;
 import server.items.inventory.service.InventoryService;
 import server.motion.service.PlayerMotionService;
@@ -18,6 +16,10 @@ import server.player.model.AccountCharactersResponse;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
 import server.player.repository.PlayerCharacterRepository;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Singleton
@@ -34,6 +36,9 @@ public class PlayerCharacterService {
     @Inject StatsService statsService;
 
     @Inject StatusService statusService;
+
+    @Inject
+    TalentService talentService;
 
     @Inject ActionbarService actionbarService;
 
@@ -73,6 +78,7 @@ public class PlayerCharacterService {
         try {
             statsService.initializePlayerStats(newCharacter.getName()).blockingSubscribe();
             statusService.initializeStatus(newCharacter.getName()).blockingSubscribe();
+            talentService.initializeActorTalents(newCharacter.getName()).blockingSubscribe();
             log.info("status for actor initialized: {}", createCharacterRequest.getName());
             // call relevant services to initialise data
             inventoryService
@@ -115,6 +121,7 @@ public class PlayerCharacterService {
         log.info("actor statuses deleted");
         actionbarService.deleteActorActionbar(actorId).blockingSubscribe();
         equipItemService.deleteCharacterEquippedItems(actorId).blockingSubscribe();
+        talentService.deleteActorTalents(actorId).blockingSubscribe();
     }
 
     // TODO: Support deletes

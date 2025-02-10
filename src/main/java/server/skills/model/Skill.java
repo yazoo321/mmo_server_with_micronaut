@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
@@ -190,5 +191,12 @@ public abstract class Skill {
         message.setCombatRequest(request);
 
         clientUpdatesService.sendUpdateToListeningIncludingSelf(message, castor);
+    }
+
+    public boolean isAvailableForCharacter(Stats stats) {
+        Map<String, Integer> base = stats.getBaseStats();
+
+        return requirements.entrySet().stream()
+                .allMatch(entry -> base.getOrDefault(entry.getKey(), 0) >= entry.getValue());
     }
 }

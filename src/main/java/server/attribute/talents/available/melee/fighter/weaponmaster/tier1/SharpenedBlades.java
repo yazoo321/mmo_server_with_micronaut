@@ -2,8 +2,6 @@ package server.attribute.talents.available.melee.fighter.weaponmaster.tier1;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.List;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
@@ -13,6 +11,9 @@ import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
+
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Serdeable
@@ -36,7 +37,7 @@ public class SharpenedBlades extends Talent {
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
         attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
-        attributeRequirements.setDependencies(Map.of());
+        attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;
     }

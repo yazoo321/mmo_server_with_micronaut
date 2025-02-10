@@ -1,9 +1,11 @@
 package server.attribute.common.model;
 
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -11,5 +13,5 @@ import lombok.NoArgsConstructor;
 public class AttributeRequirements {
 
     private Map<String, Integer> requirements;
-    private Map<String, Integer> dependencies;
+    private List<String> dependencies;
 }

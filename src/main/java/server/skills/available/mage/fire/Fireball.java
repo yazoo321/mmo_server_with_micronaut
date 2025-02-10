@@ -22,6 +22,8 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 public class Fireball extends ChannelledSkill {
 
+    // TODO: Consider scaling off levels, e.g. mage level
+    // for example, each 3 levels of mage, increases damage by 30%, up to level 9, (90%)
     public Fireball() {
         super(
                 "Fireball",

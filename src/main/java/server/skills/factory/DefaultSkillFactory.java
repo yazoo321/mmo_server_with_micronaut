@@ -15,6 +15,7 @@ import server.skills.available.cleric.heals.HealingRain;
 import server.skills.available.fighter.HeavyStrike;
 import server.skills.available.fighter.Maim;
 import server.skills.available.fighter.Rupture;
+import server.skills.available.mage.arcane.Blink;
 import server.skills.available.mage.fire.Fireball;
 import server.skills.available.mage.nature.EclipseBurst;
 import server.skills.available.mage.nature.MoonsVengeance;
@@ -58,7 +59,7 @@ public class DefaultSkillFactory implements SkillFactory {
         skillTypes.put("basic heal", BasicHeal.class);
         skillTypes.put("healing rain", HealingRain.class);
         skillTypes.put("vine grab", VineGrab.class);
-
+        skillTypes.put("blink", Blink.class);
         skillTypes.put("eclipse burst", EclipseBurst.class);
         skillTypes.put("moons vengeance", MoonsVengeance.class);
         skillTypes.put("sun smite", SunSmite.class);
