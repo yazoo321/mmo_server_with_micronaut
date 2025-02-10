@@ -2,6 +2,9 @@ package server.skills.factory;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
@@ -25,15 +28,10 @@ import server.skills.model.Skill;
 import server.skills.producer.SkillProducer;
 import server.socket.service.WebsocketClientUpdatesService;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-
 @Singleton
 public class DefaultSkillFactory implements SkillFactory {
 
-    @Getter
-    Map<String, Class<? extends Skill>> skillTypes = new HashMap<>();
+    @Getter Map<String, Class<? extends Skill>> skillTypes = new HashMap<>();
 
     @Inject WebsocketClientUpdatesService clientUpdatesService;
 
@@ -43,8 +41,7 @@ public class DefaultSkillFactory implements SkillFactory {
 
     @Inject StatusService statusService;
 
-    @Inject
-    EquipItemService equipItemService;
+    @Inject EquipItemService equipItemService;
 
     @Inject CombatService combatService;
 
@@ -92,5 +89,4 @@ public class DefaultSkillFactory implements SkillFactory {
             throw new RuntimeException("Error creating skill instance", e);
         }
     }
-
 }

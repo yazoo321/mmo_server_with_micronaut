@@ -2,6 +2,10 @@ package server.attribute.talents.available.melee.fighter.weaponmaster.tier3;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
@@ -15,11 +19,6 @@ import server.attribute.status.model.derived.AttributeMod;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 import server.attribute.talents.service.TalentService;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 @Serdeable

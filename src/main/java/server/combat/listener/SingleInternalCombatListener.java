@@ -26,7 +26,6 @@ public class SingleInternalCombatListener {
 
     @Inject WebsocketClientUpdatesService clientUpdatesService;
 
-
     @Topic("notify-actor-death")
     void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {
         combatService.handleActorDeath(damageUpdateMessage);

@@ -2,11 +2,10 @@ package server.motion.dto;
 
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.common.dto.Motion;
-
-import java.time.Instant;
 
 @Data
 @Serdeable

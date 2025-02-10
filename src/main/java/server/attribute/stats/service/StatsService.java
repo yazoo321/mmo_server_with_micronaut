@@ -4,6 +4,11 @@ import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
 import server.attribute.stats.model.DamageSource;
@@ -19,12 +24,6 @@ import server.combat.repository.CombatDataCache;
 import server.combat.service.ActorThreatService;
 import server.common.uuid.UUIDHelper;
 import server.socket.producer.UpdateProducer;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Singleton
@@ -316,7 +315,8 @@ public class StatsService {
 
     public void handleDamageReduction(Map<String, Double> damageMap, Stats stats) {
         // TODO: Consider different approaches for handling armour
-        // there should be a decaying factor to the armour, so that you can't just always absorb 100% of damage
+        // there should be a decaying factor to the armour, so that you can't just always absorb
+        // 100% of damage
 
         // simple approach is square root, for % dmg reduction
         // there should also be a flat damage reduction, which we may want to rework,
@@ -363,7 +363,8 @@ public class StatsService {
         // TODO: handle parry event
         // TODO: handle energy resist/absorb event
 
-        // resistances should scale such that when you go over 100% resistance, the damage will in fact heal you
+        // resistances should scale such that when you go over 100% resistance, the damage will in
+        // fact heal you
         // i.e. if you have 200% resistance, it will heal you for 100% damage
 
         handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_HIT_APPLY);

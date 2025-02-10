@@ -5,6 +5,7 @@ import io.micronaut.configuration.kafka.annotation.OffsetReset;
 import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.service.StatsService;
@@ -18,8 +19,6 @@ import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
-
-import java.util.Set;
 
 @Slf4j
 @KafkaListener(

@@ -15,5 +15,4 @@ public interface PlayerMotionUpdateProducer {
     // this is a complex problem, we have no guarantee which node processes characters on which map
     @Topic("force-update-actor-motion-update")
     void sendForceUpdateActorMotion(MotionMessage motionMessage);
-
 }

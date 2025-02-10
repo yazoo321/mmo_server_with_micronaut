@@ -2,6 +2,9 @@ package server.motion.service;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.common.uuid.UUIDHelper;
 import server.monster.server_integration.model.Monster;
@@ -15,42 +18,37 @@ import server.socket.service.UdpClientUpdateService;
 import server.socket.service.WebsocketClientUpdatesService;
 import server.utils.FeatureFlag;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
-
 @Slf4j
 @Singleton
 public class ActorMotionService {
 
     @Inject PlayerMotionUpdateProducer playerMotionUpdateProducer;
 
-    @Inject
-    ActorMotionRepository actorMotionRepository;
+    @Inject ActorMotionRepository actorMotionRepository;
 
-    @Inject
-    WebsocketClientUpdatesService websocketClientUpdatesService;
-    @Inject
-    UdpClientUpdateService udpClientUpdateService;
+    @Inject WebsocketClientUpdatesService websocketClientUpdatesService;
+    @Inject UdpClientUpdateService udpClientUpdateService;
 
-    @Inject
-    FeatureFlag featureFlag;
-
+    @Inject FeatureFlag featureFlag;
 
     public void relayForceUpdateActorMotion(MotionMessage motionMessage) {
         // This uses kafka to relay the message to all other relevant nodes
         playerMotionUpdateProducer.sendForceUpdateActorMotion(motionMessage);
-        actorMotionRepository.updateActorMotion(motionMessage.getActorId(), motionMessage.getMotion());
+        actorMotionRepository.updateActorMotion(
+                motionMessage.getActorId(), motionMessage.getMotion());
     }
 
     public void handleRelayActorMotion(MotionMessage motionMessage) {
         // this is received by ALL nodes, which will send the updates to relevant player clients
         String actorId = motionMessage.getActorId();
 
-        SocketResponse socketResponse = UUIDHelper.isPlayer(actorId) ? buildPlayerMotionSocketResponse(motionMessage) :
-                buildMonsterMotionSocketResponse(motionMessage);
+        SocketResponse socketResponse =
+                UUIDHelper.isPlayer(actorId)
+                        ? buildPlayerMotionSocketResponse(motionMessage)
+                        : buildMonsterMotionSocketResponse(motionMessage);
 
-        // key difference here to "player-motion-update-result" kafka topic, is that here we send update to self also
+        // key difference here to "player-motion-update-result" kafka topic, is that here we send
+        // update to self also
         // and we force update, which causes the players client to teleport the player
         if (featureFlag.getEnableUdp()) {
             udpClientUpdateService.sendUpdateToListeningIncludingSelf(socketResponse, actorId);
@@ -124,7 +122,4 @@ public class ActorMotionService {
 
         return response;
     }
-
-
-
 }

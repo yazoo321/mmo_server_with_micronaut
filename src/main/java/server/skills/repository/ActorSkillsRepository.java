@@ -1,16 +1,15 @@
 package server.skills.repository;
 
+import static com.mongodb.client.model.Filters.eq;
+
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import server.common.configuration.MongoConfiguration;
 import server.skills.model.ActorSkills;
-
-import javax.annotation.PostConstruct;
-
-import static com.mongodb.client.model.Filters.eq;
 
 @Slf4j
 @Singleton
@@ -32,8 +31,8 @@ public class ActorSkillsRepository {
 
     public Single<ActorSkills> setActorSkills(ActorSkills actorSkills) {
         return Single.fromPublisher(
-                actorSkillsCollection.replaceOne(
-                        eq("actorId", actorSkills.getActorId()), actorSkills))
+                        actorSkillsCollection.replaceOne(
+                                eq("actorId", actorSkills.getActorId()), actorSkills))
                 .map(r -> actorSkills);
     }
 

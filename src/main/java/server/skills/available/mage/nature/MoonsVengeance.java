@@ -2,6 +2,9 @@ package server.skills.available.mage.nature;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.types.ClassTypes;
@@ -9,10 +12,6 @@ import server.attribute.stats.types.DamageTypes;
 import server.combat.model.CombatData;
 import server.skills.active.aoe.TickingAoeSkill;
 import server.skills.model.SkillTarget;
-
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 @Serdeable
 @JsonTypeName("Moons vengeance")
@@ -49,8 +48,9 @@ public class MoonsVengeance extends TickingAoeSkill {
         CombatData combatData = skillDependencies.getCombatData();
 
         getAffectedActors(skillTarget)
-                .doOnSuccess(targets ->
-                        requestTakeDamageToMultipleActors(combatData.getActorId(), targets))
+                .doOnSuccess(
+                        targets ->
+                                requestTakeDamageToMultipleActors(combatData.getActorId(), targets))
                 .doOnError(err -> log.error("Error applying moons vengeance, {}", err.getMessage()))
                 .subscribe();
     }

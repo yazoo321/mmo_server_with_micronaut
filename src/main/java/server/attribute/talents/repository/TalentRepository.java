@@ -8,13 +8,12 @@ import io.micronaut.cache.annotation.Cacheable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.talents.model.ActorTalents;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentTree;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Singleton
@@ -38,7 +37,7 @@ public class TalentRepository {
         return talentRepository.insertActorTalents(actorId, actorTalents);
     }
 
-    public Map<String, Talent>  getAllTalents() {
+    public Map<String, Talent> getAllTalents() {
         return talentRepository.getAllTalents();
     }
 

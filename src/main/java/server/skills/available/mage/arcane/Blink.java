@@ -2,6 +2,7 @@ package server.skills.available.mage.arcane;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.types.ClassTypes;
@@ -9,8 +10,6 @@ import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
-
-import java.util.Map;
 
 @Slf4j
 @Serdeable

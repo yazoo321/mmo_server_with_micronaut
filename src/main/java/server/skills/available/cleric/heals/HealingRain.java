@@ -1,6 +1,7 @@
 package server.skills.available.cleric.heals;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,6 @@ import server.common.dto.Location;
 import server.common.dto.Motion;
 import server.skills.active.aoe.TickingAoeSkill;
 import server.skills.model.SkillTarget;
-
-import java.util.Map;
 
 @Getter
 @JsonTypeName("Healing rain")
@@ -51,10 +50,10 @@ public class HealingRain extends TickingAoeSkill {
         skillTarget.setLocation(new Location(actorMotion));
 
         getAffectedActors(skillTarget)
-                .doOnSuccess(targets ->
-                        requestTakeDamageToMultipleActors(combatData.getActorId(), targets))
+                .doOnSuccess(
+                        targets ->
+                                requestTakeDamageToMultipleActors(combatData.getActorId(), targets))
                 .doOnError(err -> log.error("Error applying moons vengeance, {}", err.getMessage()))
                 .subscribe();
-
     }
 }

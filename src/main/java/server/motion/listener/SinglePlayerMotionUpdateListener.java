@@ -24,8 +24,7 @@ public class SinglePlayerMotionUpdateListener {
 
     @Inject PlayerMotionService playerMotionService;
 
-    @Inject
-    ActorMotionService actorMotionService;
+    @Inject ActorMotionService actorMotionService;
 
     @Inject ActorMotionRepository actorMotionRepository;
 
@@ -34,8 +33,8 @@ public class SinglePlayerMotionUpdateListener {
     @Topic("player-motion-update")
     public void receive(PlayerMotion playerMotion) {
         // TODO: validate
-//        log.info("received player motion in player-motion-update");
-//        log.info("{}", playerMotion);
+        //        log.info("received player motion in player-motion-update");
+        //        log.info("{}", playerMotion);
 
         // TODO: consider random sampling, e.g. 10% of requests (that's still 1+ per second)
         statusService

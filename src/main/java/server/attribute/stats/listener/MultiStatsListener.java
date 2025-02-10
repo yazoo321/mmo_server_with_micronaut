@@ -58,5 +58,4 @@ public class MultiStatsListener {
                     damageUpdateMessage.getTargetStats(), damageUpdateMessage.getOriginStats());
         }
     }
-
 }

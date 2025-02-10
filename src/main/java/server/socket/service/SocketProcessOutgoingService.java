@@ -3,6 +3,15 @@ package server.socket.service;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.security.InvalidParameterException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import server.actionbar.service.ActionbarService;
 import server.attribute.talents.service.TalentService;
@@ -25,16 +34,6 @@ import server.socket.service.integrations.items.ItemSocketIntegration;
 import server.socket.service.integrations.motion.PlayerMotionIntegration;
 import server.socket.service.integrations.status.StatusSocketIntegration;
 
-import javax.annotation.PostConstruct;
-import java.security.InvalidParameterException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 @Slf4j
 @Singleton
 public class SocketProcessOutgoingService {
@@ -55,8 +54,7 @@ public class SocketProcessOutgoingService {
 
     @Inject CombatSkillsService combatSkillsService;
 
-    @Inject
-    TalentService talentService;
+    @Inject TalentService talentService;
 
     @Inject MobCombatService mobCombatService;
 
@@ -68,9 +66,7 @@ public class SocketProcessOutgoingService {
 
     @Inject ActorThreatService threatService;
 
-    @Inject
-    PlayfabService playfabService;
-
+    @Inject PlayfabService playfabService;
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
 
@@ -109,14 +105,20 @@ public class SocketProcessOutgoingService {
         this.functionMap.put(MessageType.SET_SESSION_ID.getType(), this::setSessionId);
         this.functionMap.put(SkillMessageType.INITIATE_SKILL.getType(), this::handleTryStartSkill);
         // skill management
-        this.functionMap.put(SkillMessageType.FETCH_ALL_SKILLS.getType(), this::handleFetchAllSkills);
-        this.functionMap.put(SkillMessageType.FETCH_LEARNED_SKILLS.getType(), this::handleFetchLearnedSkills);
-        this.functionMap.put(SkillMessageType.FETCH_AVAILABLE_SKILLS.getType(), this::handleFetchAvailableSkills);
+        this.functionMap.put(
+                SkillMessageType.FETCH_ALL_SKILLS.getType(), this::handleFetchAllSkills);
+        this.functionMap.put(
+                SkillMessageType.FETCH_LEARNED_SKILLS.getType(), this::handleFetchLearnedSkills);
+        this.functionMap.put(
+                SkillMessageType.FETCH_AVAILABLE_SKILLS.getType(),
+                this::handleFetchAvailableSkills);
         this.functionMap.put(SkillMessageType.LEARN_SKILL.getType(), this::handleLearnSkill);
         // talent management
         this.functionMap.put(MessageType.FETCH_ALL_TALENTS.getType(), this::handleFetchAllTalents);
-        this.functionMap.put(MessageType.FETCH_LEARNED_TALENTS.getType(), this::handleFetchLearnedTalents);
-        this.functionMap.put(MessageType.FETCH_AVAILABLE_TALENTS.getType(), this::handleAvailableTalents);
+        this.functionMap.put(
+                MessageType.FETCH_LEARNED_TALENTS.getType(), this::handleFetchLearnedTalents);
+        this.functionMap.put(
+                MessageType.FETCH_AVAILABLE_TALENTS.getType(), this::handleAvailableTalents);
         this.functionMap.put(MessageType.LEARN_TALENT.getType(), this::handleLearnTalent);
 
         this.functionMap.put(
@@ -193,7 +195,7 @@ public class SocketProcessOutgoingService {
             }
         }
 
-//        log.info("sending player motion update");
+        //        log.info("sending player motion update");
         updateProducer.sendPlayerMotionUpdate(message.getPlayerMotion());
     }
 
@@ -414,10 +416,10 @@ public class SocketProcessOutgoingService {
                 message.getServerName() == null || message.getServerName().isBlank()
                         ? null
                         : message.getServerName();
-//        String actorId =
-//                message.getActorId() == null || message.getActorId().isBlank()
-//                        ? null
-//                        : message.getActorId();
+        //        String actorId =
+        //                message.getActorId() == null || message.getActorId().isBlank()
+        //                        ? null
+        //                        : message.getActorId();
 
         SessionParamHelper.setServerName(session, serverName);
         SessionParamHelper.setActorId(session, actorId);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.websocket.WebSocketSession;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
@@ -23,8 +24,6 @@ import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
 
-import java.util.Arrays;
-
 @Slf4j
 @Singleton
 public class CombatSkillsService {
@@ -37,11 +36,9 @@ public class CombatSkillsService {
 
     @Inject CombatDataCache combatDataCache;
 
-    @Inject
-    AvailableSkills availableSkills;
+    @Inject AvailableSkills availableSkills;
 
-    @Inject
-    StatsService statsService;
+    @Inject StatsService statsService;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -60,23 +57,26 @@ public class CombatSkillsService {
     }
 
     public void fetchActorTrainedSkills(String actorId, WebSocketSession session) {
-        actorSkillsRepository.getActorSkills(actorId)
-                .doOnSuccess(actorSkills -> {
-                    SocketResponse socketResponse = new SocketResponse();
-                    socketResponse.setActorSkills(actorSkills);
-                    socketResponse.setMessageType(SocketResponseType.UPDATE_ACTOR_SKILLS.getType());
+        actorSkillsRepository
+                .getActorSkills(actorId)
+                .doOnSuccess(
+                        actorSkills -> {
+                            SocketResponse socketResponse = new SocketResponse();
+                            socketResponse.setActorSkills(actorSkills);
+                            socketResponse.setMessageType(
+                                    SocketResponseType.UPDATE_ACTOR_SKILLS.getType());
 
-                    session.send(socketResponse).subscribe(socketResponseSubscriber);
-                })
+                            session.send(socketResponse).subscribe(socketResponseSubscriber);
+                        })
                 .subscribe();
     }
 
     public void fetchAllSkills(WebSocketSession session) {
         SocketResponse socketResponse = new SocketResponse();
-        ActorSkills actorSkills = new ActorSkills(
-                SessionParamHelper.getActorId(session),
-                availableSkills.getAllSkills().values().stream().toList()
-        );
+        ActorSkills actorSkills =
+                new ActorSkills(
+                        SessionParamHelper.getActorId(session),
+                        availableSkills.getAllSkills().values().stream().toList());
         socketResponse.setActorSkills(actorSkills);
         socketResponse.setMessageType(SocketResponseType.ALL_ACTOR_SKILLS.getType());
 
@@ -84,84 +84,130 @@ public class CombatSkillsService {
     }
 
     public void fetchAvailableSkillsToLevel(String actorId, WebSocketSession session) {
-        statsService.getStatsFor(actorId)
-                .doOnSuccess(stats -> {
-                    SocketResponse socketResponse = new SocketResponse();
-                    ActorSkills actorSkills = new ActorSkills(
-                            stats.getActorId(),
-                            availableSkills.getAvailableSkillsForCharacter(stats)
-                    );
-                    socketResponse.setActorSkills(actorSkills);
-                    socketResponse.setMessageType(SocketResponseType.AVAILABLE_ACTOR_SKILLS.getType());
+        statsService
+                .getStatsFor(actorId)
+                .doOnSuccess(
+                        stats -> {
+                            SocketResponse socketResponse = new SocketResponse();
+                            ActorSkills actorSkills =
+                                    new ActorSkills(
+                                            stats.getActorId(),
+                                            availableSkills.getAvailableSkillsForCharacter(stats));
+                            socketResponse.setActorSkills(actorSkills);
+                            socketResponse.setMessageType(
+                                    SocketResponseType.AVAILABLE_ACTOR_SKILLS.getType());
 
-                    session.send(socketResponse).subscribe(socketResponseSubscriber);
-                })
+                            session.send(socketResponse).subscribe(socketResponseSubscriber);
+                        })
                 .subscribe();
     }
 
     public void handleLearnSkill(String skillId, WebSocketSession session) {
         String actorId = SessionParamHelper.getActorId(session);
         // TODO: let's only have 1 skill point per level
-        statsService.getStatsFor(actorId)
-                .doOnSuccess(stats -> {
-                    // validate that the skill can be learned.
-                    Skill skill = skillFactory.createSkill(skillId.toLowerCase());
-                    if (!skill.isAvailableForCharacter(stats)) {
-                        log.warn("Actor: {}, tried to learn a skill: {} they don't have level for ",
-                                actorId, skillId);
-                        SocketResponse socketResponse = new SocketResponse();
-                        socketResponse.setMessageType(SocketResponseType.NOTIFY_ERROR_MESSAGE.getType());
-                        socketResponse.setCustomData("You do not meet the requirements for this skill yet");
-                        session.send(socketResponse).subscribe(socketResponseSubscriber);
-                        return;
-                    }
-
-                    // check if the skill is already learnt
-                    actorSkillsRepository.getActorSkills(actorId)
-                        .doOnSuccess(actorSkills -> {
-                            if (actorSkills.getSkills().stream().anyMatch(s -> s.getClass().equals(skill.getClass()))) {
-                                log.warn("Actor: {}, tried to learn a skill: {} they already have ",
-                                        actorId, skillId);
+        statsService
+                .getStatsFor(actorId)
+                .doOnSuccess(
+                        stats -> {
+                            // validate that the skill can be learned.
+                            Skill skill = skillFactory.createSkill(skillId.toLowerCase());
+                            if (!skill.isAvailableForCharacter(stats)) {
+                                log.warn(
+                                        "Actor: {}, tried to learn a skill: {} they don't have"
+                                                + " level for ",
+                                        actorId,
+                                        skillId);
                                 SocketResponse socketResponse = new SocketResponse();
-                                socketResponse.setMessageType(SocketResponseType.NOTIFY_ERROR_MESSAGE.getType());
-                                socketResponse.setCustomData("You already levelled this skill!");
+                                socketResponse.setMessageType(
+                                        SocketResponseType.NOTIFY_ERROR_MESSAGE.getType());
+                                socketResponse.setCustomData(
+                                        "You do not meet the requirements for this skill yet");
                                 session.send(socketResponse).subscribe(socketResponseSubscriber);
                                 return;
                             }
 
-                            // TODO: check if the actor has enough skill points to learn this skill.
-                            if (!hasEnoughSkillPointsToLearn(stats, actorSkills.getSkills().size())) {
-                                log.warn("Actor does not have enough skill points to learn skill");
-                                SocketResponse socketResponse = new SocketResponse();
-                                socketResponse.setMessageType(SocketResponseType.NOTIFY_ERROR_MESSAGE.getType());
-                                socketResponse.setCustomData("You do not have enough skill points to learn this skill");
-                                session.send(socketResponse).subscribe(socketResponseSubscriber);
-                                return;
-                            }
-                            actorSkills.getSkills().add(skill);
-                            actorSkillsRepository.setActorSkills(actorSkills)
-                                    .doOnSuccess(skills -> {
-                                        SocketResponse socketResponse = new SocketResponse();
-                                        socketResponse.setActorSkills(skills);
-                                        socketResponse.setMessageType(SocketResponseType.UPDATE_ACTOR_SKILLS.getType());
+                            // check if the skill is already learnt
+                            actorSkillsRepository
+                                    .getActorSkills(actorId)
+                                    .doOnSuccess(
+                                            actorSkills -> {
+                                                if (actorSkills.getSkills().stream()
+                                                        .anyMatch(
+                                                                s ->
+                                                                        s.getClass()
+                                                                                .equals(
+                                                                                        skill
+                                                                                                .getClass()))) {
+                                                    log.warn(
+                                                            "Actor: {}, tried to learn a skill: {}"
+                                                                    + " they already have ",
+                                                            actorId,
+                                                            skillId);
+                                                    SocketResponse socketResponse =
+                                                            new SocketResponse();
+                                                    socketResponse.setMessageType(
+                                                            SocketResponseType.NOTIFY_ERROR_MESSAGE
+                                                                    .getType());
+                                                    socketResponse.setCustomData(
+                                                            "You already levelled this skill!");
+                                                    session.send(socketResponse)
+                                                            .subscribe(socketResponseSubscriber);
+                                                    return;
+                                                }
 
-                                        session.send(socketResponse).subscribe(socketResponseSubscriber);
-                                    })
+                                                // TODO: check if the actor has enough skill points
+                                                // to learn this skill.
+                                                if (!hasEnoughSkillPointsToLearn(
+                                                        stats, actorSkills.getSkills().size())) {
+                                                    log.warn(
+                                                            "Actor does not have enough skill"
+                                                                    + " points to learn skill");
+                                                    SocketResponse socketResponse =
+                                                            new SocketResponse();
+                                                    socketResponse.setMessageType(
+                                                            SocketResponseType.NOTIFY_ERROR_MESSAGE
+                                                                    .getType());
+                                                    socketResponse.setCustomData(
+                                                            "You do not have enough skill points to"
+                                                                    + " learn this skill");
+                                                    session.send(socketResponse)
+                                                            .subscribe(socketResponseSubscriber);
+                                                    return;
+                                                }
+                                                actorSkills.getSkills().add(skill);
+                                                actorSkillsRepository
+                                                        .setActorSkills(actorSkills)
+                                                        .doOnSuccess(
+                                                                skills -> {
+                                                                    SocketResponse socketResponse =
+                                                                            new SocketResponse();
+                                                                    socketResponse.setActorSkills(
+                                                                            skills);
+                                                                    socketResponse.setMessageType(
+                                                                            SocketResponseType
+                                                                                    .UPDATE_ACTOR_SKILLS
+                                                                                    .getType());
+
+                                                                    session.send(socketResponse)
+                                                                            .subscribe(
+                                                                                    socketResponseSubscriber);
+                                                                })
+                                                        .subscribe();
+                                            })
                                     .subscribe();
-                        })
-                        .subscribe();
 
-                    SocketResponse socketResponse = new SocketResponse();
-                    session.send(socketResponse).subscribe(socketResponseSubscriber);
-                })
+                            SocketResponse socketResponse = new SocketResponse();
+                            session.send(socketResponse).subscribe(socketResponseSubscriber);
+                        })
                 .subscribe();
     }
 
     private boolean hasEnoughSkillPointsToLearn(Stats stats, int numberOfSkillsLearned) {
         // assume 1 skill point available per class level
-        int total = Arrays.stream(ClassTypes.values())
-                .mapToInt(classType -> stats.getBaseStats().getOrDefault(classType.type, 0))
-                .sum();
+        int total =
+                Arrays.stream(ClassTypes.values())
+                        .mapToInt(classType -> stats.getBaseStats().getOrDefault(classType.type, 0))
+                        .sum();
 
         return total > numberOfSkillsLearned;
     }
@@ -173,6 +219,4 @@ public class CombatSkillsService {
             combatRequest.getSkillTarget().setCasterId(SessionParamHelper.getActorId(session));
         }
     }
-
-
 }

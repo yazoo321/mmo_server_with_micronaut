@@ -5,6 +5,7 @@ import io.micronaut.configuration.kafka.annotation.OffsetReset;
 import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.ItemInstanceIds;
@@ -13,8 +14,6 @@ import server.items.model.DroppedItem;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
-
-import java.util.List;
 
 @Slf4j
 @KafkaListener(

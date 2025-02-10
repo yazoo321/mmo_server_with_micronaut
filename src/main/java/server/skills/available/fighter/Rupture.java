@@ -2,6 +2,9 @@ package server.skills.available.fighter;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.types.ClassTypes;
@@ -11,10 +14,6 @@ import server.attribute.status.model.derived.Bleeding;
 import server.combat.model.CombatData;
 import server.skills.active.channelled.ChannelledSkill;
 import server.skills.model.SkillTarget;
-
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 @Serdeable
@@ -47,7 +46,13 @@ public class Rupture extends ChannelledSkill {
     private void addBleedEffect(CombatData combatData, SkillTarget skillTarget) {
         // add burning effect
         Instant duration = Instant.now().plusMillis(durationMs);
-        Status bleed = new Bleeding(duration, combatData.getActorId(), derived.get(DamageTypes.BLEEDING.getType()), 1, this.getName());
+        Status bleed =
+                new Bleeding(
+                        duration,
+                        combatData.getActorId(),
+                        derived.get(DamageTypes.BLEEDING.getType()),
+                        1,
+                        this.getName());
         requestAddStatusEffect(skillTarget.getTargetId(), Set.of(bleed));
     }
 }

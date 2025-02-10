@@ -20,9 +20,7 @@ import server.motion.service.ActorMotionService;
 // Should be received by all nodes - requires change in the group id
 public class MultiPlayerMotionUpdateListener {
 
-    @Inject
-    ActorMotionService actorMotionService;
-
+    @Inject ActorMotionService actorMotionService;
 
     @Topic("force-update-actor-motion-update")
     void sendForceUpdateActorMotion(MotionMessage motionMessage) {

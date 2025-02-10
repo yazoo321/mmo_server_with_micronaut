@@ -33,5 +33,4 @@ public class MultiStatusListener {
         clientUpdatesService.sendUpdateToListeningIncludingSelf(
                 socketResponse, actorStatus.getActorId());
     }
-
 }

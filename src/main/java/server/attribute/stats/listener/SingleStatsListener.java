@@ -5,15 +5,14 @@ import io.micronaut.configuration.kafka.annotation.OffsetReset;
 import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @KafkaListener(

@@ -1,6 +1,7 @@
 package server.skills.model;
 
 import io.micronaut.websocket.WebSocketSession;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +11,6 @@ import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
 import server.items.equippable.model.EquippedItems;
-
-import java.util.Map;
 
 @Data
 @Builder

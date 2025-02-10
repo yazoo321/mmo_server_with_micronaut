@@ -1,6 +1,11 @@
 package server.skills.available;
 
 import jakarta.inject.Singleton;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.PostConstruct;
 import lombok.Getter;
 import server.attribute.stats.model.Stats;
 import server.skills.available.cleric.heals.BasicHeal;
@@ -14,12 +19,6 @@ import server.skills.available.mage.nature.MoonsVengeance;
 import server.skills.available.mage.nature.SunSmite;
 import server.skills.available.mage.nature.VineGrab;
 import server.skills.model.Skill;
-
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Singleton
@@ -46,18 +45,19 @@ public class AvailableSkills {
     }
 
     public List<Skill> getAvailableSkillsForCharacter(Stats stats) {
-        // here we get all character levels from player, and then we can filter out skills that are not available
+        // here we get all character levels from player, and then we can filter out skills that are
+        // not available
         // Base stats contain character levels, we check and filter using those
 
         List<Skill> availableSkills = new ArrayList<>();
 
-        allSkills.forEach((key, value) -> {
-            if (value.isAvailableForCharacter(stats)) {
-                availableSkills.add(value);
-            }
-        });
+        allSkills.forEach(
+                (key, value) -> {
+                    if (value.isAvailableForCharacter(stats)) {
+                        availableSkills.add(value);
+                    }
+                });
 
         return availableSkills;
     }
-
 }

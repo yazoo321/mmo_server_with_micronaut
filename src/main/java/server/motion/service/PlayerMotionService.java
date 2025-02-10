@@ -4,16 +4,15 @@ import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.common.dto.Motion;
 import server.motion.dto.PlayerMotion;
 import server.motion.producer.PlayerMotionUpdateProducer;
 import server.motion.repository.ActorMotionRepository;
 import server.motion.repository.PlayerMotionRepository;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Singleton
@@ -82,8 +81,7 @@ public class PlayerMotionService {
     }
 
     public void relayPlayerMotion(PlayerMotion playerMotion) {
-//        log.info("relaying player motion: {}", playerMotion.getActorId());
+        //        log.info("relaying player motion: {}", playerMotion.getActorId());
         playerMotionUpdateProducer.sendPlayerMotionResult(playerMotion);
     }
-
 }

@@ -1,6 +1,9 @@
 package server.socket.model;
 
 import io.micronaut.serde.annotation.Serdeable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,10 +21,6 @@ import server.monster.server_integration.model.Monster;
 import server.motion.dto.PlayerMotion;
 import server.player.model.Character;
 import server.skills.model.ActorSkills;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Data
 @Builder
@@ -70,7 +69,8 @@ public class SocketResponse {
         return SocketResponse.builder().messageType(type.getType()).build();
     }
 
-    public static SocketResponse messageWithTypeAndCustomPayload(SocketResponseType type, String msg) {
+    public static SocketResponse messageWithTypeAndCustomPayload(
+            SocketResponseType type, String msg) {
         SocketResponse resp = messageWithType(type);
         resp.setCustomData(msg);
         return resp;

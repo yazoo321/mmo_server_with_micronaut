@@ -1,9 +1,15 @@
 package server.items.equippable.service;
 
+import static server.attribute.stats.types.StatsTypes.*;
+
 import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
@@ -17,13 +23,6 @@ import server.items.inventory.model.exceptions.InventoryException;
 import server.items.inventory.service.InventoryService;
 import server.items.model.ItemInstance;
 import server.items.types.ItemType;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static server.attribute.stats.types.StatsTypes.*;
 
 @Slf4j
 @Singleton
@@ -201,9 +200,10 @@ public class EquipItemService {
                 itemEffects.put(
                         MAIN_HAND_ATTACK_SPEED.getType(),
                         itemEffects.get(BASE_ATTACK_SPEED.getType()));
-                itemEffects.put(MAINHAND_WEAPON_DAMAGE.getType(),
-                        itemEffects.get(WEAPON_DAMAGE.getType()));
-                itemEffects.put(MAINHAND_ATTACK_DISTANCE.getType(),
+                itemEffects.put(
+                        MAINHAND_WEAPON_DAMAGE.getType(), itemEffects.get(WEAPON_DAMAGE.getType()));
+                itemEffects.put(
+                        MAINHAND_ATTACK_DISTANCE.getType(),
                         itemEffects.get(ATTACK_DISTANCE.getType()));
             }
 
@@ -213,9 +213,9 @@ public class EquipItemService {
                         OFF_HAND_ATTACK_SPEED.getType(),
                         itemEffects.get(BASE_ATTACK_SPEED.getType()));
                 itemEffects.put(
-                        OFFHAND_WEAPON_DAMAGE.getType(),
-                        itemEffects.get(WEAPON_DAMAGE.getType()));
-                itemEffects.put(OFFHAND_ATTACK_DISTANCE.getType(),
+                        OFFHAND_WEAPON_DAMAGE.getType(), itemEffects.get(WEAPON_DAMAGE.getType()));
+                itemEffects.put(
+                        OFFHAND_ATTACK_DISTANCE.getType(),
                         itemEffects.get(ATTACK_DISTANCE.getType()));
             }
         }

@@ -7,6 +7,8 @@ import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
+import java.util.Map;
+import java.util.Random;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,9 +39,6 @@ import server.socket.model.SocketResponse;
 import server.socket.model.types.SkillMessageType;
 import server.socket.service.WebsocketClientUpdatesService;
 
-import java.util.Map;
-import java.util.Random;
-
 @Slf4j
 @Serdeable
 @ReflectiveAccess
@@ -49,26 +48,26 @@ import java.util.Random;
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "name")
 @JsonSubTypes({
-        // cleric spells
-        @JsonSubTypes.Type(value = BasicHeal.class, name = "Basic heal"),
-        @JsonSubTypes.Type(value = HealingRain.class, name = "Healing rain"),
+    // cleric spells
+    @JsonSubTypes.Type(value = BasicHeal.class, name = "Basic heal"),
+    @JsonSubTypes.Type(value = HealingRain.class, name = "Healing rain"),
 
-        // fighter spells
-        @JsonSubTypes.Type(value = HeavyStrike.class, name = "Heavy strike"),
-        @JsonSubTypes.Type(value = Maim.class, name = "Maim"),
-        @JsonSubTypes.Type(value = Rupture.class, name = "Rupture"),
+    // fighter spells
+    @JsonSubTypes.Type(value = HeavyStrike.class, name = "Heavy strike"),
+    @JsonSubTypes.Type(value = Maim.class, name = "Maim"),
+    @JsonSubTypes.Type(value = Rupture.class, name = "Rupture"),
 
-        // mage: arcane
-        @JsonSubTypes.Type(value = Blink.class, name = "Blink"),
+    // mage: arcane
+    @JsonSubTypes.Type(value = Blink.class, name = "Blink"),
 
-        // mage: fire
-        @JsonSubTypes.Type(value = Fireball.class, name = "Fireball"),
+    // mage: fire
+    @JsonSubTypes.Type(value = Fireball.class, name = "Fireball"),
 
-        // mage: nature
-        @JsonSubTypes.Type(value = EclipseBurst.class, name = "Eclipse burst"),
-        @JsonSubTypes.Type(value = MoonsVengeance.class, name = "Moons vengeance"),
-        @JsonSubTypes.Type(value = SunSmite.class, name = "Sun smite"),
-        @JsonSubTypes.Type(value = VineGrab.class, name = "Vine grab"),
+    // mage: nature
+    @JsonSubTypes.Type(value = EclipseBurst.class, name = "Eclipse burst"),
+    @JsonSubTypes.Type(value = MoonsVengeance.class, name = "Moons vengeance"),
+    @JsonSubTypes.Type(value = SunSmite.class, name = "Sun smite"),
+    @JsonSubTypes.Type(value = VineGrab.class, name = "Vine grab"),
 })
 public abstract class Skill {
 
