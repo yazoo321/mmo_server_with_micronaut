@@ -2,14 +2,15 @@ package server.attribute.status.model.derived;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-import java.time.Instant;
-import java.util.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.Status;
+
+import java.time.Instant;
+import java.util.*;
 
 @Data
 @Serdeable
@@ -45,5 +46,10 @@ public class AttributeMod extends Status {
 
     public Set<String> defaultStatusEffects() {
         return new HashSet<>(Set.of(getCategory()));
+    }
+
+    @Override
+    public boolean requiresStatsUpdate() {
+        return true;
     }
 }

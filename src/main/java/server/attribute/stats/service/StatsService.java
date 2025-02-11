@@ -4,11 +4,6 @@ import com.mongodb.client.result.DeleteResult;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
 import server.attribute.stats.model.DamageSource;
@@ -24,6 +19,12 @@ import server.combat.repository.CombatDataCache;
 import server.combat.service.ActorThreatService;
 import server.common.uuid.UUIDHelper;
 import server.socket.producer.UpdateProducer;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Singleton
@@ -170,7 +171,6 @@ public class StatsService {
 
         if (damageSource.getAdditionalData().equals("PERCENT")) {
             // this is used within talents to restore HP/Mana for example on kill
-
             getStatsFor(damageSource.getActorId())
                     .doOnSuccess(
                             actorStats -> {
@@ -353,6 +353,20 @@ public class StatsService {
         }
     }
 
+    private void handleWeaponImbue(Stats sourceStats, Stats stats, Map<String, Double> damageMap) {
+        // weapon imbue will fit into 3 categories
+        // primary: basic damage, always damage, can be of any type
+        // secondary: modify attributes, such as attack slow, move slow, etc.
+        // trinary: this is not affecting the target, but rather the equipper.
+        //   examples are like increasing the equippers attack speed, move speed, def, etc
+
+        // compile the primary weapon damage here to damage map.
+
+        // TODO: our burning effect will benefit from this. this will make it too high as the frequency is too high.
+        // We will need to change how the damage effects are applied via status effects, or modify its scaling ?
+
+    }
+
     public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
         // TODO: consider hit chance?
         if (handleDodge(damageMap, stats, sourceStats)) {
@@ -366,9 +380,14 @@ public class StatsService {
         // resistances should scale such that when you go over 100% resistance, the damage will in
         // fact heal you
         // i.e. if you have 200% resistance, it will heal you for 100% damage
+        // this is only for non-physical damage
 
         handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_HIT_APPLY);
         handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_HIT_CONSUME);
+
+        // handle weapon imbues
+        // weapon imbues will merge with stats, via status effects..
+        handleWeaponImbue(sourceStats, stats, damageMap);
 
         handleDamageAmp(damageMap, stats);
 

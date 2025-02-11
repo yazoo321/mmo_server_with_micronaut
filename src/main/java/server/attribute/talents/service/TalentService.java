@@ -5,8 +5,6 @@ import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
@@ -22,6 +20,9 @@ import server.session.SessionParamHelper;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
 import server.socket.model.SocketResponseType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Singleton

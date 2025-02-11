@@ -63,7 +63,12 @@ public enum StatsTypes {
 
     // Mob specific stats
     MAIN_HAND_ATTACK_SPEED("MAIN_HAND_ATTACK_SPEED"),
-    OFF_HAND_ATTACK_SPEED("OFF_HAND_ATTACK_SPEED");
+    OFF_HAND_ATTACK_SPEED("OFF_HAND_ATTACK_SPEED"),
+
+    // controlled via statuses only.
+    PRIMARY_IMBUE("PRIMARY_IMBUE"),
+    SECONDARY_IMBUE("SECONDARY_IMBUE"),
+    TRINARY_IMBUE("TRINARY_IMBUE");
 
     public final String type;
 }
