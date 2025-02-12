@@ -12,10 +12,10 @@ import server.attribute.status.service.StatusService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "status-listener",
+        groupId = "single-status-listener",
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "status-listener")
+        clientId = "single-status-listener")
 public class SingleStatusListener {
 
     @Inject StatusService statusService;

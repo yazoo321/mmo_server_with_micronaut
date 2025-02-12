@@ -16,10 +16,10 @@ import server.attribute.status.model.Status;
 
 @Slf4j
 @KafkaListener(
-        groupId = "stats-listener",
+        groupId = "single-stats-listener",
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "stats-listener")
+        clientId = "single-stats-listener")
 public class SingleStatsListener {
 
     @Inject StatsService statsService;

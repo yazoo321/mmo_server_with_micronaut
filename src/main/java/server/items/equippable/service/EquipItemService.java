@@ -204,7 +204,7 @@ public class EquipItemService {
                         MAINHAND_WEAPON_DAMAGE.getType(), itemEffects.get(WEAPON_DAMAGE.getType()));
                 itemEffects.put(
                         MAINHAND_ATTACK_DISTANCE.getType(),
-                        itemEffects.get(ATTACK_DISTANCE.getType()));
+                        itemEffects.getOrDefault(ATTACK_DISTANCE.getType(), 200.0));
             }
 
             if (item.getCategory().equals(ItemType.SHIELD.getType())) {
@@ -216,7 +216,7 @@ public class EquipItemService {
                         OFFHAND_WEAPON_DAMAGE.getType(), itemEffects.get(WEAPON_DAMAGE.getType()));
                 itemEffects.put(
                         OFFHAND_ATTACK_DISTANCE.getType(),
-                        itemEffects.get(ATTACK_DISTANCE.getType()));
+                        itemEffects.getOrDefault(ATTACK_DISTANCE.getType(), 200.0));
             }
         }
     }

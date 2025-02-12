@@ -7,6 +7,11 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import io.reactivex.rxjava3.core.Single;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +21,6 @@ import server.attribute.status.model.derived.*;
 import server.attribute.status.producer.StatusProducer;
 import server.attribute.status.service.StatusService;
 import server.skills.model.SkillDependencies;
-
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Data
 @Slf4j

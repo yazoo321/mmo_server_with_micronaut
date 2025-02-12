@@ -22,10 +22,10 @@ import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "mob-listener",
+        groupId = "single-mob-listener",
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "mob-listener")
+        clientId = "single-mob-listener")
 public class SingleMonsterServerListener {
     // should only be processed on one node
 

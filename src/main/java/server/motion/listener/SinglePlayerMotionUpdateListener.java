@@ -15,10 +15,10 @@ import server.motion.service.PlayerMotionService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "player-motion-listener-group",
+        groupId = "single-player-motion-listener-group",
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "player-motion-listener-client")
+        clientId = "single-player-motion-listener-client")
 // should be processed by a single node
 public class SinglePlayerMotionUpdateListener {
 
@@ -30,7 +30,7 @@ public class SinglePlayerMotionUpdateListener {
 
     @Inject StatusService statusService;
 
-    @Topic("player-motion-update")
+    @Topic("player-motion-message")
     public void receive(PlayerMotion playerMotion) {
         // TODO: validate
         //        log.info("received player motion in player-motion-update");

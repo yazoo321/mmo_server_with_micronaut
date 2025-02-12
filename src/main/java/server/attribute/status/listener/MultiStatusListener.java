@@ -13,11 +13,11 @@ import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "status-listener",
+        groupId = "multi-status-listener",
         uniqueGroupId = true,
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "status-listener")
+        clientId = "multi-status-listener")
 public class MultiStatusListener {
 
     @Inject WebsocketClientUpdatesService clientUpdatesService;

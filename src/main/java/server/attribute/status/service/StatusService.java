@@ -6,6 +6,13 @@ import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.types.StatsTypes;
@@ -16,14 +23,6 @@ import server.attribute.status.producer.StatusProducer;
 import server.attribute.status.repository.StatusRepository;
 import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
-
-import java.time.Instant;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Singleton
 @Slf4j
@@ -39,10 +38,11 @@ public class StatusService {
 
     ConcurrentSet<String> syncActorStatuses = new ConcurrentSet<>();
 
-    private static final Set<String> IMBUE_TYPES = Set.of(
-            StatsTypes.PRIMARY_IMBUE.getType(),
-            StatsTypes.SECONDARY_IMBUE.getType(),
-            StatsTypes.TRINARY_IMBUE.getType());
+    private static final Set<String> IMBUE_TYPES =
+            Set.of(
+                    StatsTypes.PRIMARY_IMBUE.getType(),
+                    StatsTypes.SECONDARY_IMBUE.getType(),
+                    StatsTypes.TRINARY_IMBUE.getType());
 
     public Single<ActorStatus> getActorStatus(String actorId) {
         //        log.info("fetching actor status: {}", actorId);
@@ -107,7 +107,6 @@ public class StatusService {
         return data.stream().min(Comparator.comparing(Status::getExpiration)).orElse(null);
     }
 
-
     private boolean isAnImbue(String effect) {
         return IMBUE_TYPES.contains(effect);
     }
@@ -119,16 +118,24 @@ public class StatusService {
             int maxStacks = status.getMaxStacks();
             String originSkillId = status.getSkillId();
 
-            // check if the new status is an imbue, if so, check if already have one and remove it if so
-            Set<String> imbueEffects = status.getAttributeEffects().keySet().stream().filter(this::isAnImbue).collect(Collectors.toSet());
+            // check if the new status is an imbue, if so, check if already have one and remove it
+            // if so
+            Set<String> imbueEffects =
+                    status.getAttributeEffects().keySet().stream()
+                            .filter(this::isAnImbue)
+                            .collect(Collectors.toSet());
             // whenever we add a imbue, we always overwrite the old one when exists.
             if (!imbueEffects.isEmpty()) {
-                existingSet.forEach(s -> {
-                    Optional<String> found = s.getAttributeEffects().keySet().stream().filter(imbueEffects::contains).findAny();
-                    if (found.isPresent()) {
-                        removedSet.add(s);
-                    }
-                });
+                existingSet.forEach(
+                        s -> {
+                            Optional<String> found =
+                                    s.getAttributeEffects().keySet().stream()
+                                            .filter(imbueEffects::contains)
+                                            .findAny();
+                            if (found.isPresent()) {
+                                removedSet.add(s);
+                            }
+                        });
             }
 
             existingSet.removeAll(removedSet);

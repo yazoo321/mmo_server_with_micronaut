@@ -24,7 +24,7 @@ public interface UpdateProducer {
     @Topic("remove-mobs-from-game")
     void removeMobsFromGame(String actorIds);
 
-    @Topic("player-motion-update")
+    @Topic("player-motion-message")
     void sendPlayerMotionUpdate(PlayerMotion playerMotion);
 
     @Topic("item-added-to-map")

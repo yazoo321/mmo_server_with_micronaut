@@ -11,9 +11,13 @@ micronaut:
         mapping: /**
         paths: classpath:public
   executors:
+#    TODO: Review these, this was increased because the kafka listeners did not have enough threads
+    default:
+      type: fixed
+      nThreads: 50
     consumer:
       type: fixed
-      nThreads: 15
+      nThreads: 50
     io:
       type: fixed
       nThreads: 75

@@ -13,10 +13,11 @@ import server.motion.service.ActorMotionService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "player-motion-listener-group",
+        groupId = "multi-player-motion-listener-group",
+        uniqueGroupId = true, // processed by each node
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "player-motion-listener-client")
+        clientId = "multi-player-motion-listener-client")
 // Should be received by all nodes - requires change in the group id
 public class MultiPlayerMotionUpdateListener {
 

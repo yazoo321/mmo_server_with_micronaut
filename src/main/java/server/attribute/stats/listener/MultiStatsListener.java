@@ -15,11 +15,11 @@ import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "stats-listener",
+        groupId = "multi-stats-listener",
         uniqueGroupId = true,
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "stats-listener")
+        clientId = "multi-stats-listener")
 public class MultiStatsListener {
 
     @Inject WebsocketClientUpdatesService clientUpdatesService;
