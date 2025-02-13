@@ -1,6 +1,7 @@
 package server.skills.active;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
 import java.time.Instant;
 import java.util.Map;
@@ -51,6 +52,7 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
         CombatData combatData = skillDependencies.getCombatData();
         SkillTarget skillTarget = skillDependencies.getSkillTarget();
         Map<String, Instant> skillsOnCd = combatData.getActivatedSkills();
+        WebSocketSession session = skillDependencies.getSession();
 
         // check if any skill was cast in the last 500ms (global cd)
         Instant max = skillsOnCd.values().stream().max(Instant::compareTo).orElse(null);
@@ -71,21 +73,42 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
             }
         }
         // validate location
-        Single<Motion> actorMotion =
-                actorMotionRepository.fetchActorMotion(combatData.getActorId());
-        Single<Motion> targetMotion =
-                actorMotionRepository.fetchActorMotion(skillTarget.getTargetId());
 
-        // consider pre-fetching other data too here, like status if required
-        return Single.zip(
-                actorMotion,
-                targetMotion,
-                (actor, target) -> {
-                    getSkillDependencies().setActorMotion(actor);
-                    getSkillDependencies().setTargetMotion(target);
-                    return combatService.validatePositionLocation(
-                            combatData, actor, target, this.getMaxRange(), session);
-                });
+        Motion actorMotion =
+                actorMotionRepository.fetchActorMotion(combatData.getActorId()).blockingGet();
+        Motion targetMotion =
+                actorMotionRepository.fetchActorMotion(skillTarget.getTargetId()).blockingGet();
+
+        getSkillDependencies().setActorMotion(actorMotion);
+        getSkillDependencies().setTargetMotion(targetMotion);
+
+        return Single.just(true);
+        //        Single<Motion> actorMotion =
+        //                actorMotionRepository.fetchActorMotion(combatData.getActorId())
+        //                        .doOnSuccess(motion -> log.info("Fetched actor motion: {}",
+        // motion))
+        //                        .doOnError(err -> log.error("Error fetching actor motion: {}",
+        // err.getMessage()));
+        //
+        //        Single<Motion> targetMotion =
+        //                actorMotionRepository.fetchActorMotion(skillTarget.getTargetId())
+        //                        .doOnSuccess(motion -> log.info("Fetched target motion: {}",
+        // motion))
+        //                        .doOnError(err -> log.error("Error fetching target motion: {}",
+        // err.getMessage()));
+        //
+        //        // consider pre-fetching other data too here, like status if required
+        //        return Single.zip(
+        //                actorMotion,
+        //                targetMotion,
+        //                (actor, target) -> {
+        //                    getSkillDependencies().setActorMotion(actor);
+        //                    getSkillDependencies().setTargetMotion(target);
+        //
+        //                    return true;
+        ////                    return combatService.validatePositionLocation(
+        ////                            combatData, actor, target, this.getMaxRange(), session);
+        //                });
     }
 
     @Override

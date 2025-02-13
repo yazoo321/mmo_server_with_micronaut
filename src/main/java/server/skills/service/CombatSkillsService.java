@@ -1,9 +1,12 @@
 package server.skills.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.result.DeleteResult;
 import io.micronaut.websocket.WebSocketSession;
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.ArrayList;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
@@ -54,6 +57,17 @@ public class CombatSkillsService {
         Skill skill = skillFactory.createSkill(skillName.toLowerCase());
 
         skill.tryApply(combatData, combatRequest.getSkillTarget(), session);
+    }
+
+    public Single<ActorSkills> initialiseSkills(String actorId) {
+        ActorSkills actorSkills = new ActorSkills();
+        actorSkills.setActorId(actorId);
+        actorSkills.setSkills(new ArrayList<>());
+        return actorSkillsRepository.setActorSkills(actorSkills);
+    }
+
+    public Single<DeleteResult> deleteActorSkills(String actorId) {
+        return actorSkillsRepository.deleteActorSkills(actorId);
     }
 
     public void fetchActorTrainedSkills(String actorId, WebSocketSession session) {

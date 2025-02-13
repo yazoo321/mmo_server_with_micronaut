@@ -1,5 +1,6 @@
 package server.motion.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.time.Instant;
@@ -9,6 +10,7 @@ import server.common.dto.Motion;
 
 @Data
 @Serdeable
+@JsonInclude()
 @ReflectiveAccess
 @NoArgsConstructor
 public class PlayerMotion {

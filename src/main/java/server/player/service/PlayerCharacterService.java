@@ -19,6 +19,7 @@ import server.player.model.AccountCharactersResponse;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
 import server.player.repository.PlayerCharacterRepository;
+import server.skills.service.CombatSkillsService;
 
 @Slf4j
 @Singleton
@@ -37,6 +38,8 @@ public class PlayerCharacterService {
     @Inject StatusService statusService;
 
     @Inject TalentService talentService;
+
+    @Inject CombatSkillsService combatSkillsService;
 
     @Inject ActionbarService actionbarService;
 
@@ -77,6 +80,7 @@ public class PlayerCharacterService {
             statsService.initializePlayerStats(newCharacter.getName()).blockingSubscribe();
             statusService.initializeStatus(newCharacter.getName()).blockingSubscribe();
             talentService.initializeActorTalents(newCharacter.getName()).blockingSubscribe();
+            combatSkillsService.initialiseSkills(newCharacter.getName()).blockingSubscribe();
             log.info("status for actor initialized: {}", createCharacterRequest.getName());
             // call relevant services to initialise data
             inventoryService

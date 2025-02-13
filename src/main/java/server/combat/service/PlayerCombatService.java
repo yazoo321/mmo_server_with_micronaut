@@ -265,7 +265,7 @@ public class PlayerCombatService extends CombatService {
         double totalDamage = Math.floor(damage * amp * (1 + rand.nextDouble(0.15)));
 
         // Create a damage map (currently only physical damage)
-        return Map.of(DamageTypes.PHYSICAL.getType(), totalDamage);
+        return new HashMap<>(Map.of(DamageTypes.PHYSICAL.getType(), totalDamage));
     }
 
     private Double getAttackTimeDelay(Double baseAttackSpeed, Double characterAttackSpeed) {

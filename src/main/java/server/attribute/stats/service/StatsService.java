@@ -221,6 +221,7 @@ public class StatsService {
                                                         talentService,
                                                         sourceActor,
                                                         targetStats)))
+                .doOnError(err -> log.error("Failed to handle talent apply, {}", err.getMessage()))
                 .subscribe();
     }
 

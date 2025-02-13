@@ -4,10 +4,8 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
@@ -36,7 +34,6 @@ public class PlayerLevelStatsService {
                     StatsTypes.STA.getType(),
                     StatsTypes.INT.getType(),
                     StatsTypes.DEX.getType());
-
 
     public Single<Stats> initializeCharacterClass(String actorId, String playerClass) {
         if (!isClassValid(playerClass)) {
@@ -123,15 +120,18 @@ public class PlayerLevelStatsService {
                             }
 
                             int updated = stats.addToBase(stat, 1);
-                            Map<String, Integer> baseChange = Map.of(
-                                    stat, updated,
-                                    StatsTypes.AVAILABLE_PTS.getType(), availablePoints);
+                            Map<String, Integer> baseChange =
+                                    Map.of(
+                                            stat,
+                                            updated,
+                                            StatsTypes.AVAILABLE_PTS.getType(),
+                                            availablePoints);
                             Map<String, Double> derivedChanged = stats.recalculateDerivedStats();
 
                             statsService.handleBaseDifference(baseChange, stats);
                             statsService.handleDifference(derivedChanged, stats);
                         })
-                .doOnError(e-> log.error(e.getMessage()));
+                .doOnError(e -> log.error(e.getMessage()));
     }
 
     public void handleAddXp(Stats targetStats, Stats actorStats) {
@@ -158,7 +158,8 @@ public class PlayerLevelStatsService {
         int deadActorLevel = targetStats.getBaseStat(StatsTypes.LEVEL);
         int levelDiff = deadActorLevel - actorStats.getBaseStat(StatsTypes.LEVEL);
 
-        int xpPerLevel = 100;
+        //        int xpPerLevel = 100;
+        int xpPerLevel = 10_000;
 
         float multiplier = (float) ((levelDiff / 10) + 1);
 

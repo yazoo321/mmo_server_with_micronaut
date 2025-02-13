@@ -106,10 +106,10 @@ dependencies {
 	implementation("io.micronaut.cache:micronaut-cache-caffeine:5.0.1")
 
 	// redis
-	implementation("io.micronaut.redis:micronaut-redis-lettuce:6.6.0")
+	implementation("io.micronaut.redis:micronaut-redis-lettuce:6.6.1")
 
 	// playfab
-	implementation 'com.playfab:client-sdk:0.65.180316'
+//	implementation 'com.playfab:client-sdk:0.65.180316'
 
 
 	// test

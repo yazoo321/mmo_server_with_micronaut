@@ -380,9 +380,9 @@ public class SocketProcessOutgoingService {
 
     private void handleCharacterRespawn(SocketMessage socketMessage, WebSocketSession session) {}
 
-    private void setSessionId(SocketMessage message, WebSocketSession session) {
-        // custom data is used to send the port; re-using actorId field to get all auth info
+    private String authenticatePlayer(SocketMessage message, WebSocketSession session) {
         String data = message.getActorId();
+
         if (data == null || data.isEmpty()) {
             log.error("custom data on set session id is empty!");
             session.close();
@@ -412,10 +412,23 @@ public class SocketProcessOutgoingService {
             session.close();
         }
 
+        // TODO: validate the actor ID belongs to the account.
+        return actorId;
+    }
+
+    private void setSessionId(SocketMessage message, WebSocketSession session) {
+        // custom data is used to send the port; re-using actorId field to get all auth info
         String serverName =
                 message.getServerName() == null || message.getServerName().isBlank()
                         ? null
                         : message.getServerName();
+
+        String actorId = "";
+        if (message.getActorId() != null && !message.getActorId().isBlank()) {
+            // this is a player login, require to authenticate. (skip auth on server)
+            actorId = authenticatePlayer(message, session);
+        }
+
         //        String actorId =
         //                message.getActorId() == null || message.getActorId().isBlank()
         //                        ? null

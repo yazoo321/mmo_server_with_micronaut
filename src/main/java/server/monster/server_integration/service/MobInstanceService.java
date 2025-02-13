@@ -18,7 +18,6 @@ import server.common.dto.Motion;
 import server.items.service.ItemService;
 import server.monster.server_integration.model.Monster;
 import server.monster.server_integration.repository.MobRepository;
-import server.motion.dto.MotionResult;
 import server.motion.repository.ActorMotionRepository;
 import server.socket.producer.UpdateProducer;
 
@@ -68,19 +67,6 @@ public class MobInstanceService {
     public Single<Monster> createMob(Monster mob) {
         mob.setUpdatedAt(Instant.now().truncatedTo(ChronoUnit.MICROS));
         return mobRepository.insertMobInstance(mob);
-    }
-
-    public Single<Monster> updateMobMotion(String actorId, Motion motion) {
-        return mobRepository.updateMotionOnly(actorId, motion);
-    }
-
-    public MotionResult buildMobMotionResult(String actorId, Motion motion) {
-        Monster monster = new Monster();
-        monster.setActorId(actorId);
-        monster.setMotion(motion);
-        // we don't populate other info here
-
-        return MotionResult.builder().monster(monster).build();
     }
 
     public void handleMobDeath(Stats mobStats) {

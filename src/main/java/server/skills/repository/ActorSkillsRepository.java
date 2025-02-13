@@ -2,6 +2,7 @@ package server.skills.repository;
 
 import static com.mongodb.client.model.Filters.eq;
 
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
@@ -34,6 +35,10 @@ public class ActorSkillsRepository {
                         actorSkillsCollection.replaceOne(
                                 eq("actorId", actorSkills.getActorId()), actorSkills))
                 .map(r -> actorSkills);
+    }
+
+    public Single<DeleteResult> deleteActorSkills(String actorId) {
+        return Single.fromPublisher(actorSkillsCollection.deleteOne(eq("actorId", actorId)));
     }
 
     @PostConstruct

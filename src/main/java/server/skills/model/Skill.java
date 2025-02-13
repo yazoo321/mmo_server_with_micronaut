@@ -146,6 +146,7 @@ public abstract class Skill {
                         canApply -> {
                             if (!canApply) {
                                 log.info("Cannot apply skill at this time");
+                                return;
                             }
 
                             prepareApply()
@@ -157,6 +158,11 @@ public abstract class Skill {
                                             })
                                     .subscribe();
                         })
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "Failed to check if we can apply skill, {}",
+                                        err.getMessage()))
                 .subscribe();
     }
 

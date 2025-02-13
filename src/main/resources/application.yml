@@ -106,11 +106,6 @@ mongo-database:
   actorAllegiance: "actorAllegiance"
   actorThreat: "actorThreat"
   actorTalents: "actorTalents"
-redisson:
-  single-server-config:
-    address: "redis://redis:6379"
-  threads: 3
-  netty-threads: 6
 
 redis:
   uri: redis://redis
