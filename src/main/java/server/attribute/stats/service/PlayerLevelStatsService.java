@@ -47,7 +47,9 @@ public class PlayerLevelStatsService {
                 new HashMap<>(
                         Map.of(
                                 StatsTypes.LEVEL.type, 1,
-                                StatsTypes.XP.type, 0));
+                                StatsTypes.XP.type, 300_000,  //TODO: remove these two lines, it helps for test
+                                StatsTypes.CAN_LEVEL.type, 1
+                        ));
         baseAttr.putAll(toAdd);
 
         AVAILABLE_CLASSES.forEach(

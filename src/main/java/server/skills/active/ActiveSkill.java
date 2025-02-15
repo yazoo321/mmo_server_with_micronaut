@@ -1,5 +1,6 @@
 package server.skills.active;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
@@ -10,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
@@ -30,6 +32,8 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
 
     @JsonProperty protected Integer ticks;
 
+    @BsonIgnore
+    @JsonIgnore
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public ActiveSkill(

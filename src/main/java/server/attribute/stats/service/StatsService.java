@@ -391,7 +391,7 @@ public class StatsService {
         // weapon imbues will merge with stats, via status effects..
         handleWeaponImbue(sourceStats, stats, damageMap);
 
-        handleDamageAmp(damageMap, stats);
+        handleDamageAmp(damageMap, sourceStats);
 
         boolean isCrit = handleCrit(damageMap, stats, sourceStats);
 

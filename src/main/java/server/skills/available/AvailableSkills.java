@@ -60,4 +60,8 @@ public class AvailableSkills {
 
         return availableSkills;
     }
+
+    public Skill getSkillByName(String name) {
+        return allSkills.get(name.toLowerCase());
+    }
 }

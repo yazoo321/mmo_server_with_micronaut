@@ -1,5 +1,6 @@
 package server.skills.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
@@ -88,18 +90,17 @@ public abstract class Skill {
     protected WebSocketSession session;
 
     // populated via factory methods
-    @Setter protected WebsocketClientUpdatesService clientUpdatesService;
-    @Setter protected SessionParamHelper sessionParamHelper;
-    @Setter protected ActorMotionRepository actorMotionRepository;
-    @Setter protected StatsService statsService;
-    @Setter protected StatusService statusService;
-    @Setter protected CombatService combatService;
-    @Setter protected CombatDataCache combatDataCache;
-    @Setter protected EquipItemService equipItemService;
+    @BsonIgnore @JsonIgnore @Setter protected WebsocketClientUpdatesService clientUpdatesService;
+    @BsonIgnore @JsonIgnore @Setter protected SessionParamHelper sessionParamHelper;
+    @BsonIgnore @JsonIgnore @Setter protected ActorMotionRepository actorMotionRepository;
+    @BsonIgnore @JsonIgnore @Setter protected StatsService statsService;
+    @BsonIgnore @JsonIgnore @Setter protected StatusService statusService;
+    @BsonIgnore @JsonIgnore @Setter protected CombatService combatService;
+    @BsonIgnore @JsonIgnore @Setter protected CombatDataCache combatDataCache;
+    @BsonIgnore @JsonIgnore @Setter protected EquipItemService equipItemService;
+    @BsonIgnore @JsonIgnore @Setter protected SkillProducer skillProducer;
 
-    @Setter protected SkillProducer skillProducer;
-
-    protected SkillDependencies skillDependencies;
+    @BsonIgnore @JsonIgnore protected SkillDependencies skillDependencies;
 
     public SkillDependencies getSkillDependencies() {
         if (skillDependencies == null) {
@@ -126,6 +127,7 @@ public abstract class Skill {
         this.travelSpeed = travelSpeed;
     }
 
+    @BsonIgnore @JsonIgnore
     protected Random rand = new Random();
 
     public abstract void startSkill();

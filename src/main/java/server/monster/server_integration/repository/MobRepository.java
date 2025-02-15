@@ -50,7 +50,7 @@ public class MobRepository {
                 .map(mob -> mobInstance);
     }
 
-    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId")
+    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId", async = true)
     public Single<Motion> updateMotionOnly(String actorId, Motion motion) {
         return Single.fromPublisher(
                         mobMotionMongoCollection.findOneAndUpdate(

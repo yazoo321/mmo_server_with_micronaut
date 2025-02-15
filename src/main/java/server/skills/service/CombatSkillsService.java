@@ -63,7 +63,7 @@ public class CombatSkillsService {
         ActorSkills actorSkills = new ActorSkills();
         actorSkills.setActorId(actorId);
         actorSkills.setSkills(new ArrayList<>());
-        return actorSkillsRepository.setActorSkills(actorSkills);
+        return actorSkillsRepository.createActorSkills(actorSkills);
     }
 
     public Single<DeleteResult> deleteActorSkills(String actorId) {

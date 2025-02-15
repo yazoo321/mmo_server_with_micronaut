@@ -68,7 +68,7 @@ public class PlayerMotionRepository {
                 .map(success -> playerMotion.getMotion());
     }
 
-    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId")
+    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId", async = true)
     public Single<Motion> updateMotion(String actorId, PlayerMotion playerMotion) {
         return Single.fromPublisher(
                         playerMotionMongoCollection.findOneAndUpdate(
