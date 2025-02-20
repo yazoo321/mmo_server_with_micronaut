@@ -63,7 +63,8 @@ public abstract class Talent {
         }
 
         int pointsRequired = this.getTier() * 5 - 5;
-        if (pointsPerTree.get(this.getTreeName()) < pointsRequired) {
+
+        if (pointsPerTree.getOrDefault(this.getTreeName(), 0) < pointsRequired) {
             return 0;
         }
 

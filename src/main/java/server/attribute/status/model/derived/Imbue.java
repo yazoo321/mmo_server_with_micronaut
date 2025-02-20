@@ -30,7 +30,7 @@ public class Imbue extends Status {
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(expiration);
         this.setMaxStacks(maxStacks);
-        this.setOrigin(sourceActorId);
+        this.setSourceActor(sourceActorId);
         this.setSkillId(skillId);
         this.setCategory(imbueType.getType());
     }

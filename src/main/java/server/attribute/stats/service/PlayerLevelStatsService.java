@@ -183,21 +183,20 @@ public class PlayerLevelStatsService {
         statsService.handleBaseDifference(updated, playerStats);
     }
 
-    public void handleAddBaseStat(String actorId, String statType) {
+    public Single<Stats> handleAddBaseStat(String actorId, String statType) {
         if (isClassValid(statType)) {
-            handleLevelUp(actorId, statType).subscribe();
-            return;
+            return handleLevelUp(actorId, statType);
         }
 
         if (isBaseStatValid(statType)) {
-            handleAddStatPoint(actorId, statType).subscribe();
-            return;
+            return handleAddStatPoint(actorId, statType);
         }
-
         log.error("Erroneous stat type being added: {} on actor: {}", statType, actorId);
+
+        return null;
     }
 
-    private boolean isClassValid(String className) {
+    public static boolean isClassValid(String className) {
         // consider other validations
 
         return AVAILABLE_CLASSES.contains(className);

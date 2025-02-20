@@ -6,7 +6,9 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
+import server.attribute.talents.service.TalentService;
 import server.session.SessionParamHelper;
+import server.skills.service.CombatSkillsService;
 import server.socket.model.SocketMessage;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseSubscriber;
@@ -22,6 +24,12 @@ public class StatsSocketIntegration {
     PlayerLevelStatsService playerLevelStatsService;
 
     @Inject SocketResponseSubscriber socketResponseSubscriber;
+
+    @Inject
+    CombatSkillsService combatSkillsService;
+
+    @Inject
+    TalentService talentService;
 
     // TODO: Offload load via kafka
 
@@ -50,6 +58,14 @@ public class StatsSocketIntegration {
                     SessionParamHelper.getActorId(session), socketMessage);
             return;
         }
-        playerLevelStatsService.handleAddBaseStat(socketMessage.getActorId(), socketMessage.getCustomData());
+        playerLevelStatsService.handleAddBaseStat(socketMessage.getActorId(), socketMessage.getCustomData())
+                .doOnSuccess(stats -> {
+                    if (PlayerLevelStatsService.isClassValid(socketMessage.getCustomData())) {
+                        // we also want to send updated skills and talents
+                        combatSkillsService.fetchAvailableSkillsToLevel(socketMessage.getActorId(), session);
+                        talentService.fetchAvailableTalents(session);
+                    }
+                })
+                .subscribe();
     }
 }

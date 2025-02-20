@@ -51,7 +51,7 @@ public class Status {
     Integer maxStacks;
     // TODO: rename to sourceActor
     // TODO: Introduce source skill ID
-    String origin;
+    String sourceActor;
     String skillId;
     String category;
 
@@ -114,7 +114,7 @@ public class Status {
                             applier.accept(
                                     SkillDependencies.builder()
                                             .actorId(actorId)
-                                            .targetActorId(this.getOrigin())
+                                            .targetActorId(this.getSourceActor())
                                             .build());
 
                             return true;
