@@ -222,11 +222,11 @@ public class SocketProcessOutgoingService {
     }
 
     private void handleFetchInventory(SocketMessage message, WebSocketSession session) {
-        itemSocketIntegration.handleFetchInventory(message.getInventoryRequest(), session);
+        itemSocketIntegration.handleFetchInventory(message.getActorId(), session);
     }
 
     private void handleFetchEquipped(SocketMessage message, WebSocketSession session) {
-        itemSocketIntegration.handleFetchEquipped(message.getInventoryRequest(), session);
+        itemSocketIntegration.handleFetchEquipped(message.getActorId(), session);
     }
 
     private void handleEquipItem(SocketMessage message, WebSocketSession session) {

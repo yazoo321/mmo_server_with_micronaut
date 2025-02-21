@@ -91,13 +91,13 @@ public class ItemSocketIntegration {
                 .subscribe();
     }
 
-    public void handleFetchInventory(GenericInventoryData request, WebSocketSession session) {
-        sendInventoryToPlayer(session, request.getActorId());
+    public void handleFetchInventory(String actorId, WebSocketSession session) {
+        sendInventoryToPlayer(session, actorId);
     }
 
-    public void handleFetchEquipped(GenericInventoryData request, WebSocketSession session) {
+    public void handleFetchEquipped(String actorId, WebSocketSession session) {
         equipItemService
-                .getEquippedItems(request.getActorId())
+                .getEquippedItems(actorId)
                 .doOnSuccess(
                         equippedItems -> {
                             if (equippedItems.isEmpty()) {
