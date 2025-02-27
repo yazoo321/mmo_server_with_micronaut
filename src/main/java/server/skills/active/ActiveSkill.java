@@ -32,8 +32,7 @@ public abstract class ActiveSkill extends Skill implements InstantSkill, TravelS
 
     @JsonProperty protected Integer ticks;
 
-    @BsonIgnore
-    @JsonIgnore
+    @BsonIgnore @JsonIgnore
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public ActiveSkill(

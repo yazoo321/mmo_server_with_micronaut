@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
@@ -102,45 +101,54 @@ public class CombatSkillsService {
     }
 
     public void fetchAvailableSkillsToLevel(String actorId, WebSocketSession session) {
-        Single<ActorSkills> actorSkillsSingle = actorSkillsRepository
-                .getActorSkills(actorId);
-        Single<Stats> statsSingle = statsService
-                .getStatsFor(actorId);
+        Single<ActorSkills> actorSkillsSingle = actorSkillsRepository.getActorSkills(actorId);
+        Single<Stats> statsSingle = statsService.getStatsFor(actorId);
 
-        Single.zip(actorSkillsSingle, statsSingle, (actorSkills, stats) -> {
-            Set<String> learnedSkillSet = actorSkills.getSkills().stream().map(Skill::getName)
-                    .collect(Collectors.toSet());
+        Single.zip(
+                        actorSkillsSingle,
+                        statsSingle,
+                        (actorSkills, stats) -> {
+                            Set<String> learnedSkillSet =
+                                    actorSkills.getSkills().stream()
+                                            .map(Skill::getName)
+                                            .collect(Collectors.toSet());
 
-            List<Skill> availableSkillsToLevel = availableSkills.getAvailableSkillsForCharacter(stats);
-            availableSkillsToLevel = availableSkillsToLevel.stream().filter(s -> !learnedSkillSet.contains(s.getName())).toList();
+                            List<Skill> availableSkillsToLevel =
+                                    availableSkills.getAvailableSkillsForCharacter(stats);
+                            availableSkillsToLevel =
+                                    availableSkillsToLevel.stream()
+                                            .filter(s -> !learnedSkillSet.contains(s.getName()))
+                                            .toList();
 
-            SocketResponse socketResponse = new SocketResponse();
-            ActorSkills actorSkillsResponse =
-                    new ActorSkills(
-                            stats.getActorId(), availableSkillsToLevel);
-            socketResponse.setActorSkills(actorSkillsResponse);
-            socketResponse.setMessageType(
-                    SocketResponseType.AVAILABLE_ACTOR_SKILLS.getType());
+                            SocketResponse socketResponse = new SocketResponse();
+                            ActorSkills actorSkillsResponse =
+                                    new ActorSkills(stats.getActorId(), availableSkillsToLevel);
+                            socketResponse.setActorSkills(actorSkillsResponse);
+                            socketResponse.setMessageType(
+                                    SocketResponseType.AVAILABLE_ACTOR_SKILLS.getType());
 
-            session.send(socketResponse).subscribe(socketResponseSubscriber);
-            return 1;
-        }).subscribe();
-//        statsService
-//                .getStatsFor(actorId)
-//                .doOnSuccess(
-//                        stats -> {
-//                            SocketResponse socketResponse = new SocketResponse();
-//                            ActorSkills actorSkills =
-//                                    new ActorSkills(
-//                                            stats.getActorId(),
-//                                            availableSkills.getAvailableSkillsForCharacter(stats));
-//                            socketResponse.setActorSkills(actorSkills);
-//                            socketResponse.setMessageType(
-//                                    SocketResponseType.AVAILABLE_ACTOR_SKILLS.getType());
-//
-//                            session.send(socketResponse).subscribe(socketResponseSubscriber);
-//                        })
-//                .subscribe();
+                            session.send(socketResponse).subscribe(socketResponseSubscriber);
+                            return 1;
+                        })
+                .subscribe();
+        //        statsService
+        //                .getStatsFor(actorId)
+        //                .doOnSuccess(
+        //                        stats -> {
+        //                            SocketResponse socketResponse = new SocketResponse();
+        //                            ActorSkills actorSkills =
+        //                                    new ActorSkills(
+        //                                            stats.getActorId(),
+        //
+        // availableSkills.getAvailableSkillsForCharacter(stats));
+        //                            socketResponse.setActorSkills(actorSkills);
+        //                            socketResponse.setMessageType(
+        //                                    SocketResponseType.AVAILABLE_ACTOR_SKILLS.getType());
+        //
+        //
+        // session.send(socketResponse).subscribe(socketResponseSubscriber);
+        //                        })
+        //                .subscribe();
     }
 
     public void handleLearnSkill(String skillId, WebSocketSession session) {

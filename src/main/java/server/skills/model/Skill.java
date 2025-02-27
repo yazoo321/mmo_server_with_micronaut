@@ -127,8 +127,7 @@ public abstract class Skill {
         this.travelSpeed = travelSpeed;
     }
 
-    @BsonIgnore @JsonIgnore
-    protected Random rand = new Random();
+    @BsonIgnore @JsonIgnore protected Random rand = new Random();
 
     public abstract void startSkill();
 

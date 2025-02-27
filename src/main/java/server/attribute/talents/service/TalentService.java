@@ -54,7 +54,7 @@ public class TalentService {
                         .actorId(SessionParamHelper.getActorId(session))
                         .build();
         response.setTalentData(talentData);
-        response.setMessageType(SocketResponseType.ALL_ACTOR_TALENTS.getType());
+        response.setMessageType(SocketResponseType.ALL_TALENTS.getType());
 
         session.send(response).subscribe(socketResponseSubscriber);
     }
@@ -73,7 +73,7 @@ public class TalentService {
                                             .build();
                             response.setTalentData(talentData);
                             response.setMessageType(
-                                    SocketResponseType.AVAILABLE_ACTOR_TALENTS.getType());
+                                    SocketResponseType.LEARNED_TALENTS.getType());
 
                             session.send(response).subscribe(socketResponseSubscriber);
                         })
@@ -102,7 +102,7 @@ public class TalentService {
                                             .build();
                             response.setTalentData(talentData);
                             response.setMessageType(
-                                    SocketResponseType.AVAILABLE_ACTOR_TALENTS.getType());
+                                    SocketResponseType.AVAILABLE_TALENTS.getType());
 
                             session.send(response).subscribe(socketResponseSubscriber);
                         })
@@ -196,7 +196,7 @@ public class TalentService {
                                                                             talentData);
                                                                     response.setMessageType(
                                                                             SocketResponseType
-                                                                                    .AVAILABLE_ACTOR_TALENTS
+                                                                                    .LEARNED_TALENTS
                                                                                     .getType());
 
                                                                     session.send(response)
