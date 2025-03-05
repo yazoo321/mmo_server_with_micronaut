@@ -148,7 +148,8 @@ public class StatsService {
         getStatsFor(talentAttributeEffects.getActorId())
                 .doOnSuccess(
                         stats -> {
-                            // talent services handles the correct attribute effects, overwriting previous state
+                            // talent services handles the correct attribute effects, overwriting
+                            // previous state
                             stats.setTalentEffects(talentAttributeEffects.getAttributeEffects());
                             Map<String, Double> updated = stats.recalculateDerivedStats();
                             handleDifference(updated, stats);
@@ -205,7 +206,10 @@ public class StatsService {
                                     addMana(actorStats, mpVal);
                                 }
                             })
-                    .doOnError(err -> log.error("Failed to apply flat hp/mp mod, {}", err.getMessage()))
+                    .doOnError(
+                            err ->
+                                    log.error(
+                                            "Failed to apply flat hp/mp mod, {}", err.getMessage()))
                     .subscribe();
         }
     }

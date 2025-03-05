@@ -181,7 +181,7 @@ public class Stats {
     public static Map<String, Double> applyMultipliers(
             Map<String, Double> left, Map<String, AttributeEffects> right) {
         Map<String, Double> copy = new HashMap<>(left);
-        right.forEach((k, v) -> copy.merge(k, v.getMultiplyModifier(), (a, b) -> a * (1+b)));
+        right.forEach((k, v) -> copy.merge(k, v.getMultiplyModifier(), (a, b) -> a * (1 + b)));
 
         return copy;
     }

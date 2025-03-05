@@ -5,8 +5,6 @@ import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -188,38 +186,62 @@ public class TalentService {
     }
 
     private void updateTalentDerivedStats(String actorId) {
-        talentRepository.getActorTalentsOfType(actorId, TalentType.PASSIVE)
-                .doOnSuccess(talents -> {
-                    Map<String, AttributeEffects> talentEffects = new HashMap<>();
-                    talents.forEach(
-                            (talent, level) -> {
-                                talent.getAttributeEffects().forEach(attributeEffects -> {
-                                    AttributeEffects effect = new AttributeEffects(attributeEffects, level);
-                                    if (talentEffects.containsKey(effect.getAffectedAttribute())) {
-                                        AttributeEffects existingEffect = talentEffects.get(effect.getAffectedAttribute());
-                                        existingEffect.setAdditiveModifier(existingEffect.getAdditiveModifier() + effect.getAdditiveModifier());
-                                        existingEffect.setMultiplyModifier(existingEffect.getMultiplyModifier() + effect.getMultiplyModifier());
-                                    } else {
-                                        talentEffects.put(effect.getAffectedAttribute(), effect);
-                                    }
-                                });
-                            });
-                    ActorTalentAttributeEffects actorTalentAttributeEffects = new ActorTalentAttributeEffects();
-                    actorTalentAttributeEffects.setActorId(actorId);
-                    actorTalentAttributeEffects.setAttributeEffects(talentEffects);
-                    talentProducer.requestTalentLearn(actorTalentAttributeEffects);
-                }).subscribe();
+        talentRepository
+                .getActorTalentsOfType(actorId, TalentType.PASSIVE)
+                .doOnSuccess(
+                        talents -> {
+                            Map<String, AttributeEffects> talentEffects = new HashMap<>();
+                            talents.forEach(
+                                    (talent, level) -> {
+                                        talent.getAttributeEffects()
+                                                .forEach(
+                                                        attributeEffects -> {
+                                                            AttributeEffects effect =
+                                                                    new AttributeEffects(
+                                                                            attributeEffects,
+                                                                            level);
+                                                            if (talentEffects.containsKey(
+                                                                    effect
+                                                                            .getAffectedAttribute())) {
+                                                                AttributeEffects existingEffect =
+                                                                        talentEffects.get(
+                                                                                effect
+                                                                                        .getAffectedAttribute());
+                                                                existingEffect.setAdditiveModifier(
+                                                                        existingEffect
+                                                                                        .getAdditiveModifier()
+                                                                                + effect
+                                                                                        .getAdditiveModifier());
+                                                                existingEffect.setMultiplyModifier(
+                                                                        existingEffect
+                                                                                        .getMultiplyModifier()
+                                                                                + effect
+                                                                                        .getMultiplyModifier());
+                                                            } else {
+                                                                talentEffects.put(
+                                                                        effect
+                                                                                .getAffectedAttribute(),
+                                                                        effect);
+                                                            }
+                                                        });
+                                    });
+                            ActorTalentAttributeEffects actorTalentAttributeEffects =
+                                    new ActorTalentAttributeEffects();
+                            actorTalentAttributeEffects.setActorId(actorId);
+                            actorTalentAttributeEffects.setAttributeEffects(talentEffects);
+                            talentProducer.requestTalentLearn(actorTalentAttributeEffects);
+                        })
+                .subscribe();
 
-//        // we need to merge this with stats
-//        ActorTalentAttributeEffects effects = new ActorTalentAttributeEffects();
-//        effects.setActorId(actorId);
-//        effects.setAttributeEffects(new ArrayList<>());
-//
-//        learnedTalent.getAttributeEffects().forEach(effect -> {
-//            AttributeEffects attributeEffects = new AttributeEffects(effect, level);
-//            effects.getAttributeEffects().add(attributeEffects);
-//        });
-
+        //        // we need to merge this with stats
+        //        ActorTalentAttributeEffects effects = new ActorTalentAttributeEffects();
+        //        effects.setActorId(actorId);
+        //        effects.setAttributeEffects(new ArrayList<>());
+        //
+        //        learnedTalent.getAttributeEffects().forEach(effect -> {
+        //            AttributeEffects attributeEffects = new AttributeEffects(effect, level);
+        //            effects.getAttributeEffects().add(attributeEffects);
+        //        });
 
     }
 
@@ -235,7 +257,9 @@ public class TalentService {
                 .doOnSuccess(
                         updated -> {
                             Talent learnedTalent = talentRepository.getTalentByName(talentName);
-                            if (learnedTalent.getTalentType().equals(TalentType.PASSIVE.getType())) {
+                            if (learnedTalent
+                                    .getTalentType()
+                                    .equals(TalentType.PASSIVE.getType())) {
                                 updateTalentDerivedStats(actorId);
                             }
 

@@ -52,7 +52,7 @@ public class CripplingBlows extends Talent {
             Integer level, TalentService talentService, Stats actorStats, Stats targetStats) {
         double chance = rand.nextDouble(1.0);
 
-        if (chance > 0.2) {  //change to 0.2
+        if (chance > 0.2) { // change to 0.2
             // 20% chance to activate
             return;
         }

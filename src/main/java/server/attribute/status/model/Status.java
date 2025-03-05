@@ -35,8 +35,8 @@ import server.skills.model.SkillDependencies;
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "category"
-//        defaultImpl = AttributeMod.class
-)
+        //        defaultImpl = AttributeMod.class
+        )
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Bleeding.class, name = "BLEEDING"),
     @JsonSubTypes.Type(value = Burning.class, name = "BURNING"),

@@ -85,7 +85,6 @@ public class TalentRepository {
                         });
     }
 
-
     public Single<Map<Talent, Integer>> getActorTalentsOfType(
             String actorId, TalentType talentType) {
         // this will be called quite often as part of combat service, hence looking to optimise
@@ -99,7 +98,8 @@ public class TalentRepository {
                                             (k, v) -> {
                                                 Talent talent =
                                                         talentRepository.getAllTalents().get(k);
-                                                if (talent.getTalentType().equals(talentType.getType())) {
+                                                if (talent.getTalentType()
+                                                        .equals(talentType.getType())) {
                                                     map.put(talent, v);
                                                 }
                                             });

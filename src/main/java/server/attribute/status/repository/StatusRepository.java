@@ -12,7 +12,6 @@ import io.micronaut.cache.annotation.Cacheable;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.util.Arrays;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +34,7 @@ public class StatusRepository {
     private final String ACTOR_AGGREGATED_STATUSES = "actor-aggregated-statuses";
     private final String ACTOR_AGGREGATED_DERIVED = "actor-aggregated-derived";
 
-    @Inject
-    UpdateProducer updateProducer;
+    @Inject UpdateProducer updateProducer;
 
     public StatusRepository(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
@@ -59,7 +57,6 @@ public class StatusRepository {
                         err -> log.error("Failed to fetch actor statuses, {}", err.getMessage()));
     }
 
-
     @CacheInvalidate(
             value = {ACTOR_STATUS_CACHE, ACTOR_AGGREGATED_STATUSES},
             parameters = {"actorId"},
@@ -69,14 +66,21 @@ public class StatusRepository {
         Bson filter = Filters.eq("actorId", actorId);
         Bson update = Updates.addEachToSet("actorStatuses", Arrays.asList(newStatuses.toArray()));
 
-        return Single.fromPublisher(actorStatusCollection.findOneAndUpdate(filter, update,
-                        new FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)))
-                .doOnSuccess(updatedActorStatus -> {
-                    updateProducer.updateStatusInternal(updatedActorStatus);
+        return Single.fromPublisher(
+                        actorStatusCollection.findOneAndUpdate(
+                                filter,
+                                update,
+                                new FindOneAndUpdateOptions()
+                                        .upsert(true)
+                                        .returnDocument(ReturnDocument.AFTER)))
+                .doOnSuccess(
+                        updatedActorStatus -> {
+                            updateProducer.updateStatusInternal(updatedActorStatus);
 
-                    ActorStatus clientUpdate = new ActorStatus(actorId, newStatuses, true, null);
-                    updateProducer.updateStatus(clientUpdate);
-                });
+                            ActorStatus clientUpdate =
+                                    new ActorStatus(actorId, newStatuses, true, null);
+                            updateProducer.updateStatus(clientUpdate);
+                        });
     }
 
     @CacheInvalidate(
@@ -84,20 +88,29 @@ public class StatusRepository {
             parameters = {"actorId"},
             async = true)
     public Single<ActorStatus> removeStatuses(String actorId, Set<Status> statusesToRemove) {
-        log.info("Updating actor statuses for: {}, removing statuses: {}", actorId, statusesToRemove);
+        log.info(
+                "Updating actor statuses for: {}, removing statuses: {}",
+                actorId,
+                statusesToRemove);
         Bson filter = Filters.eq("actorId", actorId);
         Bson update = Updates.pullAll("actorStatuses", Arrays.asList(statusesToRemove.toArray()));
 
-        return Single.fromPublisher(actorStatusCollection.findOneAndUpdate(filter, update,
-                        new FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)))
-                .doOnSuccess(updatedActorStatus -> {
-                    updateProducer.updateStatusInternal(updatedActorStatus);
+        return Single.fromPublisher(
+                        actorStatusCollection.findOneAndUpdate(
+                                filter,
+                                update,
+                                new FindOneAndUpdateOptions()
+                                        .upsert(true)
+                                        .returnDocument(ReturnDocument.AFTER)))
+                .doOnSuccess(
+                        updatedActorStatus -> {
+                            updateProducer.updateStatusInternal(updatedActorStatus);
 
-                    ActorStatus clientUpdate = new ActorStatus(actorId, statusesToRemove, false, null);
-                    updateProducer.updateStatus(clientUpdate);
-                });
+                            ActorStatus clientUpdate =
+                                    new ActorStatus(actorId, statusesToRemove, false, null);
+                            updateProducer.updateStatus(clientUpdate);
+                        });
     }
-
 
     @CacheInvalidate(
             value = {ACTOR_STATUS_CACHE, ACTOR_STATUS_CACHE, ACTOR_AGGREGATED_STATUSES},
@@ -109,21 +122,22 @@ public class StatusRepository {
         Bson filter = Filters.eq("actorId", actorStatus.getActorId());
         ReplaceOptions options = new ReplaceOptions().upsert(true);
         return Single.fromPublisher(actorStatusCollection.replaceOne(filter, actorStatus, options))
-                .map(res -> {
-                    if (res.wasAcknowledged()) {
-                        // notify internal status update, which will update stats
-                        updateProducer.updateStatusInternal(actorStatus);
-                    }
-                    return actorStatus;
-                });
+                .map(
+                        res -> {
+                            if (res.wasAcknowledged()) {
+                                // notify internal status update, which will update stats
+                                updateProducer.updateStatusInternal(actorStatus);
+                            }
+                            return actorStatus;
+                        });
     }
 
-//    @Cacheable(
-//            value = ACTOR_AGGREGATED_STATUSES,
-//            parameters = {"actorId"})
-//    public Single<Set<String>> getAggregatedStatuses(String actorId) {
-//        return getActorStatuses(actorId).map(ActorStatus::aggregateStatusEffects);
-//    }
+    //    @Cacheable(
+    //            value = ACTOR_AGGREGATED_STATUSES,
+    //            parameters = {"actorId"})
+    //    public Single<Set<String>> getAggregatedStatuses(String actorId) {
+    //        return getActorStatuses(actorId).map(ActorStatus::aggregateStatusEffects);
+    //    }
 
     @CacheInvalidate(
             value = {ACTOR_STATUS_CACHE, ACTOR_STATUS_CACHE, ACTOR_AGGREGATED_STATUSES},

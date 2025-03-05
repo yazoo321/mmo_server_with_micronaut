@@ -65,16 +65,16 @@ public class StatusService {
         log.info("Removing old statuses: {}", removed);
         actorStatus.getActorStatuses().removeAll(removed);
         statusRepository.removeStatuses(actorStatus.getActorId(), removed).subscribe();
-//        statusRepository.updateStatus(actorStatus.getActorId(), actorStatus).subscribe();
+        //        statusRepository.updateStatus(actorStatus.getActorId(), actorStatus).subscribe();
 
-//        ActorStatus update =
-//                new ActorStatus(
-//                        actorStatus.getActorId(),
-//                        removed,
-//                        false,
-//                        actorStatus.aggregateStatusEffects());
-//        // notify the user about removed statuses
-//        updateProducer.updateStatus(update);
+        //        ActorStatus update =
+        //                new ActorStatus(
+        //                        actorStatus.getActorId(),
+        //                        removed,
+        //                        false,
+        //                        actorStatus.aggregateStatusEffects());
+        //        // notify the user about removed statuses
+        //        updateProducer.updateStatus(update);
 
         return actorStatus;
     }
@@ -107,18 +107,23 @@ public class StatusService {
                             .collect(Collectors.toSet());
             // whenever we add a imbue, we always overwrite the old one when exists.
             if (!imbueEffects.isEmpty()) {
-                Set<Status> toRemove = existingSet.stream()
-                        .filter(s -> s.getAttributeEffects().keySet().stream().anyMatch(imbueEffects::contains))
-                        .collect(Collectors.toSet());
+                Set<Status> toRemove =
+                        existingSet.stream()
+                                .filter(
+                                        s ->
+                                                s.getAttributeEffects().keySet().stream()
+                                                        .anyMatch(imbueEffects::contains))
+                                .collect(Collectors.toSet());
                 removedSet.addAll(toRemove);
                 existingSet.removeAll(toRemove);
             }
 
-            Set<Status> toRemove = existingSet.stream()
-                    .filter(s -> s.getSkillId().equals(originSkillId))
-                    .sorted(Comparator.comparing(Status::getExpiration))
-                    .limit(existingSet.size() - maxStacks + 1)
-                    .collect(Collectors.toSet());
+            Set<Status> toRemove =
+                    existingSet.stream()
+                            .filter(s -> s.getSkillId().equals(originSkillId))
+                            .sorted(Comparator.comparing(Status::getExpiration))
+                            .limit(existingSet.size() - maxStacks + 1)
+                            .collect(Collectors.toSet());
             removedSet.addAll(toRemove);
             existingSet.removeAll(toRemove);
 
@@ -126,7 +131,8 @@ public class StatusService {
         }
 
         if (!removedSet.isEmpty()) {
-            log.info("handle stacking: Removing status with Skill IDs: {}",
+            log.info(
+                    "handle stacking: Removing status with Skill IDs: {}",
                     removedSet.stream().map(Status::getSkillId).collect(Collectors.toList()));
             actorStatus.aggregateStatusEffects();
             ActorStatus update =
@@ -138,61 +144,63 @@ public class StatusService {
             updateProducer.updateStatus(update);
         }
     }
-//    private void handleStacking(Set<Status> statuses, ActorStatus actorStatus) {
-//        Set<Status> existingSet = actorStatus.getActorStatuses();
-//        Set<Status> removedSet = new HashSet<>();
-//        for (Status status : statuses) {
-//            int maxStacks = status.getMaxStacks();
-//            String originSkillId = status.getSkillId();
-//
-//            // check if the new status is an imbue, if so, check if already have one and remove it
-//            // if so
-//            Set<String> imbueEffects =
-//                    status.getAttributeEffects().keySet().stream()
-//                            .filter(this::isAnImbue)
-//                            .collect(Collectors.toSet());
-//            // whenever we add a imbue, we always overwrite the old one when exists.
-//            if (!imbueEffects.isEmpty()) {
-//                existingSet.forEach(
-//                        s -> {
-//                            Optional<String> found =
-//                                    s.getAttributeEffects().keySet().stream()
-//                                            .filter(imbueEffects::contains)
-//                                            .findAny();
-//                            if (found.isPresent()) {
-//                                removedSet.add(s);
-//                            }
-//                        });
-//            }
-//
-//            existingSet.removeAll(removedSet);
-//
-//            Set<Status> inScope =
-//                    existingSet.stream()
-//                            .filter(s -> s.getSkillId().equals(originSkillId))
-//                            .collect(Collectors.toSet());
-//
-//            if (inScope.size() >= maxStacks) {
-//                // remove the one ending soonest; this is not good approach but we can improve
-//                // later.
-//                Status shortest = findStatusWithShortestExpiry(inScope);
-//                existingSet.remove(shortest);
-//                removedSet.add(shortest);
-//            }
-//            existingSet.add(status);
-//        }
-//        actorStatus.aggregateStatusEffects();
-//
-//        if (!removedSet.isEmpty()) {
-//            ActorStatus update =
-//                    new ActorStatus(
-//                            actorStatus.getActorId(),
-//                            removedSet,
-//                            false,
-//                            actorStatus.getStatusEffects());
-//            updateProducer.updateStatus(update);
-//        }
-//    }
+
+    //    private void handleStacking(Set<Status> statuses, ActorStatus actorStatus) {
+    //        Set<Status> existingSet = actorStatus.getActorStatuses();
+    //        Set<Status> removedSet = new HashSet<>();
+    //        for (Status status : statuses) {
+    //            int maxStacks = status.getMaxStacks();
+    //            String originSkillId = status.getSkillId();
+    //
+    //            // check if the new status is an imbue, if so, check if already have one and
+    // remove it
+    //            // if so
+    //            Set<String> imbueEffects =
+    //                    status.getAttributeEffects().keySet().stream()
+    //                            .filter(this::isAnImbue)
+    //                            .collect(Collectors.toSet());
+    //            // whenever we add a imbue, we always overwrite the old one when exists.
+    //            if (!imbueEffects.isEmpty()) {
+    //                existingSet.forEach(
+    //                        s -> {
+    //                            Optional<String> found =
+    //                                    s.getAttributeEffects().keySet().stream()
+    //                                            .filter(imbueEffects::contains)
+    //                                            .findAny();
+    //                            if (found.isPresent()) {
+    //                                removedSet.add(s);
+    //                            }
+    //                        });
+    //            }
+    //
+    //            existingSet.removeAll(removedSet);
+    //
+    //            Set<Status> inScope =
+    //                    existingSet.stream()
+    //                            .filter(s -> s.getSkillId().equals(originSkillId))
+    //                            .collect(Collectors.toSet());
+    //
+    //            if (inScope.size() >= maxStacks) {
+    //                // remove the one ending soonest; this is not good approach but we can improve
+    //                // later.
+    //                Status shortest = findStatusWithShortestExpiry(inScope);
+    //                existingSet.remove(shortest);
+    //                removedSet.add(shortest);
+    //            }
+    //            existingSet.add(status);
+    //        }
+    //        actorStatus.aggregateStatusEffects();
+    //
+    //        if (!removedSet.isEmpty()) {
+    //            ActorStatus update =
+    //                    new ActorStatus(
+    //                            actorStatus.getActorId(),
+    //                            removedSet,
+    //                            false,
+    //                            actorStatus.getStatusEffects());
+    //            updateProducer.updateStatus(update);
+    //        }
+    //    }
 
     public void addStatusToActor(ActorStatus actorStatus, Set<Status> statuses) {
         actorStatus.aggregateStatusEffects();
@@ -204,17 +212,19 @@ public class StatusService {
         log.info("Adding statuses to actor: {}", statuses);
         handleStacking(statuses, actorStatus);
 
-        statusRepository.addStatuses(actorStatus.getActorId(), statuses)
+        statusRepository
+                .addStatuses(actorStatus.getActorId(), statuses)
                 .doOnError(err -> log.error(err.getMessage()))
                 .subscribe();
-//        statusRepository
-//                .updateStatus(actorStatus.getActorId(), actorStatus)
-//                .doOnError(err -> log.error(err.getMessage()))
-//                .blockingSubscribe();
+        //        statusRepository
+        //                .updateStatus(actorStatus.getActorId(), actorStatus)
+        //                .doOnError(err -> log.error(err.getMessage()))
+        //                .blockingSubscribe();
 
-//        ActorStatus update = new ActorStatus(actorStatus.getActorId(), statuses, true, null);
-//        update.setStatusEffects(actorStatus.getStatusEffects());
-//        updateProducer.updateStatus(update);
+        //        ActorStatus update = new ActorStatus(actorStatus.getActorId(), statuses, true,
+        // null);
+        //        update.setStatusEffects(actorStatus.getStatusEffects());
+        //        updateProducer.updateStatus(update);
     }
 
     public Single<ActorStatus> removeAllStatuses(String actorId) {
@@ -222,13 +232,14 @@ public class StatusService {
                 .getActorStatuses(actorId)
                 .flatMap(
                         status -> {
-//                            ActorStatus update =
-//                                    new ActorStatus(
-//                                            actorId, status.getActorStatuses(), false, Set.of());
-//
-//                            updateProducer.updateStatus(update);
-//                            status.getActorStatuses().clear();
-//                            status.aggregateStatusEffects();
+                            //                            ActorStatus update =
+                            //                                    new ActorStatus(
+                            //                                            actorId,
+                            // status.getActorStatuses(), false, Set.of());
+                            //
+                            //                            updateProducer.updateStatus(update);
+                            //                            status.getActorStatuses().clear();
+                            //                            status.aggregateStatusEffects();
 
                             return statusRepository
                                     .removeStatuses(actorId, status.getActorStatuses())

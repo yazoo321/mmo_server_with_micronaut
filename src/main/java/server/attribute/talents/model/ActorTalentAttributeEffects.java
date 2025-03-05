@@ -2,7 +2,6 @@ package server.attribute.talents.model;
 
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.Map;
-
 import lombok.Data;
 import server.attribute.common.model.AttributeEffects;
 

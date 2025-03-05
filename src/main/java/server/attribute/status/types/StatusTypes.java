@@ -24,7 +24,6 @@ public enum StatusTypes {
     BURNING("BURNING"),
     FROSTED("FROSTED"),
 
-
     // Statuses which affect stats, have to be in line with StatsTypes
     ATTRIBUTE_MOD("ATTRIBUTE_MOD"),
     MOVE_SPEED("MOVE_SPEED"),
