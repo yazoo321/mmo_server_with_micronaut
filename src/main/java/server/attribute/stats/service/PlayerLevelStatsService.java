@@ -4,10 +4,8 @@ import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
 import server.attribute.stats.model.types.ClassTypes;
@@ -37,7 +35,6 @@ public class PlayerLevelStatsService {
                     StatsTypes.INT.getType(),
                     StatsTypes.DEX.getType());
 
-
     public Single<Stats> initializeCharacterClass(String actorId, String playerClass) {
         if (!isClassValid(playerClass)) {
             throw new CharacterException("Invalid class selected");
@@ -50,7 +47,9 @@ public class PlayerLevelStatsService {
                 new HashMap<>(
                         Map.of(
                                 StatsTypes.LEVEL.type, 1,
-                                StatsTypes.XP.type, 0));
+                                StatsTypes.XP.type,
+                                        300_000, // TODO: remove these two lines, it helps for test
+                                StatsTypes.CAN_LEVEL.type, 1));
         baseAttr.putAll(toAdd);
 
         AVAILABLE_CLASSES.forEach(
@@ -123,15 +122,18 @@ public class PlayerLevelStatsService {
                             }
 
                             int updated = stats.addToBase(stat, 1);
-                            Map<String, Integer> baseChange = Map.of(
-                                    stat, updated,
-                                    StatsTypes.AVAILABLE_PTS.getType(), availablePoints);
+                            Map<String, Integer> baseChange =
+                                    Map.of(
+                                            stat,
+                                            updated,
+                                            StatsTypes.AVAILABLE_PTS.getType(),
+                                            availablePoints);
                             Map<String, Double> derivedChanged = stats.recalculateDerivedStats();
 
                             statsService.handleBaseDifference(baseChange, stats);
                             statsService.handleDifference(derivedChanged, stats);
                         })
-                .doOnError(e-> log.error(e.getMessage()));
+                .doOnError(e -> log.error(e.getMessage()));
     }
 
     public void handleAddXp(Stats targetStats, Stats actorStats) {
@@ -158,7 +160,8 @@ public class PlayerLevelStatsService {
         int deadActorLevel = targetStats.getBaseStat(StatsTypes.LEVEL);
         int levelDiff = deadActorLevel - actorStats.getBaseStat(StatsTypes.LEVEL);
 
-        int xpPerLevel = 100;
+        //        int xpPerLevel = 100;
+        int xpPerLevel = 10_000;
 
         float multiplier = (float) ((levelDiff / 10) + 1);
 
@@ -180,21 +183,20 @@ public class PlayerLevelStatsService {
         statsService.handleBaseDifference(updated, playerStats);
     }
 
-    public void handleAddBaseStat(String actorId, String statType) {
+    public Single<Stats> handleAddBaseStat(String actorId, String statType) {
         if (isClassValid(statType)) {
-            handleLevelUp(actorId, statType).subscribe();
-            return;
+            return handleLevelUp(actorId, statType);
         }
 
         if (isBaseStatValid(statType)) {
-            handleAddStatPoint(actorId, statType).subscribe();
-            return;
+            return handleAddStatPoint(actorId, statType);
         }
-
         log.error("Erroneous stat type being added: {} on actor: {}", statType, actorId);
+
+        return null;
     }
 
-    private boolean isClassValid(String className) {
+    public static boolean isClassValid(String className) {
         // consider other validations
 
         return AVAILABLE_CLASSES.contains(className);

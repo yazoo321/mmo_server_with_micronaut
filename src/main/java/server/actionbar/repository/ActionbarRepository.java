@@ -38,7 +38,7 @@ public class ActionbarRepository {
     public Single<List<ActorActionbar>> getActorActionbar(String actorId) {
         return Flowable.fromPublisher(actionbarMongoCollection.find(eq("actorId", actorId)))
                 .toList()
-                .doOnError((exception) -> log.error("actor skills not found for {}", actorId));
+                .doOnError((exception) -> log.error("actor actionbar not found for {}", actorId));
     }
 
     public void updateActorActionbar(ActorActionbar actorActionbar) {

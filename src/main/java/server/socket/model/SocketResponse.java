@@ -12,6 +12,7 @@ import server.actionbar.model.ActorActionbar;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
+import server.attribute.talents.model.TalentData;
 import server.combat.model.CombatRequest;
 import server.combat.model.ThreatUpdate;
 import server.items.inventory.model.response.GenericInventoryData;
@@ -62,11 +63,14 @@ public class SocketResponse {
 
     String customData;
 
+    TalentData talentData;
+
     public static SocketResponse messageWithType(SocketResponseType type) {
         return SocketResponse.builder().messageType(type.getType()).build();
     }
 
-    public static SocketResponse messageWithTypeAndCustomPayload(SocketResponseType type, String msg) {
+    public static SocketResponse messageWithTypeAndCustomPayload(
+            SocketResponseType type, String msg) {
         SocketResponse resp = messageWithType(type);
         resp.setCustomData(msg);
         return resp;

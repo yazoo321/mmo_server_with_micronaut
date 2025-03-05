@@ -27,7 +27,7 @@ public class Silenced extends Status {
         this.setExpiration(expiration);
         this.setMaxStacks(1);
         this.setSkillId(skillId);
-        this.setOrigin(sourceId);
+        this.setSourceActor(sourceId);
         this.setCategory(StatusTypes.SILENCED.getType());
     }
 

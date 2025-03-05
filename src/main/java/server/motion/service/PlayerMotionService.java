@@ -81,9 +81,7 @@ public class PlayerMotionService {
     }
 
     public void relayPlayerMotion(PlayerMotion playerMotion) {
-//        log.info("relaying player motion: {}", playerMotion.getActorId());
+        //        log.info("relaying player motion: {}", playerMotion.getActorId());
         playerMotionUpdateProducer.sendPlayerMotionResult(playerMotion);
     }
-
-    public void handlePlayerRespawn(String actorId, String customData) {}
 }

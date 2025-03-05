@@ -16,20 +16,15 @@ import server.socket.service.WebsocketClientUpdatesService;
 // TODO: This combat listener should only process messages 'at most once' per message
 @Slf4j
 @KafkaListener(
-        groupId = "internal-combat-listener-group",
+        groupId = "single-internal-combat-listener-group",
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "internal-combat-listener-client")
-public class InternalCombatListener {
+        clientId = "single-internal-combat-listener-client")
+public class SingleInternalCombatListener {
 
     @Inject CombatService combatService;
 
     @Inject WebsocketClientUpdatesService clientUpdatesService;
-
-    //    @Topic("processed-damage-updates")
-    //    public void receiveDamageUpdates(DamageUpdateMessage damageUpdateMessage) {
-    //
-    //    }
 
     @Topic("notify-actor-death")
     void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {

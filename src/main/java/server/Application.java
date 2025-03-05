@@ -5,6 +5,7 @@ import io.micronaut.serde.annotation.SerdeImport;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
+import server.common.dto.Motion;
 import server.motion.model.MotionMessage;
 import server.socket.model.SocketMessage;
 import server.socket.model.SocketResponse;
@@ -21,6 +22,7 @@ import server.socket.model.SocketResponse;
                                         name = "Yaroslav Lazarev",
                                         email = "y.lazarev@hotmail.com")))
 @SerdeImport(MotionMessage.class)
+@SerdeImport(Motion.class)
 @SerdeImport(SocketMessage.class)
 @SerdeImport(SocketResponse.class)
 public class Application {

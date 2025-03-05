@@ -5,14 +5,20 @@ import jakarta.inject.Singleton;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.repository.CombatDataCache;
 import server.combat.service.CombatService;
+import server.items.equippable.service.EquipItemService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.skills.available.cleric.heals.BasicHeal;
 import server.skills.available.cleric.heals.HealingRain;
+import server.skills.available.fighter.HeavyStrike;
+import server.skills.available.fighter.Maim;
+import server.skills.available.fighter.Rupture;
+import server.skills.available.mage.arcane.Blink;
 import server.skills.available.mage.fire.Fireball;
 import server.skills.available.mage.nature.EclipseBurst;
 import server.skills.available.mage.nature.MoonsVengeance;
@@ -25,7 +31,7 @@ import server.socket.service.WebsocketClientUpdatesService;
 @Singleton
 public class DefaultSkillFactory implements SkillFactory {
 
-    Map<String, Class<? extends Skill>> skillTypes = new HashMap<>();
+    @Getter Map<String, Class<? extends Skill>> skillTypes = new HashMap<>();
 
     @Inject WebsocketClientUpdatesService clientUpdatesService;
 
@@ -34,6 +40,8 @@ public class DefaultSkillFactory implements SkillFactory {
     @Inject StatsService statsService;
 
     @Inject StatusService statusService;
+
+    @Inject EquipItemService equipItemService;
 
     @Inject CombatService combatService;
 
@@ -48,10 +56,14 @@ public class DefaultSkillFactory implements SkillFactory {
         skillTypes.put("basic heal", BasicHeal.class);
         skillTypes.put("healing rain", HealingRain.class);
         skillTypes.put("vine grab", VineGrab.class);
-
+        skillTypes.put("blink", Blink.class);
         skillTypes.put("eclipse burst", EclipseBurst.class);
         skillTypes.put("moons vengeance", MoonsVengeance.class);
         skillTypes.put("sun smite", SunSmite.class);
+
+        skillTypes.put("maim", Maim.class);
+        skillTypes.put("rupture", Rupture.class);
+        skillTypes.put("heavy strike", HeavyStrike.class);
     }
 
     @Override
@@ -67,6 +79,7 @@ public class DefaultSkillFactory implements SkillFactory {
             skill.setActorMotionRepository(actorMotionRepository);
             skill.setCombatDataCache(combatDataCache);
             skill.setSkillProducer(skillProducer);
+            skill.setEquipItemService(equipItemService);
 
             return skill;
         } catch (InstantiationException

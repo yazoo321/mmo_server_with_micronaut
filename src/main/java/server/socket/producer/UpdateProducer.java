@@ -24,7 +24,7 @@ public interface UpdateProducer {
     @Topic("remove-mobs-from-game")
     void removeMobsFromGame(String actorIds);
 
-    @Topic("player-motion-update")
+    @Topic("player-motion-message")
     void sendPlayerMotionUpdate(PlayerMotion playerMotion);
 
     @Topic("item-added-to-map")
@@ -50,6 +50,10 @@ public interface UpdateProducer {
 
     @Topic("update-actor-status")
     void updateStatus(ActorStatus actorStatus);
+
+    // this is used to update the stats
+    @Topic("update-actor-status-internal")
+    void updateStatusInternal(ActorStatus actorStatus);
 
     @Topic("update-threat-levels")
     void updateThreatLevels(ThreatUpdate threatUpdate);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,7 @@ import server.attribute.talents.service.TalentService;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = SharpenedBlades.class, name = "Sharpened blades"),
 })
+// TODO: We probably don't need reflective access
 public abstract class Talent {
 
     protected String name;
@@ -44,6 +46,54 @@ public abstract class Talent {
     public void applyEffect(
             Integer level, TalentService talentService, Stats actorStats, Stats targetStats) {
         return;
+    }
+
+    public int isAvailableForCharacter(
+            Stats stats, Map<String, Integer> learnedTalents, Map<String, Integer> pointsPerTree) {
+        Map<String, Integer> base = stats.getBaseStats();
+
+        // checks base stats to make sure level requirements are met
+        boolean baseRequirements =
+                this.attributeRequirements.getRequirements().entrySet().stream()
+                        .allMatch(
+                                entry -> base.getOrDefault(entry.getKey(), 0) >= entry.getValue());
+
+        if (!baseRequirements) {
+            return 0;
+        }
+
+        int pointsRequired = this.getTier() * 5 - 5;
+
+        if (pointsPerTree.getOrDefault(this.getTreeName(), 0) < pointsRequired) {
+            return 0;
+        }
+
+        // the dependencies refer to talent pre-requisites that may exist
+        // we check them against actors existing learned talents
+
+        // example; current level = 1; dependency is level 1; we can level to 2;
+        int talentLevel = learnedTalents.getOrDefault(this.getName(), 0);
+        talentLevel++; // if we have talent level 0, we _want_ to level it to 1. if its level 1,
+        // then 2, etc.
+
+        // set high min level if there are no requirements
+        // otherwise, we can only match up to the dependency level
+        int minDependencyLevel =
+                attributeRequirements.getDependencies().isEmpty()
+                        ? 10
+                        : attributeRequirements.getDependencies().stream()
+                                .map(dependency -> learnedTalents.getOrDefault(dependency, 0))
+                                .min(Integer::compare)
+                                .orElse(0);
+
+        int ableToLevel = Math.min(talentLevel, minDependencyLevel);
+
+        if (ableToLevel > this.getLevels()) {
+            // should not be larger
+            return 0;
+        }
+
+        return ableToLevel;
     }
 }
 

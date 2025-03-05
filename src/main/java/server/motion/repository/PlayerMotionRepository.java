@@ -68,15 +68,8 @@ public class PlayerMotionRepository {
                 .map(success -> playerMotion.getMotion());
     }
 
-    @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId")
-    public Single<PlayerMotion> setPlayerOnlineStatus(String actorId, boolean isOnline) {
-        return Single.fromPublisher(
-                playerMotionMongoCollection.findOneAndUpdate(
-                        eq("actorId", actorId), set("isOnline", isOnline)));
-    }
-
-    @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId")
-    public Single<PlayerMotion> updateMotion(String actorId, PlayerMotion playerMotion) {
+    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId", async = true)
+    public Single<Motion> updateMotion(String actorId, PlayerMotion playerMotion) {
         return Single.fromPublisher(
                         playerMotionMongoCollection.findOneAndUpdate(
                                 eq("actorId", playerMotion.getActorId()),
@@ -86,10 +79,10 @@ public class PlayerMotionRepository {
                                         Updates.set(
                                                 "updatedAt",
                                                 Instant.now().truncatedTo(ChronoUnit.MICROS)))))
-                .map(success -> playerMotion);
+                .map(success -> playerMotion.getMotion());
     }
 
-    @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId")
+    @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId", async = true)
     public Single<DeleteResult> deletePlayerMotion(String actorId) {
         // TODO: should be delete one, but sometimes tests can flake
         return Single.fromPublisher(playerMotionMongoCollection.deleteMany(eq("actorId", actorId)));

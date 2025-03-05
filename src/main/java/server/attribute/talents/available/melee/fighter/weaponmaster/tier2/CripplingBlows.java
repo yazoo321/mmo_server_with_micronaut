@@ -41,8 +41,8 @@ public class CripplingBlows extends Talent {
         this.applyType = AttributeApplyType.ON_DMG_APPLY.getType();
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
-        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
-        attributeRequirements.setDependencies(Map.of());
+        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 3));
+        attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;
     }
@@ -52,7 +52,7 @@ public class CripplingBlows extends Talent {
             Integer level, TalentService talentService, Stats actorStats, Stats targetStats) {
         double chance = rand.nextDouble(1.0);
 
-        if (chance > 0.2) {
+        if (chance > 0.2) { // change to 0.2
             // 20% chance to activate
             return;
         }

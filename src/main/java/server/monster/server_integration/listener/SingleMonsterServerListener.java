@@ -10,23 +10,26 @@ import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
+import server.attribute.talents.service.TalentService;
 import server.common.uuid.UUIDHelper;
 import server.monster.server_integration.model.Monster;
 import server.monster.server_integration.producer.MonsterServerProducer;
 import server.monster.server_integration.service.MobInstanceService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
+import server.skills.service.CombatSkillsService;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
 import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "mob-listener",
+        groupId = "single-mob-listener",
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "mob-listener")
-public class MonsterServerListener {
+        clientId = "single-mob-listener")
+public class SingleMonsterServerListener {
+    // should only be processed on one node
 
     @Inject MonsterServerProducer monsterServerProducer;
 
@@ -34,6 +37,8 @@ public class MonsterServerListener {
 
     @Inject StatsService statsService;
     @Inject StatusService statusService;
+    @Inject TalentService talentService;
+    @Inject CombatSkillsService combatSkillsService;
 
     @Inject SessionParamHelper sessionParamHelper;
 
@@ -49,6 +54,10 @@ public class MonsterServerListener {
                         mob -> {
                             statsService.initializeMobStats(monster.getActorId());
                             statusService.initializeStatus(monster.getActorId()).subscribe();
+                            talentService
+                                    .initializeActorTalents(monster.getActorId())
+                                    .blockingSubscribe();
+                            combatSkillsService.initialiseSkills(monster.getActorId());
                         })
                 .doOnError(error -> log.error("Error on creating mob, {}", error.getMessage()))
                 .subscribe();
@@ -84,8 +93,7 @@ public class MonsterServerListener {
 
     @Topic("notify-actor-death")
     void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {
-        if (!UUIDHelper.isPlayer(damageUpdateMessage.getTargetStats().getActorId())
-                && !UUIDHelper.isPlayer(damageUpdateMessage.getOriginStats().getActorId())) {
+        if (!UUIDHelper.isPlayer(damageUpdateMessage.getTargetStats().getActorId())) {
             // the target was a mob and the killer is a player
             // TODO: item drops will require to be owned by the killer
             mobInstanceService.handleMobDeath(damageUpdateMessage.getTargetStats());

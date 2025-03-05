@@ -6,10 +6,7 @@ import static server.attribute.stats.types.StatsTypes.WEAPON_DAMAGE;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Singleton;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.Stats;
@@ -60,94 +57,101 @@ public class MobCombatService extends CombatService {
         Single<ActorStatus> targetStatusSingle = statusService.getActorStatus(target.getActorId());
 
         Single.zip(
-                actorStatsSingle,
-                actorMotionSingle,
-                actorStatusSingle,
-                targetStatusSingle,
-                (actorStats, actorMotion, actorStatus, targetStatus) -> {
-                    if (actorStatus.isDead() || targetStatus.isDead()) {
-                        sessionsInCombat.remove(actorId);
-                        return 1;
-                    }
-                    if (!actorStatus.canAttack()) {
-                        // stunned or disarmed, try later
-                        return 1;
-                    }
+                        actorStatsSingle,
+                        actorMotionSingle,
+                        actorStatusSingle,
+                        targetStatusSingle,
+                        (actorStats, actorMotion, actorStatus, targetStatus) -> {
+                            if (actorStatus.isDead() || targetStatus.isDead()) {
+                                sessionsInCombat.remove(actorId);
+                                return 1;
+                            }
+                            if (!actorStatus.canAttack()) {
+                                // stunned or disarmed, try later
+                                return 1;
+                            }
 
-                    Map<String, Double> derivedStats = actorStats.getDerivedStats();
-                    int distanceThreshold = 250;
+                            Map<String, Double> derivedStats = actorStats.getDerivedStats();
+                            int distanceThreshold = 250;
 
-                    boolean valid =
-                            validatePositionLocation(
-                                    combatData,
-                                    actorMotion,
-                                    target.getActorId(),
-                                    distanceThreshold,
-                                    null);
+                            boolean valid =
+                                    validatePositionLocation(
+                                            combatData,
+                                            actorMotion,
+                                            target.getActorId(),
+                                            distanceThreshold,
+                                            null);
 
-                    if (!valid) {
-                        return 1;
-                    }
+                            if (!valid) {
+                                return 1;
+                            }
 
-                    Instant lastHit =
-                            isMainHand
-                                    ? combatData.getMainHandLastAttack()
-                                    : combatData.getOffhandLastAttack();
-                    // TODO: this is for demo, needs changing
-                    if (lastHit == null || lastHit.isBefore(Instant.now().minusSeconds(4))) {
-                        lastHit = Instant.now().minusSeconds(4);
-                        requestAttackSwing(actorId, combatData, isMainHand);
-                    }
+                            Instant lastHit =
+                                    isMainHand
+                                            ? combatData.getMainHandLastAttack()
+                                            : combatData.getOffhandLastAttack();
+                            // TODO: this is for demo, needs changing
+                            if (lastHit == null
+                                    || lastHit.isBefore(Instant.now().minusSeconds(4))) {
+                                lastHit = Instant.now().minusSeconds(4);
+                                requestAttackSwing(actorId, combatData, isMainHand);
+                            }
 
-                    Double baseSpeed =
-                            isMainHand
-                                    ? derivedStats.get(StatsTypes.MAIN_HAND_ATTACK_SPEED.getType())
-                                    : derivedStats.get(StatsTypes.OFF_HAND_ATTACK_SPEED.getType());
-                    Double characterAttackSpeed =
-                            derivedStats.get(StatsTypes.ATTACK_SPEED.getType());
+                            Double baseSpeed =
+                                    isMainHand
+                                            ? derivedStats.get(
+                                                    StatsTypes.MAIN_HAND_ATTACK_SPEED.getType())
+                                            : derivedStats.get(
+                                                    StatsTypes.OFF_HAND_ATTACK_SPEED.getType());
+                            Double characterAttackSpeed =
+                                    derivedStats.get(StatsTypes.ATTACK_SPEED.getType());
 
-                    // Calculate the actual delay in milliseconds
-                    long actualDelayInMS =
-                            (long) (getAttackTimeDelay(baseSpeed, characterAttackSpeed) * 1000);
+                            // Calculate the actual delay in milliseconds
+                            long actualDelayInMS =
+                                    (long)
+                                            (getAttackTimeDelay(baseSpeed, characterAttackSpeed)
+                                                    * 1000);
 
-                    // Calculate the next allowed attack time
-                    Instant nextAttackTime = lastHit.plusMillis(actualDelayInMS);
+                            // Calculate the next allowed attack time
+                            Instant nextAttackTime = lastHit.plusMillis(actualDelayInMS);
 
-                    if (nextAttackTime.isBefore(Instant.now())) {
-                        // The player can attack
-                        // Get derived stats and equipped items
+                            if (nextAttackTime.isBefore(Instant.now())) {
+                                // The player can attack
+                                // Get derived stats and equipped items
 
-                        if (!combatData
-                                .getAttackSent()
-                                .getOrDefault(isMainHand ? "MAIN" : "OFF", false)) {
-                            requestAttackSwing(actorId, combatData, isMainHand);
-                        }
+                                if (!combatData
+                                        .getAttackSent()
+                                        .getOrDefault(isMainHand ? "MAIN" : "OFF", false)) {
+                                    requestAttackSwing(actorId, combatData, isMainHand);
+                                }
 
-                        combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", false);
+                                combatData.getAttackSent().put(isMainHand ? "MAIN" : "OFF", false);
 
-                        // Create a damage map (currently only physical damage)
-                        Map<String, Double> damageMap = calculateDamageMap(derivedStats);
-                        statsService.takeDamage(target, damageMap, actorStats);
-                        if (isMainHand) {
-                            combatData.setMainHandLastAttack(Instant.now());
-                        } else {
-                            combatData.setOffhandLastAttack(Instant.now());
-                        }
+                                // Create a damage map (currently only physical damage)
+                                Map<String, Double> damageMap = calculateDamageMap(derivedStats);
+                                statsService.takeDamage(target, damageMap, actorStats);
+                                if (isMainHand) {
+                                    combatData.setMainHandLastAttack(Instant.now());
+                                } else {
+                                    combatData.setOffhandLastAttack(Instant.now());
+                                }
 
-                        combatDataCache.cacheCombatData(actorId, combatData);
-                        return 1;
-                    }
+                                combatDataCache.cacheCombatData(actorId, combatData);
+                                return 1;
+                            }
 
-                    // Check if the next attack time is before the current time
-                    if (nextAttackTime.isBefore(Instant.now().plusMillis(100))) {
-                        // send a swing action as we're about to hit - we don't know if we will hit
-                        // or miss yet
-                        requestAttackSwing(actorId, combatData, isMainHand);
-                        combatDataCache.cacheCombatData(actorId, combatData);
-                    }
+                            // Check if the next attack time is before the current time
+                            if (nextAttackTime.isBefore(Instant.now().plusMillis(100))) {
+                                // send a swing action as we're about to hit - we don't know if we
+                                // will hit
+                                // or miss yet
+                                requestAttackSwing(actorId, combatData, isMainHand);
+                                combatDataCache.cacheCombatData(actorId, combatData);
+                            }
 
-                    return 1;
-                });
+                            return 1;
+                        })
+                .subscribe();
     }
 
     void attackLoop(String actorId) {
@@ -205,11 +209,13 @@ public class MobCombatService extends CombatService {
         double totalDamage = damage * amp * (1 + rand.nextDouble(0.15));
 
         // Create a damage map (currently only physical damage)
-        return Map.of(DamageTypes.PHYSICAL.getType(), totalDamage);
+        return new HashMap<>(Map.of(DamageTypes.PHYSICAL.getType(), totalDamage));
     }
 
     private Double getAttackTimeDelay(Double baseAttackSpeed, Double characterAttackSpeed) {
-        // 100 attack speed increases speed by 2x
+        // Base attack speed is speed of weapon, e.g. 2.3 seconds
         return baseAttackSpeed / (1 + (characterAttackSpeed / 100));
+        // 100 attack speed increases speed by 2x
+        //        return baseAttackSpeed / (1 + (characterAttackSpeed / 100));
     }
 }

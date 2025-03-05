@@ -9,33 +9,16 @@ import lombok.extern.slf4j.Slf4j;
 import server.attribute.stats.model.DamageUpdateMessage;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.service.StatusService;
-import server.socket.model.SocketResponse;
-import server.socket.model.SocketResponseType;
-import server.socket.service.WebsocketClientUpdatesService;
 
 @Slf4j
 @KafkaListener(
-        groupId = "status-listener",
+        groupId = "single-status-listener",
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "status-listener")
-public class StatusListener {
-
-    @Inject WebsocketClientUpdatesService clientUpdatesService;
+        clientId = "single-status-listener")
+public class SingleStatusListener {
 
     @Inject StatusService statusService;
-
-    @Topic("update-actor-status")
-    public void receiveUpdateActorStatus(ActorStatus actorStatus) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.STATUS_UPDATE.getType())
-                        .actorStatus(actorStatus)
-                        .build();
-
-        clientUpdatesService.sendUpdateToListeningIncludingSelf(
-                socketResponse, actorStatus.getActorId());
-    }
 
     @Topic("request-add-actor-status")
     public void requestAddActorStatus(ActorStatus actorStatus) {

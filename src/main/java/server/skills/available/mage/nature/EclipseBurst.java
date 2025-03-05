@@ -5,6 +5,7 @@ import io.micronaut.serde.annotation.Serdeable;
 import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
@@ -19,7 +20,7 @@ public class EclipseBurst extends ChannelledSkill {
 
     public EclipseBurst() {
         super(
-                "Eclipse Burst",
+                "Eclipse burst",
                 "Summon the moon to fiercely strike a target with its magic power",
                 Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 80.0),
                 4_000,
@@ -28,7 +29,7 @@ public class EclipseBurst extends ChannelledSkill {
                 true,
                 1000,
                 0,
-                Map.of(),
+                Map.of(ClassTypes.MAGE.getType(), 2),
                 0,
                 0);
     }

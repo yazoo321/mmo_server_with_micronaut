@@ -5,10 +5,11 @@ import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.DamageTypes;
-import server.attribute.stats.types.StatsTypes;
 import server.combat.model.CombatData;
 import server.common.dto.Location;
+import server.common.dto.Motion;
 import server.skills.active.aoe.TickingAoeSkill;
 import server.skills.model.SkillTarget;
 
@@ -22,14 +23,14 @@ public class HealingRain extends TickingAoeSkill {
         super(
                 "Healing rain",
                 "Channel an aura of tranquility which periodically heals actors nearby",
-                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), -20.0),
+                Map.of(DamageTypes.POSITIVE.getType(), -20.0),
                 1000,
                 3000,
                 false,
                 true,
                 500,
                 0,
-                Map.of(),
+                Map.of(ClassTypes.CLERIC.getType(), 3),
                 600,
                 3000,
                 10,
@@ -44,39 +45,15 @@ public class HealingRain extends TickingAoeSkill {
     @Override
     public void applyEffect() {
         CombatData combatData = skillDependencies.getCombatData();
-        Double healAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
+        SkillTarget skillTarget = skillDependencies.getSkillTarget();
+        Motion actorMotion = skillDependencies.getActorMotion();
+        skillTarget.setLocation(new Location(actorMotion));
 
-        Map<String, Double> damageMap = Map.of(DamageTypes.POSITIVE.getType(), healAmt);
-
-        actorMotionRepository
-                .fetchActorMotion(combatData.getActorId())
+        getAffectedActors(skillTarget)
                 .doOnSuccess(
-                        motion ->
-                                getAffectedPlayers(new Location(motion), combatData.getActorId())
-                                        .doOnSuccess(
-                                                actors ->
-                                                        actors.stream()
-                                                                .parallel()
-                                                                .forEach(
-                                                                        actor -> {
-                                                                            log.info(
-                                                                                    "Applying"
-                                                                                        + " Healing"
-                                                                                        + " rain"
-                                                                                        + " to: {},"
-                                                                                        + " will"
-                                                                                        + " take:"
-                                                                                        + " {}",
-                                                                                    actor,
-                                                                                    damageMap);
-                                                                            requestTakeDamage(
-                                                                                    combatData
-                                                                                            .getActorId(),
-                                                                                    actor,
-                                                                                    damageMap);
-                                                                        }))
-                                        .subscribe())
-                .doOnError(err -> log.error("Healing rain encountered error: {}", err.getMessage()))
+                        targets ->
+                                requestTakeDamageToMultipleActors(combatData.getActorId(), targets))
+                .doOnError(err -> log.error("Error applying moons vengeance, {}", err.getMessage()))
                 .subscribe();
     }
 }

@@ -18,12 +18,12 @@ import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.stats.types.DamageAdditionalData;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
+import server.attribute.talents.model.ActorTalentAttributeEffects;
 import server.attribute.talents.service.TalentService;
 import server.combat.model.CombatData;
 import server.combat.repository.CombatDataCache;
 import server.combat.service.ActorThreatService;
 import server.common.uuid.UUIDHelper;
-import server.session.SessionParamHelper;
 import server.socket.producer.UpdateProducer;
 
 @Slf4j
@@ -34,8 +34,6 @@ public class StatsService {
     @Inject ActorStatsRepository repository;
 
     @Inject UpdateProducer updateProducer;
-
-    @Inject SessionParamHelper sessionParamHelper;
 
     @Inject ActorThreatService threatService;
 
@@ -62,7 +60,7 @@ public class StatsService {
         mobStats.setBaseStats(
                 new HashMap<>(
                         Map.of(
-                                StatsTypes.STR.getType(), 100,
+                                StatsTypes.STR.getType(), 50,
                                 StatsTypes.STA.getType(), 100,
                                 StatsTypes.DEX.getType(), 100,
                                 StatsTypes.INT.getType(), 100)));
@@ -146,6 +144,20 @@ public class StatsService {
                 .blockingSubscribe();
     }
 
+    public void updateTalentStats(ActorTalentAttributeEffects talentAttributeEffects) {
+        getStatsFor(talentAttributeEffects.getActorId())
+                .doOnSuccess(
+                        stats -> {
+                            // talent services handles the correct attribute effects, overwriting
+                            // previous state
+                            stats.setTalentEffects(talentAttributeEffects.getAttributeEffects());
+                            Map<String, Double> updated = stats.recalculateDerivedStats();
+                            handleDifference(updated, stats);
+                        })
+                .doOnError(err -> log.error("Failed to update talent stats, {}", err.getMessage()))
+                .subscribe();
+    }
+
     public void resetHPAndMP(String actorId, Double hpPercent, Double mpPercent) {
         getStatsFor(actorId)
                 .doOnSuccess(
@@ -163,7 +175,7 @@ public class StatsService {
 
                             handleDifference(updated, stats);
                         })
-                .doOnError(err -> log.error(err.getMessage()))
+                .doOnError(err -> log.error("Failed to reset hp and mp, {}", err.getMessage()))
                 .subscribe();
     }
 
@@ -173,7 +185,6 @@ public class StatsService {
 
         if (damageSource.getAdditionalData().equals("PERCENT")) {
             // this is used within talents to restore HP/Mana for example on kill
-
             getStatsFor(damageSource.getActorId())
                     .doOnSuccess(
                             actorStats -> {
@@ -195,6 +206,10 @@ public class StatsService {
                                     addMana(actorStats, mpVal);
                                 }
                             })
+                    .doOnError(
+                            err ->
+                                    log.error(
+                                            "Failed to apply flat hp/mp mod, {}", err.getMessage()))
                     .subscribe();
         }
     }
@@ -209,6 +224,7 @@ public class StatsService {
                         (targetStats, sourceStats) -> {
                             return takeDamage(targetStats, damageMap, sourceStats);
                         })
+                .doOnError(err -> log.error("Failed to apply take damage, {}", err.getMessage()))
                 .subscribe();
     }
 
@@ -225,6 +241,7 @@ public class StatsService {
                                                         talentService,
                                                         sourceActor,
                                                         targetStats)))
+                .doOnError(err -> log.error("Failed to handle talent apply, {}", err.getMessage()))
                 .subscribe();
     }
 
@@ -316,6 +333,62 @@ public class StatsService {
         }
     }
 
+    public void handleDamageReduction(Map<String, Double> damageMap, Stats stats) {
+        // TODO: Consider different approaches for handling armour
+        // there should be a decaying factor to the armour, so that you can't just always absorb
+        // 100% of damage
+
+        // simple approach is square root, for % dmg reduction
+        // there should also be a flat damage reduction, which we may want to rework,
+        // e.g. heavy armour / shield can provide flat + armour
+
+        Double phyArmour = stats.getDerived(StatsTypes.DEF);
+        double phyReduction = phyArmour > 0 ? (Math.sqrt(phyArmour) / 100) : 0;
+        phyReduction = 1 - phyReduction;
+
+        // base reduction scales off armour
+        double baseReduction = stats.getDerived(StatsTypes.PHY_REDUCTION) + phyReduction;
+
+        Double mgcArmour = stats.getDerived(StatsTypes.MAG_DEF);
+        double mgcReduction = mgcArmour > 0 ? (Math.sqrt(mgcArmour) / 100) : 0;
+        mgcReduction = 1 - mgcReduction;
+
+        Set<Map.Entry<String, Double>> entrySet = damageMap.entrySet();
+
+        for (Map.Entry<String, Double> entry : entrySet) {
+            String type = entry.getKey();
+            Double amount = entry.getValue();
+
+            if (amount < 0) {
+                // this is a heal effect
+                continue;
+            }
+
+            boolean phyType = PHYSICAL_ATTACK_TYPES.contains(type);
+            if (phyType) {
+                entry.setValue(Math.max((amount * phyReduction) - baseReduction, 0));
+            } else {
+                entry.setValue(Math.max(amount * mgcReduction, 0));
+            }
+        }
+    }
+
+    private void handleWeaponImbue(Stats sourceStats, Stats stats, Map<String, Double> damageMap) {
+        // weapon imbue will fit into 3 categories
+        // primary: basic damage, always damage, can be of any type
+        // secondary: modify attributes, such as attack slow, move slow, etc.
+        // trinary: this is not affecting the target, but rather the equipper.
+        //   examples are like increasing the equippers attack speed, move speed, def, etc
+
+        // compile the primary weapon damage here to damage map.
+
+        // TODO: our burning effect will benefit from this. this will make it too high as the
+        // frequency is too high.
+        // We will need to change how the damage effects are applied via status effects, or modify
+        // its scaling ?
+
+    }
+
     public Stats takeDamage(Stats stats, Map<String, Double> damageMap, Stats sourceStats) {
         // TODO: consider hit chance?
         if (handleDodge(damageMap, stats, sourceStats)) {
@@ -326,10 +399,19 @@ public class StatsService {
         // TODO: handle parry event
         // TODO: handle energy resist/absorb event
 
+        // resistances should scale such that when you go over 100% resistance, the damage will in
+        // fact heal you
+        // i.e. if you have 200% resistance, it will heal you for 100% damage
+        // this is only for non-physical damage
+
         handleTalentApplyOnApplyType(sourceStats, stats, AttributeApplyType.ON_HIT_APPLY);
         handleTalentApplyOnApplyType(stats, sourceStats, AttributeApplyType.ON_HIT_CONSUME);
 
-        handleDamageAmp(damageMap, stats);
+        // handle weapon imbues
+        // weapon imbues will merge with stats, via status effects..
+        handleWeaponImbue(sourceStats, stats, damageMap);
+
+        handleDamageAmp(damageMap, sourceStats);
 
         boolean isCrit = handleCrit(damageMap, stats, sourceStats);
 
@@ -337,6 +419,7 @@ public class StatsService {
         Double totalDamage = damageMap.values().stream().reduce(0.0, Double::sum);
 
         // handle damage reduction
+        handleDamageReduction(damageMap, stats);
 
         if (totalDamage == 0) {
             // no damage taken, ignore
@@ -514,6 +597,10 @@ public class StatsService {
     }
 
     void handleThreat(Map<String, Double> damageMap, String actorTakingDamage, String sourceActor) {
+        if (actorTakingDamage.equals(sourceActor)) {
+            return;
+        }
+
         if (!UUIDHelper.isPlayer(sourceActor) && !UUIDHelper.isPlayer(actorTakingDamage)) {
             return;
         }

@@ -28,6 +28,7 @@ public class ActorThreatService {
     public Single<ActorThreat> addActorThreat(String actorId, String targetId, Integer threat) {
         // TODO: CHANGE ME
         log.info("Adding actor threat: {}", actorId);
+
         return statusRepository
                 .getActorStatuses(actorId)
                 .flatMap(
@@ -107,6 +108,9 @@ public class ActorThreatService {
                         threatMap -> {
                             Map<String, Integer> threatLevels = threatMap.getActorThreat();
 
+                            if (threatLevels == null || threatLevels.isEmpty()) {
+                                return Single.just(DeleteResult.acknowledged(1));
+                            }
                             List<String> removed = threatLevels.keySet().stream().toList();
 
                             threatLevels.clear();

@@ -23,7 +23,7 @@ public class Unconscious extends Status {
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(null);
         this.setMaxStacks(1);
-        this.setOrigin(null);
+        this.setSourceActor(null);
         this.setSkillId(null);
         this.setCategory(StatusTypes.UNCONSCIOUS.getType());
     }

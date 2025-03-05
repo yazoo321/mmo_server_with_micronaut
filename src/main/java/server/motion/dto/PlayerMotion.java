@@ -24,8 +24,6 @@ public class PlayerMotion {
 
     String actorId;
     Motion motion;
-
     Boolean isOnline;
-
     Instant updatedAt;
 }

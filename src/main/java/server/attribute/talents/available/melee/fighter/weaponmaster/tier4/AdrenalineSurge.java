@@ -42,8 +42,8 @@ public class AdrenalineSurge extends Talent {
         this.applyType = AttributeApplyType.ON_HIT_CONSUME.getType();
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
-        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
-        attributeRequirements.setDependencies(Map.of());
+        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 8));
+        attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;
     }
@@ -64,7 +64,7 @@ public class AdrenalineSurge extends Talent {
 
         Status phyAmpStatus =
                 new AttributeMod(
-                        expire, sourceActor, StatsTypes.PHY_AMP, phyAmpInc, 1.0, 1, this.name);
+                        expire, sourceActor, StatsTypes.PHY_AMP, phyAmpInc, 0.0, 1, this.name);
 
         ActorStatus actorStatus = new ActorStatus();
         actorStatus.setActorId(actorStats.getActorId());

@@ -1,13 +1,14 @@
 package server.motion.repository;
 
+import io.micronaut.cache.SyncCache;
 import io.micronaut.cache.annotation.CacheConfig;
 import io.micronaut.cache.annotation.CacheInvalidate;
 import io.micronaut.cache.annotation.CachePut;
-import io.micronaut.cache.annotation.Cacheable;
 import io.micronaut.scheduling.annotation.Scheduled;
 import io.netty.util.internal.ConcurrentSet;
 import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.List;
@@ -27,16 +28,28 @@ public class ActorMotionRepository {
 
     private static final String ACTOR_MOTION_CACHE = "actor-motion-cache";
 
+    @Inject
+    @Named(ACTOR_MOTION_CACHE)
+    private SyncCache<?> actorMotionCache;
+
     private Set<String> syncActorMotion = new ConcurrentSet<>();
 
     @Inject PlayerMotionRepository playerMotionRepository;
 
     @Inject MobRepository mobRepository;
 
-    @Cacheable(value = ACTOR_MOTION_CACHE, parameters = "actorId")
+    //    @Cacheable(value = ACTOR_MOTION_CACHE, parameters = "actorId")
     public Single<Motion> fetchActorMotion(String actorId) {
+        // There appears to be some race conditions with cacheable and cacheput, using
+        // actorMotionCache instead
         if (actorId == null || actorId.isBlank()) {
             return null;
+        }
+
+        Motion cachedMotion = actorMotionCache.get(actorId, Motion.class).orElse(null);
+
+        if (cachedMotion != null) {
+            return Single.just(cachedMotion);
         }
 
         if (UUIDHelper.isPlayer(actorId)) {
@@ -53,7 +66,7 @@ public class ActorMotionRepository {
         }
     }
 
-    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId", async = true)
+    @CachePut(value = ACTOR_MOTION_CACHE, parameters = "actorId")
     public Motion updateActorMotion(String actorId, Motion motion) {
         if (actorId == null) {
             log.error("actorId null when trying to update motion");
@@ -69,7 +82,7 @@ public class ActorMotionRepository {
         return motion;
     }
 
-    @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId")
+    @CacheInvalidate(value = ACTOR_MOTION_CACHE, parameters = "actorId", async = true)
     public void handleDisconnect(String actorId) {
         fetchActorMotion(actorId)
                 .doOnSuccess(motion -> handleUpdate(actorId, motion, false))
@@ -92,11 +105,13 @@ public class ActorMotionRepository {
             fetchActorMotion(id)
                     .doOnSuccess(motion -> handleUpdate(id, motion, true))
                     .doOnError(
-                            err ->
-                                    log.error(
-                                            "failed to sync actor: {}, motion with repo: {}",
-                                            id,
-                                            err.getMessage()))
+                            err -> {
+                                log.error(
+                                        "Failed to sync actor ({}) motion, {}",
+                                        id,
+                                        err.getMessage());
+                                syncActorMotion.remove(id);
+                            })
                     .subscribe();
         }
     }
@@ -116,8 +131,6 @@ public class ActorMotionRepository {
                                             "failed to update motion for: {}, {}",
                                             actorId,
                                             err.getMessage()))
-                    //                    .doOnSuccess(done -> log.info("Updated player motion {}",
-                    // done))
                     .subscribe();
         } else {
             mobRepository

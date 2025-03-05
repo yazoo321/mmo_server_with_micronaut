@@ -59,11 +59,12 @@ public class TalentRepositoryImpl {
                         v.getTieredTalents()
                                 .forEach(
                                         (tier, talents) ->
-                                                talents.forEach(
-                                                        talent ->
-                                                                allTalents.put(
-                                                                        talent.getName(),
-                                                                        talent))));
+                                                talents.getTalentList()
+                                                        .forEach(
+                                                                talent ->
+                                                                        allTalents.put(
+                                                                                talent.getName(),
+                                                                                talent))));
     }
 
     private void prepareTalentCollection() {

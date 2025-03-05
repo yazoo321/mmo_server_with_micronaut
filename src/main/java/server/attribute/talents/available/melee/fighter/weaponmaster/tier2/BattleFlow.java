@@ -33,8 +33,8 @@ public class BattleFlow extends Talent {
         this.applyType = AttributeApplyType.ON_DEATH_APPLY.getType();
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
-        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
-        attributeRequirements.setDependencies(Map.of());
+        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 3));
+        attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;
     }

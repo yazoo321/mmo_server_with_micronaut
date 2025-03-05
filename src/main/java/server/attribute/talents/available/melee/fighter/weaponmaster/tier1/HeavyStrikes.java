@@ -36,7 +36,7 @@ public class HeavyStrikes extends Talent {
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
         attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
-        attributeRequirements.setDependencies(Map.of());
+        attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;
     }

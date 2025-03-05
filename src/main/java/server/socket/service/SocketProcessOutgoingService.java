@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import server.actionbar.service.ActionbarService;
+import server.attribute.talents.service.TalentService;
 import server.combat.service.ActorThreatService;
 import server.combat.service.MobCombatService;
 import server.combat.service.PlayerCombatService;
@@ -53,6 +54,8 @@ public class SocketProcessOutgoingService {
 
     @Inject CombatSkillsService combatSkillsService;
 
+    @Inject TalentService talentService;
+
     @Inject MobCombatService mobCombatService;
 
     @Inject ActionbarService actionbarService;
@@ -63,9 +66,7 @@ public class SocketProcessOutgoingService {
 
     @Inject ActorThreatService threatService;
 
-    @Inject
-    PlayfabService playfabService;
-
+    @Inject PlayfabService playfabService;
 
     Map<String, BiConsumer<SocketMessage, WebSocketSession>> functionMap;
 
@@ -103,7 +104,25 @@ public class SocketProcessOutgoingService {
         this.functionMap.put(MessageType.STOP_ATTACK.getType(), this::handleStopAttack);
         this.functionMap.put(MessageType.SET_SESSION_ID.getType(), this::setSessionId);
         this.functionMap.put(SkillMessageType.INITIATE_SKILL.getType(), this::handleTryStartSkill);
-        this.functionMap.put(SkillMessageType.FETCH_SKILLS.getType(), this::handleFetchSkills);
+        // skill management
+        this.functionMap.put(
+                SkillMessageType.FETCH_ALL_SKILLS.getType(), this::handleFetchAllSkills);
+        this.functionMap.put(
+                SkillMessageType.FETCH_LEARNED_SKILLS.getType(), this::handleFetchLearnedSkills);
+        this.functionMap.put(
+                SkillMessageType.FETCH_AVAILABLE_SKILLS.getType(),
+                this::handleFetchAvailableSkills);
+        this.functionMap.put(SkillMessageType.LEARN_SKILL.getType(), this::handleLearnSkill);
+        // talent management
+        this.functionMap.put(
+                MessageType.FETCH_TALENT_TREE_NAMES.getType(), this::handleFetchTalentTreeNames);
+        this.functionMap.put(MessageType.FETCH_ALL_TALENTS.getType(), this::handleFetchAllTalents);
+        this.functionMap.put(
+                MessageType.FETCH_LEARNED_TALENTS.getType(), this::handleFetchLearnedTalents);
+        this.functionMap.put(
+                MessageType.FETCH_AVAILABLE_TALENTS.getType(), this::handleAvailableTalents);
+        this.functionMap.put(MessageType.LEARN_TALENT.getType(), this::handleLearnTalent);
+
         this.functionMap.put(
                 SkillMessageType.FETCH_ACTIONBAR.getType(), this::handleFetchActionBar);
         this.functionMap.put(
@@ -178,7 +197,7 @@ public class SocketProcessOutgoingService {
             }
         }
 
-//        log.info("sending player motion update");
+        //        log.info("sending player motion update");
         updateProducer.sendPlayerMotionUpdate(message.getPlayerMotion());
     }
 
@@ -205,11 +224,11 @@ public class SocketProcessOutgoingService {
     }
 
     private void handleFetchInventory(SocketMessage message, WebSocketSession session) {
-        itemSocketIntegration.handleFetchInventory(message.getInventoryRequest(), session);
+        itemSocketIntegration.handleFetchInventory(message.getActorId(), session);
     }
 
     private void handleFetchEquipped(SocketMessage message, WebSocketSession session) {
-        itemSocketIntegration.handleFetchEquipped(message.getInventoryRequest(), session);
+        itemSocketIntegration.handleFetchEquipped(message.getActorId(), session);
     }
 
     private void handleEquipItem(SocketMessage message, WebSocketSession session) {
@@ -253,12 +272,70 @@ public class SocketProcessOutgoingService {
         combatSkillsService.tryApplySkill(message.getCombatRequest(), session);
     }
 
-    private void handleFetchSkills(SocketMessage message, WebSocketSession session) {
+    private void handleFetchAllSkills(SocketMessage message, WebSocketSession session) {
+        combatSkillsService.fetchAllSkills(session);
+    }
+
+    private void handleFetchLearnedSkills(SocketMessage message, WebSocketSession session) {
         String actorId =
                 SessionParamHelper.getIsPlayer(session)
                         ? SessionParamHelper.getActorId(session)
                         : message.getActorId();
-        combatSkillsService.getActorAvailableSkills(actorId, session);
+        combatSkillsService.fetchActorTrainedSkills(actorId, session);
+    }
+
+    private void handleFetchAvailableSkills(SocketMessage message, WebSocketSession session) {
+        String actorId =
+                SessionParamHelper.getIsPlayer(session)
+                        ? SessionParamHelper.getActorId(session)
+                        : message.getActorId();
+        combatSkillsService.fetchAvailableSkillsToLevel(actorId, session);
+    }
+
+    private void handleLearnSkill(SocketMessage message, WebSocketSession session) {
+        combatSkillsService.handleLearnSkill(message.getCustomData(), session);
+    }
+
+    private void handleFetchAllTalents(SocketMessage message, WebSocketSession session) {
+        talentService.fetchAllTalentsForTree(session, message.getCustomData());
+    }
+
+    private void handleFetchTalentTreeNames(SocketMessage message, WebSocketSession session) {
+        talentService.fetchAllTalentTreeNames(session);
+    }
+
+    private void handleFetchLearnedTalents(SocketMessage message, WebSocketSession session) {
+        String actorId =
+                SessionParamHelper.getIsPlayer(session)
+                        ? SessionParamHelper.getActorId(session)
+                        : message.getActorId();
+        talentService.fetchActorLearnedTalents(actorId, session);
+    }
+
+    private void handleAvailableTalents(SocketMessage message, WebSocketSession session) {
+        talentService.fetchAvailableTalents(session);
+    }
+
+    private void handleLearnTalent(SocketMessage message, WebSocketSession session) {
+        // custom data should be populated with "talentName:level", e.g. "Sharpened blades:2"
+        String data = message.getCustomData();
+        String[] parts = data.split(":");
+        String talentName = parts[0];
+        int level;
+        try {
+            level = Integer.parseInt(parts[1]);
+        } catch (Exception e) {
+            log.error("Error processing input data from learn talent!");
+            return;
+        }
+
+        if (talentName == null || talentName.isEmpty() || level == 0) {
+            log.error("Error processing input data from learn talent!");
+            return;
+        }
+
+        // specify level to avoid concurrency/race condition issues
+        talentService.learnTalent(session, talentName, level);
     }
 
     private void handleStopAttack(SocketMessage message, WebSocketSession session) {
@@ -309,9 +386,9 @@ public class SocketProcessOutgoingService {
 
     private void handleCharacterRespawn(SocketMessage socketMessage, WebSocketSession session) {}
 
-    private void setSessionId(SocketMessage message, WebSocketSession session) {
-        // custom data is used to send the port; re-using actorId field to get all auth info
+    private String authenticatePlayer(SocketMessage message, WebSocketSession session) {
         String data = message.getActorId();
+
         if (data == null || data.isEmpty()) {
             log.error("custom data on set session id is empty!");
             session.close();
@@ -341,14 +418,27 @@ public class SocketProcessOutgoingService {
             session.close();
         }
 
+        // TODO: validate the actor ID belongs to the account.
+        return actorId;
+    }
+
+    private void setSessionId(SocketMessage message, WebSocketSession session) {
+        // custom data is used to send the port; re-using actorId field to get all auth info
         String serverName =
                 message.getServerName() == null || message.getServerName().isBlank()
                         ? null
                         : message.getServerName();
-//        String actorId =
-//                message.getActorId() == null || message.getActorId().isBlank()
-//                        ? null
-//                        : message.getActorId();
+
+        String actorId = "";
+        if (message.getActorId() != null && !message.getActorId().isBlank()) {
+            // this is a player login, require to authenticate. (skip auth on server)
+            actorId = authenticatePlayer(message, session);
+        }
+
+        //        String actorId =
+        //                message.getActorId() == null || message.getActorId().isBlank()
+        //                        ? null
+        //                        : message.getActorId();
 
         SessionParamHelper.setServerName(session, serverName);
         SessionParamHelper.setActorId(session, actorId);

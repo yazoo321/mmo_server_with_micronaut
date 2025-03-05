@@ -11,9 +11,13 @@ micronaut:
         mapping: /**
         paths: classpath:public
   executors:
+#    TODO: Review these, this was increased because the kafka listeners did not have enough threads
+    default:
+      type: fixed
+      nThreads: 50
     consumer:
       type: fixed
-      nThreads: 15
+      nThreads: 50
     io:
       type: fixed
       nThreads: 75
@@ -102,16 +106,12 @@ mongo-database:
   actorAllegiance: "actorAllegiance"
   actorThreat: "actorThreat"
   actorTalents: "actorTalents"
-redisson:
-  single-server-config:
-    address: "redis://redis:6379"
-  threads: 3
-  netty-threads: 6
 
 redis:
   uri: redis://redis
-  io-thread-pool-size: 5
-  computation-thread-pool-size: 4
+  io-thread-pool-size: 15
+  computation-thread-pool-size: 6
+  pipelining: true
   #  ssl: true
   timeout: 2s
   #  valueSerializer: io.micronaut.jackson.serialize.JacksonObjectSerializer

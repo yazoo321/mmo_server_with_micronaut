@@ -1,6 +1,7 @@
 package server.skills.model;
 
 import io.micronaut.websocket.WebSocketSession;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import server.attribute.stats.model.Stats;
 import server.attribute.status.model.ActorStatus;
 import server.combat.model.CombatData;
 import server.common.dto.Motion;
+import server.items.equippable.model.EquippedItems;
 
 @Data
 @Builder
@@ -31,6 +33,8 @@ public class SkillDependencies {
 
     SkillTarget skillTarget;
     CombatData combatData;
+
+    Map<String, EquippedItems> equippedItems;
 
     WebSocketSession session;
 }

@@ -1,6 +1,12 @@
 package server.motion.socket.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import io.reactivex.rxjava3.core.Single;
+import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,23 +24,13 @@ import server.motion.dto.PlayerMotion;
 import server.motion.repository.ActorMotionRepository;
 import server.motion.repository.PlayerMotionRepository;
 
-import java.util.UUID;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 public class ActorMotionRepositoryTest {
 
-    @Mock
-    private PlayerMotionRepository playerMotionRepository;
+    @Mock private PlayerMotionRepository playerMotionRepository;
 
-    @Mock
-    private MobRepository mobRepository;
+    @Mock private MobRepository mobRepository;
 
-    @InjectMocks
-    private ActorMotionRepository actorMotionRepository;
+    @InjectMocks private ActorMotionRepository actorMotionRepository;
 
     @BeforeEach
     public void setUp() {
@@ -46,7 +42,8 @@ public class ActorMotionRepositoryTest {
         String playerId = "CHARACTER_1";
         Motion motion = new Motion();
         PlayerMotion playerMotion = new PlayerMotion(playerId, motion, null, null);
-        when(playerMotionRepository.fetchPlayerMotion(playerId)).thenReturn(Single.just(playerMotion));
+        when(playerMotionRepository.fetchPlayerMotion(playerId))
+                .thenReturn(Single.just(playerMotion));
 
         Single<Motion> result = actorMotionRepository.fetchActorMotion(playerId);
 
@@ -72,8 +69,11 @@ public class ActorMotionRepositoryTest {
 
     private static Stream<Arguments> actorIdToMotion() {
         return Stream.of(
-                Arguments.of(UUID.randomUUID().toString(), Motion.builder().map("test1").x(10).y(20).z(30).build()),
-                Arguments.of("CHARACTER_1", Motion.builder().map("test1").x(10).y(20).z(30).build()));
+                Arguments.of(
+                        UUID.randomUUID().toString(),
+                        Motion.builder().map("test1").x(10).y(20).z(30).build()),
+                Arguments.of(
+                        "CHARACTER_1", Motion.builder().map("test1").x(10).y(20).z(30).build()));
     }
 
     @ParameterizedTest
@@ -91,12 +91,13 @@ public class ActorMotionRepositoryTest {
 
         // prepare update requests
         when(playerMotionRepository.updateMotion(anyString(), any(PlayerMotion.class)))
-                .thenReturn(Single.just(expectedPlayerMotion));
+                .thenReturn(Single.just(expectedPlayerMotion.getMotion()));
         when(mobRepository.updateMotionOnly(actorId, motion))
-                .thenReturn(Single.just(expectedMob));
+                .thenReturn(Single.just(expectedMob.getMotion()));
 
         // prepare read requests
-        when(playerMotionRepository.fetchPlayerMotion(actorId)).thenReturn(Single.just(expectedPlayerMotion));
+        when(playerMotionRepository.fetchPlayerMotion(actorId))
+                .thenReturn(Single.just(expectedPlayerMotion));
         when(mobRepository.findMobInstance(actorId)).thenReturn(Single.just(expectedMob));
 
         Motion updatedMotion = actorMotionRepository.updateActorMotion(actorId, motion);
@@ -121,5 +122,4 @@ public class ActorMotionRepositoryTest {
             verifyNoInteractions(playerMotionRepository);
         }
     }
-
 }

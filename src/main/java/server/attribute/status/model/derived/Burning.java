@@ -44,7 +44,7 @@ public class Burning extends Status {
         this.setStatusEffects(new HashSet<>(Set.of(StatusTypes.BURNING.getType())));
         this.setExpiration(expiration);
         this.setMaxStacks(maxStacks);
-        this.setOrigin(sourceActorId);
+        this.setSourceActor(sourceActorId);
         this.setSkillId(skillId);
         this.setCategory(StatusTypes.BURNING.getType());
     }
@@ -70,7 +70,7 @@ public class Burning extends Status {
                 DamageSource damageSource = new DamageSource();
                 damageSource.setDamageMap(damageMap);
                 damageSource.setActorId(dependencies.getActorId());
-                damageSource.setSourceActorId(this.getOrigin());
+                damageSource.setSourceActorId(this.getSourceActor());
                 damageSource.setSourceStatusId(this.getId());
 
                 log.info("requesting producer to take damage! {}", damageMap);

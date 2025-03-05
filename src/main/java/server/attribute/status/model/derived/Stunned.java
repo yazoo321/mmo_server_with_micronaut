@@ -26,7 +26,7 @@ public class Stunned extends Status {
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(expiration);
         this.setMaxStacks(1);
-        this.setOrigin(sourceActorId);
+        this.setSourceActor(sourceActorId);
         this.setSkillId(skillId);
         this.setCategory(StatusTypes.STUNNED.getType());
     }

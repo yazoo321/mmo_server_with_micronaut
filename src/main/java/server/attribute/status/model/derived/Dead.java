@@ -23,7 +23,7 @@ public class Dead extends Status {
         this.setStatusEffects(defaultStatusEffects());
         this.setExpiration(null);
         this.setMaxStacks(1);
-        this.setOrigin(null);
+        this.setSourceActor(null);
         this.setCategory(StatusTypes.DEAD.getType());
     }
 

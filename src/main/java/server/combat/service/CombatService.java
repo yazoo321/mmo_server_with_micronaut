@@ -98,6 +98,8 @@ public class CombatService {
                 combatData.setLastHelperNotification(Instant.now());
                 combatDataCache.cacheCombatData(combatData.getActorId(), combatData);
 
+                // TODO: change this to NOTIFY_ERROR_MESSAGE / NOTIFY_COMBAT_WARN
+                // will require working on the client side
                 if (!inRange) {
                     clientUpdatesService.sendToSelf(
                             session,

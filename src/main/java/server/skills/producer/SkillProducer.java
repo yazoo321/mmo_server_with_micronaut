@@ -4,6 +4,7 @@ import io.micronaut.configuration.kafka.annotation.KafkaClient;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import server.attribute.stats.model.DamageSource;
 import server.attribute.status.model.ActorStatus;
+import server.motion.model.MotionMessage;
 
 @KafkaClient(id = "skill-internal-producer")
 public interface SkillProducer {
@@ -16,4 +17,7 @@ public interface SkillProducer {
 
     @Topic("request-take-damage")
     void requestTakeDamage(DamageSource damageSource);
+
+    @Topic("request-update-motion")
+    void requestUpdateMotion(MotionMessage motionMessage);
 }

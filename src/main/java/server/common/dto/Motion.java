@@ -1,7 +1,5 @@
 package server.common.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import java.time.temporal.ValueRange;
 import lombok.Builder;
@@ -13,10 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Builder
 @Serdeable
-@JsonInclude
-@ReflectiveAccess
 @NoArgsConstructor
 public class Motion {
+
     public static Motion fromLocation(Location location) {
         Motion motion = new Motion();
         motion.map = location.getMap();

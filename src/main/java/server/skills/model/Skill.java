@@ -1,5 +1,6 @@
 package server.skills.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -7,27 +8,38 @@ import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.websocket.WebSocketSession;
 import io.reactivex.rxjava3.core.Single;
+import java.util.Map;
+import java.util.Random;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import server.attribute.stats.model.Stats;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.combat.model.CombatData;
 import server.combat.model.CombatRequest;
 import server.combat.repository.CombatDataCache;
 import server.combat.service.CombatService;
+import server.items.equippable.service.EquipItemService;
 import server.motion.repository.ActorMotionRepository;
 import server.session.SessionParamHelper;
 import server.skills.available.cleric.heals.BasicHeal;
+import server.skills.available.cleric.heals.HealingRain;
+import server.skills.available.fighter.HeavyStrike;
+import server.skills.available.fighter.Maim;
+import server.skills.available.fighter.Rupture;
+import server.skills.available.mage.arcane.Blink;
 import server.skills.available.mage.fire.Fireball;
+import server.skills.available.mage.nature.EclipseBurst;
+import server.skills.available.mage.nature.MoonsVengeance;
+import server.skills.available.mage.nature.SunSmite;
+import server.skills.available.mage.nature.VineGrab;
 import server.skills.producer.SkillProducer;
 import server.socket.model.SocketResponse;
 import server.socket.model.types.SkillMessageType;
 import server.socket.service.WebsocketClientUpdatesService;
-
-import java.util.Map;
-import java.util.Random;
 
 @Slf4j
 @Serdeable
@@ -38,8 +50,26 @@ import java.util.Random;
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "name")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Fireball.class, name = "Fireball"),
+    // cleric spells
     @JsonSubTypes.Type(value = BasicHeal.class, name = "Basic heal"),
+    @JsonSubTypes.Type(value = HealingRain.class, name = "Healing rain"),
+
+    // fighter spells
+    @JsonSubTypes.Type(value = HeavyStrike.class, name = "Heavy strike"),
+    @JsonSubTypes.Type(value = Maim.class, name = "Maim"),
+    @JsonSubTypes.Type(value = Rupture.class, name = "Rupture"),
+
+    // mage: arcane
+    @JsonSubTypes.Type(value = Blink.class, name = "Blink"),
+
+    // mage: fire
+    @JsonSubTypes.Type(value = Fireball.class, name = "Fireball"),
+
+    // mage: nature
+    @JsonSubTypes.Type(value = EclipseBurst.class, name = "Eclipse burst"),
+    @JsonSubTypes.Type(value = MoonsVengeance.class, name = "Moons vengeance"),
+    @JsonSubTypes.Type(value = SunSmite.class, name = "Sun smite"),
+    @JsonSubTypes.Type(value = VineGrab.class, name = "Vine grab"),
 })
 public abstract class Skill {
 
@@ -60,17 +90,17 @@ public abstract class Skill {
     protected WebSocketSession session;
 
     // populated via factory methods
-    @Setter protected WebsocketClientUpdatesService clientUpdatesService;
-    @Setter protected SessionParamHelper sessionParamHelper;
-    @Setter protected ActorMotionRepository actorMotionRepository;
-    @Setter protected StatsService statsService;
-    @Setter protected StatusService statusService;
-    @Setter protected CombatService combatService;
-    @Setter protected CombatDataCache combatDataCache;
+    @BsonIgnore @JsonIgnore @Setter protected WebsocketClientUpdatesService clientUpdatesService;
+    @BsonIgnore @JsonIgnore @Setter protected SessionParamHelper sessionParamHelper;
+    @BsonIgnore @JsonIgnore @Setter protected ActorMotionRepository actorMotionRepository;
+    @BsonIgnore @JsonIgnore @Setter protected StatsService statsService;
+    @BsonIgnore @JsonIgnore @Setter protected StatusService statusService;
+    @BsonIgnore @JsonIgnore @Setter protected CombatService combatService;
+    @BsonIgnore @JsonIgnore @Setter protected CombatDataCache combatDataCache;
+    @BsonIgnore @JsonIgnore @Setter protected EquipItemService equipItemService;
+    @BsonIgnore @JsonIgnore @Setter protected SkillProducer skillProducer;
 
-    @Setter protected SkillProducer skillProducer;
-
-    protected SkillDependencies skillDependencies;
+    @BsonIgnore @JsonIgnore protected SkillDependencies skillDependencies;
 
     public SkillDependencies getSkillDependencies() {
         if (skillDependencies == null) {
@@ -97,7 +127,7 @@ public abstract class Skill {
         this.travelSpeed = travelSpeed;
     }
 
-    protected Random rand = new Random();
+    @BsonIgnore @JsonIgnore protected Random rand = new Random();
 
     public abstract void startSkill();
 
@@ -117,6 +147,7 @@ public abstract class Skill {
                         canApply -> {
                             if (!canApply) {
                                 log.info("Cannot apply skill at this time");
+                                return;
                             }
 
                             prepareApply()
@@ -128,6 +159,11 @@ public abstract class Skill {
                                             })
                                     .subscribe();
                         })
+                .doOnError(
+                        err ->
+                                log.error(
+                                        "Failed to check if we can apply skill, {}",
+                                        err.getMessage()))
                 .subscribe();
     }
 
@@ -161,5 +197,12 @@ public abstract class Skill {
         message.setCombatRequest(request);
 
         clientUpdatesService.sendUpdateToListeningIncludingSelf(message, castor);
+    }
+
+    public boolean isAvailableForCharacter(Stats stats) {
+        Map<String, Integer> base = stats.getBaseStats();
+
+        return requirements.entrySet().stream()
+                .allMatch(entry -> base.getOrDefault(entry.getKey(), 0) >= entry.getValue());
     }
 }

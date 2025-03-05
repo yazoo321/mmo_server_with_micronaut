@@ -1,18 +1,20 @@
 package server.skills.repository;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
 
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import io.reactivex.rxjava3.core.Single;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import server.common.configuration.MongoConfiguration;
+import server.skills.available.AvailableSkills;
 import server.skills.model.ActorSkills;
-import server.skills.model.Skill;
+import server.skills.model.ActorSkillsRef;
 
 @Slf4j
 @Singleton
@@ -20,7 +22,10 @@ public class ActorSkillsRepository {
 
     MongoConfiguration configuration;
     MongoClient mongoClient;
-    MongoCollection<ActorSkills> actorSkillsCollection;
+    MongoCollection<ActorSkillsRef> actorSkillsCollection;
+
+    // TODO: Rework this logic..
+    @Inject AvailableSkills availableSkills;
 
     public ActorSkillsRepository(MongoConfiguration configuration, MongoClient mongoClient) {
         this.configuration = configuration;
@@ -29,13 +34,40 @@ public class ActorSkillsRepository {
 
     public Single<ActorSkills> getActorSkills(String actorId) {
         return Single.fromPublisher(actorSkillsCollection.find(eq("actorId", actorId)))
+                .map(
+                        actorSkillsRef -> {
+                            ActorSkills actorSkills = new ActorSkills();
+                            actorSkills.setActorId(actorSkillsRef.getActorId());
+                            actorSkills.setSkills(
+                                    actorSkillsRef.getSkills().stream()
+                                            .map(
+                                                    skillName ->
+                                                            availableSkills.getSkillByName(
+                                                                    skillName))
+                                            .collect(Collectors.toList()));
+
+                            return actorSkills;
+                        })
                 .doOnError((exception) -> log.error("actor skills not found for {}", actorId));
     }
 
-    public Single<ActorSkills> setActorSkills(String actorId, List<Skill> skills) {
+    public Single<ActorSkills> createActorSkills(ActorSkills actorSkills) {
+        ActorSkillsRef skillRef = new ActorSkillsRef(actorSkills);
+
+        return Single.fromPublisher(actorSkillsCollection.insertOne(skillRef))
+                .map(i -> actorSkills);
+    }
+
+    public Single<ActorSkills> setActorSkills(ActorSkills actorSkills) {
+        ActorSkillsRef skillRef = new ActorSkillsRef(actorSkills);
         return Single.fromPublisher(
-                actorSkillsCollection.findOneAndUpdate(
-                        eq("actorId", actorId), set("skills", skills)));
+                        actorSkillsCollection.replaceOne(
+                                eq("actorId", actorSkills.getActorId()), skillRef))
+                .map(r -> actorSkills);
+    }
+
+    public Single<DeleteResult> deleteActorSkills(String actorId) {
+        return Single.fromPublisher(actorSkillsCollection.deleteOne(eq("actorId", actorId)));
     }
 
     @PostConstruct
@@ -43,6 +75,6 @@ public class ActorSkillsRepository {
         this.actorSkillsCollection =
                 mongoClient
                         .getDatabase(configuration.getDatabaseName())
-                        .getCollection(configuration.getActorSkills(), ActorSkills.class);
+                        .getCollection(configuration.getActorSkills(), ActorSkillsRef.class);
     }
 }

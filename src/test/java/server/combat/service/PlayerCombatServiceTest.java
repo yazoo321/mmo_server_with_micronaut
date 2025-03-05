@@ -140,7 +140,7 @@ class PlayerCombatServiceTest {
         Set<String> targets = combatData.getTargets();
         Assertions.assertThat(targets.size()).isEqualTo(1);
 
-        await().pollDelay(300, TimeUnit.MILLISECONDS)
+        await().pollDelay(500, TimeUnit.MILLISECONDS)
                 .timeout(Duration.of(15, ChronoUnit.SECONDS))
                 .until(
                         () -> {

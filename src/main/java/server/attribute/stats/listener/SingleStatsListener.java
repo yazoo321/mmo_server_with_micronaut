@@ -10,62 +10,20 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeEffects;
 import server.attribute.stats.model.DamageSource;
-import server.attribute.stats.model.DamageUpdateMessage;
-import server.attribute.stats.model.Stats;
-import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
-import server.socket.model.SocketResponse;
-import server.socket.model.SocketResponseType;
-import server.socket.service.WebsocketClientUpdatesService;
+import server.attribute.talents.model.ActorTalentAttributeEffects;
 
 @Slf4j
 @KafkaListener(
-        groupId = "stats-listener",
+        groupId = "single-stats-listener",
         offsetReset = OffsetReset.LATEST,
         offsetStrategy = OffsetStrategy.SYNC,
-        clientId = "stats-listener")
-public class StatsListener {
-
-    @Inject WebsocketClientUpdatesService clientUpdatesService;
+        clientId = "single-stats-listener")
+public class SingleStatsListener {
 
     @Inject StatsService statsService;
-
-    @Inject PlayerLevelStatsService playerLevelStatsService;
-
-    @Topic("update-actor-stats")
-    public void receiveUpdatePlayerAttributes(Stats stats) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.STATS_UPDATE.getType())
-                        .stats(stats)
-                        .build();
-
-        clientUpdatesService.sendUpdateToListeningIncludingSelf(socketResponse, stats.getActorId());
-    }
-
-    @Topic("processed-damage-updates")
-    public void receiveDamageUpdates(DamageUpdateMessage damageUpdateMessage) {
-        log.info("Received processed-damage-updates message: {}", damageUpdateMessage);
-        // relay this to the clients
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.DAMAGE_UPDATE.getType())
-                        .damageSource(damageUpdateMessage.getDamageSource())
-                        .build();
-
-        clientUpdatesService.sendUpdateToListeningIncludingSelf(
-                socketResponse, damageUpdateMessage.getOriginStats().getActorId());
-    }
-
-    @Topic("notify-actor-death")
-    void receive_actor_death_notify(DamageUpdateMessage damageUpdateMessage) {
-        if (damageUpdateMessage.getOriginStats().isPlayer()) {
-            playerLevelStatsService.handleAddXp(
-                    damageUpdateMessage.getTargetStats(), damageUpdateMessage.getOriginStats());
-        }
-    }
 
     @Topic("request-take-damage")
     public void requestTakeDamage(DamageSource damageSource) {
@@ -83,9 +41,10 @@ public class StatsListener {
         statsService.flatHP_MP_Mod(damageSource);
     }
 
-    @Topic("update-actor-status")
+    @Topic("update-actor-status-internal")
     public void receive_actor_statuses(ActorStatus actorStatus) {
         log.info("stats service received status update {}", actorStatus);
+        log.info("stats service received status update {}", actorStatus.getActorStatuses());
 
         Map<String, AttributeEffects> statusesAffectingStats = new HashMap<>();
 
@@ -107,7 +66,14 @@ public class StatsListener {
                             actorStats.setStatusEffects(statusesAffectingStats);
                             statsService.evaluateDerivedStats(actorStats);
                         })
+                .doOnError(err -> log.error("Failed to update actor status: {}", err.getMessage()))
                 .subscribe();
+    }
+
+    @Topic("request-talent-learn")
+    void requestTalentLearn(ActorTalentAttributeEffects talentAttributeEffects) {
+        log.info("request to learn talent received! {}", talentAttributeEffects);
+        statsService.updateTalentStats(talentAttributeEffects);
     }
 
     private void merge(Map<String, AttributeEffects> left, Map<String, AttributeEffects> right) {

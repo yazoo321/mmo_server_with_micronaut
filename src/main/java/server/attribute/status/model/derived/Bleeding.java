@@ -45,7 +45,7 @@ public class Bleeding extends Status {
         this.setStatusEffects(new HashSet<>());
         this.setExpiration(expiration);
         this.setMaxStacks(maxStacks);
-        this.setOrigin(sourceActorId);
+        this.setSourceActor(sourceActorId);
         this.setSkillId(skillId);
         this.setCategory(StatusTypes.BLEEDING.getType());
     }

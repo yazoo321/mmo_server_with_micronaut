@@ -15,8 +15,14 @@ public class AttributeEffects {
     private Double additiveModifier;
     private Double multiplyModifier;
 
+    public AttributeEffects(AttributeEffects attributeEffects, int multiplier) {
+        this.affectedAttribute = attributeEffects.affectedAttribute;
+        this.additiveModifier = attributeEffects.getAdditiveModifier() * multiplier;
+        this.multiplyModifier = attributeEffects.getMultiplyModifier() * multiplier;
+    }
+
     public Double getMultiplyModifier() {
-        return Objects.requireNonNullElse(multiplyModifier, 1.0);
+        return Objects.requireNonNullElse(multiplyModifier, 0.0);
     }
 
     public Double getAdditiveModifier() {

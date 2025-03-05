@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import server.attribute.stats.model.types.ClassTypes;
 import server.attribute.stats.types.DamageTypes;
-import server.attribute.stats.types.StatsTypes;
 import server.attribute.status.model.Status;
 import server.attribute.status.model.derived.Burning;
 import server.combat.model.CombatData;
@@ -21,35 +21,36 @@ import server.skills.model.SkillTarget;
 @EqualsAndHashCode(callSuper = false)
 public class Fireball extends ChannelledSkill {
 
+    // TODO: Consider scaling off levels, e.g. mage level
+    // for example, each 3 levels of mage, increases damage by 30%, up to level 9, (90%)
     public Fireball() {
         super(
                 "Fireball",
-                "Hurl a fireball at a selected target",
-                Map.of(StatsTypes.MAGIC_DAMAGE.getType(), 80.0),
+                "Hurl a fireball at a selected target, dealing damage and burning them for 1.5"
+                        + " seconds",
+                Map.of(DamageTypes.FIRE.getType(), 80.0),
                 0,
                 1500,
                 false,
                 true,
                 1000,
                 500,
-                Map.of(),
-                0,
-                0);
+                Map.of(ClassTypes.MAGE.getType(), 1),
+                1500,
+                7);
     }
 
     @Override
     public void endSkill(CombatData combatData, SkillTarget skillTarget) {
-        Double dmgAmt = derived.get(StatsTypes.MAGIC_DAMAGE.getType());
-        Map<String, Double> damageMap = Map.of(DamageTypes.FIRE.getType(), dmgAmt);
 
-        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), damageMap);
-        addBurningEffect(dmgAmt, combatData, skillTarget);
+        requestTakeDamage(combatData.getActorId(), skillTarget.getTargetId(), derived);
+        addBurningEffect(combatData, skillTarget);
     }
 
-    private void addBurningEffect(Double dmgAmt, CombatData combatData, SkillTarget skillTarget) {
+    private void addBurningEffect(CombatData combatData, SkillTarget skillTarget) {
         // add burning effect
-        Instant duration = Instant.now().plusMillis(1500);
-        Double tickDamage = dmgAmt / 7;
+        Instant duration = Instant.now().plusMillis(durationMs);
+        Double tickDamage = derived.get(DamageTypes.FIRE.getType()) / ticks;
         Status burn = new Burning(duration, combatData.getActorId(), tickDamage, 1, this.getName());
 
         requestAddStatusEffect(skillTarget.getTargetId(), Set.of(burn));

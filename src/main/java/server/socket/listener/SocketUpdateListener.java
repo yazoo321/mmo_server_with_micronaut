@@ -6,20 +6,14 @@ import io.micronaut.configuration.kafka.annotation.OffsetStrategy;
 import io.micronaut.configuration.kafka.annotation.Topic;
 import jakarta.inject.Inject;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.items.equippable.model.EquippedItems;
 import server.items.inventory.model.ItemInstanceIds;
 import server.items.inventory.model.response.GenericInventoryData;
 import server.items.model.DroppedItem;
-import server.monster.server_integration.model.Monster;
-import server.motion.dto.PlayerMotion;
 import server.socket.model.SocketResponse;
 import server.socket.model.SocketResponseType;
-import server.socket.service.UdpClientUpdateService;
 import server.socket.service.WebsocketClientUpdatesService;
-import server.utils.FeatureFlag;
 
 @Slf4j
 @KafkaListener(
@@ -30,48 +24,6 @@ import server.utils.FeatureFlag;
 public class SocketUpdateListener {
 
     @Inject WebsocketClientUpdatesService websocketClientUpdatesService;
-    @Inject UdpClientUpdateService udpClientUpdateService;
-
-    @Inject FeatureFlag featureFlag;
-
-    @Topic("player-motion-update-result")
-    void receivePlayerMotionUpdate(PlayerMotion playerMotion) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.PLAYER_MOTION_UPDATE.getType())
-                        .playerMotion(Map.of(playerMotion.getActorId(), playerMotion))
-                        .playerKeys(Set.of(playerMotion.getActorId()))
-                        .build();
-
-        //        log.info("Received player motion update result");
-        //        log.info("{}", playerMotion);
-
-        if (featureFlag.getEnableUdp()) {
-            udpClientUpdateService.sendUpdateToListening(socketResponse, playerMotion.getActorId());
-        } else {
-            websocketClientUpdatesService.sendUpdateToListening(
-                    socketResponse, playerMotion.getActorId());
-        }
-    }
-
-    @Topic("mob-motion-update-result")
-    void receiveMobMotionUpdate(Monster monster) {
-        SocketResponse socketResponse =
-                SocketResponse.builder()
-                        .messageType(SocketResponseType.MOB_MOTION_UPDATE.getType())
-                        .monsters(Map.of(monster.getActorId(), monster))
-                        .mobKeys(Set.of(monster.getActorId()))
-                        .build();
-
-        //        log.info("{}", monster);
-
-        if (featureFlag.getEnableUdp()) {
-            udpClientUpdateService.sendUpdateToListening(socketResponse, monster.getActorId());
-        } else {
-            websocketClientUpdatesService.sendUpdateToListening(
-                    socketResponse, monster.getActorId());
-        }
-    }
 
     @Topic("item-added-to-map")
     void itemAddedToMap(DroppedItem droppedItem) {
