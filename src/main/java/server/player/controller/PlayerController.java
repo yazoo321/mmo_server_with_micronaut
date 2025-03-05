@@ -4,12 +4,14 @@ import io.micronaut.http.annotation.*;
 import jakarta.inject.Inject;
 import java.util.List;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import server.player.model.AccountCharactersResponse;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
 import server.player.service.PlayerCharacterService;
 
 // @Secured(SecurityRule.IS_AUTHENTICATED)
+@Slf4j
 @Controller("/player")
 public class PlayerController {
 
@@ -26,7 +28,7 @@ public class PlayerController {
     public Character createCharacter(
             @Body @Valid CreateCharacterRequest createCharacterRequest,
             @Header String accountName) {
-
+        log.info("create character call: {}", createCharacterRequest);
         return playerCharacterService.createCharacter(createCharacterRequest, accountName);
     }
 

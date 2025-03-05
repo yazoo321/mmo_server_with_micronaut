@@ -10,10 +10,12 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.talents.model.ActorTalents;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentTree;
+import server.attribute.talents.model.TalentType;
 
 @Slf4j
 @Singleton
@@ -32,6 +34,7 @@ public class TalentRepository {
         return talentRepository.getActorTalents(actorId);
     }
 
+    @CacheInvalidate(value = TALENT_LOCAL_CACHE, parameters = "actorId", all = true)
     @CachePut(value = TALENT_LOCAL_CACHE, parameters = "actorId", async = true)
     public Single<ActorTalents> insertActorTalents(String actorId, ActorTalents actorTalents) {
         return talentRepository.insertActorTalents(actorId, actorTalents);
@@ -39,6 +42,10 @@ public class TalentRepository {
 
     public Map<String, Talent> getAllTalents() {
         return talentRepository.getAllTalents();
+    }
+
+    public Set<String> getTalentTreeNames() {
+        return talentRepository.getTalentTrees().keySet();
     }
 
     public Talent getTalentByName(String name) {
@@ -71,6 +78,28 @@ public class TalentRepository {
                                                 Talent talent =
                                                         talentRepository.getAllTalents().get(k);
                                                 if (talent.getApplyType().equals(applyType)) {
+                                                    map.put(talent, v);
+                                                }
+                                            });
+                            return map;
+                        });
+    }
+
+
+    public Single<Map<Talent, Integer>> getActorTalentsOfType(
+            String actorId, TalentType talentType) {
+        // this will be called quite often as part of combat service, hence looking to optimise
+        return getActorTalents(actorId)
+                .map(
+                        actorTalents -> {
+                            Map<Talent, Integer> map = new HashMap<>();
+                            actorTalents
+                                    .getLearnedTalents()
+                                    .forEach(
+                                            (k, v) -> {
+                                                Talent talent =
+                                                        talentRepository.getAllTalents().get(k);
+                                                if (talent.getTalentType().equals(talentType.getType())) {
                                                     map.put(talent, v);
                                                 }
                                             });

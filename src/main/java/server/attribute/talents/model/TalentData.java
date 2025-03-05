@@ -1,5 +1,6 @@
 package server.attribute.talents.model;
 
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,4 +18,5 @@ public class TalentData {
     Map<String, Talent> talents;
     TalentTree talentTree;
     ActorTalents actorTalents;
+    List<String> items;
 }

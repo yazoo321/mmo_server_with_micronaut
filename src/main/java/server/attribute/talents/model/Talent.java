@@ -88,7 +88,7 @@ public abstract class Talent {
 
         int ableToLevel = Math.min(talentLevel, minDependencyLevel);
 
-        if (ableToLevel >= this.getLevels()) {
+        if (ableToLevel > this.getLevels()) {
             // should not be larger
             return 0;
         }

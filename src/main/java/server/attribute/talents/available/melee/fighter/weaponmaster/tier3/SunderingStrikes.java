@@ -37,7 +37,7 @@ public class SunderingStrikes extends Talent {
         this.applyType = AttributeApplyType.ON_CRIT_APPLY.getType();
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
-        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
+        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 6));
         attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;

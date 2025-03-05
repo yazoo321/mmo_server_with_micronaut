@@ -1,6 +1,7 @@
 package server.attribute.status.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
@@ -16,6 +17,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import server.attribute.common.model.AttributeEffects;
 import server.attribute.status.model.derived.*;
 import server.attribute.status.producer.StatusProducer;
@@ -32,7 +34,9 @@ import server.skills.model.SkillDependencies;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "category")
+        property = "category"
+//        defaultImpl = AttributeMod.class
+)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Bleeding.class, name = "BLEEDING"),
     @JsonSubTypes.Type(value = Burning.class, name = "BURNING"),
@@ -40,6 +44,7 @@ import server.skills.model.SkillDependencies;
     @JsonSubTypes.Type(value = Silenced.class, name = "SILENCED"),
     @JsonSubTypes.Type(value = Stunned.class, name = "STUNNED"),
     @JsonSubTypes.Type(value = Unconscious.class, name = "UNCONCIOUS"),
+    @JsonSubTypes.Type(value = AttributeMod.class, name = "ATTRIBUTE_MOD"),
 })
 public class Status {
 
@@ -53,7 +58,18 @@ public class Status {
     // TODO: Introduce source skill ID
     String sourceActor;
     String skillId;
+
+    @JsonProperty("category")
+    @BsonProperty("category")
     String category;
+
+    public String getCategory() {
+        if (category == null) {
+            log.warn("Category is null for status: {}", this);
+            this.category = "";
+        }
+        return category;
+    }
 
     @JsonIgnore protected StatusProducer statusProducer;
 

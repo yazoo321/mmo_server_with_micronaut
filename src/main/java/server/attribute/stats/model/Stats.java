@@ -104,17 +104,8 @@ public class Stats {
         updatedDerived.put(StatsTypes.MAX_HP.getType(), 100.0 + stamina * 10);
         updatedDerived.put(StatsTypes.MAX_MP.getType(), 50.0 + intelligence * 5);
 
-        updatedDerived.put(
-                StatsTypes.CURRENT_HP.getType(),
-                getDerived(StatsTypes.CURRENT_HP) > updatedDerived.get(StatsTypes.MAX_HP.getType())
-                        ? updatedDerived.get(StatsTypes.MAX_HP.getType())
-                        : getDerived(StatsTypes.CURRENT_HP));
-
-        updatedDerived.put(
-                StatsTypes.CURRENT_MP.getType(),
-                getDerived(StatsTypes.CURRENT_MP) > updatedDerived.get(StatsTypes.MAX_MP.getType())
-                        ? updatedDerived.get(StatsTypes.MAX_MP.getType())
-                        : getDerived(StatsTypes.CURRENT_MP));
+        double prevMaxHp = getDerived(StatsTypes.MAX_HP);
+        double prevMaxMp = getDerived(StatsTypes.MAX_MP);
 
         updatedDerived.put(StatsTypes.ATTACK_SPEED.getType(), 50.0 + (dexterity / 2));
         updatedDerived.put(StatsTypes.CAST_SPEED.getType(), 50.0 + intelligence);
@@ -143,6 +134,19 @@ public class Stats {
 
         updatedDerived = applyMultipliers(updatedDerived, talentEffects);
         updatedDerived = applyMultipliers(updatedDerived, statusEffects);
+
+        // ensure that current hp and mp are not larger than max hp and mp
+        updatedDerived.put(
+                StatsTypes.CURRENT_HP.getType(),
+                getDerived(StatsTypes.CURRENT_HP) > updatedDerived.get(StatsTypes.MAX_HP.getType())
+                        ? updatedDerived.get(StatsTypes.MAX_HP.getType())
+                        : getDerived(StatsTypes.CURRENT_HP));
+
+        updatedDerived.put(
+                StatsTypes.CURRENT_MP.getType(),
+                getDerived(StatsTypes.CURRENT_MP) > updatedDerived.get(StatsTypes.MAX_MP.getType())
+                        ? updatedDerived.get(StatsTypes.MAX_MP.getType())
+                        : getDerived(StatsTypes.CURRENT_MP));
 
         // evaluate if new entries are different to old ones
         MapDifference<String, Double> diff = Maps.difference(derivedStats, updatedDerived);
@@ -177,7 +181,7 @@ public class Stats {
     public static Map<String, Double> applyMultipliers(
             Map<String, Double> left, Map<String, AttributeEffects> right) {
         Map<String, Double> copy = new HashMap<>(left);
-        right.forEach((k, v) -> copy.merge(k, v.getAdditiveModifier(), (a, b) -> a * b));
+        right.forEach((k, v) -> copy.merge(k, v.getMultiplyModifier(), (a, b) -> a * (1+b)));
 
         return copy;
     }

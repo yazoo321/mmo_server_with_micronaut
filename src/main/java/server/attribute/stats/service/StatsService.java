@@ -18,6 +18,7 @@ import server.attribute.stats.repository.ActorStatsRepository;
 import server.attribute.stats.types.DamageAdditionalData;
 import server.attribute.stats.types.DamageTypes;
 import server.attribute.stats.types.StatsTypes;
+import server.attribute.talents.model.ActorTalentAttributeEffects;
 import server.attribute.talents.service.TalentService;
 import server.combat.model.CombatData;
 import server.combat.repository.CombatDataCache;
@@ -59,7 +60,7 @@ public class StatsService {
         mobStats.setBaseStats(
                 new HashMap<>(
                         Map.of(
-                                StatsTypes.STR.getType(), 100,
+                                StatsTypes.STR.getType(), 50,
                                 StatsTypes.STA.getType(), 100,
                                 StatsTypes.DEX.getType(), 100,
                                 StatsTypes.INT.getType(), 100)));
@@ -143,6 +144,19 @@ public class StatsService {
                 .blockingSubscribe();
     }
 
+    public void updateTalentStats(ActorTalentAttributeEffects talentAttributeEffects) {
+        getStatsFor(talentAttributeEffects.getActorId())
+                .doOnSuccess(
+                        stats -> {
+                            // talent services handles the correct attribute effects, overwriting previous state
+                            stats.setTalentEffects(talentAttributeEffects.getAttributeEffects());
+                            Map<String, Double> updated = stats.recalculateDerivedStats();
+                            handleDifference(updated, stats);
+                        })
+                .doOnError(err -> log.error("Failed to update talent stats, {}", err.getMessage()))
+                .subscribe();
+    }
+
     public void resetHPAndMP(String actorId, Double hpPercent, Double mpPercent) {
         getStatsFor(actorId)
                 .doOnSuccess(
@@ -160,7 +174,7 @@ public class StatsService {
 
                             handleDifference(updated, stats);
                         })
-                .doOnError(err -> log.error(err.getMessage()))
+                .doOnError(err -> log.error("Failed to reset hp and mp, {}", err.getMessage()))
                 .subscribe();
     }
 
@@ -191,6 +205,7 @@ public class StatsService {
                                     addMana(actorStats, mpVal);
                                 }
                             })
+                    .doOnError(err -> log.error("Failed to apply flat hp/mp mod, {}", err.getMessage()))
                     .subscribe();
         }
     }
@@ -205,6 +220,7 @@ public class StatsService {
                         (targetStats, sourceStats) -> {
                             return takeDamage(targetStats, damageMap, sourceStats);
                         })
+                .doOnError(err -> log.error("Failed to apply take damage, {}", err.getMessage()))
                 .subscribe();
     }
 
@@ -577,6 +593,10 @@ public class StatsService {
     }
 
     void handleThreat(Map<String, Double> damageMap, String actorTakingDamage, String sourceActor) {
+        if (actorTakingDamage.equals(sourceActor)) {
+            return;
+        }
+
         if (!UUIDHelper.isPlayer(sourceActor) && !UUIDHelper.isPlayer(actorTakingDamage)) {
             return;
         }

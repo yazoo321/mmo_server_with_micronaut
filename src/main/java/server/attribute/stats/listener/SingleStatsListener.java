@@ -13,6 +13,7 @@ import server.attribute.stats.model.DamageSource;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.model.ActorStatus;
 import server.attribute.status.model.Status;
+import server.attribute.talents.model.ActorTalentAttributeEffects;
 
 @Slf4j
 @KafkaListener(
@@ -40,9 +41,10 @@ public class SingleStatsListener {
         statsService.flatHP_MP_Mod(damageSource);
     }
 
-    @Topic("update-actor-status")
+    @Topic("update-actor-status-internal")
     public void receive_actor_statuses(ActorStatus actorStatus) {
         log.info("stats service received status update {}", actorStatus);
+        log.info("stats service received status update {}", actorStatus.getActorStatuses());
 
         Map<String, AttributeEffects> statusesAffectingStats = new HashMap<>();
 
@@ -64,7 +66,14 @@ public class SingleStatsListener {
                             actorStats.setStatusEffects(statusesAffectingStats);
                             statsService.evaluateDerivedStats(actorStats);
                         })
+                .doOnError(err -> log.error("Failed to update actor status: {}", err.getMessage()))
                 .subscribe();
+    }
+
+    @Topic("request-talent-learn")
+    void requestTalentLearn(ActorTalentAttributeEffects talentAttributeEffects) {
+        log.info("request to learn talent received! {}", talentAttributeEffects);
+        statsService.updateTalentStats(talentAttributeEffects);
     }
 
     private void merge(Map<String, AttributeEffects> left, Map<String, AttributeEffects> right) {

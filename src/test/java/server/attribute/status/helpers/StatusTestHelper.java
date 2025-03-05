@@ -23,7 +23,7 @@ public class StatusTestHelper {
             defaultActorStatus.setActorStatuses(new HashSet<>());
             defaultActorStatus.setStatusEffects(new HashSet<>());
 
-            statusRepository.updateStatus(actor, defaultActorStatus).blockingSubscribe();
+            statusRepository.createActorStatus(actor, defaultActorStatus).blockingSubscribe();
         });
     }
 

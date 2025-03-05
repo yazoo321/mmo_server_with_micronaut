@@ -51,6 +51,10 @@ public interface UpdateProducer {
     @Topic("update-actor-status")
     void updateStatus(ActorStatus actorStatus);
 
+    // this is used to update the stats
+    @Topic("update-actor-status-internal")
+    void updateStatusInternal(ActorStatus actorStatus);
+
     @Topic("update-threat-levels")
     void updateThreatLevels(ThreatUpdate threatUpdate);
 

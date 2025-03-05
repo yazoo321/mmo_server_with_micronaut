@@ -114,6 +114,8 @@ public class SocketProcessOutgoingService {
                 this::handleFetchAvailableSkills);
         this.functionMap.put(SkillMessageType.LEARN_SKILL.getType(), this::handleLearnSkill);
         // talent management
+        this.functionMap.put(
+                MessageType.FETCH_TALENT_TREE_NAMES.getType(), this::handleFetchTalentTreeNames);
         this.functionMap.put(MessageType.FETCH_ALL_TALENTS.getType(), this::handleFetchAllTalents);
         this.functionMap.put(
                 MessageType.FETCH_LEARNED_TALENTS.getType(), this::handleFetchLearnedTalents);
@@ -296,6 +298,10 @@ public class SocketProcessOutgoingService {
 
     private void handleFetchAllTalents(SocketMessage message, WebSocketSession session) {
         talentService.fetchAllTalentsForTree(session, message.getCustomData());
+    }
+
+    private void handleFetchTalentTreeNames(SocketMessage message, WebSocketSession session) {
+        talentService.fetchAllTalentTreeNames(session);
     }
 
     private void handleFetchLearnedTalents(SocketMessage message, WebSocketSession session) {

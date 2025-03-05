@@ -109,8 +109,9 @@ mongo-database:
 
 redis:
   uri: redis://redis
-  io-thread-pool-size: 5
-  computation-thread-pool-size: 4
+  io-thread-pool-size: 15
+  computation-thread-pool-size: 6
+  pipelining: true
   #  ssl: true
   timeout: 2s
   #  valueSerializer: io.micronaut.jackson.serialize.JacksonObjectSerializer

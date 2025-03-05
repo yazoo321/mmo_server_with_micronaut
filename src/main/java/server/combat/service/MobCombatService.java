@@ -213,7 +213,9 @@ public class MobCombatService extends CombatService {
     }
 
     private Double getAttackTimeDelay(Double baseAttackSpeed, Double characterAttackSpeed) {
-        // 100 attack speed increases speed by 2x
+        // Base attack speed is speed of weapon, e.g. 2.3 seconds
         return baseAttackSpeed / (1 + (characterAttackSpeed / 100));
+        // 100 attack speed increases speed by 2x
+//        return baseAttackSpeed / (1 + (characterAttackSpeed / 100));
     }
 }

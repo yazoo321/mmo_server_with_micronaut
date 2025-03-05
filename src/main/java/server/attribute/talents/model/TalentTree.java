@@ -1,7 +1,6 @@
 package server.attribute.talents.model;
 
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,5 +14,5 @@ public class TalentTree {
 
     protected String name;
     protected String description;
-    protected Map<Integer, List<Talent>> tieredTalents;
+    protected Map<Integer, TalentList> tieredTalents;
 }

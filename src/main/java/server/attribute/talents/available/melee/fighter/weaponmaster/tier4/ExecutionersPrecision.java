@@ -42,7 +42,7 @@ public class ExecutionersPrecision extends Talent {
         this.applyType = AttributeApplyType.ON_HIT_APPLY.getType();
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
-        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
+        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 8));
         attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;
@@ -70,7 +70,7 @@ public class ExecutionersPrecision extends Talent {
 
         Status phyAmpStatus =
                 new AttributeMod(
-                        expire, sourceActor, StatsTypes.PHY_AMP, phyAmpInc, 1.0, 1, this.name);
+                        expire, sourceActor, StatsTypes.PHY_AMP, phyAmpInc, 0.0, 1, this.name);
 
         ActorStatus actorStatus = new ActorStatus();
         actorStatus.setActorId(actorStats.getActorId());

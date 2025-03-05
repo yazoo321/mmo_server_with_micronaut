@@ -35,7 +35,7 @@ public class IronGrip extends Talent {
         this.attributeEffects = List.of(attributeEffect);
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
-        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 1));
+        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 6));
         attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;
