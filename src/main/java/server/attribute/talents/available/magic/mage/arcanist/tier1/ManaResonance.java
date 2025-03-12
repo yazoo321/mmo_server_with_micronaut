@@ -1,9 +1,7 @@
-package server.attribute.talents.available.melee.fighter.weaponmaster.tier2;
+package server.attribute.talents.available.magic.mage.arcanist.tier1;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.micronaut.serde.annotation.Serdeable;
-import java.util.List;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import server.attribute.common.model.AttributeApplyType;
@@ -14,28 +12,31 @@ import server.attribute.stats.types.StatsTypes;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentType;
 
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @Serdeable
-@JsonTypeName("Perfect form")
+@JsonTypeName("Mana Resonance")
 @EqualsAndHashCode(callSuper = false)
-public class PerfectForm extends Talent {
+public class ManaResonance extends Talent {
 
-    public PerfectForm() {
-        this.name = "Perfect form";
-        this.description = "Increases attack speed by 4% per rank";
+    public ManaResonance() {
+        this.name = "Mana Resonance";
+        this.description = "Increases mana regeneration by 3% per rank (max 5 ranks)";
         this.levels = 5;
-        this.treeName = "Weaponmaster";
+        this.treeName = "Arcanist";
         this.talentType = TalentType.PASSIVE.getType();
-        this.tier = 2;
+        this.tier = 1;
         this.applyType = AttributeApplyType.DERIVED_STATS.getType();
 
         AttributeEffects attributeEffect =
-                new AttributeEffects(StatsTypes.ATTACK_SPEED.getType(), 4.0, null);
+                new AttributeEffects(StatsTypes.MP_REGEN.getType(), 0.03, null);
 
         this.attributeEffects = List.of(attributeEffect);
 
         AttributeRequirements attributeRequirements = new AttributeRequirements();
-        attributeRequirements.setRequirements(Map.of(ClassTypes.FIGHTER.getType(), 3));
+        attributeRequirements.setRequirements(Map.of(ClassTypes.MAGE.getType(), 1));
         attributeRequirements.setDependencies(List.of());
 
         this.attributeRequirements = attributeRequirements;

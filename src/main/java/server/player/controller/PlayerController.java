@@ -1,10 +1,12 @@
 package server.player.controller;
 
 import io.micronaut.http.annotation.*;
+import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import server.common.dto.Motion;
 import server.player.model.AccountCharactersResponse;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
@@ -43,4 +45,18 @@ public class PlayerController {
         // TODO: validation that character belongs to account
         playerCharacterService.deleteCharacter(actorId);
     }
+
+    @Patch(value = "/respawn-character/{actorId}")
+    public Single<Motion> respawnCharacter(@Header String accountName, String actorId) {
+        // TODO: validate request
+        return playerCharacterService.respawnPlayer(actorId);
+    }
+
+    @Post("/respawn-character")
+    public Character respawnCharacter(
+            @Body CreateCharacterRequest createCharacterRequest,
+            @Header String accountName) {
+        return playerCharacterService.createCharacter(createCharacterRequest, accountName);
+    }
+
 }

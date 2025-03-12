@@ -12,6 +12,7 @@ import server.attribute.stats.service.PlayerLevelStatsService;
 import server.attribute.stats.service.StatsService;
 import server.attribute.status.service.StatusService;
 import server.attribute.talents.service.TalentService;
+import server.common.dto.Motion;
 import server.items.equippable.service.EquipItemService;
 import server.items.inventory.service.InventoryService;
 import server.motion.service.PlayerMotionService;
@@ -19,7 +20,10 @@ import server.player.model.AccountCharactersResponse;
 import server.player.model.Character;
 import server.player.model.CreateCharacterRequest;
 import server.player.repository.PlayerCharacterRepository;
+import server.skills.repository.ActorSkillsRepository;
 import server.skills.service.CombatSkillsService;
+import server.socket.model.SocketMessage;
+import server.socket.service.integrations.motion.PlayerMotionIntegration;
 
 @Slf4j
 @Singleton
@@ -39,11 +43,21 @@ public class PlayerCharacterService {
 
     @Inject TalentService talentService;
 
+    @Inject
+    ActorSkillsRepository actorSkillsRepository;
+
     @Inject CombatSkillsService combatSkillsService;
 
     @Inject ActionbarService actionbarService;
 
     @Inject EquipItemService equipItemService;
+
+    @Inject
+    PlayerMotionIntegration playerMotionIntegration;
+
+    public Single<Motion> respawnPlayer(String actorId) {
+        return playerMotionIntegration.handleSimpleRespawn(actorId);
+    }
 
     public AccountCharactersResponse getAccountCharacters(String username) {
         List<Character> characterList = playerCharacterRepository.findByAccount(username);
@@ -118,9 +132,8 @@ public class PlayerCharacterService {
         playerMotionService.deletePlayerMotion(actorId).blockingSubscribe();
         playerCharacterRepository.deleteByActorId(actorId);
         statsService.deleteStatsFor(actorId).blockingSubscribe();
-        log.info("Deleting actor statuses: {}", actorId);
         statusService.deleteActorStatus(actorId).blockingSubscribe();
-        log.info("actor statuses deleted");
+        actorSkillsRepository.deleteActorSkills(actorId).blockingSubscribe();
         actionbarService.deleteActorActionbar(actorId).blockingSubscribe();
         equipItemService.deleteCharacterEquippedItems(actorId).blockingSubscribe();
         talentService.deleteActorTalents(actorId).blockingSubscribe();

@@ -68,8 +68,4 @@ public class SinglePlayerMotionUpdateListener {
         actorMotionService.relayForceUpdateActorMotion(motionMessage);
     }
 
-    @Topic("force-update-actor-motion-update")
-    void sendForceUpdateActorMotion(MotionMessage motionMessage) {
-        actorMotionService.handleRelayActorMotion(motionMessage);
-    }
 }

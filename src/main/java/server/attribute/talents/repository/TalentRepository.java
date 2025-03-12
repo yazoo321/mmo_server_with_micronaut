@@ -87,7 +87,7 @@ public class TalentRepository {
 
     public Single<Map<Talent, Integer>> getActorTalentsOfType(
             String actorId, TalentType talentType) {
-        // this will be called quite often as part of combat service, hence looking to optimise
+        // this is not called too often (only on talent learn) therefore does not require caching
         return getActorTalents(actorId)
                 .map(
                         actorTalents -> {
