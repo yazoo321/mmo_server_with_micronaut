@@ -52,15 +52,18 @@ public class CripplingBlows extends Talent {
             Integer level, TalentService talentService, Stats actorStats, Stats targetStats) {
         double chance = rand.nextDouble(1.0);
 
-        if (chance > 0.2) { // change to 0.2
-            // 20% chance to activate
+        if (chance > 0.2) {
             return;
         }
         Instant expire = Instant.now().plusMillis(3000); // lasts for 3 seconds
         String sourceId = actorStats.getActorId();
-        Double moveSpeedMultiplier = 0.8; // 20% reduction of speed
-        //        Status moveSlow = new MoveMod(expire, sourceId, moveSpeedMultiplier, 1,
-        // this.name);
+        ActorStatus actorStatus = getActorStatus(targetStats, expire, sourceId);
+
+        talentService.requestAddStatusToActor(actorStatus);
+    }
+
+    private ActorStatus getActorStatus(Stats targetStats, Instant expire, String sourceId) {
+        Double moveSpeedMultiplier = -0.02;
         Status moveSlow =
                 new AttributeMod(
                         expire,
@@ -73,7 +76,6 @@ public class CripplingBlows extends Talent {
         ActorStatus actorStatus = new ActorStatus();
         actorStatus.setActorId(targetStats.getActorId());
         actorStatus.setActorStatuses(Set.of(moveSlow));
-
-        talentService.requestAddStatusToActor(actorStatus);
+        return actorStatus;
     }
 }

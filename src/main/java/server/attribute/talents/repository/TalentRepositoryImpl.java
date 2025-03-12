@@ -20,6 +20,7 @@ import server.attribute.talents.model.ActorTalents;
 import server.attribute.talents.model.Talent;
 import server.attribute.talents.model.TalentTree;
 import server.attribute.talents.trees.fighter.weaponmaster.WeaponMasterTree;
+import server.attribute.talents.trees.mage.arcanist.ArcanistTree;
 import server.common.configuration.MongoConfiguration;
 
 @Slf4j
@@ -52,7 +53,9 @@ public class TalentRepositoryImpl {
 
     private void prepareTalents() {
         TalentTree weaponMasterTree = new WeaponMasterTree();
+        TalentTree arcanistTree = new ArcanistTree();
         talentTrees.put(weaponMasterTree.getName(), weaponMasterTree);
+        talentTrees.put(arcanistTree.getName(), arcanistTree);
         // put the rest of the available talent trees here
         talentTrees.forEach(
                 (k, v) ->

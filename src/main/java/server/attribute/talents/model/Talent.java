@@ -96,21 +96,3 @@ public abstract class Talent {
         return ableToLevel;
     }
 }
-
-//    public Talent(String name,
-//                  String description,
-//                  List<AttributeEffects> attributeEffects,
-//                  AttributeRequirements attributeRequirements,
-//                  Integer levels,
-//                  String treeName,
-//                  Integer tier,
-//                  String talentType) {
-//        this.name = name;
-//        this.description = description;
-//        this.attributeEffects = attributeEffects;
-//        this.attributeRequirements = attributeRequirements;
-//        this.levels = levels;
-//        this.treeName = treeName;
-//        this.tier = tier;
-//        this.talentType = talentType;
-//    }

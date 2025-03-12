@@ -56,11 +56,11 @@ public class DefaultSkillFactory implements SkillFactory {
         skillTypes.put("basic heal", BasicHeal.class);
         skillTypes.put("healing rain", HealingRain.class);
         skillTypes.put("vine grab", VineGrab.class);
-        skillTypes.put("blink", Blink.class);
         skillTypes.put("eclipse burst", EclipseBurst.class);
         skillTypes.put("moons vengeance", MoonsVengeance.class);
         skillTypes.put("sun smite", SunSmite.class);
 
+        skillTypes.put("blink", Blink.class);
         skillTypes.put("maim", Maim.class);
         skillTypes.put("rupture", Rupture.class);
         skillTypes.put("heavy strike", HeavyStrike.class);

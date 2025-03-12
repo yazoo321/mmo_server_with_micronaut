@@ -3,6 +3,7 @@ package server.socket.v2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -23,7 +24,7 @@ public class UDPServer {
 
     private static final int UDP_PORT = 9876;
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private static final ObjectReader reader = mapper.reader();
     private static final ObjectWriter writer = mapper.writer();
 

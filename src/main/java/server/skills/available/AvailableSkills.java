@@ -13,6 +13,7 @@ import server.skills.available.cleric.heals.HealingRain;
 import server.skills.available.fighter.HeavyStrike;
 import server.skills.available.fighter.Maim;
 import server.skills.available.fighter.Rupture;
+import server.skills.available.mage.arcane.Blink;
 import server.skills.available.mage.fire.Fireball;
 import server.skills.available.mage.nature.EclipseBurst;
 import server.skills.available.mage.nature.MoonsVengeance;
@@ -39,6 +40,7 @@ public class AvailableSkills {
         allSkills.put("moons vengeance", new MoonsVengeance());
         allSkills.put("sun smite", new SunSmite());
 
+        allSkills.put("blink", new Blink());
         allSkills.put("maim", new Maim());
         allSkills.put("rupture", new Rupture());
         allSkills.put("heavy strike", new HeavyStrike());
