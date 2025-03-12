@@ -26,7 +26,7 @@ public class PerfectForm extends Talent {
         this.levels = 5;
         this.treeName = "Weaponmaster";
         this.talentType = TalentType.PASSIVE.getType();
-        this.tier = 2;
+        this.tier = 1;
         this.applyType = AttributeApplyType.DERIVED_STATS.getType();
 
         AttributeEffects attributeEffect =

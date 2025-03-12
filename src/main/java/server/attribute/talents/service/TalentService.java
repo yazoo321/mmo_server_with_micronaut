@@ -39,10 +39,6 @@ public class TalentService {
         talentProducer.requestAddStatusToActor(actorStatus);
     }
 
-    public void requestStatChange(DamageSource damageSource) {
-        talentProducer.requestFlatChange(damageSource);
-    }
-
     public void fetchAllTalentTreeNames(WebSocketSession session) {
         List<String> talentTreeNames = talentRepository.getTalentTreeNames().stream().toList();
 
@@ -54,6 +50,10 @@ public class TalentService {
         response.setTalentData(talentData);
 
         session.send(response).subscribe(socketResponseSubscriber);
+    }
+
+    public void requestStatChange(DamageSource damageSource) {
+        talentProducer.requestFlatChange(damageSource);
     }
 
     public void fetchAllTalentsForTree(WebSocketSession session, String treeName) {
@@ -232,6 +232,17 @@ public class TalentService {
                             talentProducer.requestTalentLearn(actorTalentAttributeEffects);
                         })
                 .subscribe();
+
+        //        // we need to merge this with stats
+        //        ActorTalentAttributeEffects effects = new ActorTalentAttributeEffects();
+        //        effects.setActorId(actorId);
+        //        effects.setAttributeEffects(new ArrayList<>());
+        //
+        //        learnedTalent.getAttributeEffects().forEach(effect -> {
+        //            AttributeEffects attributeEffects = new AttributeEffects(effect, level);
+        //            effects.getAttributeEffects().add(attributeEffects);
+        //        });
+
     }
 
     private void handleLearnTalent(

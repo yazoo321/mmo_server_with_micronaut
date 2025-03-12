@@ -98,9 +98,8 @@ public abstract class ChannelledSkill extends ActiveSkill {
                 () -> {
                     if (channelingInProgress()) {
                         notifyStopChannel(combatData.getActorId(), true);
-                        this.travel(combatData, skillTarget);
                         updateSessionInitiateSkill(combatData.getActorId(), skillTarget);
-
+                        this.travel(combatData, skillTarget);
                     }
                     combatData.setCombatState(CombatState.IDLE.getType()); // Reset combat state
                     channelingTask.cancel(true); // Stop the periodic check

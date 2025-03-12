@@ -1,7 +1,6 @@
 package server.socket.service.integrations.motion;
 
 import io.micronaut.websocket.WebSocketSession;
-import io.reactivex.rxjava3.core.Single;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import server.attribute.stats.service.StatsService;
@@ -66,24 +65,4 @@ public class PlayerMotionIntegration {
                 .subscribe();
     }
 
-
-    // Used for getting uns
-    public Single<Motion> handleSimpleRespawn(String actorId) {
-        return actorMotionRepository.fetchActorMotion(actorId)
-                .map(playerMotion -> {
-                    Motion motion = respawnPoints.getRespawnPointFor(playerMotion, "nearest");
-
-                    PlayerMotion updatedPlayerMotion = new PlayerMotion();
-                    updatedPlayerMotion.setActorId(actorId);
-                    updatedPlayerMotion.setMotion(motion);
-                    updatedPlayerMotion.setIsOnline(true);
-                    updatedPlayerMotion.setUpdatedAt(Instant.now());
-
-                    actorMotionRepository.updateActorMotion(actorId, motion);
-                    statusService.removeAllStatuses(actorId).subscribe();
-                    statsService.resetHPAndMP(actorId, 0.7, 0.7);
-
-                    return motion;
-                });
-    }
 }

@@ -50,7 +50,11 @@ public class SunderingStrikes extends Talent {
         Instant expire = Instant.now().plusMillis(5000); // lasts for 5 seconds
         String sourceActor = actorStats.getActorId();
 
-        double armorReduction = -(0.05 * level);
+        double armorReduction = 0.05 * level;
+        armorReduction = 1 - armorReduction;
+
+        //        Status armorReduce = new ArmorMod(expire, sourceActor, armorReduction, 1,
+        // this.name);
         Status armorReduce =
                 new AttributeMod(
                         expire, sourceActor, StatsTypes.DEF, 0.0, armorReduction, 1, this.name);
